@@ -104,6 +104,8 @@ public class InputMapper : EditorWindow
 
 
 
+
+
 		}
 		
 		static void generateCSharpStatesEnum (string namespaceName, string enumName, string fileName, StringBuilder statesStringBuilder)
@@ -246,12 +248,15 @@ public class InputMapper : EditorWindow
 				if (path != null && path.Length > 1) {
 						//Debug.Log ("Before..." + _stateInputCombinations.Count+" inputmngr "+InputManager.Settings.stateInputs.Count);
 						generateCSharpStatesEnum (_namespace, _enumName, _enumFileName, filterInputStates ());
+						
+			          	
 						InputManager.saveSettings (path);
 
-						Debug.Log ("AfterSave..." + _stateInputCombinations.Count+" inputmngr "+InputManager.Settings.stateInputs.Count+"to path:"+path);
+						//Debug.Log ("AfterSave..." + _stateInputCombinations.Count+" inputmngr "+InputManager.Settings.stateInputs.Count+"to path:"+path);
 
+						
 						loadTextAsset (path);
-						Debug.Log ("Loading Text asset"+settingsXML.name+" "+path);
+						//Debug.Log ("Loading Text asset"+settingsXML.name+" "+path);
 				}
 		}
 
@@ -588,11 +593,15 @@ public class InputMapper : EditorWindow
 						_selectedStateHash = 0;
 
 
+			if(!Directory.Exists(Application.streamingAssetsPath))
+			{
+				Directory.CreateDirectory(Application.streamingAssetsPath);
+			}
 
 						if (settingsXML != null)
-								saveInputSettings (Path.Combine(Application.dataPath, AssetDatabase.GetAssetPath (settingsXML)));
+								saveInputSettings (Path.Combine(Application.streamingAssetsPath,settingsXML.name+".xml"));
 						else
-								saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", "", "", "xml"));
+								saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", Application.streamingAssetsPath, "InputSettings", "xml"));
 
 						return;
 

@@ -63,7 +63,6 @@
      <Compile Include="Assets\Scripts\ws\winx\input\InputProcessor.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\InputState.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\KeyCodeExtension.cs" />
-     <Compile Include="Assets\Scripts\ws\winx\input\states\CharacterInputController.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\states\States.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\HIDDeviceInfo.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\IDeviceCollection.cs" />
@@ -77,9 +76,9 @@
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\WinHIDInterface.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\WinMMDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\XInputDriver.cs" />
+     <None Include="Assets\StreamingAssets\test.xml" />
      <None Include="Assets\Necromancer GUI\Kingthings.txt" />
      <None Include="Assets\Necromancer GUI\Readme.txt" />
-     <None Include="Assets\test.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

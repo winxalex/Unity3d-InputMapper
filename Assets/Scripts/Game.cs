@@ -29,6 +29,7 @@ public class Game : MonoBehaviour {
 
 			//Debug.Log(Application.persistentDataPath);
 
+
 			InputManager.AddDriver(new XInputDriver());
 
 //			InputManager.AddStateInput("My State1",new InputCombination(KeyCodeExtension.toCode(Joysticks.Joystick1,JoystickAxis.AxisPovX,JoystickPovPosition.Forward),(int)KeyCode.Joystick4Button9,(int)KeyCode.P,(int)KeyCode.JoystickButton0));
@@ -52,7 +53,7 @@ public class Game : MonoBehaviour {
 			//driver.GetInput();
 
 
-		
+	
 //			if(InputManager.GetInput((int)CharacterInputControllerClass.States.Base_Layer_Walk_Forward,false,false)){
 //				Debug.Log("Hold down");
 //			}

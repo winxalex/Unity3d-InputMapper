@@ -73,7 +73,8 @@ namespace ws.winx.gui
 		/// </summary>
 		void saveInputSettings ()
 		{
-			InputManager.saveSettings(Path.Combine(Application.dataPath,settingsXML.name+".xml"));
+
+			InputManager.saveSettings(Path.Combine(Application.streamingAssetsPath,settingsXML.name+".xml"));
 
 		}
 
@@ -82,8 +83,10 @@ namespace ws.winx.gui
 		/// Loads the input settings.
 		/// </summary>
 		void loadInputSettings(){
+
+			//Path.Combine(Application.streamingAssetsPath, settingsXML.name+".xml");
 			 
-			_stateInputCombinations=InputManager.loadSettings(Path.Combine(Application.dataPath,settingsXML.name+".xml")).stateInputs;
+			_stateInputCombinations=InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath,settingsXML.name+".xml")).stateInputs;
 		}
 
 
