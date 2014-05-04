@@ -164,14 +164,14 @@ namespace ws.winx.input
 						int inx;
 			
 			
-			
+			            //Button found
 						if ((inx = code.IndexOf ("Bu")) > -1) {
 								return toCode ((Joysticks)Enum.Parse (typeof(Joysticks), code.Substring (0, inx)), JoystickAxis.None, Convert.ToInt32 (code.Substring (inx + 6, code.Length - (inx + 6))));
-						} else if ((inx = code.IndexOf ("Pov")) > -1) {
+						} else if ((inx = code.IndexOf ("Pov")) > -1) {//found POV
 								return toCode ((Joysticks)Enum.Parse (typeof(Joysticks), code.Substring (0, inx - 4)),
 				               (JoystickAxis)Enum.Parse (typeof(JoystickAxis), code.Substring (inx - 4, 8)),
-				               ((int)(JoystickPovPosition)Enum.Parse (typeof(JoystickPovPosition), code.Substring (inx + 4, code.Length - (inx + 4)))) / 9000 - 1);
-						} else if ((inx = code.IndexOf ("A")) > -1) {
+				               ((int)(JoystickPovPosition)Enum.Parse (typeof(JoystickPovPosition), code.Substring (inx + 4, code.Length - (inx + 4)))) / (int)JoystickPovPosition.Right - 1);
+						} else if ((inx = code.IndexOf ("A")) > -1) {//found Axis
 								return toCode ((Joysticks)Enum.Parse (typeof(Joysticks), code.Substring (0, inx)),
 				               (JoystickAxis)Enum.Parse (typeof(JoystickAxis), code.Substring (inx, 5)),
 				               (int)(JoystickPosition)Enum.Parse (typeof(JoystickPosition), code.Substring (inx + 5, code.Length - (inx + 5))));

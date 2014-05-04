@@ -139,10 +139,9 @@ namespace ws.winx.platform.windows
 		//public void Update (IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension> joystick)
 		{
 			           
-            //don't update in same frame twice
-//            if (_lastFrameNum == Time.frameCount)
-//                return;
-//			else _lastFrameNum=Time.frameCount;
+
+
+		//	UnityEngine.Debug.Log("Update Joy"+joystick.ID);
 
             //thru to get joystick info
             JoystickError result = UnsafeNativeMethods.joyGetPosEx(joystick.ID, ref info);
@@ -206,19 +205,23 @@ namespace ws.winx.platform.windows
                     int x = 0;
                     int y = 0;
 
-                    if ((JoystickPovPosition)info.Pov != JoystickPovPosition.Centered)
+
+				//	UnityEngine.Debug.Log("Pov is"+info.Pov);
+
+
+					if ((JoystickPovPosition)info.Pov != JoystickPovPosition.Centered)
                     {
-                        if (info.Pov > (int)JoystickPovPosition.Left || info.Pov < (int)JoystickPovPosition.Right)
+						if (info.Pov > (ushort)JoystickPovPosition.Left || info.Pov < (ushort)JoystickPovPosition.Right)
                         { y = 1; }
                         if ((info.Pov > 0) && (info.Pov < (int)JoystickPovPosition.Backward))
                         { x = 1; }
-                        if ((info.Pov > (int)JoystickPovPosition.Right) && (info.Pov < (int)JoystickPovPosition.Left))
+						if ((info.Pov > (ushort)JoystickPovPosition.Right) && (info.Pov < (ushort)JoystickPovPosition.Left))
                         { y = -1; }
-                        if (info.Pov > (int)JoystickPovPosition.Backward)
+						if (info.Pov > (ushort)JoystickPovPosition.Backward)
                         { x = -1; }
                     }
 
-
+					//UnityEngine.Debug.Log(x+" "+y);
                     joystick.Axis[JoystickAxis.AxisPovX].value = x;
                     joystick.Axis[JoystickAxis.AxisPovY].value = y;
 
@@ -507,7 +510,7 @@ namespace ws.winx.platform.windows
         }
 
         [Flags]
-        enum JoystickFlags
+        enum JoystickFlags//:uint
         {
             X = 0x1,
             Y = 0x2,
@@ -517,7 +520,8 @@ namespace ws.winx.platform.windows
             V = 0x20,
             Pov = 0x40,
             Buttons = 0x80,
-            All = X | Y | Z | R | U | V | Pov | Buttons
+//			JOY_RETURNCENTERED=0x00000400,
+			All = X | Y | Z | R | U | V | Pov | Buttons
         }
 
 
@@ -537,7 +541,7 @@ namespace ws.winx.platform.windows
             public int VPos;
             public uint Buttons;
             public uint ButtonNumber;
-            public int Pov;
+            public ushort Pov;
             uint Reserved1;
             uint Reserved2;
             public static readonly int SizeInBytes;

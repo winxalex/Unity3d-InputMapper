@@ -131,12 +131,16 @@ namespace ws.winx.devices
         public void Update()
         {
 
-            if (_lastFrameNum == Time.frameCount)
-                return;
-            else 
-                _lastFrameNum = Time.frameCount;
+//            if (_lastFrameNum == Time.frameCount){
+//                return;
+//			}
+//            else{ 
+//                _lastFrameNum = Time.frameCount+0;
+//
+//           		 driver.Update(this);// as IJoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension>);
+//			}
 
-            driver.Update(this);// as IJoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension>);
+			driver.Update(this);
 
         }
 
@@ -506,7 +510,7 @@ namespace ws.winx.devices
 							if (axis_collection [JoystickAxis.AxisPovX].buttonState == JoystickButtonState.Down )
 							{
 							    if(axis_collection[JoystickAxis.AxisPovX].value>0)
-									return KeyCodeExtension.toCode ((Joysticks)ID, JoystickAxis.AxisPovY,JoystickPovPosition.Right );
+									return KeyCodeExtension.toCode ((Joysticks)ID, JoystickAxis.AxisPovX,JoystickPovPosition.Right );
 				                else
 									return KeyCodeExtension.toCode ((Joysticks)ID, JoystickAxis.AxisPovX,JoystickPovPosition.Left );
 			                }
@@ -516,7 +520,7 @@ namespace ws.winx.devices
 								if(axis_collection[JoystickAxis.AxisPovY].value>0)
 									return KeyCodeExtension.toCode ((Joysticks)ID, JoystickAxis.AxisPovY,JoystickPovPosition.Forward );
 								else
-									return KeyCodeExtension.toCode ((Joysticks)ID, JoystickAxis.AxisPovX,JoystickPovPosition.Backward );
+									return KeyCodeExtension.toCode ((Joysticks)ID, JoystickAxis.AxisPovY,JoystickPovPosition.Backward );
 							}
 
 					

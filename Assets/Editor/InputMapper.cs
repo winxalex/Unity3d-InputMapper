@@ -248,10 +248,10 @@ public class InputMapper : EditorWindow
 						generateCSharpStatesEnum (_namespace, _enumName, _enumFileName, filterInputStates ());
 						InputManager.saveSettings (path);
 
-						//Debug.Log ("AfterSave..." + _stateInputCombinations.Count+" inputmngr "+InputManager.Settings.stateInputs.Count);
+						Debug.Log ("AfterSave..." + _stateInputCombinations.Count+" inputmngr "+InputManager.Settings.stateInputs.Count+"to path:"+path);
 
 						loadTextAsset (path);
-						//Debug.Log ("Loading Text asset"+settingsXML.name+" "+path);
+						Debug.Log ("Loading Text asset"+settingsXML.name+" "+path);
 				}
 		}
 
@@ -566,11 +566,16 @@ public class InputMapper : EditorWindow
 
 				if (_selectedStateHash == 0 && GUILayout.Button ("Open")) {
 						string path = EditorUtility.OpenFilePanel ("Open XML Input Settings file", "", "xml");
-						loadInputSettings (path);
+
+					if(path.Length>0){
+			  			 loadInputSettings (path);
 
 						loadTextAsset (path);
 				
 						_settingsLoaded = true;
+					}
+
+
 						return;
 				}
 
@@ -582,8 +587,10 @@ public class InputMapper : EditorWindow
 						EditorGUIUtility.keyboardControl = 0;
 						_selectedStateHash = 0;
 
+
+
 						if (settingsXML != null)
-								saveInputSettings (AssetDatabase.GetAssetPath (settingsXML));
+								saveInputSettings (Path.Combine(Application.dataPath, AssetDatabase.GetAssetPath (settingsXML)));
 						else
 								saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", "", "", "xml"));
 
@@ -626,9 +633,7 @@ public class InputMapper : EditorWindow
 				EditorGUILayout.Separator ();
 
 
-				if (_lastController != controller) {
-						_showLayer = new bool[controller.layerCount];
-				}
+				
 
 
 				
@@ -640,6 +645,8 @@ public class InputMapper : EditorWindow
 
 						numLayers = ac.layerCount;
 
+			if(_showLayer==null || _showLayer.Length!=numLayers)
+				_showLayer = new bool[controller.layerCount];
 					   
 				
 						for (; i<numLayers; i++) {

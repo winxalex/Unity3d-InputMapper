@@ -126,7 +126,9 @@ using UnityEngine;
 			{
 				
                 //!!! Make your own recognition of XBOX Devices
-				if(info.PID!=64206 || info.VID!=65261) return null;
+		        //if(info.PID!=64206 || info.VID!=65261) return null;
+
+		       return null;
 
                 JoystickDevice joystick;
                 int inx = 0;
