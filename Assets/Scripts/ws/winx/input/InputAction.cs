@@ -107,7 +107,7 @@ namespace ws.winx.input
 				if(KeyCodeExtension.toJoystickID(code)==(int)Joysticks.Joystick) _fromAny=true;
 
 
-			Debug.Log("From Any:"+_fromAny);
+			//Debug.Log("From Any:"+_fromAny);
 			__defaultCode=_code=code;
 			__defaultType=_type=type;
 
@@ -153,7 +153,7 @@ namespace ws.winx.input
 		public InputAction(String code){
 			_codeString=code;
 			parse(code);
-			Debug.Log("From Any:"+_fromAny);
+//			Debug.Log("From Any:"+_fromAny);
 		}
 
 

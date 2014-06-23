@@ -191,7 +191,7 @@ namespace ws.winx.input
 				/// <param name="data">Data.</param>
 				public static int toCode (Joysticks joy, JoystickAxis axis, int data)
 				{
-						UnityEngine.Debug.Log("Test"+joy+" "+axis+" "+data);
+//						UnityEngine.Debug.Log("Test"+joy+" "+axis+" "+data);
 						return KeyCodeExtension.MAX_KEY_CODE + ((((int)joy << CODE_AXIS_SHIFT | (int)axis) << CODE_DATA_SHIFT) | data);
 				}
 

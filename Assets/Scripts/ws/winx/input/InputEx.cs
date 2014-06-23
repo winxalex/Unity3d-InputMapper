@@ -559,7 +559,7 @@ namespace ws.winx.input
 						//take new pressed code as lastCode
 						_lastCode=code;
 						
-						Debug.Log("Single "+time+":"+_lastCodeTime+" "+InputActionType.SINGLE);
+//						Debug.Log("Single "+time+":"+_lastCodeTime+" "+InputActionType.SINGLE);
 						
 						
 						
@@ -570,7 +570,7 @@ namespace ws.winx.input
 						{
 							action= new InputAction(_lastCode,InputActionType.DOUBLE);
 							_lastCode=0;//KeyCode.None;
-							Debug.Log("Double "+time+":"+_lastCodeTime+"<"+InputActionType.DOUBLE);
+//							Debug.Log("Double "+time+":"+_lastCodeTime+"<"+InputActionType.DOUBLE);
 						}
 						
 						
@@ -589,14 +589,14 @@ namespace ws.winx.input
 						if(time-_lastCodeTime>=InputAction.LONG_CLICK_SENSITIVITY){
 							action=new InputAction(_lastCode,InputActionType.LONG);
 							_lastCode = 0;//KeyCode.None;
-							Debug.Log("Long "+(time-_lastCodeTime)+" "+InputActionType.LONG);
+	//						Debug.Log("Long "+(time-_lastCodeTime)+" "+InputActionType.LONG);
 						}
 					}else{//time wating for double click activity passed => display last code
 						if(time-_lastCodeTime>=InputAction.DOUBLE_CLICK_SENSITIVITY){
 							action=new InputAction(_lastCode,InputActionType.SINGLE);
 							_lastCode = 0;//KeyCode.None;
 							
-							Debug.Log("Single after wating Double time pass "+(time-_lastCodeTime)+" "+InputActionType.SINGLE);
+//							Debug.Log("Single after wating Double time pass "+(time-_lastCodeTime)+" "+InputActionType.SINGLE);
 						}
 						
 					}

@@ -14,6 +14,7 @@ using ws.winx.devices;
 namespace ws.winx{
 public class Game : MonoBehaviour {
 
+// What if you have 50 states. Would you need to define them manually. => Forget it about this
 //		static int idleState = Animator.StringToHash("Base Layer.Idle");	
 //		static int locoState = Animator.StringToHash("Base Layer.Locomotion");			// these integers are references to our animator's states
 //		static int jumpState = Animator.StringToHash("Base Layer.Jump");				// and are used to check state for various actions to occur
@@ -22,25 +23,27 @@ public class Game : MonoBehaviour {
 //		static int rollState = Animator.StringToHash("Base Layer.Roll");
 //		static int waveState = Animator.StringToHash("Layer2.Wave");
 
+		Animator animator;
+
 
 
 	// Use this for initialization
 	void Start () {
 
-			//Debug.Log(Application.persistentDataPath);
 
+			// initialising reference variables
+			animator = GetComponent<Animator>();	
 
+			//supporting devices with custom drivers
 			InputManager.AddDriver(new XInputDriver());
 
+			//adding input-states pairs manually
 //			InputManager.AddStateInput("My State1",new InputCombination(KeyCodeExtension.toCode(Joysticks.Joystick1,JoystickAxis.AxisPovX,JoystickPovPosition.Forward),(int)KeyCode.Joystick4Button9,(int)KeyCode.P,(int)KeyCode.JoystickButton0));
 //			InputManager.AddStateInput("My State2",new InputCombination(KeyCode.Joystick4Button9,KeyCode.P,KeyCode.JoystickButton0));
 //			InputManager.AddStateInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
 //			InputManager.AddStateInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
 //			InputManager.AddStateInput("My State2","Joystick10AxisPovXForward(-)+C(x2)");
-			//InputManager.saveSettings(Path.Combine(Application.dataPath,"InputSettings.xml"));
-
-//			Debug.Log(InputManager.Log());
-
+		
 
 
 
@@ -50,9 +53,13 @@ public class Game : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-			//driver.GetInput();
 
+		
+			//animator.Play(" ");
 
+//			if(InputManager.GetInput((int)States.Walk_Forward,false)){
+//
+//			}
 	
 //			if(InputManager.GetInput((int)CharacterInputControllerClass.States.Base_Layer_Walk_Forward,false,false)){
 //				Debug.Log("Hold down");

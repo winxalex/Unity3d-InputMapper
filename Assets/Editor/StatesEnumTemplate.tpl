@@ -4,7 +4,7 @@
 
 namespace <#= Namespace #>{
    
-  public enum <#= EnumName #>{
+  public enum <#= EnumName #>:int{
 	<#= Values #>
 	
   }

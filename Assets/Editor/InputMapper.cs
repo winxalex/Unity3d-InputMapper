@@ -183,10 +183,17 @@ public class InputMapper : EditorWindow
 		{
 				Uri fullPath = new Uri (path, UriKind.Absolute);
 				Uri relRoot = new Uri (Application.dataPath, UriKind.Absolute);
-		
-				_lastSettingsXML = settingsXML = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri (fullPath).ToString (), typeof(TextAsset)) as TextAsset;
 
-		}
+		AssetDatabase.ImportAsset(relRoot.MakeRelativeUri(fullPath).ToString(),ImportAssetOptions.ForceUpdate);
+
+				
+				_lastSettingsXML = settingsXML = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri(fullPath).ToString(), typeof(TextAsset)) as TextAsset;
+
+		_lastSettingsXML = settingsXML = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri(fullPath).ToString(), typeof(TextAsset)) as TextAsset;
+		//Debug.Log ("Loading Text asset"+settingsXML.name+" from "+path+" full path:"+ fullPath+" rell:"+relRoot+"relativePath:"+relRoot.MakeRelativeUri(fullPath).ToString());
+
+	
+	}
 	
 	
 		///////////////////////////////        LOAD INPUT SETTINGS          //////////////////////
@@ -253,10 +260,10 @@ public class InputMapper : EditorWindow
 						InputManager.saveSettings (path);
 
 						//Debug.Log ("AfterSave..." + _stateInputCombinations.Count+" inputmngr "+InputManager.Settings.stateInputs.Count+"to path:"+path);
-
 						
+
 						loadTextAsset (path);
-						//Debug.Log ("Loading Text asset"+settingsXML.name+" "+path);
+						
 				}
 		}
 
@@ -443,7 +450,7 @@ public class InputMapper : EditorWindow
 				
 				
 				
-								Debug.Log ("Action:" + _action + " " + _action.code);
+//								Debug.Log ("Action:" + _action + " " + _action.code);
 						}
 			
 			

@@ -157,7 +157,7 @@ namespace ws.winx.input
 			//DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<int,InputCombination[]>),"Inputs","");
 			DataContractSerializer serializer = new DataContractSerializer(typeof(InputSettings),"Inputs","");
 			XmlReaderSettings xmlSettings=new XmlReaderSettings();
-
+			xmlSettings.CloseInput=true;
 			xmlSettings.IgnoreWhitespace=true;
 			
 			using(XmlReader reader=XmlReader.Create(path,xmlSettings))
@@ -181,9 +181,15 @@ namespace ws.winx.input
 
 			XmlWriterSettings xmlSettings=new XmlWriterSettings();
 			xmlSettings.Indent=true;
+			xmlSettings.CloseOutput=true;//this would close stream after write 
 		//	xmlSettings.IndentChars="\t";
 		//	xmlSettings.NewLineOnAttributes = false;
 		//	xmlSettings.OmitXmlDeclaration = true;
+
+
+
+
+
 			using(XmlWriter writer=XmlWriter.Create(path,xmlSettings))
 			{
 				//serializer.WriteObject(writer, __settings.stateInputs);
@@ -192,8 +198,11 @@ namespace ws.winx.input
 				//Write the XML to file and close the writer.
 				writer.Flush();
 				writer.Close(); 
-				
+
+
 			}
+
+
 
 		}
 
@@ -208,7 +217,7 @@ namespace ws.winx.input
         //}
 
 		/// <summary>
-		/// Gets the input of real of virutal axis(2keys used as axis) mapped to State.
+		/// Gets the input of real or virutal axis(2keys used as axis) mapped to State.
 		/// </summary>
 		/// <returns>The input.</returns>
 		/// <param name="stateNameHash">State name hash.</param>
