@@ -59,7 +59,7 @@
      <Compile Include="Assets\Scripts\ws\winx\input\InputActionType.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\InputCombination.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\InputEvent.cs" />
-     <Compile Include="Assets\Scripts\ws\winx\input\InputEventManagerBehaviour.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\input\InputEventDispatcherBehaviour.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\InputEx.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\InputManager.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\InputProcessor.cs" />

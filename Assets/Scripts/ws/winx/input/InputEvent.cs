@@ -29,24 +29,17 @@ namespace ws.winx.input
         public InputEvent(int stateNameHash)
         {
             _stateNameHash = stateNameHash;
+
+           
         }
 
         public InputEvent(string stateName)
         {
-            _stateNameHash = Animator.StringToHash(stateName);
+           _stateNameHash=Animator.StringToHash(stateName);
         }
 
 
-        protected void CreateGameObjectLooper()
-        {
-            if (_container == null)
-            {
-                _container = new GameObject("InputEventManagerBehaviour");
-
-                InputEventManagerBehaviour w = _container.AddComponent<InputEventManagerBehaviour>();
-                w.Events = InputEvent.Events;
-            }
-        }
+       
 
 
 
@@ -132,6 +125,18 @@ namespace ws.winx.input
                 Events[key][inx] = value;
 
             }
+
+
+            //Create watcher of input and dispatcher of events
+            if (_container == null)
+            {
+                _container = new GameObject("InputEventManagerBehaviour");
+
+                InputEventDispatcherBehaviour w = _container.AddComponent<InputEventDispatcherBehaviour>();
+                w.Events = InputEvent.Events;
+            }
+
+
         }
 
 
@@ -152,10 +157,7 @@ namespace ws.winx.input
 
         public void Dispose()
         {
-            if(_container)
-            UnityEngine.Object.Destroy(_container);
-
-            _container = null;
+       
 
             if (InputEvent.Events != null)
             {

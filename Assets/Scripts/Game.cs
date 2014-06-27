@@ -46,7 +46,7 @@ public class Game : MonoBehaviour {
 
 
         //Add state and event 
-            InputManager.AddStateInput("Click_W+C_State", "W+C");
+            InputManager.AddStateInput("Click_W+C_State", "W");
 
             InputEvent ev = new InputEvent("Click_W+C_State");
         
