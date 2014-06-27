@@ -225,7 +225,7 @@ namespace ws.winx.input
 				   //process code ("Q(-)","W(x2)"...same with joys.. and if code and type are ok go in
 				   || ((action=InputEx.processInput(code,Time.time))!=null
 							&& action.code==_pointer.Current.code && action.type==_pointer.Current.type)){
-					UnityEngine.Debug.Log("CODE:"+_pointer.Current.codeString+" Action:"+action);
+	//				UnityEngine.Debug.Log("CODE:"+_pointer.Current.codeString+" Action:"+action);
 
 							   //save time when action happened if not saved or reseted
 								if(__lastInputTime==0){__lastInputTime=Time.time;}
@@ -249,12 +249,12 @@ namespace ws.winx.input
 									_pointer.MoveNext();//start from beginin
 									__lastInputTime=0;
 
-						UnityEngine.Debug.Log("Reset Time Cos Time Pass:"+Time.time+" Time Allowed:"+(__lastInputTime+InputAction.COMBINATION_CLICK_SENSITIVITY));
+	//					UnityEngine.Debug.Log("Reset Time Cos Time Pass:"+Time.time+" Time Allowed:"+(__lastInputTime+InputAction.COMBINATION_CLICK_SENSITIVITY));
 
 								}
 
 
-								UnityEngine.Debug.Log("CodeAfter:"+_pointer.Current.codeString);
+//								UnityEngine.Debug.Log("CodeAfter:"+_pointer.Current.codeString);
 
 					return false;
 							}
@@ -263,7 +263,7 @@ namespace ws.winx.input
 						if((__lastInputTime>0 && Time.time>__lastInputTime+InputAction.COMBINATION_CLICK_SENSITIVITY)
 				   ||  (InputEx.anyKeyDown && code==0)){
 
-						UnityEngine.Debug.Log("Reset in Idle or another key pressed"+Time.time+" Time Allowed:"+(__lastInputTime+InputAction.COMBINATION_CLICK_SENSITIVITY)+"code:"+code);
+//						UnityEngine.Debug.Log("Reset in Idle or another key pressed"+Time.time+" Time Allowed:"+(__lastInputTime+InputAction.COMBINATION_CLICK_SENSITIVITY)+"code:"+code);
 
 						_pointer=_actionsList.GetEnumerator();//Reset pointer
 						_pointer.MoveNext();//start from beginin

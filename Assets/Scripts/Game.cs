@@ -42,14 +42,41 @@ public class Game : MonoBehaviour {
 //			InputManager.AddStateInput("My State2",new InputCombination(KeyCode.Joystick4Button9,KeyCode.P,KeyCode.JoystickButton0));
 //			InputManager.AddStateInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
 //			InputManager.AddStateInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
-//			InputManager.AddStateInput("My State2","Joystick10AxisPovXForward(-)+C(x2)");
-		
+//			
 
 
+        //Add state and event 
+            InputManager.AddStateInput("Click_W+C_State", "W+C");
 
+            InputEvent ev = new InputEvent("Click_W+C_State");
+        
+			ev.CONT+=new EventHandler<EventArgs>(Handle1);
+            ev.CONT+= new EventHandler<EventArgs>(Handle2);
+            ev.UP += new EventHandler<EventArgs>(onUp);
+            ev.DOWN += new EventHandler<EventArgs>(onDown);
 	}
 
-	
+
+    void onUp(object o, EventArgs args)
+    {
+        Debug.Log("Up");
+    }
+
+    void onDown(object o, EventArgs args)
+    {
+        Debug.Log("Down");
+    }
+
+    void Handle1(object o, EventArgs args)
+    {
+        Debug.Log("Handle1");
+    }
+
+    void Handle2(object o, EventArgs args)
+    {
+        Debug.Log("Handle2");
+    }
+
 	
 	// Update is called once per frame
 	void Update () {

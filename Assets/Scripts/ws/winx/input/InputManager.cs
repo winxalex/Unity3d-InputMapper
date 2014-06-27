@@ -9,6 +9,7 @@
 //------------------------------------------------------------------------------
 using System;
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -16,6 +17,7 @@ using System.IO;
 using System.Xml;
 using System.Text;
 using ws.winx.platform;
+using System.ComponentModel;
 
 namespace ws.winx.input
 {
@@ -148,7 +150,90 @@ namespace ws.winx.input
 		}
 
 
-       
+        //private EventHandlerList _events;
+        //protected EventHandlerList Events
+        //{
+        //    get
+        //    {
+        //        if (_events == null)
+        //            _events = new EventHandlerList();
+        //        return _events;
+        //    }
+			
+        //}
+
+
+        //private static event EventHandler MyPrivateEvent;
+
+        ////public event EventHandler<EventArgs> MyCustomEvent;
+        //public static event EventHandler MyEvent
+        //{
+        //    add
+        //    {
+        //        Debug.WriteLine("Attaching To MyEvent");
+        //        MyPrivateEvent += value;
+        //    }
+        //    remove
+        //    {
+        //        MyPrivateEvent -= value;
+        //        Debug.WriteLine("Detaching From MyEvent");
+        //    }
+        //}
+
+
+        //protected void OnMyCustomEvent(EventArgs e)
+        //{
+        //    EventHandler<EventArgs> handler = Events[MyCustomEventKey] as EventHandler<EventArgs>;
+			
+        //    if (handler != null)
+        //        handler(this, e);
+        //}
+
+
+        //public static void AddInputHandler(InputCombination combination,Action handler,bool atOnce=false){
+        //    var go = new GameObject("Waiter");
+        //    var w = go.AddComponent<ConditionalBehaviour>();
+        //    w.combo = combination;
+        //    w.Action = action;
+        //    w.atOnce=atOnce;
+        //}
+		
+		
+        //class ConditionalBehaviour : MonoBehaviour
+        //{
+        //    public float SinceAlive;
+			
+        //    public Action Action;
+        //    public InputCombination combo;
+        //    public bool atOnce;
+
+        //    void onEnable(){
+        //        StartCoroutine(Run);
+        //    }
+
+        //    void onDisable(){
+        //        StopCoroutine(Run);
+        //    }
+
+        //    IEnumerator Run(){
+
+        //        while(true){
+
+        //            if(combo.GetInput(atOnce)){
+        //                if (Action != null) Action();
+
+        //            }
+
+        //            yield return null;
+        //        }
+        //    }
+			
+
+        //}
+
+		
+		
+		
 		/// <summary>
 		/// Loads the Input settings from InputSettings.xml and deserialize into OO structure.
 		/// Create your .xml settings with InputMapper Editor
@@ -230,7 +315,7 @@ namespace ws.winx.input
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
 
 
-			return __inputCombinations[0].GetAxis(sensitivity,dreadzone,gravity) + (__inputCombinations.Length==2 ? __inputCombinations[1].GetAxis(sensitivity,dreadzone,gravity):0);
+            return __inputCombinations[0].GetAxis(sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetAxis(sensitivity, dreadzone, gravity) : 0);
 
 		}
 
@@ -242,7 +327,7 @@ namespace ws.winx.input
 		/// <param name="atOnce">If set to <c>true</c> at once.</param>
 		public static bool GetInput(int stateNameHash,bool atOnce=false){
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
-			return __inputCombinations[0].GetInput(atOnce) || (__inputCombinations.Length==2 && __inputCombinations[1].GetInput(atOnce));
+            return __inputCombinations[0].GetInput(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInput(atOnce));
         }
 
 		/// <summary>
@@ -253,7 +338,7 @@ namespace ws.winx.input
 		/// <param name="atOnce">If set to <c>true</c> at once.</param>
 		public static bool GetInputUp(int stateNameHash,bool atOnce=false){
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
-			return __inputCombinations[0].GetInputUp(atOnce) || (__inputCombinations.Length==2  && __inputCombinations[1].GetInputUp(atOnce));
+            return __inputCombinations[0].GetInputUp(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp(atOnce));
 		}
 
 		/// <summary>
@@ -264,7 +349,7 @@ namespace ws.winx.input
 		/// <param name="atOnce">If set to <c>true</c> at once.</param>
 		public static bool GetInputDown(int stateNameHash,bool atOnce=false){
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
-			return __inputCombinations[0].GetInputDown(atOnce) ||  (__inputCombinations.Length==2  && __inputCombinations[1].GetInputDown(atOnce));
+            return __inputCombinations[0].GetInputDown(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputDown(atOnce));
 		}
 
 

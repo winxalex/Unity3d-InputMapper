@@ -34,7 +34,7 @@ namespace ws.winx.devices
 				//bool _anyKeyDown = false;
 				int _VID;
 				int _PID;
-                int _lastFrameNum=-1;
+//                int _lastFrameNum=-1;
 
         #endregion
 
