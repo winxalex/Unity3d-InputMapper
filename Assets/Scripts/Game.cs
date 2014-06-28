@@ -5,7 +5,6 @@ using System.Xml.Serialization;
 using System.Collections.Generic;
 using System.IO;
 using ws.winx.input;
-using ws.winx.input.states;
 using System.Runtime.Serialization;
 using System.Linq;
 using ws.winx.platform.windows;
@@ -23,17 +22,14 @@ public class Game : MonoBehaviour {
 //		static int rollState = Animator.StringToHash("Base Layer.Roll");
 //		static int waveState = Animator.StringToHash("Layer2.Wave");
 
-		Animator animator;
+		public Animator animator;
 
 
 
 	// Use this for initialization
 	void Start () {
 
-
-			// initialising reference variables
-			animator = GetComponent<Animator>();	
-
+		
 			//supporting devices with custom drivers
 			InputManager.AddDriver(new XInputDriver());
 
@@ -50,10 +46,10 @@ public class Game : MonoBehaviour {
 
             InputEvent ev = new InputEvent("Click_W+C_State");
         
-			ev.CONT+=new EventHandler<EventArgs>(Handle1);
-            ev.CONT+= new EventHandler<EventArgs>(Handle2);
-            ev.UP += new EventHandler<EventArgs>(onUp);
-            ev.DOWN += new EventHandler<EventArgs>(onDown);
+			ev.CONT+=new EventHandler(Handle1);
+            ev.CONT+= new EventHandler(Handle2);
+            ev.UP += new EventHandler(onUp);
+            ev.DOWN += new EventHandler(onDown);
 	}
 
 
@@ -80,6 +76,8 @@ public class Game : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
+
 
 		
 			//animator.Play(" ");

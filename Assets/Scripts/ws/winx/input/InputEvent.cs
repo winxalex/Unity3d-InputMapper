@@ -55,8 +55,8 @@ namespace ws.winx.input
 
         }
 
-
-        public event EventHandler<EventArgs> UP
+        //TODO optimize this
+        public event EventHandler UP
         {
             add
             {
@@ -71,7 +71,7 @@ namespace ws.winx.input
 
 
 
-        public event EventHandler<EventArgs> DOWN
+        public event EventHandler DOWN
         {
             add
             {
@@ -86,10 +86,9 @@ namespace ws.winx.input
         }
 
 
-
-        public event EventHandler<EventArgs>  CONT 
+        public event EventHandler  CONT 
         {
-            add            {
+            add {
                 AddHandler(_stateNameHash, value, (uint)EventType.CONT);
             }
             remove
@@ -134,6 +133,7 @@ namespace ws.winx.input
 
                 InputEventDispatcherBehaviour w = _container.AddComponent<InputEventDispatcherBehaviour>();
                 w.Events = InputEvent.Events;
+                w.args = new EventArgs();
             }
 
 

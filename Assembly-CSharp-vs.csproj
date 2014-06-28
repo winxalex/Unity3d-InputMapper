@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Game.cs" />
+     <Compile Include="Assets\Scripts\TestDude.cs" />
      <Compile Include="Assets\Scripts\ws\winx\data\FlexibleDictionary.cs" />
      <Compile Include="Assets\Scripts\ws\winx\devices\IAxisDetails.cs" />
      <Compile Include="Assets\Scripts\ws\winx\devices\IButtonDetails.cs" />
@@ -65,7 +66,6 @@
      <Compile Include="Assets\Scripts\ws\winx\input\InputProcessor.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\InputState.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\KeyCodeExtension.cs" />
-     <Compile Include="Assets\Scripts\ws\winx\input\states\States.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\HIDDeviceInfo.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\IDeviceCollection.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\IHIDDeviceInfo.cs" />
@@ -79,12 +79,8 @@
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\WinMMDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\XInputDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\unity\Tags.cs" />
-     <Compile Include="Assets\bbox\bbox_BoundBox.cs" />
-     <Compile Include="Assets\bbox\bbox_drawLines.cs" />
-     <Compile Include="Assets\bbox\bbox_maxCamera.cs" />
      <None Include="Assets\Necromancer GUI\Kingthings.txt" />
      <None Include="Assets\Necromancer GUI\Readme.txt" />
-     <None Include="Assets\bbox\Materials\3dtext.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

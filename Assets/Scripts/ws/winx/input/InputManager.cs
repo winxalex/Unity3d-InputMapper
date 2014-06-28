@@ -82,6 +82,20 @@ namespace ws.winx.input
 		}
 
 
+        /// <summary>
+        /// Adds the state input.
+        /// </summary>
+        /// <param name="stateName">State name hash.</param>
+        /// <param name="at">At.</param>
+        /// <param name="combos">Combos.</param>
+        public static void AddStateInput(int stateNameHash, int at = -1, params KeyCode[] combos)
+        {
+
+            AddStateInput(stateNameHash, new InputCombination(combos), at);
+
+        }
+
+
 		/// <summary>
 		/// Adds the state input.
 		/// </summary>
@@ -89,10 +103,24 @@ namespace ws.winx.input
 		/// <param name="at">At.</param>
 		/// <param name="combos">Combos.</param>
 		public static void AddStateInput(String stateName,int at=-1,params int[] combos){
-			
-			AddStateInput(stateName,new InputCombination(combos),at);
+
+            AddStateInput(stateName, new InputCombination(combos), at);
 			
 		}
+
+
+        /// <summary>
+        /// Adds the state input.
+        /// </summary>
+        /// <param name="stateName">State name Hash.</param>
+        /// <param name="at">At.</param>
+        /// <param name="combos">Combos.</param>
+        public static void AddStateInput(int stateNameHash, int at = -1, params int[] combos)
+        {
+
+            AddStateInput(stateNameHash, new InputCombination(combos), at);
+
+        }
 
 
 		/// <summary>
@@ -112,25 +140,92 @@ namespace ws.winx.input
 
 		}
 
+        /// <summary>
+        /// Adds the state input.
+        /// </summary>
+        /// <param name="stateNameHash">State name hash(int) </param>
+        /// <param name="codeCombination">Code combination.
+        /// just "I" for KeyCode.I
+        /// or "I"+InputAction.DOUBLE_DESIGNATOR 
+        ///	 or "I"+InputAction.DOUBLE_DESIGNATOR+InputAction.SPACE_DESIGNATOR+(other code);
+        ///   or just "I(x2)" depending of InputAction.DOUBLE_DESIGNATOR value
+        /// </param>
+        /// <param name="at">At.Valid:-1(next) or 0(primary) and 1(secondary)</param>
+        public static void AddStateInput(int stateNameHash, String codeCombination, int at = -1)
+        {
 
+            AddStateInput(stateNameHash, new InputCombination(codeCombination), at);
+
+        }
+
+
+        /// <summary>
+        /// Adds the state input.
+        /// </summary>
+        /// <param name="stateName">State name.</param>
+        /// <param name="combos">Combos (ex. (int)KeyCode.P,(int)KeyCode.Joystick2Button12,JoystickDevice.toCode(...))</param>
+        public static void AddStateInput(String stateName, params int[] combos)
+        {
+            AddStateInput(stateName, new InputCombination(combos));
+        }
+
+
+        /// <summary>
+        /// Adds the state input.
+        /// </summary>
+        /// <param name="stateName">State name hash.</param>
+        /// <param name="combos">Combos (ex. (int)KeyCode.P,(int)KeyCode.Joystick2Button12,JoystickDevice.toCode(...))</param>
+        public static void AddStateInput(int stateNameHash, params int[] combos)
+        {
+            AddStateInput(stateNameHash, new InputCombination(combos));
+        }
+
+
+        /// <summary>
+        /// Adds the state input.
+        /// </summary>
+        /// <param name="stateName">State name.</param>
+        /// <param name="combination">Combination.</param>
+        /// <param name="at">At.Valid:-1(next) or 0(primary) and 1(secondary)</param>
+        public static void AddStateInput(string stateName, InputCombination combination, int at = -1)
+        {
+
+            if (at > 2) throw new Exception("Only indexes 0(Primary) and 1(Secondary) input are allowed");
+
+            int stateNameHash=Animator.StringToHash(stateName);
+            InputState state;
+
+            if (!Settings.stateInputs.ContainsKey(stateNameHash))
+            {
+                //create InputState and add to Dictionary of state inputs
+                state = __settings.stateInputs[stateNameHash] = new InputState(stateName, stateNameHash);
+            }
+            else
+            {
+                state = __settings.stateInputs[stateNameHash];
+            }
+
+            state.Add(combination, at);
+
+        }
 
 
 		/// <summary>
 		/// Adds the state input.
 		/// </summary>
-		/// <param name="stateName">State name.</param>
+		/// <param name="stateName">State name hash.</param>
 		/// <param name="combination">Combination.</param>
 		/// <param name="at">At.Valid:-1(next) or 0(primary) and 1(secondary)</param>
-		public static void AddStateInput(String stateName,InputCombination combination,int at=-1){
+		public static void AddStateInput(int stateNameHash,InputCombination combination,int at=-1){
 
 			if(at>2) throw new Exception("Only indexes 0(Primary) and 1(Secondary) input are allowed");
 			
-			int stateNameHash=Animator.StringToHash(stateName);
+			
 			InputState state;
 			
 			if(!Settings.stateInputs.ContainsKey(stateNameHash)){
 				//create InputState and add to Dictionary of state inputs
-				state=__settings.stateInputs[stateNameHash]=new InputState(stateName,stateNameHash);
+				state=__settings.stateInputs[stateNameHash]=new InputState("GenState_"+stateNameHash,stateNameHash);
 			}else{
 				state=__settings.stateInputs[stateNameHash];
 			}
@@ -140,97 +235,31 @@ namespace ws.winx.input
 		}
 
 
-		/// <summary>
-		/// Adds the state input.
-		/// </summary>
-		/// <param name="stateName">State name.</param>
-		/// <param name="combos">Combos (ex. (int)KeyCode.P,(int)KeyCode.Joystick2Button12,JoystickDevice.toCode(...))</param>
-		public static void AddStateInput(String stateName,params int[] combos){
-			AddStateInput(stateName,new InputCombination(combos));
+	
+
+		//[Not tested] idea for expansion
+		public static void PlayStateOnInputUp(Animator animator,int stateNameHash,int layer=0,float normalizedTime=0f){
+					if(InputManager.GetInputUp(stateNameHash,false)) 
+						animator.Play(stateNameHash,layer,normalizedTime); 
+		}
+
+		public static void PlayStateOnInputDown(Animator animator,int stateNameHash,int layer=0,float normalizedTime=0f){
+			if(InputManager.GetInputDown(stateNameHash,false)) 
+				animator.Play(stateNameHash,layer,normalizedTime); 
 		}
 
 
-        //private EventHandlerList _events;
-        //protected EventHandlerList Events
-        //{
-        //    get
-        //    {
-        //        if (_events == null)
-        //            _events = new EventHandlerList();
-        //        return _events;
-        //    }
-			
-        //}
+		public static void CrossFadeStateOnInputUp(Animator animator,int stateNameHash,float transitionDuration=0.5f,int layer=0,float normailizeTime=0f){
+				if(InputManager.GetInputUp(stateNameHash,false)) 
+				animator.CrossFade(stateNameHash,transitionDuration,layer,normailizeTime);
 
+		}
 
-        //private static event EventHandler MyPrivateEvent;
-
-        ////public event EventHandler<EventArgs> MyCustomEvent;
-        //public static event EventHandler MyEvent
-        //{
-        //    add
-        //    {
-        //        Debug.WriteLine("Attaching To MyEvent");
-        //        MyPrivateEvent += value;
-        //    }
-        //    remove
-        //    {
-        //        MyPrivateEvent -= value;
-        //        Debug.WriteLine("Detaching From MyEvent");
-        //    }
-        //}
-
-
-        //protected void OnMyCustomEvent(EventArgs e)
-        //{
-        //    EventHandler<EventArgs> handler = Events[MyCustomEventKey] as EventHandler<EventArgs>;
-			
-        //    if (handler != null)
-        //        handler(this, e);
-        //}
-
-
-        //public static void AddInputHandler(InputCombination combination,Action handler,bool atOnce=false){
-        //    var go = new GameObject("Waiter");
-        //    var w = go.AddComponent<ConditionalBehaviour>();
-        //    w.combo = combination;
-        //    w.Action = action;
-        //    w.atOnce=atOnce;
-        //}
-		
-		
-        //class ConditionalBehaviour : MonoBehaviour
-        //{
-        //    public float SinceAlive;
-			
-        //    public Action Action;
-        //    public InputCombination combo;
-        //    public bool atOnce;
-
-        //    void onEnable(){
-        //        StartCoroutine(Run);
-        //    }
-
-        //    void onDisable(){
-        //        StopCoroutine(Run);
-        //    }
-
-        //    IEnumerator Run(){
-
-        //        while(true){
-
-        //            if(combo.GetInput(atOnce)){
-        //                if (Action != null) Action();
-
-        //            }
-
-        //            yield return null;
-        //        }
-        //    }
-			
-
-        //}
-
+		public static void CrossFadeStateOnInputDown(Animator animator,int stateNameHash,float transitionDuration=0.5f,int layer=0,float normailizeTime=0f){
+			if(InputManager.GetInputDown(stateNameHash,false)) 
+				animator.CrossFade(stateNameHash,transitionDuration,layer,normailizeTime);
+    	}
+  
 		
 		
 		

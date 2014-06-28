@@ -49,7 +49,6 @@
      <Compile Include="Assets\Editor\InputMapper.cs" />
      <None Include="Assets\Necromancer GUI\Kingthings.txt" />
      <None Include="Assets\Necromancer GUI\Readme.txt" />
-     <None Include="Assets\bbox\Materials\3dtext.shader" />
  <Reference Include="Mono.TextTemplating">
  <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Assets/Editor/Mono.TextTemplating.dll</HintPath>
  </Reference>

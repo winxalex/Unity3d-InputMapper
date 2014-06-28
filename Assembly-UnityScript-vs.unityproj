@@ -49,7 +49,6 @@
      <Compile Include="Assets\Necromancer GUI\GUITestScript.js" />
      <None Include="Assets\Necromancer GUI\Kingthings.txt" />
      <None Include="Assets\Necromancer GUI\Readme.txt" />
-     <None Include="Assets\bbox\Materials\3dtext.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -20,6 +20,13 @@ namespace ws.winx.input
 				[DataMember(Name = "InputCombinations")]
 				public InputCombination[] combinations;
 
+		        ///
+				public Animator animator {
+					get {
+						return _animator;
+					}
+				}
+
 				public int hash {
 						get {
 								return _hash;
@@ -41,7 +48,11 @@ namespace ws.winx.input
 				[DataMember(Name = "Hash")]
 				protected int _hash;
 
+				protected Animator _animator;
+
 				protected int _count=0;
+
+		        
 
 				public InputState (string name, int hash)
 				{

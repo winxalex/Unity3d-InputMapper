@@ -49,7 +49,6 @@
      <Compile Include="Assets\Editor\InputMapper.cs" />
      <None Include="Assets\Necromancer GUI\Kingthings.txt" />
      <None Include="Assets\Necromancer GUI\Readme.txt" />
-     <None Include="Assets\bbox\Materials\3dtext.shader" />
  <Reference Include="Assembly-UnityScript">
  <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Library/ScriptAssemblies/Assembly-UnityScript.dll</HintPath>
  </Reference>
