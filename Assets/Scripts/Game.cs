@@ -47,7 +47,7 @@ public class Game : MonoBehaviour {
         //Create and Map state to input combination 
 
 
-			InputManager.AddStateInput("Click_W+C_State", KeyCodeExtension.W.SINGLE,KeyCodeExtension.C.SINGLE);
+			InputManager.AddStateInput("Click_W+C_State", KeyCodeExtension.W.SINGLE,KeyCodeExtension.JoystickAxisPovYPositive.SINGLE);
 
 
 			
