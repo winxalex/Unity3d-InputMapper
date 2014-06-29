@@ -193,17 +193,17 @@ namespace ws.winx.input
 		
 		
 		
-		internal bool GetInputUp(bool atOnce){
-
-			return GetInputBase(InputEx.GetKeyUp,atOnce);
+		internal bool GetInputUp(){
+			return GetInputBase(InputEx.GetKeyUp);
 
 		}
 		
-		internal bool GetInputDown(bool atOnce){
-		      return GetInputBase(InputEx.GetKeyDown,atOnce);
+		internal bool GetInputDown(){
+		      return GetInputBase(InputEx.GetKeyDown);
 		}
-		
 
+
+        //TODO this with corutine to compare performace
 		internal bool GetCombinationInput(InputDelegate keyCallback){
 			_pointer=_actionsList.GetEnumerator();
 			_pointer.MoveNext();
@@ -218,7 +218,7 @@ namespace ws.winx.input
 			return true;
 		}
 
-		//TODO this with corutine
+		//TODO this with corutine to compare performace
 		internal bool GetCombinationInput()
 		{
 

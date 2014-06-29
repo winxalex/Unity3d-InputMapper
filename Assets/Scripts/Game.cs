@@ -43,14 +43,12 @@ public class Game : MonoBehaviour {
 			//if you want to load some states from .xml and add custom manually first load settings xml
 			InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath,"InputSettings.xml"));
 
-            InputManager.AddStateInput("adasdasd", KeyCodeExtension.Backspace.SINGLE, KeyCodeExtension.Joystick1AxisPovXNegative.LONG, KeyCodeExtension.Delete.DOUBLE);
+        
+        //Create and Map state to input combination 
+			InputManager.AddStateInput("Click_W+C_State", KeyCodeExtension.W.SINGLE,KeyCodeExtension.C.SINGLE);
 
-        //Add state and event 
-			InputManager.AddStateInput("Click_W+C_State", "W+C");
 
-
-			//KeyCode.Alpha0.Long,
-			//Joysticks.Joystick0.
+			
 
             InputEvent ev = new InputEvent("Click_W+C_State");
 			//InputEvent ev = new InputEvent((int)States.SomeState);
@@ -90,12 +88,13 @@ public class Game : MonoBehaviour {
 //			if(InputManager.GetInputDown((int)States.Wave)){
 //								Debug.Log("Wave Down");
 //			}
-		
 
 
-//			if(InputManager.GetInput((int)States.Walk_Forward,false)){
-//
-//			}
+
+        //if (InputManager.GetInput((int)States.Walk_Forward, false))
+        //{
+
+        //}
 	
 
 //          if(InputManager.GetInputDown((int)States.Walk_Forward)){

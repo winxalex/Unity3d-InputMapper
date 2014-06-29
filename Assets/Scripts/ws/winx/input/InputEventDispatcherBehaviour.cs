@@ -41,14 +41,14 @@ namespace ws.winx.input
                             ((EventHandler)d).BeginInvoke(this, args, null, null);
                     }
 
-                    if (pair.Value[1] != null && InputManager.GetInputUp(pair.Key, false))
+                    if (pair.Value[1] != null && InputManager.GetInputUp(pair.Key))
                     {
                         delegates = pair.Value[1].GetInvocationList();
                         foreach (Delegate d in delegates)
                             ((EventHandler)d).BeginInvoke(this, args, null, null);
                     }
 
-                    if (pair.Value[2] != null && InputManager.GetInputDown(pair.Key, false))
+                    if (pair.Value[2] != null && InputManager.GetInputDown(pair.Key))
                     {
                         delegates = pair.Value[2].GetInvocationList();
                         foreach (Delegate d in delegates)

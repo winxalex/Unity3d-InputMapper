@@ -290,24 +290,24 @@ namespace ws.winx.input
 
 		//[Not tested] idea for expansion
 		public static void PlayStateOnInputUp(Animator animator,int stateNameHash,int layer=0,float normalizedTime=0f){
-					if(InputManager.GetInputUp(stateNameHash,false)) 
+					if(InputManager.GetInputUp(stateNameHash)) 
 						animator.Play(stateNameHash,layer,normalizedTime); 
 		}
 
 		public static void PlayStateOnInputDown(Animator animator,int stateNameHash,int layer=0,float normalizedTime=0f){
-			if(InputManager.GetInputDown(stateNameHash,false)) 
+			if(InputManager.GetInputDown(stateNameHash)) 
 				animator.Play(stateNameHash,layer,normalizedTime); 
 		}
 
 
 		public static void CrossFadeStateOnInputUp(Animator animator,int stateNameHash,float transitionDuration=0.5f,int layer=0,float normailizeTime=0f){
-				if(InputManager.GetInputUp(stateNameHash,false)) 
+				if(InputManager.GetInputUp(stateNameHash)) 
 				animator.CrossFade(stateNameHash,transitionDuration,layer,normailizeTime);
 
 		}
 
 		public static void CrossFadeStateOnInputDown(Animator animator,int stateNameHash,float transitionDuration=0.5f,int layer=0,float normailizeTime=0f){
-			if(InputManager.GetInputDown(stateNameHash,false)) 
+			if(InputManager.GetInputDown(stateNameHash)) 
 				animator.CrossFade(stateNameHash,transitionDuration,layer,normailizeTime);
     	}
   
@@ -404,7 +404,7 @@ namespace ws.winx.input
 		/// </summary>
 		/// <returns><c>true</c>, if input happen, <c>false</c> otherwise.</returns>
 		/// <param name="stateNameHash">State name hash.</param>
-		/// <param name="atOnce">If set to <c>true</c> at once.</param>
+		/// <param name="atOnce" default="false">Affect only in combo inputs!!!(default=false)Function returns true when combination pressed in row  If set to <c>true</c> function return true when all keys/buttons are pressed.</param>
 		public static bool GetInput(int stateNameHash,bool atOnce=false){
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
             return __inputCombinations[0].GetInput(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInput(atOnce));
@@ -415,10 +415,9 @@ namespace ws.winx.input
 		/// </summary>
 		/// <returns><c>true</c>, if input binded to state happen, <c>false</c> otherwise.</returns>
 		/// <param name="stateNameHash">State name hash.</param>
-		/// <param name="atOnce">If set to <c>true</c> at once.</param>
-		public static bool GetInputUp(int stateNameHash,bool atOnce=false){
+		public static bool GetInputUp(int stateNameHash){
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
-            return __inputCombinations[0].GetInputUp(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp(atOnce));
+            return __inputCombinations[0].GetInputUp() || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp());
 		}
 
 		/// <summary>
@@ -426,10 +425,10 @@ namespace ws.winx.input
 		/// </summary>
 		/// <returns><c>true</c>, if input binded to state down happen, <c>false</c> otherwise.</returns>
 		/// <param name="stateNameHash">State name hash.</param>
-		/// <param name="atOnce">If set to <c>true</c> at once.</param>
-		public static bool GetInputDown(int stateNameHash,bool atOnce=false){
+		
+		public static bool GetInputDown(int stateNameHash){
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
-            return __inputCombinations[0].GetInputDown(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputDown(atOnce));
+            return __inputCombinations[0].GetInputDown() || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputDown());
 		}
 
 
