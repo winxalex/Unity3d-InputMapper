@@ -70,89 +70,89 @@ namespace ws.winx.input
 
 
 		/// <summary>
-		/// Adds the state input.
+		/// Maps state to input.
 		/// </summary>
 		/// <param name="stateName">State name.</param>
 		/// <param name="at">At.</param>
 		/// <param name="combos">Combos.</param>
-		public static void AddStateInput(String stateName,int at=-1,params KeyCode[] combos){
+		public static void MapStateToInput(String stateName,int at=-1,params KeyCode[] combos){
 			
-			AddStateInput(stateName,new InputCombination(combos),at);
+			MapStateToInput(stateName,new InputCombination(combos),at);
 			
 		}
 
 
         /// <summary>
-        /// Adds the state input.
+        /// Maps state to input.
         /// </summary>
         /// <param name="stateName">State name hash.</param>
         /// <param name="at">At.</param>
         /// <param name="combos">Combos.</param>
-        public static void AddStateInput(int stateNameHash, int at = -1, params KeyCode[] combos)
+        public static void MapStateToInput(int stateNameHash, int at = -1, params KeyCode[] combos)
         {
 
-            AddStateInput(stateNameHash, new InputCombination(combos), at);
+            MapStateToInput(stateNameHash, new InputCombination(combos), at);
 
         }
 
 
 		/// <summary>
-		/// Adds the state input.
+		/// Maps state to input.
 		/// </summary>
 		/// <param name="stateName">State name.</param>
 		/// <param name="at">At.</param>
 		/// <param name="combos">Combos.</param>
-		public static void AddStateInput(String stateName,int at=-1,params int[] combos){
+		public static void MapStateToInput(String stateName,int at=-1,params int[] combos){
 
-            AddStateInput(stateName, new InputCombination(combos), at);
+            MapStateToInput(stateName, new InputCombination(combos), at);
 			
 		}
 
 
         /// <summary>
-        /// Adds the state input.
+        /// Maps state to input.
         /// </summary>
         /// <param name="stateName">State name Hash.</param>
         /// <param name="at">At.</param>
         /// <param name="combos">Combos.</param>
-        public static void AddStateInput(int stateNameHash, int at = -1, params int[] combos)
+        public static void MapStateToInput(int stateNameHash, int at = -1, params int[] combos)
         {
 
-            AddStateInput(stateNameHash, new InputCombination(combos), at);
+            MapStateToInput(stateNameHash, new InputCombination(combos), at);
 
         }
 
 
         /// <summary>
-        /// Adds the state input.
+        /// Maps state to input.
         /// </summary>
         /// <param name="stateName">State name Hash.</param>
         /// <param name="at">At.</param>
         /// <param name="combos">Actions. KeyExtension.Backspace.DOUBLE,...</param>
-        public static void AddStateInput(int stateNameHash, int at = -1, params InputAction[] actions)
+        public static void MapStateToInput(int stateNameHash, int at = -1, params InputAction[] actions)
         {
 
-            AddStateInput(stateNameHash, new InputCombination(actions), at);
+            MapStateToInput(stateNameHash, new InputCombination(actions), at);
 
         }
 
 
         /// <summary>
-        /// Adds the state input.
+        /// Maps state to input.
         /// </summary>
         /// <param name="stateName">State name .</param>
         /// <param name="at">At.</param>
         /// <param name="combos">Actions. ex KeyExtension.Backspace.DOUBLE,...</param>
-        public static void AddStateInput(string stateName, int at = -1, params InputAction[] actions)
+        public static void MapStateToInput(string stateName, int at = -1, params InputAction[] actions)
         {
 
-            AddStateInput(stateName, new InputCombination(actions), at);
+            MapStateToInput(stateName, new InputCombination(actions), at);
 
         }
 
 
 		/// <summary>
-		/// Adds the state input.
+		/// Maps state to input.
 		/// </summary>
 		/// <param name="stateName">State name </param>
 		/// <param name="codeCombination">Code combination.
@@ -162,14 +162,14 @@ namespace ws.winx.input
 		///   or just "I(x2)" depending of InputAction.DOUBLE_DESIGNATOR value
 		/// </param>
 		/// <param name="at">At.Valid:-1(next) or 0(primary) and 1(secondary)</param>
-		public static void AddStateInput(String stateName,String codeCombination,int at=-1){
+		public static void MapStateToInput(String stateName,String codeCombination,int at=-1){
 
-			AddStateInput(stateName,new InputCombination(codeCombination),at);
+			MapStateToInput(stateName,new InputCombination(codeCombination),at);
 
 		}
 
         /// <summary>
-        /// Adds the state input.
+        /// Maps state to input.
         /// </summary>
         /// <param name="stateNameHash">State name hash(int) </param>
         /// <param name="codeCombination">Code combination.
@@ -179,66 +179,66 @@ namespace ws.winx.input
         ///   or just "I(x2)" depending of InputAction.DOUBLE_DESIGNATOR value
         /// </param>
         /// <param name="at">At.Valid:-1(next) or 0(primary) and 1(secondary)</param>
-        public static void AddStateInput(int stateNameHash, String codeCombination, int at = -1)
+        public static void MapStateToInput(int stateNameHash, String codeCombination, int at = -1)
         {
 
-            AddStateInput(stateNameHash, new InputCombination(codeCombination), at);
+            MapStateToInput(stateNameHash, new InputCombination(codeCombination), at);
 
         }
 
 
         /// <summary>
-        /// Adds the state input.
+        /// Maps state to input.
         /// </summary>
         /// <param name="stateName">State name.</param>
         /// <param name="combos">Combos (ex. (int)KeyCode.P,(int)KeyCode.Joystick2Button12,JoystickDevice.toCode(...))</param>
-        public static void AddStateInput(String stateName, params int[] combos)
+        public static void MapStateToInput(String stateName, params int[] combos)
         {
-            AddStateInput(stateName, new InputCombination(combos));
+            MapStateToInput(stateName, new InputCombination(combos));
         }
 
 
         /// <summary>
-        /// Adds the state input.
+        /// Maps state to input.
         /// </summary>
         /// <param name="stateName">State name hash.</param>
         /// <param name="combos">Combos (ex. (int)KeyCode.P,(int)KeyCode.Joystick2Button12,JoystickDevice.toCode(...))</param>
-        public static void AddStateInput(int stateNameHash, params int[] combos)
+        public static void MapStateToInput(int stateNameHash, params int[] combos)
         {
-            AddStateInput(stateNameHash, new InputCombination(combos));
+            MapStateToInput(stateNameHash, new InputCombination(combos));
         }
 
 
         /// <summary>
-        /// Adds the state input.
+        /// Maps state to input.
         /// </summary>
         /// <param name="stateName">State name hash.</param>
         /// <param name="combos">Combos (ex. KeyCodeExtension.Backspace.DOUBLE,KeyCodeExtesnion.Joystick1AxisYPositive.SINGLE)</param>
-        public static void AddStateInput(int stateNameHash, params InputAction[] actions)
+        public static void MapStateToInput(int stateNameHash, params InputAction[] actions)
         {
-            AddStateInput(stateNameHash, new InputCombination(actions));
+            MapStateToInput(stateNameHash, new InputCombination(actions));
         }
 
 
 
         /// <summary>
-        /// Adds the state input.
+        /// Maps state to input.
         /// </summary>
         /// <param name="stateName">State name</param>
         /// <param name="combos">Combos (ex. KeyCodeExtension.Backspace.DOUBLE,KeyCodeExtesnion.Joystick1AxisYPositive.SINGLE)</param>
-        public static void AddStateInput(string stateName, params InputAction[] actions)
+        public static void MapStateToInput(string stateName, params InputAction[] actions)
         {
-            AddStateInput(stateName, new InputCombination(actions));
+            MapStateToInput(stateName, new InputCombination(actions));
         }
 
 
         /// <summary>
-        /// Adds the state input.
+        /// Maps state to input.
         /// </summary>
         /// <param name="stateName">State name.</param>
         /// <param name="combination">Combination.</param>
         /// <param name="at">At.Valid:-1(next) or 0(primary) and 1(secondary)</param>
-        public static void AddStateInput(string stateName, InputCombination combination, int at = -1)
+        public static void MapStateToInput(string stateName, InputCombination combination, int at = -1)
         {
 
             if (at > 2) throw new Exception("Only indexes 0(Primary) and 1(Secondary) input are allowed");
@@ -262,12 +262,12 @@ namespace ws.winx.input
 
 
 		/// <summary>
-		/// Adds the state input.
+		/// Maps state to input.
 		/// </summary>
 		/// <param name="stateName">State name hash.</param>
 		/// <param name="combination">Combination.</param>
 		/// <param name="at">At.Valid:-1(next) or 0(primary) and 1(secondary)</param>
-		public static void AddStateInput(int stateNameHash,InputCombination combination,int at=-1){
+		public static void MapStateToInput(int stateNameHash,InputCombination combination,int at=-1){
 
 			if(at>2) throw new Exception("Only indexes 0(Primary) and 1(Secondary) input are allowed");
 			

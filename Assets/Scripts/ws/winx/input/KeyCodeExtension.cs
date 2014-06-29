@@ -225,7 +225,7 @@ namespace ws.winx.input
 		public static KeyModifier Colon{get{ return KeyModifier.Instance.SetCode(KeyCode.Colon);}}
 		public static KeyModifier Semicolon{get{ return KeyModifier.Instance.SetCode(KeyCode.Semicolon);}}
 		public static KeyModifier Less{get{ return KeyModifier.Instance.SetCode(KeyCode.Less);}}
-		public static KeyModifier Equals{get{ return KeyModifier.Instance.SetCode(KeyCode.Equals);}}
+		public static KeyModifier Equal{get{ return KeyModifier.Instance.SetCode(KeyCode.Equals);}}
 		public static KeyModifier Greater{get{ return KeyModifier.Instance.SetCode(KeyCode.Greater);}}
 		public static KeyModifier Question{get{ return KeyModifier.Instance.SetCode(KeyCode.Question);}}
 		public static KeyModifier At{get{ return KeyModifier.Instance.SetCode(KeyCode.At);}}

@@ -56,7 +56,7 @@ namespace ws.winx.gui
 				
 
 
-					Debug.Log ("Action:"+_action+" "+_action.code);
+//					Debug.Log ("Action:"+_action+" "+_action.code);
 				}
 				
 				
@@ -99,6 +99,9 @@ namespace ws.winx.gui
 				
 				
 			}
+
+
+			_stateInputCombinations=stateInputs;
 		
 		}
 

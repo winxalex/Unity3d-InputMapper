@@ -34,20 +34,20 @@ public class Game : MonoBehaviour {
 			//supporting devices with custom drivers
 			InputManager.AddDriver(new XInputDriver());
 
-			//adding input-states pairs manually
-//			InputManager.AddStateInput("My State1",new InputCombination(KeyCodeExtension.toCode(Joysticks.Joystick1,JoystickAxis.AxisPovX,JoystickPovPosition.Forward),(int)KeyCode.Joystick4Button9,(int)KeyCode.P,(int)KeyCode.JoystickButton0));
-//			InputManager.AddStateInput("My State2",new InputCombination(KeyCode.Joystick4Button9,KeyCode.P,KeyCode.JoystickButton0));
-//			InputManager.AddStateInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
-//			InputManager.AddStateInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
+	
 //			
 			//if you want to load some states from .xml and add custom manually first load settings xml
 			InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath,"InputSettings.xml"));
 
         
-        //Create and Map state to input combination 
+       
+			//		adding input-states pairs manually
+			//			InputManager.AddStateInput("My State1",new InputCombination(KeyCodeExtension.toCode(Joysticks.Joystick1,JoystickAxis.AxisPovX,JoystickPovPosition.Forward),(int)KeyCode.Joystick4Button9,(int)KeyCode.P,(int)KeyCode.JoystickButton0));
+			//			InputManager.AddStateInput("My State2",new InputCombination(KeyCode.Joystick4Button9,KeyCode.P,KeyCode.JoystickButton0));
+			//			InputManager.AddStateInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
+			//			InputManager.AddStateInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
 
-
-			InputManager.AddStateInput("Click_W+C_State", KeyCodeExtension.W.SINGLE,KeyCodeExtension.JoystickAxisPovYPositive.SINGLE);
+			InputManager.MapStateToInput("Click_W+C_State", KeyCodeExtension.Alpha0.DOUBLE,KeyCodeExtension.JoystickAxisPovYPositive.SINGLE);
 
 
 			
@@ -57,8 +57,8 @@ public class Game : MonoBehaviour {
         
 			ev.CONT+=new EventHandler(Handle1);
             ev.CONT+= new EventHandler(Handle2);
-            ev.UP += new EventHandler(onUp);
-            ev.DOWN += new EventHandler(onDown);
+            ev.UP += new EventHandler(onUp);//this wouldn't fire for combo inputs(single only)
+			ev.DOWN += new EventHandler(onDown);//this wouldn't fire for combo inputs(single only)
 	}
 
 
@@ -87,33 +87,33 @@ public class Game : MonoBehaviour {
 	void Update () {
 
 
-//			if(InputManager.GetInputDown((int)States.Wave)){
-//								Debug.Log("Wave Down");
-//			}
+			if(InputManager.GetInputDown((int)States.Wave)){
+								Debug.Log("Wave Down");
+			}
 
 
 
-        //if (InputManager.GetInput((int)States.Walk_Forward, false))
-        //{
-
-        //}
-	
-
+//        if (InputManager.GetInput((int)States.Walk_Forward, false))
+//        {
+//
+//        }
+//	
+//
 //          if(InputManager.GetInputDown((int)States.Walk_Forward)){
 //				Debug.Log("Down");
 //			}
 //
-			//			if(InputManager.GetInputUp((int)States.Walk_Forward)){
+//			if(InputManager.GetInputUp((int)States.Walk_Forward)){
 //				Debug.Log("Up");
 //			}
 //
-//		
-//
+////		
+////
 //          //using input as analog value
-			//float analogValue=InputManager.GetInput((int)States.Walk_Forward,false,0.3f,0.1f,0f);
+//			float analogValue=InputManager.GetInput((int)States.Walk_Forward,false,0.3f,0.1f,0f);
 //			analogValue-=InputManager.GetInput((int)States.Base_Layer_MyState,false,0.3f,0.1f,0f);
 //
-//			Debug.Log(analogValue);
+////			Debug.Log(analogValue);
 
 
 
