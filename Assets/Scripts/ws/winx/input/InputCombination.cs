@@ -172,7 +172,8 @@ namespace ws.winx.input
 		
 		
 		protected bool GetInputBase(InputDelegate keyCallback,bool atOnce=false){
-			if(__currentInputAction.type==InputActionType.SINGLE && _actionsList.Count==1){
+            if (__currentInputAction.type == InputActionType.SINGLE && _actionsList.Count == 1)
+            {
 				
 				return keyCallback(__currentInputAction);
 				
@@ -188,18 +189,23 @@ namespace ws.winx.input
 		
 		
 		internal bool GetInput(bool atOnce){
+                  
 				 return GetInputBase(InputEx.GetKey,atOnce); 
     	}
 		
 		
 		
 		internal bool GetInputUp(){
-			return GetInputBase(InputEx.GetKeyUp);
+            if (_actionsList.Count == 1)
+			    return GetInputBase(InputEx.GetKeyUp);
+            else { /*Debug.LogWarning("Use GetInput only with Combos");*/ return false; }
 
 		}
 		
 		internal bool GetInputDown(){
+              if (_actionsList.Count == 1)
 		      return GetInputBase(InputEx.GetKeyDown);
+              else { /*Debug.LogWarning("Use GetInput only with Combos");*/ return false; }
 		}
 
 

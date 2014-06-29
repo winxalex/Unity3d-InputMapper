@@ -59,336 +59,336 @@ namespace ws.winx.input
 				public readonly static int MAX_KEY_CODE=(int)KeyCode.Joystick4Button19+1;
 
 
-                public static JoystickModifier JoystickAxisXPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisX, JoystickPovPosition.Right);// 
-                public static JoystickModifier JoystickAxisXNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisX, JoystickPovPosition.Left);// 
-                public static JoystickModifier JoystickAxisYPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisY, JoystickPovPosition.Forward);// 
-                public static JoystickModifier JoystickAxisYNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisY, JoystickPovPosition.Backward);// 
-                public static JoystickModifier JoystickAxisZPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisZ, JoystickPovPosition.Right);// 
-                public static JoystickModifier JoystickAxisZNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisZ, JoystickPovPosition.Left);// 
-                public static JoystickModifier JoystickAxisRPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisR, JoystickPovPosition.Forward);// 
-                public static JoystickModifier JoystickAxisRNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisR, JoystickPovPosition.Backward);// 
-                public static JoystickModifier JoystickAxisUPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisU, JoystickPovPosition.Right);// 
-                public static JoystickModifier JoystickAxisUNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisU, JoystickPovPosition.Left);// 
-                public static JoystickModifier JoystickAxisVPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisV, JoystickPovPosition.Forward);// 
-                public static JoystickModifier JoystickAxisVNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisV, JoystickPovPosition.Backward);// 
-                public static JoystickModifier JoystickAxisPovXPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisPovX, JoystickPovPosition.Right);// 
-                public static JoystickModifier JoystickAxisPovXNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisPovX, JoystickPovPosition.Left);// 
-                public static JoystickModifier JoystickAxisPovYPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisPovY, JoystickPovPosition.Forward);// 
-                public static JoystickModifier JoystickAxisPovYNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisPovY, JoystickPovPosition.Backward);// 
+                public static JoystickModifier JoystickAxisXPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisX, JoystickPovPosition.Right);}}
+                public static JoystickModifier JoystickAxisXNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisX, JoystickPovPosition.Left);}}
+                public static JoystickModifier JoystickAxisYPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisY, JoystickPovPosition.Forward);}}
+                public static JoystickModifier JoystickAxisYNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisY, JoystickPovPosition.Backward);}}
+                public static JoystickModifier JoystickAxisZPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisZ, JoystickPovPosition.Right);}}
+                public static JoystickModifier JoystickAxisZNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisZ, JoystickPovPosition.Left);}}
+                public static JoystickModifier JoystickAxisRPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisR, JoystickPovPosition.Forward);}}
+                public static JoystickModifier JoystickAxisRNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisR, JoystickPovPosition.Backward);}}
+                public static JoystickModifier JoystickAxisUPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisU, JoystickPovPosition.Right);}}
+                public static JoystickModifier JoystickAxisUNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisU, JoystickPovPosition.Left);}}
+                public static JoystickModifier JoystickAxisVPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisV, JoystickPovPosition.Forward);}}
+                public static JoystickModifier JoystickAxisVNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisV, JoystickPovPosition.Backward);}}
+                public static JoystickModifier JoystickAxisPovXPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisPovX, JoystickPovPosition.Right);}}
+                public static JoystickModifier JoystickAxisPovXNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisPovX, JoystickPovPosition.Left);}}
+                public static JoystickModifier JoystickAxisPovYPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisPovY, JoystickPovPosition.Forward);}}
+                public static JoystickModifier JoystickAxisPovYNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick, JoystickAxis.AxisPovY, JoystickPovPosition.Backward);}}
 
             	
        
-        public static JoystickModifier Joystick1AxisXPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisX, JoystickPovPosition.Right);// 
-        public static JoystickModifier Joystick1AxisXNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisX, JoystickPovPosition.Left);// 
-        public static JoystickModifier Joystick1AxisYPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisY, JoystickPovPosition.Forward);// 
-        public static JoystickModifier Joystick1AxisYNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisY, JoystickPovPosition.Backward);// 
-        public static JoystickModifier Joystick1AxisZPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisZ, JoystickPovPosition.Right);// 
-        public static JoystickModifier Joystick1AxisZNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisZ, JoystickPovPosition.Left);// 
-        public static JoystickModifier Joystick1AxisRPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisR, JoystickPovPosition.Forward);// 
-        public static JoystickModifier Joystick1AxisRNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisR, JoystickPovPosition.Backward);// 
-        public static JoystickModifier Joystick1AxisUPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisU, JoystickPovPosition.Right);// 
-        public static JoystickModifier Joystick1AxisUNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisU, JoystickPovPosition.Left);// 
-        public static JoystickModifier Joystick1AxisVPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisV, JoystickPovPosition.Forward);// 
-        public static JoystickModifier Joystick1AxisVNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisV, JoystickPovPosition.Backward);// 
-        public static JoystickModifier Joystick1AxisPovXPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisPovX, JoystickPovPosition.Right);// 
-        public static JoystickModifier Joystick1AxisPovXNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisPovX, JoystickPovPosition.Left);// 
-        public static JoystickModifier Joystick1AxisPovYPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisPovY, JoystickPovPosition.Forward);// 
-        public static JoystickModifier Joystick1AxisPovYNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisPovY, JoystickPovPosition.Backward);// 
+        public static JoystickModifier Joystick1AxisXPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisX, JoystickPovPosition.Right);}}
+        public static JoystickModifier Joystick1AxisXNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisX, JoystickPovPosition.Left);}}
+        public static JoystickModifier Joystick1AxisYPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisY, JoystickPovPosition.Forward);}}
+        public static JoystickModifier Joystick1AxisYNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisY, JoystickPovPosition.Backward);}}
+        public static JoystickModifier Joystick1AxisZPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisZ, JoystickPovPosition.Right);}}
+        public static JoystickModifier Joystick1AxisZNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisZ, JoystickPovPosition.Left);}}
+        public static JoystickModifier Joystick1AxisRPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisR, JoystickPovPosition.Forward);}}
+        public static JoystickModifier Joystick1AxisRNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisR, JoystickPovPosition.Backward);}}
+        public static JoystickModifier Joystick1AxisUPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisU, JoystickPovPosition.Right);}}
+        public static JoystickModifier Joystick1AxisUNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisU, JoystickPovPosition.Left);}}
+        public static JoystickModifier Joystick1AxisVPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisV, JoystickPovPosition.Forward);}}
+        public static JoystickModifier Joystick1AxisVNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisV, JoystickPovPosition.Backward);}}
+        public static JoystickModifier Joystick1AxisPovXPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisPovX, JoystickPovPosition.Right);}}
+        public static JoystickModifier Joystick1AxisPovXNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisPovX, JoystickPovPosition.Left);}}
+        public static JoystickModifier Joystick1AxisPovYPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisPovY, JoystickPovPosition.Forward);}}
+        public static JoystickModifier Joystick1AxisPovYNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisPovY, JoystickPovPosition.Backward);}}
 
 
-        public static JoystickModifier Joystick2AxisXPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisX, JoystickPovPosition.Right);// 
-        public static JoystickModifier Joystick2AxisXNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisX, JoystickPovPosition.Left);// 
-        public static JoystickModifier Joystick2AxisYPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisY, JoystickPovPosition.Forward);// 
-        public static JoystickModifier Joystick2AxisYNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisY, JoystickPovPosition.Backward);// 
-        public static JoystickModifier Joystick2AxisZPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisZ, JoystickPovPosition.Right);// 
-        public static JoystickModifier Joystick2AxisZNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisZ, JoystickPovPosition.Left);// 
-        public static JoystickModifier Joystick2AxisRPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisR, JoystickPovPosition.Forward);// 
-        public static JoystickModifier Joystick2AxisRNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisR, JoystickPovPosition.Backward);// 
-        public static JoystickModifier Joystick2AxisUPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisU, JoystickPovPosition.Right);// 
-        public static JoystickModifier Joystick2AxisUNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisU, JoystickPovPosition.Left);// 
-        public static JoystickModifier Joystick2AxisVPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisV, JoystickPovPosition.Forward);// 
-        public static JoystickModifier Joystick2AxisVNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisV, JoystickPovPosition.Backward);// 
-        public static JoystickModifier Joystick2AxisPovXPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisPovX, JoystickPovPosition.Right);// 
-        public static JoystickModifier Joystick2AxisPovXNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisPovX, JoystickPovPosition.Left);// 
-        public static JoystickModifier Joystick2AxisPovYPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisPovY, JoystickPovPosition.Forward);// 
-        public static JoystickModifier Joystick2AxisPovYNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisPovY, JoystickPovPosition.Backward);// 
+        public static JoystickModifier Joystick2AxisXPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisX, JoystickPovPosition.Right);}}
+        public static JoystickModifier Joystick2AxisXNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisX, JoystickPovPosition.Left);}}
+        public static JoystickModifier Joystick2AxisYPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisY, JoystickPovPosition.Forward);}}
+        public static JoystickModifier Joystick2AxisYNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisY, JoystickPovPosition.Backward);}}
+        public static JoystickModifier Joystick2AxisZPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisZ, JoystickPovPosition.Right);}}
+        public static JoystickModifier Joystick2AxisZNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisZ, JoystickPovPosition.Left);}}
+        public static JoystickModifier Joystick2AxisRPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisR, JoystickPovPosition.Forward);}}
+        public static JoystickModifier Joystick2AxisRNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisR, JoystickPovPosition.Backward);}}
+        public static JoystickModifier Joystick2AxisUPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisU, JoystickPovPosition.Right);}}
+        public static JoystickModifier Joystick2AxisUNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisU, JoystickPovPosition.Left);}}
+        public static JoystickModifier Joystick2AxisVPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisV, JoystickPovPosition.Forward);}}
+        public static JoystickModifier Joystick2AxisVNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisV, JoystickPovPosition.Backward);}}
+        public static JoystickModifier Joystick2AxisPovXPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisPovX, JoystickPovPosition.Right);}}
+        public static JoystickModifier Joystick2AxisPovXNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisPovX, JoystickPovPosition.Left);}}
+        public static JoystickModifier Joystick2AxisPovYPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisPovY, JoystickPovPosition.Forward);}}
+        public static JoystickModifier Joystick2AxisPovYNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick1, JoystickAxis.AxisPovY, JoystickPovPosition.Backward);}}
 
-        public static JoystickModifier Joystick3AxisXPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisX, JoystickPovPosition.Right);// 
-        public static JoystickModifier Joystick3AxisXNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisX, JoystickPovPosition.Left);// 
-        public static JoystickModifier Joystick3AxisYPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisY, JoystickPovPosition.Forward);// 
-        public static JoystickModifier Joystick3AxisYNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisY, JoystickPovPosition.Backward);// 
-        public static JoystickModifier Joystick3AxisZPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisZ, JoystickPovPosition.Right);// 
-        public static JoystickModifier Joystick3AxisZNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisZ, JoystickPovPosition.Left);// 
-        public static JoystickModifier Joystick3AxisRPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisR, JoystickPovPosition.Forward);// 
-        public static JoystickModifier Joystick3AxisRNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisR, JoystickPovPosition.Backward);// 
-        public static JoystickModifier Joystick3AxisUPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisU, JoystickPovPosition.Right);// 
-        public static JoystickModifier Joystick3AxisUNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisU, JoystickPovPosition.Left);// 
-        public static JoystickModifier Joystick3AxisVPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisV, JoystickPovPosition.Forward);// 
-        public static JoystickModifier Joystick3AxisVNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisV, JoystickPovPosition.Backward);// 
-        public static JoystickModifier Joystick3AxisPovXPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisPovX, JoystickPovPosition.Right);// 
-        public static JoystickModifier Joystick3AxisPovXNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisPovX, JoystickPovPosition.Left);// 
-        public static JoystickModifier Joystick3AxisPovYPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisPovY, JoystickPovPosition.Forward);// 
-        public static JoystickModifier Joystick3AxisPovYNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisPovY, JoystickPovPosition.Backward);// 
+        public static JoystickModifier Joystick3AxisXPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisX, JoystickPovPosition.Right);}}
+        public static JoystickModifier Joystick3AxisXNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisX, JoystickPovPosition.Left);}}
+        public static JoystickModifier Joystick3AxisYPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisY, JoystickPovPosition.Forward);}}
+        public static JoystickModifier Joystick3AxisYNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisY, JoystickPovPosition.Backward);}}
+        public static JoystickModifier Joystick3AxisZPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisZ, JoystickPovPosition.Right);}}
+        public static JoystickModifier Joystick3AxisZNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisZ, JoystickPovPosition.Left);}}
+        public static JoystickModifier Joystick3AxisRPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisR, JoystickPovPosition.Forward);}}
+        public static JoystickModifier Joystick3AxisRNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisR, JoystickPovPosition.Backward);}}
+        public static JoystickModifier Joystick3AxisUPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisU, JoystickPovPosition.Right);}}
+        public static JoystickModifier Joystick3AxisUNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisU, JoystickPovPosition.Left);}}
+        public static JoystickModifier Joystick3AxisVPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisV, JoystickPovPosition.Forward);}}
+        public static JoystickModifier Joystick3AxisVNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisV, JoystickPovPosition.Backward);}}
+        public static JoystickModifier Joystick3AxisPovXPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisPovX, JoystickPovPosition.Right);}}
+        public static JoystickModifier Joystick3AxisPovXNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisPovX, JoystickPovPosition.Left);}}
+        public static JoystickModifier Joystick3AxisPovYPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisPovY, JoystickPovPosition.Forward);}}
+        public static JoystickModifier Joystick3AxisPovYNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick2, JoystickAxis.AxisPovY, JoystickPovPosition.Backward);}}
 
-        public static JoystickModifier Joystick4AxisXPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisX, JoystickPovPosition.Right);// 
-        public static JoystickModifier Joystick4AxisXNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisX, JoystickPovPosition.Left);// 
-        public static JoystickModifier Joystick4AxisYPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisY, JoystickPovPosition.Forward);// 
-        public static JoystickModifier Joystick4AxisYNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisY, JoystickPovPosition.Backward);// 
-        public static JoystickModifier Joystick4AxisZPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisZ, JoystickPovPosition.Right);// 
-        public static JoystickModifier Joystick4AxisZNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisZ, JoystickPovPosition.Left);// 
-        public static JoystickModifier Joystick4AxisRPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisR, JoystickPovPosition.Forward);// 
-        public static JoystickModifier Joystick4AxisRNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisR, JoystickPovPosition.Backward);// 
-        public static JoystickModifier Joystick4AxisUPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisU, JoystickPovPosition.Right);// 
-        public static JoystickModifier Joystick4AxisUNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisU, JoystickPovPosition.Left);// 
-        public static JoystickModifier Joystick4AxisVPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisV, JoystickPovPosition.Forward);// 
-        public static JoystickModifier Joystick4AxisVNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisV, JoystickPovPosition.Backward);// 
-        public static JoystickModifier Joystick4AxisPovXPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisPovX, JoystickPovPosition.Right);// 
-        public static JoystickModifier Joystick4AxisPovXNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisPovX, JoystickPovPosition.Left);// 
-        public static JoystickModifier Joystick4AxisPovYPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisPovY, JoystickPovPosition.Forward);// 
-        public static JoystickModifier Joystick4AxisPovYNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisPovY, JoystickPovPosition.Backward);// 
+        public static JoystickModifier Joystick4AxisXPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisX, JoystickPovPosition.Right);}}
+        public static JoystickModifier Joystick4AxisXNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisX, JoystickPovPosition.Left);}}
+        public static JoystickModifier Joystick4AxisYPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisY, JoystickPovPosition.Forward);}}
+        public static JoystickModifier Joystick4AxisYNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisY, JoystickPovPosition.Backward);}}
+        public static JoystickModifier Joystick4AxisZPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisZ, JoystickPovPosition.Right);}}
+        public static JoystickModifier Joystick4AxisZNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisZ, JoystickPovPosition.Left);}}
+        public static JoystickModifier Joystick4AxisRPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisR, JoystickPovPosition.Forward);}}
+        public static JoystickModifier Joystick4AxisRNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisR, JoystickPovPosition.Backward);}}
+        public static JoystickModifier Joystick4AxisUPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisU, JoystickPovPosition.Right);}}
+        public static JoystickModifier Joystick4AxisUNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisU, JoystickPovPosition.Left);}}
+        public static JoystickModifier Joystick4AxisVPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisV, JoystickPovPosition.Forward);}}
+        public static JoystickModifier Joystick4AxisVNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisV, JoystickPovPosition.Backward);}}
+        public static JoystickModifier Joystick4AxisPovXPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisPovX, JoystickPovPosition.Right);}}
+        public static JoystickModifier Joystick4AxisPovXNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisPovX, JoystickPovPosition.Left);}}
+        public static JoystickModifier Joystick4AxisPovYPositive {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisPovY, JoystickPovPosition.Forward);}}
+        public static JoystickModifier Joystick4AxisPovYNegative {get{return JoystickModifier.Instance.SetCode(Joysticks.Joystick3, JoystickAxis.AxisPovY, JoystickPovPosition.Backward);}}
     
         
-        public static KeyModifier Backspace = KeyModifier.Instance.SetCode(KeyCode.Backspace);
+        public static KeyModifier Backspace{get{ return KeyModifier.Instance.SetCode(KeyCode.Backspace);}}
      
-		public static KeyModifier Delete =KeyModifier.Instance.SetCode(KeyCode.Delete);
-		public static KeyModifier Tab =KeyModifier.Instance.SetCode(KeyCode.Tab);
-		public static KeyModifier Clear  =KeyModifier.Instance.SetCode(KeyCode.Clear);
-		public static KeyModifier Return=KeyModifier.Instance.SetCode(KeyCode.Return);
-		public static KeyModifier Pause=KeyModifier.Instance.SetCode(KeyCode.Pause);
-		public static KeyModifier Escape=KeyModifier.Instance.SetCode(KeyCode.Escape);
-		public static KeyModifier Space =KeyModifier.Instance.SetCode(KeyCode.Space);
-		public static KeyModifier Keypad0 =KeyModifier.Instance.SetCode(KeyCode.Keypad0);
-		public static KeyModifier Keypad1=KeyModifier.Instance.SetCode(KeyCode.Keypad1);
-		public static KeyModifier Keypad2=KeyModifier.Instance.SetCode(KeyCode.Keypad2);
-		public static KeyModifier Keypad3=KeyModifier.Instance.SetCode(KeyCode.Keypad3);
-		public static KeyModifier Keypad4=KeyModifier.Instance.SetCode(KeyCode.Keypad4);
-		public static KeyModifier Keypad5=KeyModifier.Instance.SetCode(KeyCode.Keypad5);
-		public static KeyModifier Keypad6=KeyModifier.Instance.SetCode(KeyCode.Keypad6);
-		public static KeyModifier Keypad7=KeyModifier.Instance.SetCode(KeyCode.Keypad7);
-		public static KeyModifier Keypad8=KeyModifier.Instance.SetCode(KeyCode.Keypad8);
-		public static KeyModifier Keypad9=KeyModifier.Instance.SetCode(KeyCode.Keypad9);
-		public static KeyModifier KeypadPeriod=KeyModifier.Instance.SetCode(KeyCode.KeypadPeriod);
-		public static KeyModifier KeypadDivide=KeyModifier.Instance.SetCode(KeyCode.KeypadDivide);
-		public static KeyModifier KeypadMultiply=KeyModifier.Instance.SetCode(KeyCode.KeypadMultiply);
-		public static KeyModifier KeypadMinus=KeyModifier.Instance.SetCode(KeyCode.KeypadMinus);
-		public static KeyModifier KeypadPlus=KeyModifier.Instance.SetCode(KeyCode.KeypadPlus);
-		public static KeyModifier KeypadEnter=KeyModifier.Instance.SetCode(KeyCode.KeypadEnter);
-		public static KeyModifier KeypadEquals=KeyModifier.Instance.SetCode(KeyCode.KeypadEquals);
-		public static KeyModifier UpArrow=KeyModifier.Instance.SetCode(KeyCode.UpArrow);
-		public static KeyModifier DownArrow=KeyModifier.Instance.SetCode(KeyCode.DownArrow);
-		public static KeyModifier RightArrow=KeyModifier.Instance.SetCode(KeyCode.RightArrow);
-		public static KeyModifier LeftArrow=KeyModifier.Instance.SetCode(KeyCode.LeftArrow);
-		public static KeyModifier Insert=KeyModifier.Instance.SetCode(KeyCode.Insert);
-		public static KeyModifier Home=KeyModifier.Instance.SetCode(KeyCode.Home);
-		public static KeyModifier End=KeyModifier.Instance.SetCode(KeyCode.End);
-		public static KeyModifier PageUp=KeyModifier.Instance.SetCode(KeyCode.PageUp);
-		public static KeyModifier PageDown=KeyModifier.Instance.SetCode(KeyCode.PageDown);
-		public static KeyModifier F1=KeyModifier.Instance.SetCode(KeyCode.F1);
-		public static KeyModifier F2=KeyModifier.Instance.SetCode(KeyCode.F2);
-		public static KeyModifier F3=KeyModifier.Instance.SetCode(KeyCode.F3);
-		public static KeyModifier F4=KeyModifier.Instance.SetCode(KeyCode.F4);
-		public static KeyModifier F5=KeyModifier.Instance.SetCode(KeyCode.F5);
-		public static KeyModifier F6=KeyModifier.Instance.SetCode(KeyCode.F6);
-		public static KeyModifier F7=KeyModifier.Instance.SetCode(KeyCode.F7);
-		public static KeyModifier F8=KeyModifier.Instance.SetCode(KeyCode.F8);
-		public static KeyModifier F9=KeyModifier.Instance.SetCode(KeyCode.F9);
-		public static KeyModifier F10=KeyModifier.Instance.SetCode(KeyCode.F10);
-		public static KeyModifier F11=KeyModifier.Instance.SetCode(KeyCode.F11);
-		public static KeyModifier F12=KeyModifier.Instance.SetCode(KeyCode.F12);
-		public static KeyModifier F13=KeyModifier.Instance.SetCode(KeyCode.F14);
-		public static KeyModifier F14=KeyModifier.Instance.SetCode(KeyCode.F14);
-		public static KeyModifier F15=KeyModifier.Instance.SetCode(KeyCode.F15);
-		public static KeyModifier Alpha0 = KeyModifier.Instance.SetCode(KeyCode.Alpha0);
-		public static KeyModifier Alpha1=KeyModifier.Instance.SetCode(KeyCode.Alpha1);
-		public static KeyModifier Alpha2=KeyModifier.Instance.SetCode(KeyCode.Alpha2);
-		public static KeyModifier Alpha3=KeyModifier.Instance.SetCode(KeyCode.Alpha3);
-		public static KeyModifier Alpha4=KeyModifier.Instance.SetCode(KeyCode.Alpha4);
-		public static KeyModifier Alpha5=KeyModifier.Instance.SetCode(KeyCode.Alpha5);
-		public static KeyModifier Alpha6=KeyModifier.Instance.SetCode(KeyCode.Alpha6);
-		public static KeyModifier Alpha7=KeyModifier.Instance.SetCode(KeyCode.Alpha7);
-		public static KeyModifier Alpha8=KeyModifier.Instance.SetCode(KeyCode.Alpha8);
-		public static KeyModifier Alpha9=KeyModifier.Instance.SetCode(KeyCode.Alpha9);
-		public static KeyModifier Exclaim = KeyModifier.Instance.SetCode(KeyCode.Exclaim);
-		public static KeyModifier DoubleQuote=KeyModifier.Instance.SetCode(KeyCode.DoubleQuote);
-		public static KeyModifier Hash=KeyModifier.Instance.SetCode(KeyCode.Hash);
-		public static KeyModifier Dollar=KeyModifier.Instance.SetCode(KeyCode.Dollar);
-		public static KeyModifier Ampersand = KeyModifier.Instance.SetCode(KeyCode.Ampersand);
-		public static KeyModifier Quote=KeyModifier.Instance.SetCode(KeyCode.Quote);
-		public static KeyModifier LeftParen=KeyModifier.Instance.SetCode(KeyCode.LeftParen);
-		public static KeyModifier RightParen=KeyModifier.Instance.SetCode(KeyCode.RightParen);
-		public static KeyModifier Asterisk=KeyModifier.Instance.SetCode(KeyCode.Asterisk);
-		public static KeyModifier Plus=KeyModifier.Instance.SetCode(KeyCode.Plus);
-		public static KeyModifier Comma=KeyModifier.Instance.SetCode(KeyCode.Comma);
-		public static KeyModifier Minus=KeyModifier.Instance.SetCode(KeyCode.Minus);
-		public static KeyModifier Period=KeyModifier.Instance.SetCode(KeyCode.Period);
-		public static KeyModifier Slash=KeyModifier.Instance.SetCode(KeyCode.Slash);
-		public static KeyModifier Colon = KeyModifier.Instance.SetCode(KeyCode.Colon);
-		public static KeyModifier Semicolon=KeyModifier.Instance.SetCode(KeyCode.Semicolon);
-		public static KeyModifier Less=KeyModifier.Instance.SetCode(KeyCode.Less);
-		public static KeyModifier Equals=KeyModifier.Instance.SetCode(KeyCode.Equals);
-		public static KeyModifier Greater=KeyModifier.Instance.SetCode(KeyCode.Greater);
-		public static KeyModifier Question=KeyModifier.Instance.SetCode(KeyCode.Question);
-		public static KeyModifier At=KeyModifier.Instance.SetCode(KeyCode.At);
-		public static KeyModifier LeftBracket = KeyModifier.Instance.SetCode(KeyCode.LeftBracket);
-		public static KeyModifier Backslash=KeyModifier.Instance.SetCode(KeyCode.Backslash);
-		public static KeyModifier RightBracket=KeyModifier.Instance.SetCode(KeyCode.RightBracket);
-		public static KeyModifier Caret=KeyModifier.Instance.SetCode(KeyCode.Caret);
-		public static KeyModifier Underscore=KeyModifier.Instance.SetCode(KeyCode.Underscore);
-		public static KeyModifier BackQuote=KeyModifier.Instance.SetCode(KeyCode.BackQuote);
-		public static KeyModifier A=KeyModifier.Instance.SetCode(KeyCode.A);
-		public static KeyModifier B=KeyModifier.Instance.SetCode(KeyCode.B);
-		public static KeyModifier C=KeyModifier.Instance.SetCode(KeyCode.C);
-		public static KeyModifier D=KeyModifier.Instance.SetCode(KeyCode.D);
-		public static KeyModifier E=KeyModifier.Instance.SetCode(KeyCode.E);
-		public static KeyModifier F=KeyModifier.Instance.SetCode(KeyCode.F);
-		public static KeyModifier G=KeyModifier.Instance.SetCode(KeyCode.G);
-		public static KeyModifier H=KeyModifier.Instance.SetCode(KeyCode.H);
-		public static KeyModifier I=KeyModifier.Instance.SetCode(KeyCode.I);
-		public static KeyModifier J=KeyModifier.Instance.SetCode(KeyCode.J);
-		public static KeyModifier K=KeyModifier.Instance.SetCode(KeyCode.K);
-		public static KeyModifier L=KeyModifier.Instance.SetCode(KeyCode.L);
-		public static KeyModifier M=KeyModifier.Instance.SetCode(KeyCode.M);
-		public static KeyModifier N=KeyModifier.Instance.SetCode(KeyCode.N);
-		public static KeyModifier O=KeyModifier.Instance.SetCode(KeyCode.O);
-		public static KeyModifier P=KeyModifier.Instance.SetCode(KeyCode.P);
-		public static KeyModifier Q=KeyModifier.Instance.SetCode(KeyCode.Q);
-		public static KeyModifier R=KeyModifier.Instance.SetCode(KeyCode.R);
-		public static KeyModifier S=KeyModifier.Instance.SetCode(KeyCode.S);
-		public static KeyModifier T=KeyModifier.Instance.SetCode(KeyCode.T);
-		public static KeyModifier U=KeyModifier.Instance.SetCode(KeyCode.U);
-		public static KeyModifier V=KeyModifier.Instance.SetCode(KeyCode.V);
-		public static KeyModifier W=KeyModifier.Instance.SetCode(KeyCode.W);
-		public static KeyModifier X=KeyModifier.Instance.SetCode(KeyCode.X);
-		public static KeyModifier Y=KeyModifier.Instance.SetCode(KeyCode.Y);
-		public static KeyModifier Z=KeyModifier.Instance.SetCode(KeyCode.Z);
-		public static KeyModifier Numlock = KeyModifier.Instance.SetCode(KeyCode.Numlock);
-		public static KeyModifier CapsLock=KeyModifier.Instance.SetCode(KeyCode.CapsLock);
-		public static KeyModifier ScrollLock=KeyModifier.Instance.SetCode(KeyCode.ScrollLock);
-		public static KeyModifier RightShift=KeyModifier.Instance.SetCode(KeyCode.RightShift);
-		public static KeyModifier LeftShift=KeyModifier.Instance.SetCode(KeyCode.LeftShift);
-		public static KeyModifier RightControl=KeyModifier.Instance.SetCode(KeyCode.RightControl);
-		public static KeyModifier LeftControl=KeyModifier.Instance.SetCode(KeyCode.LeftControl);
-		public static KeyModifier RightAlt=KeyModifier.Instance.SetCode(KeyCode.RightAlt);
-		public static KeyModifier LeftAlt=KeyModifier.Instance.SetCode(KeyCode.LeftAlt);
-		public static KeyModifier LeftCommand = KeyModifier.Instance.SetCode(KeyCode.LeftCommand);
-		public static KeyModifier LeftApple = KeyModifier.Instance.SetCode(KeyCode.LeftApple);
-		public static KeyModifier LeftWindows=KeyModifier.Instance.SetCode(KeyCode.LeftWindows);
-		public static KeyModifier RightCommand = KeyModifier.Instance.SetCode(KeyCode.RightCommand);
-		public static KeyModifier RightApple = KeyModifier.Instance.SetCode(KeyCode.RightApple);
-		public static KeyModifier RightWindows = KeyModifier.Instance.SetCode(KeyCode.RightWindows);
-		public static KeyModifier AltGr=KeyModifier.Instance.SetCode(KeyCode.AltGr);
-		public static KeyModifier Help = KeyModifier.Instance.SetCode(KeyCode.Help);
-		public static KeyModifier Print=KeyModifier.Instance.SetCode(KeyCode.Print);
-		public static KeyModifier SysReq=KeyModifier.Instance.SetCode(KeyCode.SysReq);
-		public static KeyModifier Break=KeyModifier.Instance.SetCode(KeyCode.Break);
-		public static KeyModifier Menu=KeyModifier.Instance.SetCode(KeyCode.Menu);
-		public static KeyModifier Mouse0 =KeyModifier.Instance.SetCode(KeyCode.Mouse0);
-		public static KeyModifier Mouse1=KeyModifier.Instance.SetCode(KeyCode.Mouse1);
-		public static KeyModifier Mouse2=KeyModifier.Instance.SetCode(KeyCode.Mouse2);
-		public static KeyModifier Mouse3=KeyModifier.Instance.SetCode(KeyCode.Mouse3);
-		public static KeyModifier Mouse4=KeyModifier.Instance.SetCode(KeyCode.Mouse4);
-		public static KeyModifier Mouse5=KeyModifier.Instance.SetCode(KeyCode.Mouse5);
-		public static KeyModifier Mouse6=KeyModifier.Instance.SetCode(KeyCode.Mouse6);
-		public static KeyModifier JoystickButton0=KeyModifier.Instance.SetCode(KeyCode.JoystickButton0);
-		public static KeyModifier JoystickButton1=KeyModifier.Instance.SetCode(KeyCode.JoystickButton1);
-		public static KeyModifier JoystickButton2=KeyModifier.Instance.SetCode(KeyCode.JoystickButton2);
-		public static KeyModifier JoystickButton3=KeyModifier.Instance.SetCode(KeyCode.JoystickButton3);
-		public static KeyModifier JoystickButton4=KeyModifier.Instance.SetCode(KeyCode.JoystickButton4);
-		public static KeyModifier JoystickButton5=KeyModifier.Instance.SetCode(KeyCode.JoystickButton5);
-		public static KeyModifier JoystickButton6=KeyModifier.Instance.SetCode(KeyCode.JoystickButton6);
-		public static KeyModifier JoystickButton7=KeyModifier.Instance.SetCode(KeyCode.JoystickButton7);
-		public static KeyModifier JoystickButton8=KeyModifier.Instance.SetCode(KeyCode.JoystickButton8);
-		public static KeyModifier JoystickButton9=KeyModifier.Instance.SetCode(KeyCode.JoystickButton9);
-		public static KeyModifier JoystickButton10=KeyModifier.Instance.SetCode(KeyCode.JoystickButton10);
-		public static KeyModifier JoystickButton11=KeyModifier.Instance.SetCode(KeyCode.JoystickButton11);
-		public static KeyModifier JoystickButton12=KeyModifier.Instance.SetCode(KeyCode.JoystickButton12);
-		public static KeyModifier JoystickButton13=KeyModifier.Instance.SetCode(KeyCode.JoystickButton13);
-		public static KeyModifier JoystickButton14=KeyModifier.Instance.SetCode(KeyCode.JoystickButton14);
-		public static KeyModifier JoystickButton15=KeyModifier.Instance.SetCode(KeyCode.JoystickButton15);
-		public static KeyModifier JoystickButton16=KeyModifier.Instance.SetCode(KeyCode.JoystickButton16);
-		public static KeyModifier JoystickButton17=KeyModifier.Instance.SetCode(KeyCode.JoystickButton17);
-		public static KeyModifier JoystickButton18=KeyModifier.Instance.SetCode(KeyCode.JoystickButton18);
-		public static KeyModifier JoystickButton19=KeyModifier.Instance.SetCode(KeyCode.JoystickButton19);
-		public static KeyModifier Joystick1Button0=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button0);
-		public static KeyModifier Joystick1Button1=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button1);
-		public static KeyModifier Joystick1Button2=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button2);
-		public static KeyModifier Joystick1Button3=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button3);
-		public static KeyModifier Joystick1Button4=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button4);
-		public static KeyModifier Joystick1Button5=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button5);
-		public static KeyModifier Joystick1Button6=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button6);
-		public static KeyModifier Joystick1Button7=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button7);
-		public static KeyModifier Joystick1Button8=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button8);
-		public static KeyModifier Joystick1Button9=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button9);
-		public static KeyModifier Joystick1Button10=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button10);
-		public static KeyModifier Joystick1Button11=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button11);
-		public static KeyModifier Joystick1Button12=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button12);
-		public static KeyModifier Joystick1Button13=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button13);
-		public static KeyModifier Joystick1Button14=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button14);
-		public static KeyModifier Joystick1Button15=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button15);
-		public static KeyModifier Joystick1Button16=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button16);
-		public static KeyModifier Joystick1Button17=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button17);
-		public static KeyModifier Joystick1Button18=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button18);
-		public static KeyModifier Joystick1Button19=KeyModifier.Instance.SetCode(KeyCode.Joystick1Button19);
-		public static KeyModifier Joystick2Button0=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button0);
-		public static KeyModifier Joystick2Button1=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button1);
-		public static KeyModifier Joystick2Button2=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button2);
-		public static KeyModifier Joystick2Button3=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button3);
-		public static KeyModifier Joystick2Button4=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button4);
-		public static KeyModifier Joystick2Button5=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button5);
-		public static KeyModifier Joystick2Button6=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button6);
-		public static KeyModifier Joystick2Button7=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button7);
-		public static KeyModifier Joystick2Button8=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button8);
-		public static KeyModifier Joystick2Button9=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button10);
-		public static KeyModifier Joystick2Button10=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button10);
-		public static KeyModifier Joystick2Button11=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button11);
-		public static KeyModifier Joystick2Button12=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button12);
-		public static KeyModifier Joystick2Button13=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button13);
-		public static KeyModifier Joystick2Button14=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button14);
-		public static KeyModifier Joystick2Button15=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button15);
-		public static KeyModifier Joystick2Button16=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button17);
-		public static KeyModifier Joystick2Button17=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button17);
-		public static KeyModifier Joystick2Button18=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button18);
-		public static KeyModifier Joystick2Button19=KeyModifier.Instance.SetCode(KeyCode.Joystick2Button19);
-		public static KeyModifier Joystick3Button0=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button0);
-		public static KeyModifier Joystick3Button1=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button1);
-		public static KeyModifier Joystick3Button2=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button2);
-		public static KeyModifier Joystick3Button3=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button3);
-		public static KeyModifier Joystick3Button4=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button4);
-		public static KeyModifier Joystick3Button5=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button5);
-		public static KeyModifier Joystick3Button6=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button6);
-		public static KeyModifier Joystick3Button7=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button7);
-		public static KeyModifier Joystick3Button8=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button8);
-		public static KeyModifier Joystick3Button9=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button9);
-		public static KeyModifier Joystick3Button10=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button10);
-		public static KeyModifier Joystick3Button11=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button11);
-		public static KeyModifier Joystick3Button12=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button12);
-		public static KeyModifier Joystick3Button13=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button13);
-		public static KeyModifier Joystick3Button14=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button14);
-		public static KeyModifier Joystick3Button15=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button15);
-		public static KeyModifier Joystick3Button16=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button16);
-		public static KeyModifier Joystick3Button17=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button17);
-		public static KeyModifier Joystick3Button18=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button18);
-		public static KeyModifier Joystick3Button19=KeyModifier.Instance.SetCode(KeyCode.Joystick3Button19);
-		public static KeyModifier Joystick4Button0=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button0);
-		public static KeyModifier Joystick4Button1=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button1);
-		public static KeyModifier Joystick4Button2=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button2);
-		public static KeyModifier Joystick4Button3=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button3);
-		public static KeyModifier Joystick4Button4=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button4);
-		public static KeyModifier Joystick4Button5=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button5);
-		public static KeyModifier Joystick4Button6=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button6);
-		public static KeyModifier Joystick4Button7=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button7);
-		public static KeyModifier Joystick4Button8=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button8);
-		public static KeyModifier Joystick4Button9=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button9);
-		public static KeyModifier Joystick4Button10=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button10);
-		public static KeyModifier Joystick4Button11=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button11);
-		public static KeyModifier Joystick4Button12=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button12);
-		public static KeyModifier Joystick4Button13=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button13);
-		public static KeyModifier Joystick4Button14=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button14);
-		public static KeyModifier Joystick4Button15=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button15);
-		public static KeyModifier Joystick4Button16=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button16);
-		public static KeyModifier Joystick4Button17=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button17);
-		public static KeyModifier Joystick4Button18=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button18);
-		public static KeyModifier Joystick4Button19=KeyModifier.Instance.SetCode(KeyCode.Joystick4Button19);
+		public static KeyModifier Delete {get{ return KeyModifier.Instance.SetCode(KeyCode.Delete);}}
+		public static KeyModifier Tab {get{ return KeyModifier.Instance.SetCode(KeyCode.Tab);}}
+		public static KeyModifier Clear  {get{ return KeyModifier.Instance.SetCode(KeyCode.Clear);}}
+		public static KeyModifier Return{get{ return KeyModifier.Instance.SetCode(KeyCode.Return);}}
+		public static KeyModifier Pause{get{ return KeyModifier.Instance.SetCode(KeyCode.Pause);}}
+		public static KeyModifier Escape{get{ return KeyModifier.Instance.SetCode(KeyCode.Escape);}}
+		public static KeyModifier Space {get{ return KeyModifier.Instance.SetCode(KeyCode.Space);}}
+		public static KeyModifier Keypad0 {get{ return KeyModifier.Instance.SetCode(KeyCode.Keypad0);}}
+		public static KeyModifier Keypad1{get{ return KeyModifier.Instance.SetCode(KeyCode.Keypad1);}}
+		public static KeyModifier Keypad2{get{ return KeyModifier.Instance.SetCode(KeyCode.Keypad2);}}
+		public static KeyModifier Keypad3{get{ return KeyModifier.Instance.SetCode(KeyCode.Keypad3);}}
+		public static KeyModifier Keypad4{get{ return KeyModifier.Instance.SetCode(KeyCode.Keypad4);}}
+		public static KeyModifier Keypad5{get{ return KeyModifier.Instance.SetCode(KeyCode.Keypad5);}}
+		public static KeyModifier Keypad6{get{ return KeyModifier.Instance.SetCode(KeyCode.Keypad6);}}
+		public static KeyModifier Keypad7{get{ return KeyModifier.Instance.SetCode(KeyCode.Keypad7);}}
+		public static KeyModifier Keypad8{get{ return KeyModifier.Instance.SetCode(KeyCode.Keypad8);}}
+		public static KeyModifier Keypad9{get{ return KeyModifier.Instance.SetCode(KeyCode.Keypad9);}}
+		public static KeyModifier KeypadPeriod{get{ return KeyModifier.Instance.SetCode(KeyCode.KeypadPeriod);}}
+		public static KeyModifier KeypadDivide{get{ return KeyModifier.Instance.SetCode(KeyCode.KeypadDivide);}}
+		public static KeyModifier KeypadMultiply{get{ return KeyModifier.Instance.SetCode(KeyCode.KeypadMultiply);}}
+		public static KeyModifier KeypadMinus{get{ return KeyModifier.Instance.SetCode(KeyCode.KeypadMinus);}}
+		public static KeyModifier KeypadPlus{get{ return KeyModifier.Instance.SetCode(KeyCode.KeypadPlus);}}
+		public static KeyModifier KeypadEnter{get{ return KeyModifier.Instance.SetCode(KeyCode.KeypadEnter);}}
+		public static KeyModifier KeypadEquals{get{ return KeyModifier.Instance.SetCode(KeyCode.KeypadEquals);}}
+		public static KeyModifier UpArrow{get{ return KeyModifier.Instance.SetCode(KeyCode.UpArrow);}}
+		public static KeyModifier DownArrow{get{ return KeyModifier.Instance.SetCode(KeyCode.DownArrow);}}
+		public static KeyModifier RightArrow{get{ return KeyModifier.Instance.SetCode(KeyCode.RightArrow);}}
+		public static KeyModifier LeftArrow{get{ return KeyModifier.Instance.SetCode(KeyCode.LeftArrow);}}
+		public static KeyModifier Insert{get{ return KeyModifier.Instance.SetCode(KeyCode.Insert);}}
+		public static KeyModifier Home{get{ return KeyModifier.Instance.SetCode(KeyCode.Home);}}
+		public static KeyModifier End{get{ return KeyModifier.Instance.SetCode(KeyCode.End);}}
+		public static KeyModifier PageUp{get{ return KeyModifier.Instance.SetCode(KeyCode.PageUp);}}
+		public static KeyModifier PageDown{get{ return KeyModifier.Instance.SetCode(KeyCode.PageDown);}}
+		public static KeyModifier F1{get{ return KeyModifier.Instance.SetCode(KeyCode.F1);}}
+		public static KeyModifier F2{get{ return KeyModifier.Instance.SetCode(KeyCode.F2);}}
+		public static KeyModifier F3{get{ return KeyModifier.Instance.SetCode(KeyCode.F3);}}
+		public static KeyModifier F4{get{ return KeyModifier.Instance.SetCode(KeyCode.F4);}}
+		public static KeyModifier F5{get{ return KeyModifier.Instance.SetCode(KeyCode.F5);}}
+		public static KeyModifier F6{get{ return KeyModifier.Instance.SetCode(KeyCode.F6);}}
+		public static KeyModifier F7{get{ return KeyModifier.Instance.SetCode(KeyCode.F7);}}
+		public static KeyModifier F8{get{ return KeyModifier.Instance.SetCode(KeyCode.F8);}}
+		public static KeyModifier F9{get{ return KeyModifier.Instance.SetCode(KeyCode.F9);}}
+		public static KeyModifier F10{get{ return KeyModifier.Instance.SetCode(KeyCode.F10);}}
+		public static KeyModifier F11{get{ return KeyModifier.Instance.SetCode(KeyCode.F11);}}
+		public static KeyModifier F12{get{ return KeyModifier.Instance.SetCode(KeyCode.F12);}}
+		public static KeyModifier F13{get{ return KeyModifier.Instance.SetCode(KeyCode.F14);}}
+		public static KeyModifier F14{get{ return KeyModifier.Instance.SetCode(KeyCode.F14);}}
+		public static KeyModifier F15{get{ return KeyModifier.Instance.SetCode(KeyCode.F15);}}
+		public static KeyModifier Alpha0 {get{ return KeyModifier.Instance.SetCode(KeyCode.Alpha0);}}
+		public static KeyModifier Alpha1{get{ return KeyModifier.Instance.SetCode(KeyCode.Alpha1);}}
+		public static KeyModifier Alpha2{get{ return KeyModifier.Instance.SetCode(KeyCode.Alpha2);}}
+		public static KeyModifier Alpha3{get{ return KeyModifier.Instance.SetCode(KeyCode.Alpha3);}}
+		public static KeyModifier Alpha4{get{ return KeyModifier.Instance.SetCode(KeyCode.Alpha4);}}
+		public static KeyModifier Alpha5{get{ return KeyModifier.Instance.SetCode(KeyCode.Alpha5);}}
+		public static KeyModifier Alpha6{get{ return KeyModifier.Instance.SetCode(KeyCode.Alpha6);}}
+		public static KeyModifier Alpha7{get{ return KeyModifier.Instance.SetCode(KeyCode.Alpha7);}}
+		public static KeyModifier Alpha8{get{ return KeyModifier.Instance.SetCode(KeyCode.Alpha8);}}
+		public static KeyModifier Alpha9{get{ return KeyModifier.Instance.SetCode(KeyCode.Alpha9);}}
+		public static KeyModifier Exclaim {get{ return KeyModifier.Instance.SetCode(KeyCode.Exclaim);}}
+		public static KeyModifier DoubleQuote{get{ return KeyModifier.Instance.SetCode(KeyCode.DoubleQuote);}}
+		public static KeyModifier Hash{get{ return KeyModifier.Instance.SetCode(KeyCode.Hash);}}
+		public static KeyModifier Dollar{get{ return KeyModifier.Instance.SetCode(KeyCode.Dollar);}}
+		public static KeyModifier Ampersand{get{ return KeyModifier.Instance.SetCode(KeyCode.Ampersand);}}
+		public static KeyModifier Quote{get{ return KeyModifier.Instance.SetCode(KeyCode.Quote);}}
+		public static KeyModifier LeftParen{get{ return KeyModifier.Instance.SetCode(KeyCode.LeftParen);}}
+		public static KeyModifier RightParen{get{ return KeyModifier.Instance.SetCode(KeyCode.RightParen);}}
+		public static KeyModifier Asterisk{get{ return KeyModifier.Instance.SetCode(KeyCode.Asterisk);}}
+		public static KeyModifier Plus{get{ return KeyModifier.Instance.SetCode(KeyCode.Plus);}}
+		public static KeyModifier Comma{get{ return KeyModifier.Instance.SetCode(KeyCode.Comma);}}
+		public static KeyModifier Minus{get{ return KeyModifier.Instance.SetCode(KeyCode.Minus);}}
+		public static KeyModifier Period{get{ return KeyModifier.Instance.SetCode(KeyCode.Period);}}
+		public static KeyModifier Slash{get{ return KeyModifier.Instance.SetCode(KeyCode.Slash);}}
+		public static KeyModifier Colon{get{ return KeyModifier.Instance.SetCode(KeyCode.Colon);}}
+		public static KeyModifier Semicolon{get{ return KeyModifier.Instance.SetCode(KeyCode.Semicolon);}}
+		public static KeyModifier Less{get{ return KeyModifier.Instance.SetCode(KeyCode.Less);}}
+		public static KeyModifier Equals{get{ return KeyModifier.Instance.SetCode(KeyCode.Equals);}}
+		public static KeyModifier Greater{get{ return KeyModifier.Instance.SetCode(KeyCode.Greater);}}
+		public static KeyModifier Question{get{ return KeyModifier.Instance.SetCode(KeyCode.Question);}}
+		public static KeyModifier At{get{ return KeyModifier.Instance.SetCode(KeyCode.At);}}
+		public static KeyModifier LeftBracket{get{ return KeyModifier.Instance.SetCode(KeyCode.LeftBracket);}}
+		public static KeyModifier Backslash{get{ return KeyModifier.Instance.SetCode(KeyCode.Backslash);}}
+		public static KeyModifier RightBracket{get{ return KeyModifier.Instance.SetCode(KeyCode.RightBracket);}}
+		public static KeyModifier Caret{get{ return KeyModifier.Instance.SetCode(KeyCode.Caret);}}
+		public static KeyModifier Underscore{get{ return KeyModifier.Instance.SetCode(KeyCode.Underscore);}}
+		public static KeyModifier BackQuote{get{ return KeyModifier.Instance.SetCode(KeyCode.BackQuote);}}
+		public static KeyModifier A{get{ return KeyModifier.Instance.SetCode(KeyCode.A);}}
+		public static KeyModifier B{get{ return KeyModifier.Instance.SetCode(KeyCode.B);}}
+		public static KeyModifier C{get{ return KeyModifier.Instance.SetCode(KeyCode.C);}}
+		public static KeyModifier D{get{ return KeyModifier.Instance.SetCode(KeyCode.D);}}
+		public static KeyModifier E{get{ return KeyModifier.Instance.SetCode(KeyCode.E);}}
+		public static KeyModifier F{get{ return KeyModifier.Instance.SetCode(KeyCode.F);}}
+		public static KeyModifier G{get{ return KeyModifier.Instance.SetCode(KeyCode.G);}}
+		public static KeyModifier H{get{ return KeyModifier.Instance.SetCode(KeyCode.H);}}
+		public static KeyModifier I{get{ return KeyModifier.Instance.SetCode(KeyCode.I);}}
+		public static KeyModifier J{get{ return KeyModifier.Instance.SetCode(KeyCode.J);}}
+		public static KeyModifier K{get{ return KeyModifier.Instance.SetCode(KeyCode.K);}}
+		public static KeyModifier L{get{ return KeyModifier.Instance.SetCode(KeyCode.L);}}
+		public static KeyModifier M{get{ return KeyModifier.Instance.SetCode(KeyCode.M);}}
+		public static KeyModifier N{get{ return KeyModifier.Instance.SetCode(KeyCode.N);}}
+		public static KeyModifier O{get{ return KeyModifier.Instance.SetCode(KeyCode.O);}}
+		public static KeyModifier P{get{ return KeyModifier.Instance.SetCode(KeyCode.P);}}
+		public static KeyModifier Q{get{ return KeyModifier.Instance.SetCode(KeyCode.Q);}}
+		public static KeyModifier R{get{ return KeyModifier.Instance.SetCode(KeyCode.R);}}
+		public static KeyModifier S{get{ return KeyModifier.Instance.SetCode(KeyCode.S);}}
+		public static KeyModifier T{get{ return KeyModifier.Instance.SetCode(KeyCode.T);}}
+		public static KeyModifier U{get{ return KeyModifier.Instance.SetCode(KeyCode.U);}}
+		public static KeyModifier V{get{ return KeyModifier.Instance.SetCode(KeyCode.V);}}
+		public static KeyModifier W{get{ return KeyModifier.Instance.SetCode(KeyCode.W);}}
+		public static KeyModifier X{get{ return KeyModifier.Instance.SetCode(KeyCode.X);}}
+		public static KeyModifier Y{get{ return KeyModifier.Instance.SetCode(KeyCode.Y);}}
+		public static KeyModifier Z{get{ return KeyModifier.Instance.SetCode(KeyCode.Z);}}
+		public static KeyModifier Numlock{get{ return KeyModifier.Instance.SetCode(KeyCode.Numlock);}}
+		public static KeyModifier CapsLock{get{ return KeyModifier.Instance.SetCode(KeyCode.CapsLock);}}
+		public static KeyModifier ScrollLock{get{ return KeyModifier.Instance.SetCode(KeyCode.ScrollLock);}}
+		public static KeyModifier RightShift{get{ return KeyModifier.Instance.SetCode(KeyCode.RightShift);}}
+		public static KeyModifier LeftShift{get{ return KeyModifier.Instance.SetCode(KeyCode.LeftShift);}}
+		public static KeyModifier RightControl{get{ return KeyModifier.Instance.SetCode(KeyCode.RightControl);}}
+		public static KeyModifier LeftControl{get{ return KeyModifier.Instance.SetCode(KeyCode.LeftControl);}}
+		public static KeyModifier RightAlt{get{ return KeyModifier.Instance.SetCode(KeyCode.RightAlt);}}
+		public static KeyModifier LeftAlt{get{ return KeyModifier.Instance.SetCode(KeyCode.LeftAlt);}}
+		public static KeyModifier LeftCommand{get{ return KeyModifier.Instance.SetCode(KeyCode.LeftCommand);}}
+		public static KeyModifier LeftApple{get{ return KeyModifier.Instance.SetCode(KeyCode.LeftApple);}}
+		public static KeyModifier LeftWindows{get{ return KeyModifier.Instance.SetCode(KeyCode.LeftWindows);}}
+		public static KeyModifier RightCommand{get{ return KeyModifier.Instance.SetCode(KeyCode.RightCommand);}}
+		public static KeyModifier RightApple{get{ return KeyModifier.Instance.SetCode(KeyCode.RightApple);}}
+		public static KeyModifier RightWindows{get{ return KeyModifier.Instance.SetCode(KeyCode.RightWindows);}}
+		public static KeyModifier AltGr{get{ return KeyModifier.Instance.SetCode(KeyCode.AltGr);}}
+        public static KeyModifier Help { get { return KeyModifier.Instance.SetCode(KeyCode.Help); } }
+		public static KeyModifier Print{get{ return KeyModifier.Instance.SetCode(KeyCode.Print);}}
+		public static KeyModifier SysReq{get{ return KeyModifier.Instance.SetCode(KeyCode.SysReq);}}
+		public static KeyModifier Break{get{ return KeyModifier.Instance.SetCode(KeyCode.Break);}}
+		public static KeyModifier Menu{get{ return KeyModifier.Instance.SetCode(KeyCode.Menu);}}
+		public static KeyModifier Mouse0 {get{ return KeyModifier.Instance.SetCode(KeyCode.Mouse0);}}
+		public static KeyModifier Mouse1{get{ return KeyModifier.Instance.SetCode(KeyCode.Mouse1);}}
+		public static KeyModifier Mouse2{get{ return KeyModifier.Instance.SetCode(KeyCode.Mouse2);}}
+		public static KeyModifier Mouse3{get{ return KeyModifier.Instance.SetCode(KeyCode.Mouse3);}}
+		public static KeyModifier Mouse4{get{ return KeyModifier.Instance.SetCode(KeyCode.Mouse4);}}
+		public static KeyModifier Mouse5{get{ return KeyModifier.Instance.SetCode(KeyCode.Mouse5);}}
+		public static KeyModifier Mouse6{get{ return KeyModifier.Instance.SetCode(KeyCode.Mouse6);}}
+		public static KeyModifier JoystickButton0{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton0);}}
+		public static KeyModifier JoystickButton1{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton1);}}
+		public static KeyModifier JoystickButton2{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton2);}}
+		public static KeyModifier JoystickButton3{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton3);}}
+		public static KeyModifier JoystickButton4{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton4);}}
+		public static KeyModifier JoystickButton5{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton5);}}
+		public static KeyModifier JoystickButton6{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton6);}}
+		public static KeyModifier JoystickButton7{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton7);}}
+		public static KeyModifier JoystickButton8{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton8);}}
+		public static KeyModifier JoystickButton9{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton9);}}
+		public static KeyModifier JoystickButton10{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton10);}}
+		public static KeyModifier JoystickButton11{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton11);}}
+		public static KeyModifier JoystickButton12{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton12);}}
+		public static KeyModifier JoystickButton13{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton13);}}
+		public static KeyModifier JoystickButton14{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton14);}}
+		public static KeyModifier JoystickButton15{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton15);}}
+		public static KeyModifier JoystickButton16{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton16);}}
+		public static KeyModifier JoystickButton17{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton17);}}
+		public static KeyModifier JoystickButton18{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton18);}}
+		public static KeyModifier JoystickButton19{get{ return KeyModifier.Instance.SetCode(KeyCode.JoystickButton19);}}
+		public static KeyModifier Joystick1Button0{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button0);}}
+		public static KeyModifier Joystick1Button1{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button1);}}
+		public static KeyModifier Joystick1Button2{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button2);}}
+		public static KeyModifier Joystick1Button3{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button3);}}
+		public static KeyModifier Joystick1Button4{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button4);}}
+		public static KeyModifier Joystick1Button5{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button5);}}
+		public static KeyModifier Joystick1Button6{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button6);}}
+		public static KeyModifier Joystick1Button7{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button7);}}
+		public static KeyModifier Joystick1Button8{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button8);}}
+		public static KeyModifier Joystick1Button9{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button9);}}
+		public static KeyModifier Joystick1Button10{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button10);}}
+		public static KeyModifier Joystick1Button11{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button11);}}
+		public static KeyModifier Joystick1Button12{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button12);}}
+		public static KeyModifier Joystick1Button13{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button13);}}
+		public static KeyModifier Joystick1Button14{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button14);}}
+		public static KeyModifier Joystick1Button15{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button15);}}
+		public static KeyModifier Joystick1Button16{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button16);}}
+		public static KeyModifier Joystick1Button17{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button17);}}
+		public static KeyModifier Joystick1Button18{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button18);}}
+		public static KeyModifier Joystick1Button19{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick1Button19);}}
+		public static KeyModifier Joystick2Button0{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button0);}}
+		public static KeyModifier Joystick2Button1{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button1);}}
+		public static KeyModifier Joystick2Button2{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button2);}}
+		public static KeyModifier Joystick2Button3{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button3);}}
+		public static KeyModifier Joystick2Button4{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button4);}}
+		public static KeyModifier Joystick2Button5{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button5);}}
+		public static KeyModifier Joystick2Button6{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button6);}}
+		public static KeyModifier Joystick2Button7{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button7);}}
+		public static KeyModifier Joystick2Button8{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button8);}}
+		public static KeyModifier Joystick2Button9{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button10);}}
+		public static KeyModifier Joystick2Button10{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button10);}}
+		public static KeyModifier Joystick2Button11{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button11);}}
+		public static KeyModifier Joystick2Button12{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button12);}}
+		public static KeyModifier Joystick2Button13{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button13);}}
+		public static KeyModifier Joystick2Button14{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button14);}}
+		public static KeyModifier Joystick2Button15{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button15);}}
+		public static KeyModifier Joystick2Button16{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button17);}}
+		public static KeyModifier Joystick2Button17{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button17);}}
+		public static KeyModifier Joystick2Button18{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button18);}}
+		public static KeyModifier Joystick2Button19{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick2Button19);}}
+		public static KeyModifier Joystick3Button0{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button0);}}
+		public static KeyModifier Joystick3Button1{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button1);}}
+		public static KeyModifier Joystick3Button2{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button2);}}
+		public static KeyModifier Joystick3Button3{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button3);}}
+		public static KeyModifier Joystick3Button4{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button4);}}
+		public static KeyModifier Joystick3Button5{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button5);}}
+		public static KeyModifier Joystick3Button6{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button6);}}
+		public static KeyModifier Joystick3Button7{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button7);}}
+		public static KeyModifier Joystick3Button8{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button8);}}
+		public static KeyModifier Joystick3Button9{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button9);}}
+		public static KeyModifier Joystick3Button10{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button10);}}
+		public static KeyModifier Joystick3Button11{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button11);}}
+		public static KeyModifier Joystick3Button12{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button12);}}
+		public static KeyModifier Joystick3Button13{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button13);}}
+		public static KeyModifier Joystick3Button14{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button14);}}
+		public static KeyModifier Joystick3Button15{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button15);}}
+		public static KeyModifier Joystick3Button16{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button16);}}
+		public static KeyModifier Joystick3Button17{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button17);}}
+		public static KeyModifier Joystick3Button18{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button18);}}
+		public static KeyModifier Joystick3Button19{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick3Button19);}}
+		public static KeyModifier Joystick4Button0{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button0);}}
+		public static KeyModifier Joystick4Button1{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button1);}}
+		public static KeyModifier Joystick4Button2{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button2);}}
+		public static KeyModifier Joystick4Button3{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button3);}}
+		public static KeyModifier Joystick4Button4{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button4);}}
+		public static KeyModifier Joystick4Button5{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button5);}}
+		public static KeyModifier Joystick4Button6{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button6);}}
+		public static KeyModifier Joystick4Button7{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button7);}}
+		public static KeyModifier Joystick4Button8{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button8);}}
+		public static KeyModifier Joystick4Button9{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button9);}}
+		public static KeyModifier Joystick4Button10{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button10);}}
+		public static KeyModifier Joystick4Button11{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button11);}}
+		public static KeyModifier Joystick4Button12{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button12);}}
+		public static KeyModifier Joystick4Button13{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button13);}}
+		public static KeyModifier Joystick4Button14{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button14);}}
+		public static KeyModifier Joystick4Button15{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button15);}}
+		public static KeyModifier Joystick4Button16{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button16);}}
+		public static KeyModifier Joystick4Button17{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button17);}}
+		public static KeyModifier Joystick4Button18{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button18);}}
+		public static KeyModifier Joystick4Button19{get{ return KeyModifier.Instance.SetCode(KeyCode.Joystick4Button19);}}
     
 
     
