@@ -69,6 +69,23 @@ namespace ws.winx.input
 		}
 
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ws.winx.input.InputCombination"/> class.
+        /// </summary>
+        /// <param name="actions">Codes ex. KeyCodeExtension.,...</param>
+        public InputCombination(params InputAction[] actions)
+        {
+            //_actionsList=codes.Select(entry => new InputAction(entry)).ToList();
+
+            _actionsList = new List<InputAction>();
+            for (int i = 0; i < actions.Length; i++)
+                _actionsList.Add(actions[i]);
+
+            initPointer();
+
+
+        }
+
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ws.winx.input.InputCombination"/> class.
@@ -97,6 +114,9 @@ namespace ws.winx.input
 			
 			
 		}
+
+
+
 
 
 
@@ -197,7 +217,8 @@ namespace ws.winx.input
 			
 			return true;
 		}
-		
+
+		//TODO this with corutine
 		internal bool GetCombinationInput()
 		{
 

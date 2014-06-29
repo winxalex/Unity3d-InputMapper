@@ -1,20 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 using ws.winx.input;
+using ws.winx.input.states;
 
 
 public class TestDude : MonoBehaviour {
 
     Animator _animator;
 
-    int WaveState=Animator.StringToHash("Wave");
+   
 
 	// Use this for initialization
 	void Start () {
 	_animator=this.GetComponent<Animator>();
 
-        //State Wave will be bind to "W" (combination)
-		InputManager.AddStateInput(WaveState,"W");
+        
 
 	}
 	
@@ -22,8 +22,8 @@ public class TestDude : MonoBehaviour {
     void Update()
     {
 
-        //use auto generated States.[state_name] class instead manual Wave creation
-        InputManager.PlayStateOnInputDown(_animator, WaveState);
+        //use auto generated States.[state_name] 
+        InputManager.PlayStateOnInputDown(_animator, (int)States.Wave);
     }
 	
 }

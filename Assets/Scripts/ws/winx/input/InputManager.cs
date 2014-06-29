@@ -123,6 +123,34 @@ namespace ws.winx.input
         }
 
 
+        /// <summary>
+        /// Adds the state input.
+        /// </summary>
+        /// <param name="stateName">State name Hash.</param>
+        /// <param name="at">At.</param>
+        /// <param name="combos">Actions. KeyExtension.Backspace.DOUBLE,...</param>
+        public static void AddStateInput(int stateNameHash, int at = -1, params InputAction[] actions)
+        {
+
+            AddStateInput(stateNameHash, new InputCombination(actions), at);
+
+        }
+
+
+        /// <summary>
+        /// Adds the state input.
+        /// </summary>
+        /// <param name="stateName">State name .</param>
+        /// <param name="at">At.</param>
+        /// <param name="combos">Actions. ex KeyExtension.Backspace.DOUBLE,...</param>
+        public static void AddStateInput(string stateName, int at = -1, params InputAction[] actions)
+        {
+
+            AddStateInput(stateName, new InputCombination(actions), at);
+
+        }
+
+
 		/// <summary>
 		/// Adds the state input.
 		/// </summary>
@@ -178,6 +206,29 @@ namespace ws.winx.input
         public static void AddStateInput(int stateNameHash, params int[] combos)
         {
             AddStateInput(stateNameHash, new InputCombination(combos));
+        }
+
+
+        /// <summary>
+        /// Adds the state input.
+        /// </summary>
+        /// <param name="stateName">State name hash.</param>
+        /// <param name="combos">Combos (ex. KeyCodeExtension.Backspace.DOUBLE,KeyCodeExtesnion.Joystick1AxisYPositive.SINGLE)</param>
+        public static void AddStateInput(int stateNameHash, params InputAction[] actions)
+        {
+            AddStateInput(stateNameHash, new InputCombination(actions));
+        }
+
+
+
+        /// <summary>
+        /// Adds the state input.
+        /// </summary>
+        /// <param name="stateName">State name</param>
+        /// <param name="combos">Combos (ex. KeyCodeExtension.Backspace.DOUBLE,KeyCodeExtesnion.Joystick1AxisYPositive.SINGLE)</param>
+        public static void AddStateInput(string stateName, params InputAction[] actions)
+        {
+            AddStateInput(stateName, new InputCombination(actions));
         }
 
 
@@ -485,8 +536,10 @@ namespace ws.winx.input
 		   }
 		}
 		#endregion
-    
 
+
+
+      
     }
 }
 

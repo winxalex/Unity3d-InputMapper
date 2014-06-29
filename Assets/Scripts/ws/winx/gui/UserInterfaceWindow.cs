@@ -84,8 +84,22 @@ namespace ws.winx.gui
 		void loadInputSettings(){
 
 			//Path.Combine(Application.streamingAssetsPath, settingsXML.name+".xml");
+
+			//clone
+			_stateInputCombinations = new Dictionary<int,InputState> (InputManager.Settings.stateInputs);
 			 
-			_stateInputCombinations=InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath,settingsXML.name+".xml")).stateInputs;
+			InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath,settingsXML.name+".xml"));
+	
+			var stateInputs = InputManager.Settings.stateInputs;
+
+			//concat//concate with priority of keys/items loaded from .xml
+			foreach (var KeyValuePair in _stateInputCombinations) {
+				if (!stateInputs.ContainsKey (KeyValuePair.Key))
+					InputManager.Settings.stateInputs.Add (KeyValuePair.Key, KeyValuePair.Value);
+				
+				
+			}
+		
 		}
 
 

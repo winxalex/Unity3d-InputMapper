@@ -57,10 +57,427 @@ namespace ws.winx.input
 				public static int CODE_DATA_MASK = 0x1F;
 				public static int CODE_ID_SHIFT = CODE_DATA_SHIFT + CODE_AXIS_SHIFT;//Default 9;
 				public readonly static int MAX_KEY_CODE=(int)KeyCode.Joystick4Button19+1;
+
+
+            	
+       
+        public static JoystickModifier Joystick1AxisXPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisX, JoystickPovPosition.Right);// 
+        public static JoystickModifier Joystick1AxisXNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisX, JoystickPovPosition.Left);// 
+        public static JoystickModifier Joystick1AxisYPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisY, JoystickPovPosition.Forward);// 
+        public static JoystickModifier Joystick1AxisYNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisY, JoystickPovPosition.Backward);// 
+        public static JoystickModifier Joystick1AxisZPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisZ, JoystickPovPosition.Right);// 
+        public static JoystickModifier Joystick1AxisZNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisZ, JoystickPovPosition.Left);// 
+        public static JoystickModifier Joystick1AxisRPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisR, JoystickPovPosition.Forward);// 
+        public static JoystickModifier Joystick1AxisRNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisR, JoystickPovPosition.Backward);// 
+        public static JoystickModifier Joystick1AxisUPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisU, JoystickPovPosition.Right);// 
+        public static JoystickModifier Joystick1AxisUNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisU, JoystickPovPosition.Left);// 
+        public static JoystickModifier Joystick1AxisVPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisV, JoystickPovPosition.Forward);// 
+        public static JoystickModifier Joystick1AxisVNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisV, JoystickPovPosition.Backward);// 
+        public static JoystickModifier Joystick1AxisPovXPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisPovX, JoystickPovPosition.Right);// 
+        public static JoystickModifier Joystick1AxisPovXNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisPovX, JoystickPovPosition.Left);// 
+        public static JoystickModifier Joystick1AxisPovYPositive = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisPovY, JoystickPovPosition.Forward);// 
+        public static JoystickModifier Joystick1AxisPovYNegative = JoystickModifier.Instance.SetCode(Joysticks.Joystick0, JoystickAxis.AxisPovY, JoystickPovPosition.Backward);// 
+      
+
+        
+        
+        public static KeyModifier Backspace = KeyModifier.Instance.SetCode(KeyCode.Backspace);
+     
+		public static KeyModifier Delete =KeyModifier.Instance.SetCode(KeyCode.Delete);
+		public static KeyModifier Tab =KeyModifier.Instance.SetCode(KeyCode.Tab);
+		public static KeyModifier Clear  =KeyModifier.Instance.SetCode(KeyCode.Clear);
+		public static KeyModifier Return=KeyModifier.Instance.SetCode(KeyCode.Return);
+		public static KeyModifier Pause=KeyModifier.Instance.SetCode(KeyCode.Pause);
+		public static KeyModifier Escape=KeyModifier.Instance.SetCode(KeyCode.Escape);
+		public static KeyModifier Space =KeyModifier.Instance.SetCode(KeyCode.Space);
+		public static KeyModifier Keypad0 =KeyModifier.Instance.SetCode(KeyCode.);
+		public static KeyModifier Keypad1=KeyModifier.Instance.SetCode(KeyCode.);
+		public static KeyModifier Keypad2=KeyModifier.Instance.SetCode(KeyCode.);
+		public static KeyModifier Keypad3=KeyModifier.Instance.SetCode(KeyCode.);
+		Keypad4=KeyModifier.Instance.SetCode(KeyCode.);
+		Keypad5=KeyModifier.Instance.SetCode(KeyCode.);
+		Keypad6=KeyModifier.Instance.SetCode(KeyCode.);
+		Keypad7=KeyModifier.Instance.SetCode(KeyCode.);
+		Keypad8=KeyModifier.Instance.SetCode(KeyCode.);
+		Keypad9=KeyModifier.Instance.SetCode(KeyCode.);
+		KeypadPeriod=KeyModifier.Instance.SetCode(KeyCode.);
+		KeypadDivide=KeyModifier.Instance.SetCode(KeyCode.);
+		KeypadMultiply=KeyModifier.Instance.SetCode(KeyCode.);
+		KeypadMinus=KeyModifier.Instance.SetCode(KeyCode.);
+		KeypadPlus=KeyModifier.Instance.SetCode(KeyCode.);
+		KeypadEnter=KeyModifier.Instance.SetCode(KeyCode.);
+		KeypadEquals=KeyModifier.Instance.SetCode(KeyCode.);
+		UpArrow=KeyModifier.Instance.SetCode(KeyCode.);
+		DownArrow=KeyModifier.Instance.SetCode(KeyCode.);
+		RightArrow=KeyModifier.Instance.SetCode(KeyCode.);
+		LeftArrow=KeyModifier.Instance.SetCode(KeyCode.);
+		Insert=KeyModifier.Instance.SetCode(KeyCode.);
+		Home=KeyModifier.Instance.SetCode(KeyCode.);
+		End=KeyModifier.Instance.SetCode(KeyCode.);
+		PageUp=KeyModifier.Instance.SetCode(KeyCode.);
+		PageDown=KeyModifier.Instance.SetCode(KeyCode.);
+		F1=KeyModifier.Instance.SetCode(KeyCode.);
+		F2=KeyModifier.Instance.SetCode(KeyCode.);
+		F3=KeyModifier.Instance.SetCode(KeyCode.);
+		F4=KeyModifier.Instance.SetCode(KeyCode.);
+		F5=KeyModifier.Instance.SetCode(KeyCode.);
+		F6=KeyModifier.Instance.SetCode(KeyCode.);
+		F7=KeyModifier.Instance.SetCode(KeyCode.);
+		F8=KeyModifier.Instance.SetCode(KeyCode.);
+		F9=KeyModifier.Instance.SetCode(KeyCode.);
+		F10=KeyModifier.Instance.SetCode(KeyCode.);
+		F11=KeyModifier.Instance.SetCode(KeyCode.);
+		F12=KeyModifier.Instance.SetCode(KeyCode.);
+		F13=KeyModifier.Instance.SetCode(KeyCode.);
+		F14=KeyModifier.Instance.SetCode(KeyCode.);
+		F15=KeyModifier.Instance.SetCode(KeyCode.);
+		Alpha0 = 48=KeyModifier.Instance.SetCode(KeyCode.);
+		Alpha1=KeyModifier.Instance.SetCode(KeyCode.);
+		Alpha2=KeyModifier.Instance.SetCode(KeyCode.);
+		Alpha3=KeyModifier.Instance.SetCode(KeyCode.);
+		Alpha4=KeyModifier.Instance.SetCode(KeyCode.);
+		Alpha5=KeyModifier.Instance.SetCode(KeyCode.);
+		Alpha6=KeyModifier.Instance.SetCode(KeyCode.);
+		Alpha7=KeyModifier.Instance.SetCode(KeyCode.);
+		Alpha8=KeyModifier.Instance.SetCode(KeyCode.);
+		Alpha9=KeyModifier.Instance.SetCode(KeyCode.);
+		Exclaim = 33=KeyModifier.Instance.SetCode(KeyCode.);
+		DoubleQuote=KeyModifier.Instance.SetCode(KeyCode.);
+		Hash=KeyModifier.Instance.SetCode(KeyCode.);
+		Dollar=KeyModifier.Instance.SetCode(KeyCode.);
+		Ampersand = 38=KeyModifier.Instance.SetCode(KeyCode.);
+		Quote=KeyModifier.Instance.SetCode(KeyCode.);
+		LeftParen=KeyModifier.Instance.SetCode(KeyCode.);
+		RightParen=KeyModifier.Instance.SetCode(KeyCode.);
+		Asterisk=KeyModifier.Instance.SetCode(KeyCode.);
+		Plus=KeyModifier.Instance.SetCode(KeyCode.);
+		Comma=KeyModifier.Instance.SetCode(KeyCode.);
+		Minus=KeyModifier.Instance.SetCode(KeyCode.);
+		Period=KeyModifier.Instance.SetCode(KeyCode.);
+		Slash=KeyModifier.Instance.SetCode(KeyCode.);
+		Colon = 58=KeyModifier.Instance.SetCode(KeyCode.);
+		Semicolon=KeyModifier.Instance.SetCode(KeyCode.);
+		Less=KeyModifier.Instance.SetCode(KeyCode.);
+		Equals=KeyModifier.Instance.SetCode(KeyCode.);
+		Greater=KeyModifier.Instance.SetCode(KeyCode.);
+		Question=KeyModifier.Instance.SetCode(KeyCode.);
+		At=KeyModifier.Instance.SetCode(KeyCode.);
+		LeftBracket = 91=KeyModifier.Instance.SetCode(KeyCode.);
+		Backslash=KeyModifier.Instance.SetCode(KeyCode.);
+		RightBracket=KeyModifier.Instance.SetCode(KeyCode.);
+		Caret=KeyModifier.Instance.SetCode(KeyCode.);
+		Underscore=KeyModifier.Instance.SetCode(KeyCode.);
+		BackQuote=KeyModifier.Instance.SetCode(KeyCode.);
+		A=KeyModifier.Instance.SetCode(KeyCode.);
+		B=KeyModifier.Instance.SetCode(KeyCode.);
+		C=KeyModifier.Instance.SetCode(KeyCode.);
+		D=KeyModifier.Instance.SetCode(KeyCode.);
+		E=KeyModifier.Instance.SetCode(KeyCode.);
+		F=KeyModifier.Instance.SetCode(KeyCode.);
+		G=KeyModifier.Instance.SetCode(KeyCode.);
+		H=KeyModifier.Instance.SetCode(KeyCode.);
+		I=KeyModifier.Instance.SetCode(KeyCode.);
+		J=KeyModifier.Instance.SetCode(KeyCode.);
+		K=KeyModifier.Instance.SetCode(KeyCode.);
+		L=KeyModifier.Instance.SetCode(KeyCode.);
+		M=KeyModifier.Instance.SetCode(KeyCode.);
+		N=KeyModifier.Instance.SetCode(KeyCode.);
+		O=KeyModifier.Instance.SetCode(KeyCode.);
+		P=KeyModifier.Instance.SetCode(KeyCode.);
+		Q=KeyModifier.Instance.SetCode(KeyCode.);
+		R=KeyModifier.Instance.SetCode(KeyCode.);
+		S=KeyModifier.Instance.SetCode(KeyCode.);
+		T=KeyModifier.Instance.SetCode(KeyCode.);
+		U=KeyModifier.Instance.SetCode(KeyCode.);
+		V=KeyModifier.Instance.SetCode(KeyCode.);
+		W=KeyModifier.Instance.SetCode(KeyCode.);
+		X=KeyModifier.Instance.SetCode(KeyCode.);
+		Y=KeyModifier.Instance.SetCode(KeyCode.);
+		Z=KeyModifier.Instance.SetCode(KeyCode.);
+		Numlock = 300=KeyModifier.Instance.SetCode(KeyCode.);
+		CapsLock=KeyModifier.Instance.SetCode(KeyCode.);
+		ScrollLock=KeyModifier.Instance.SetCode(KeyCode.);
+		RightShift=KeyModifier.Instance.SetCode(KeyCode.);
+		LeftShift=KeyModifier.Instance.SetCode(KeyCode.);
+		RightControl=KeyModifier.Instance.SetCode(KeyCode.);
+		LeftControl=KeyModifier.Instance.SetCode(KeyCode.);
+		RightAlt=KeyModifier.Instance.SetCode(KeyCode.);
+		LeftAlt=KeyModifier.Instance.SetCode(KeyCode.);
+		LeftCommand = 310=KeyModifier.Instance.SetCode(KeyCode.);
+		LeftApple = 310=KeyModifier.Instance.SetCode(KeyCode.);
+		LeftWindows=KeyModifier.Instance.SetCode(KeyCode.);
+		RightCommand = 309=KeyModifier.Instance.SetCode(KeyCode.);
+		RightApple = 309=KeyModifier.Instance.SetCode(KeyCode.);
+		RightWindows = 312=KeyModifier.Instance.SetCode(KeyCode.);
+		AltGr=KeyModifier.Instance.SetCode(KeyCode.);
+		Help = 315=KeyModifier.Instance.SetCode(KeyCode.);
+		Print=KeyModifier.Instance.SetCode(KeyCode.);
+		SysReq=KeyModifier.Instance.SetCode(KeyCode.);
+		Break=KeyModifier.Instance.SetCode(KeyCode.);
+		Menu=KeyModifier.Instance.SetCode(KeyCode.);
+		Mouse0 = 323=KeyModifier.Instance.SetCode(KeyCode.);
+		Mouse1=KeyModifier.Instance.SetCode(KeyCode.);
+		Mouse2=KeyModifier.Instance.SetCode(KeyCode.);
+		Mouse3=KeyModifier.Instance.SetCode(KeyCode.);
+		Mouse4=KeyModifier.Instance.SetCode(KeyCode.);
+		Mouse5=KeyModifier.Instance.SetCode(KeyCode.);
+		Mouse6=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton0=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton1=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton2=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton3=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton4=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton5=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton6=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton7=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton8=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton9=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton10=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton11=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton12=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton13=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton14=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton15=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton16=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton17=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton18=KeyModifier.Instance.SetCode(KeyCode.);
+		JoystickButton19=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button0=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button1=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button2=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button3=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button4=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button5=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button6=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button7=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button8=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button9=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button10=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button11=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button12=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button13=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button14=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button15=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button16=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button17=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button18=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick1Button19=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button0=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button1=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button2=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button3=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button4=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button5=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button6=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button7=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button8=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button9=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button10=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button11=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button12=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button13=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button14=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button15=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button16=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button17=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button18=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick2Button19=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button0=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button1=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button2=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button3=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button4=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button5=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button6=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button7=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button8=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button9=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button10=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button11=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button12=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button13=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button14=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button15=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button16=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button17=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button18=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick3Button19=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button0=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button1=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button2=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button3=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button4=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button5=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button6=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button7=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button8=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button9=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button10=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button11=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button12=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button13=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button14=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button15=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button16=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button17=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button18=KeyModifier.Instance.SetCode(KeyCode.);
+		Joystick4Button19=KeyModifier.Instance.SetCode(KeyCode.);
+    
+
+    
+    
+
+
+    public sealed class KeyModifier
+{
+   private static readonly KeyModifier instance = new KeyModifier();
+   
+   private KeyModifier(){}
+
+ private KeyCode __code;
+
+   public static KeyModifier Instance
+   {
+      get 
+      {
+         return instance; 
+      }
+   }
+
+
+     public KeyModifier SetCode(KeyCode code){
+             instance.__code=code;
+         return instance;
+     }
+
+
+         public  InputAction SINGLE{
+            get
+            {
+                return new InputAction(this.__code, InputActionType.SINGLE);
+            }
+           
+        }
+
+
+           public  InputAction DOUBLE{
+            get
+            {
+                return new InputAction(this.__code, InputActionType.DOUBLE);
+            }
+            
+        }
+
+          public  InputAction LONG{
+            get
+            {
+                return new InputAction(this.__code, InputActionType.LONG);
+            }
+            
+        }
+
+}
+
+
+
+    public sealed class JoystickModifier
+    {
+        private static readonly JoystickModifier instance = new JoystickModifier();
+
+        private JoystickModifier() { }
+
+      
+
+        public static JoystickModifier Instance
+        {
+            get
+            {
+                return instance;
+            }
+        }
+
+
+        private Joysticks __joysticks;
+        private JoystickAxis __joystickAxis;
+        private JoystickPovPosition __joystickPovPosition;
+
+        public JoystickModifier SetCode(Joysticks joysticks, JoystickAxis joystickAxis, JoystickPovPosition joystickPovPosition)
+        {
+            // TODO: Complete member initialization
+            instance.__joysticks = joysticks;
+            instance.__joystickAxis = joystickAxis;
+            instance.__joystickPovPosition = joystickPovPosition;
+
+            return instance;
+        }
+
+
+        public InputAction SINGLE
+        {
+            get
+            {
+                return new InputAction(KeyCodeExtension.toCode(instance.__joysticks, instance.__joystickAxis, instance.__joystickPovPosition), InputActionType.SINGLE);
+            }
+
+        }
+
+
+        public InputAction DOUBLE
+        {
+            get
+            {
+                return new InputAction(KeyCodeExtension.toCode(instance.__joysticks, instance.__joystickAxis, instance.__joystickPovPosition), InputActionType.DOUBLE);
+            }
+
+        }
+
+        public InputAction LONG
+        {
+            get
+            {
+                return new InputAction(KeyCodeExtension.toCode(instance.__joysticks, instance.__joystickAxis, instance.__joystickPovPosition), InputActionType.LONG);
+      
+            }
+
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 				
-				public static JoystickAxis toAxis (this KeyCode keycode,int code){
-					return toAxis(code);
-				}
+                //public static JoystickAxis toAxis (this KeyCode keycode,int code){
+                //    return toAxis(code);
+                //}
 
 				public static JoystickAxis toAxis (int code)
 				{

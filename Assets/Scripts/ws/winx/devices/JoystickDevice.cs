@@ -836,6 +836,14 @@ namespace ws.winx.devices
 
 
 
+
+    
+
+  
+    
+
+
+
     #region JoystickAxis
 
 		/// <summary>

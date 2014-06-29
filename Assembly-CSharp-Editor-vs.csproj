@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Editor\InputMapper.cs" />
+     <None Include="Assets\StreamingAssets\InputSettings.xml" />
      <None Include="Assets\Necromancer GUI\Kingthings.txt" />
      <None Include="Assets\Necromancer GUI\Readme.txt" />
  <Reference Include="Assembly-UnityScript">

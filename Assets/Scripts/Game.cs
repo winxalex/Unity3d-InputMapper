@@ -9,6 +9,7 @@ using System.Runtime.Serialization;
 using System.Linq;
 using ws.winx.platform.windows;
 using ws.winx.devices;
+using ws.winx.input.states;
 
 namespace ws.winx{
 public class Game : MonoBehaviour {
@@ -39,12 +40,20 @@ public class Game : MonoBehaviour {
 //			InputManager.AddStateInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
 //			InputManager.AddStateInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
 //			
+			//if you want to load some states from .xml and add custom manually first load settings xml
+			InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath,"InputSettings.xml"));
 
+            InputManager.AddStateInput("adasdasd", KeyCodeExtension.Backspace.SINGLE, KeyCodeExtension.Joystick1AxisPovXNegative.LONG, KeyCodeExtension.Delete.DOUBLE);
 
         //Add state and event 
-            InputManager.AddStateInput("Click_W+C_State", "W");
+			InputManager.AddStateInput("Click_W+C_State", "W+C");
+
+
+			//KeyCode.Alpha0.Long,
+			//Joysticks.Joystick0.
 
             InputEvent ev = new InputEvent("Click_W+C_State");
+			//InputEvent ev = new InputEvent((int)States.SomeState);
         
 			ev.CONT+=new EventHandler(Handle1);
             ev.CONT+= new EventHandler(Handle2);
@@ -78,31 +87,30 @@ public class Game : MonoBehaviour {
 	void Update () {
 
 
-
+//			if(InputManager.GetInputDown((int)States.Wave)){
+//								Debug.Log("Wave Down");
+//			}
 		
-			//animator.Play(" ");
+
 
 //			if(InputManager.GetInput((int)States.Walk_Forward,false)){
 //
 //			}
 	
-//			if(InputManager.GetInput((int)CharacterInputControllerClass.States.Base_Layer_Walk_Forward,false,false)){
-//				Debug.Log("Hold down");
-//			}
 
-//			if(InputManager.GetInputDown((int)CharacterInputControllerClass.States.Base_Layer_Walk_Forward)){
+//          if(InputManager.GetInputDown((int)States.Walk_Forward)){
 //				Debug.Log("Down");
 //			}
 //
-//			if(InputManager.GetInputUp((int)CharacterInputControllerClass.States.Base_Layer_Walk_Forward)){
+			//			if(InputManager.GetInputUp((int)States.Walk_Forward)){
 //				Debug.Log("Up");
 //			}
 //
 //		
 //
-//
-//			float analogValue=InputManager.GetInput((int)CharacterInputControllerClass.States.Base_Layer_Walk_Forward,false,0.3f,0.1f,0f);
-//			analogValue-=InputManager.GetInput((int)CharacterInputControllerClass.States.Base_Layer_MyState,false,0.3f,0.1f,0f);
+//          //using input as analog value
+			//float analogValue=InputManager.GetInput((int)States.Walk_Forward,false,0.3f,0.1f,0f);
+//			analogValue-=InputManager.GetInput((int)States.Base_Layer_MyState,false,0.3f,0.1f,0f);
 //
 //			Debug.Log(analogValue);
 
