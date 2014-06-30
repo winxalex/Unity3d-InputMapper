@@ -23,7 +23,7 @@ public class Game : MonoBehaviour {
 //		static int rollState = Animator.StringToHash("Base Layer.Roll");
 //		static int waveState = Animator.StringToHash("Layer2.Wave");
 
-		public Animator animator;
+	
 
 
 
@@ -42,16 +42,16 @@ public class Game : MonoBehaviour {
         
        
 			//		adding input-states pairs manually
-			//			InputManager.AddStateInput("My State1",new InputCombination(KeyCodeExtension.toCode(Joysticks.Joystick1,JoystickAxis.AxisPovX,JoystickPovPosition.Forward),(int)KeyCode.Joystick4Button9,(int)KeyCode.P,(int)KeyCode.JoystickButton0));
-			//			InputManager.AddStateInput("My State2",new InputCombination(KeyCode.Joystick4Button9,KeyCode.P,KeyCode.JoystickButton0));
-			//			InputManager.AddStateInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
-			//			InputManager.AddStateInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
+			//			InputManager.MapStateToInput("My State1",new InputCombination(KeyCodeExtension.toCode(Joysticks.Joystick1,JoystickAxis.AxisPovX,JoystickPovPosition.Forward),(int)KeyCode.Joystick4Button9,(int)KeyCode.P,(int)KeyCode.JoystickButton0));
+			//			InputManager.MapStateToInput("My State2",new InputCombination(KeyCode.Joystick4Button9,KeyCode.P,KeyCode.JoystickButton0));
+			//			InputManager.MapStateToInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
+			//			InputManager.MapStateToInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
 
 			InputManager.MapStateToInput("Click_W+C_State", KeyCodeExtension.Alpha0.DOUBLE,KeyCodeExtension.JoystickAxisPovYPositive.SINGLE);
 
 
 			
-
+			//Event Based input handling
             InputEvent ev = new InputEvent("Click_W+C_State");
 			//InputEvent ev = new InputEvent((int)States.SomeState);
         
