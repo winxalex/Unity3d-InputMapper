@@ -7,7 +7,10 @@ namespace ws.winx.devices
 {
 	class XInputDevice:JoystickDevice
 	{
-
+        public XInputDevice(int id,int axes,int buttons)
+            : base(id, axes, buttons)
+        {
+        }
 
         public void SetMotor(float leftMotor, float rightMotor)
         {

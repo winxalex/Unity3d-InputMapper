@@ -130,13 +130,13 @@ using UnityEngine;
 
 		       return null;
 
-                JoystickDevice joystick;
+                XInputDevice joystick;
                 int inx = 0;
 
 				_hidInterface=info.hidInterface;
 
 
-                joystick = new JoystickDevice(info.id, 8, 10);
+                joystick = new XInputDevice(info.id, 8, 10);
                
 
                 //inti button structure
