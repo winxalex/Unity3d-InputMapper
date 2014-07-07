@@ -275,6 +275,11 @@ using UnityEngine;
     }
 
 
+
+    internal void SetMotor(XInputDevice device,float  leftMotor, float rightMotor)
+    {
+        UnsafeNativeMethods.XInputGamePadSetState((uint)device.ID,leftMotor,rightMotor);
+    }
 	
 
 

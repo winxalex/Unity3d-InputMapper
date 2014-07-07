@@ -50,6 +50,12 @@
      <None Include="Assets\StreamingAssets\InputSettings.xml" />
      <None Include="Assets\Necromancer GUI\Kingthings.txt" />
      <None Include="Assets\Necromancer GUI\Readme.txt" />
+ <Reference Include="AssetStoreTools">
+ <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Assets/AssetStoreTools/Editor/AssetStoreTools.dll</HintPath>
+ </Reference>
+ <Reference Include="AssetStoreToolsExtra">
+ <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Assets/AssetStoreTools/Editor/AssetStoreToolsExtra.dll</HintPath>
+ </Reference>
  <Reference Include="Mono.TextTemplating">
  <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Assets/Editor/Mono.TextTemplating.dll</HintPath>
  </Reference>
@@ -58,8 +64,6 @@
  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp.csproj">
-      <Project>{6693B6BC-2394-7970-6EAE-2E1FFD1EDBA8}</Project>      <Name>Assembly-CSharp</Name>    </ProjectReference>
     <ProjectReference Include="Assembly-UnityScript.unityproj">
       <Project>{C2A8E536-5566-07AD-8B27-9AAEC642B98B}</Project>      <Name>Assembly-UnityScript</Name>    </ProjectReference>
   </ItemGroup>

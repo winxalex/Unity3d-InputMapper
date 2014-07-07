@@ -50,6 +50,8 @@ public class Game : MonoBehaviour {
 			InputManager.MapStateToInput("Click_W+C_State", KeyCodeExtension.Alpha0.DOUBLE,KeyCodeExtension.JoystickAxisPovYPositive.SINGLE);
 
 
+       // MyCodeExtension.GAMEPAD_X.SINGLE
+           // InputManager.MapStateToInput("Vibrator", MyCodeExtension.GAMEPAD_VIBRATOR.SINGLE);
 			
 			//Event Based input handling
             InputEvent ev = new InputEvent("Click_W+C_State");

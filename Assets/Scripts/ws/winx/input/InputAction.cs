@@ -185,16 +185,11 @@ namespace ws.winx.input
 		/// </summary>
 		/// <returns>The enum string.</returns>
 		/// <param name="code">Code.</param>
-		protected string ToEnumString(int code){
+		protected virtual string ToEnumString(int code){
 		
-
-			if(code<KeyCodeExtension.MAX_KEY_CODE){
-				return ((KeyCode)code).ToString();
-			}else{//joystick extension codes for joystick axis
-
-				return KeyCodeExtension.toEnumString(code);
-
-			}
+           // InputManager.keyCodeExtension
+            return KeyCodeExtension.toEnumString(code);
+		
 		
 
 		}

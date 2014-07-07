@@ -33,9 +33,9 @@ namespace ws.winx.input
            
         }
 
-        public InputEvent(string stateName)
+        public InputEvent(string stateName):this(Animator.StringToHash(stateName))
         {
-           _stateNameHash=Animator.StringToHash(stateName);
+          
         }
 
 

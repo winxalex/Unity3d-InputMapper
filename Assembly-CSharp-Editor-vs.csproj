@@ -53,16 +53,18 @@
  <Reference Include="Assembly-UnityScript">
  <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Library/ScriptAssemblies/Assembly-UnityScript.dll</HintPath>
  </Reference>
+ <Reference Include="AssetStoreTools">
+ <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Assets/AssetStoreTools/Editor/AssetStoreTools.dll</HintPath>
+ </Reference>
+ <Reference Include="AssetStoreToolsExtra">
+ <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Assets/AssetStoreTools/Editor/AssetStoreToolsExtra.dll</HintPath>
+ </Reference>
  <Reference Include="Mono.TextTemplating">
  <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Assets/Editor/Mono.TextTemplating.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.Graphs">
  <HintPath>E:/Program Files/Unity/Editor/Data/Managed/UnityEditor.Graphs.dll</HintPath>
  </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp-vs.csproj">
-      <Project>{6693B6BC-2394-7970-6EAE-2E1FFD1EDBA8}</Project>      <Name>Assembly-CSharp-vs</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

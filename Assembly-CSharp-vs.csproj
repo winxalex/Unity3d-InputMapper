@@ -55,6 +55,10 @@
      <Compile Include="Assets\Scripts\ws\winx\devices\IDeviceExtension.cs" />
      <Compile Include="Assets\Scripts\ws\winx\devices\IJoystickDevice.cs" />
      <Compile Include="Assets\Scripts\ws\winx\devices\JoystickDevice.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\devices\WiimoteDevice.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\examples\MyCodeExtension.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\examples\MyJoystickDevice.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\examples\MyXInputDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\gui\UserInterfaceWindow.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\InputAction.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\InputActionType.cs" />
@@ -76,9 +80,11 @@
      <Compile Include="Assets\Scripts\ws\winx\platform\OSX\OSXDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\OSX\OSXHIDInterface.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\HIDImports.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Windows\WiiDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\WinHIDInterface.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\WinMMDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\XInputDriver.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Windows\wiiMotedata.cs" />
      <Compile Include="Assets\Scripts\ws\winx\unity\Tags.cs" />
      <None Include="Assets\StreamingAssets\InputSettings.xml" />
      <None Include="Assets\Necromancer GUI\Kingthings.txt" />

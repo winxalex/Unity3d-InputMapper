@@ -194,7 +194,7 @@ namespace ws.winx.devices
 				/// </summary>
 				/// <returns><c>true</c>, if key was gotten, <c>false</c> otherwise.</returns>
 				/// <param name="code">Code. joystick(4bits) + axis(4bits) + data(+/- 5bits);</param>
-				public bool GetKey (int code)
+				public virtual bool GetKey (int code)
 				{
 						Update();
 
@@ -251,14 +251,14 @@ namespace ws.winx.devices
 				/// </summary>
 				/// <returns><c>true</c>, if key up was gotten, <c>false</c> otherwise.</returns>
 				/// <param name="code">Code.</param>
-				public bool GetKeyUp (int code)
+				public virtual  bool GetKeyUp (int code)
 				{
 						Update();// 
 
 
 						JoystickAxis axis = KeyCodeExtension.toAxis (code);
 						int data = KeyCodeExtension.toData (code);
-
+                    
 						if (axis == JoystickAxis.None)
 								return button_collection [data].buttonState == JoystickButtonState.Up;
 								
@@ -294,7 +294,7 @@ namespace ws.winx.devices
 				/// </summary>
 				/// <returns><c>true</c>, if key down was gotten, <c>false</c> otherwise.</returns>
 				/// <param name="code">Code.</param>
-				public bool GetKeyDown (int code)
+				public virtual bool GetKeyDown (int code)
 				{
                     Update();
 
@@ -343,7 +343,7 @@ namespace ws.winx.devices
 		/// Gets the input.
 		/// </summary>
 		/// <returns>The input.</returns>
-		public int GetInput(){
+		public virtual int GetInput(){
 				
 					Update();
 
@@ -866,7 +866,13 @@ namespace ws.winx.devices
 				/// <summary>The seventh axis of the JoystickDevice.</summary>
 				AxisPovX,
 				/// <summary>The eighth axis of the JoystickDevice.</summary>
-				AxisPovY,
+                AxisPovY,
+                /// <summary>The nineth axis of the JoystickDevice.</summary>
+				AxisAccX,
+                /// <summary>The tenth axis of the JoystickDevice.</summary>
+                AxisAccY,
+                /// <summary>The eleventh axis of the JoystickDevice.</summary>
+                AxisAccZ,
 				None
         
 
@@ -893,11 +899,11 @@ namespace ws.winx.devices
 
 		public enum JoystickPovPosition : ushort
 		{
-				Centered = 0xFFFF,
-				Forward = 36000,/* 0 */
-				Right = 9000,
-				Backward = 18000,
-				Left = 27000
+				Centered = 0xFFFF,/* x */
+				Forward = 36000,/* 3 */
+				Right = 9000,/* 0 */
+				Backward = 18000,/* 1 */
+				Left = 27000/* 2 */
 		}
 
     #endregion
