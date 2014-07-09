@@ -33,6 +33,10 @@ namespace ws.winx.input
 		private static IHIDInterface __hidInterface;//=new ws.winx.platform.windows.WinHIDInterface();
         private static List<IJoystickDriver> __drivers;
 
+
+
+      
+
 		internal static IHIDInterface hidInterface{
 			get{ 
 

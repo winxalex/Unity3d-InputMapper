@@ -137,8 +137,7 @@ using UnityEngine;
 
 
                 joystick = new XInputDevice(info.id, 8, 10);
-                joystick.driver = this;
-               
+              
 
                 //inti button structure
                 for (; inx < 10; inx++)

@@ -21,6 +21,7 @@ namespace ws.winx.input
 			public static int MAX_NUM_JOYSTICK_BUTTONS=20;
 		    public static int MAX_NUM_MOUSE_BUTTONS=7;
 
+           
 
 
 		public delegate object GetKeyBaseDelegate(int code);

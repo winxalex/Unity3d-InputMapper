@@ -27,6 +27,8 @@ namespace ws.winx.platform.windows
 
         JoystickDevicesCollection _joysticks;
 
+        internal readonly Dictionary<IJoystickDevice, IHIDDeviceInfo> DeviceHIDInfos;
+
         #endregion
 
 
@@ -67,6 +69,7 @@ namespace ws.winx.platform.windows
         {
             __drivers = drivers;
             _joysticks = new JoystickDevicesCollection();
+            DeviceHIDInfos = new Dictionary<IJoystickDevice, IHIDDeviceInfo>();
 
             Enumerate();
         }
@@ -139,8 +142,8 @@ namespace ws.winx.platform.windows
 
 
 
-            var deviceInfo = GetDeviceInfo(rawInputDeviceList.DeviceHandle);
-
+           DeviceInfo deviceInfo = GetDeviceInfo(rawInputDeviceList.DeviceHandle);
+          
 			return new HIDDeviceInfo(inx, Convert.ToInt32(deviceInfo.HIDInfo.VendorID), Convert.ToInt32(deviceInfo.HIDInfo.ProductID), rawInputDeviceList.DeviceHandle, this, GetDevicePath(rawInputDeviceList.DeviceHandle));
 
         }
@@ -378,6 +381,9 @@ namespace ws.winx.platform.windows
             }
         }
         #endregion
+
+
+
 
         #region JoystickDevicesCollection
 

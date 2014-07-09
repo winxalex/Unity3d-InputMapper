@@ -8,6 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 using System;
+
 namespace ws.winx.platform
 {
 		public interface IHIDDeviceInfo
@@ -18,6 +19,8 @@ namespace ws.winx.platform
 			IntPtr device {get;}
 			string DevicePath {get;}
 			int id{get;}
+            
+            
 		}
 }
 

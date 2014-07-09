@@ -873,6 +873,12 @@ namespace ws.winx.devices
                 AxisAccY,
                 /// <summary>The eleventh axis of the JoystickDevice.</summary>
                 AxisAccZ,
+                /// <summary>The twelveth axis of the JoystickDevice.</summary>
+                AxisAccR,
+                /// <summary>The 13th axis of the JoystickDevice.</summary>
+                AxisAccU,
+                /// <summary>The 14th axis of the JoystickDevice.</summary>
+                AxisAccV,
 				None
         
 

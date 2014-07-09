@@ -86,7 +86,7 @@ namespace ws.winx.input
         }
 
 
-        public event EventHandler  CONT 
+        public event EventHandler  INPUT 
         {
             add {
                 AddHandler(_stateNameHash, value, (uint)EventType.CONT);
