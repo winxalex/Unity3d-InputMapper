@@ -1,10 +1,6 @@
 ﻿//////////////////////////////////////////////////////////////////////////////////
 //	
 //  Original code by Written by Brian Peek (http://www.brianpeek.com/)
-//	for MSDN's Coding4Fun (http://msdn.microsoft.com/coding4fun/)
-//	Visit http://blogs.msdn.com/coding4fun/archive/2007/03/14/1879033.aspx
-//  and http://www.codeplex.com/WiimoteLib
-//	for more information
 //////////////////////////////////////////////////////////////////////////////////
 
 using System;
@@ -26,21 +22,20 @@ namespace ws.winx.platform.windows
     public class WiiDriver : IJoystickDriver, IDisposable
     {
 
-        internal struct AsyncPackage{
-            FileStream stream=null;
-            SafeFileHandle handle=null;
-            WiimoteDevice device=null;
-            bool isReady=true;
-            IAsyncResult result=null;
-
+        internal class AsyncPackage{
+            public FileStream stream=null;
+            public SafeFileHandle handle=null;
+            public WiimoteDevice device=null;
+            public bool isReady=true;
+            public IAsyncResult result=null;
+           public byte[] buffer=new byte[REPORT_LENGTH];
         }
 
 
-        protected static Dictionary<WiimoteDevice, AsyncPackage> _AsyncPackages;
-       // protected static Dictionary<WiimoteDevice, FileStream> _FileStreams;
+        
 
 
-
+        protected static WinHIDInterface _hidInterface;
 
         ///// <summary>
         ///// Event raised when Wiimote state is changed
@@ -101,7 +96,7 @@ namespace ws.winx.platform.windows
         // size of requested read
         private short mSize;
 
-        private WiimoteDevice __currentDevice;
+       
 
 
         // event for read data processing
@@ -120,40 +115,56 @@ namespace ws.winx.platform.windows
 
         public void Update(IJoystickDevice joystick)
         {
-            //Read from joystick stream
+            
+            HIDDeviceInfo info=_hidInterface.DeviceHIDInfos[joystick] as HIDDeviceInfo;
+            AsyncPackage package = (AsyncPackage)info.Extension;
 
-            //FileStream stream = ((WiimoteDevice)joystick).mStream;
+            if (package.isReady)
+            {
+                package.isReady = false;
 
-            //// if the stream is valid and ready
-            //if (stream != null && stream.CanRead)
-            //{
-            //    // setup the read and the callback
-            //    byte[] buff = new byte[REPORT_LENGTH];
-            //   // stream.BeginRead(buff, 0, REPORT_LENGTH, new AsyncCallback(OnReadData), buff);
+				Array.Clear(package.buffer, 0, REPORT_LENGTH);
+               
+                package.result = package.stream.BeginRead(package.buffer, 0, REPORT_LENGTH, null, null);
 
-              // IAsyncResult result = stream.BeginRead(buff, 0, REPORT_LENGTH, null, null);
-            //result.
-            //    try
-            //    {
-            //        // end the current read
-            //        stream.EndRead(result);
+                
 
-            //        // parse it
-            //        if (ParseInputReport(buff))
-            //        {
-            //            // post an event
-            //           // if (WiimoteChanged != null)
-            //            //    WiimoteChanged(this, new WiimoteChangedEventArgs(mWiimoteState));
-            //        }
+            }
+            else if(package.result.IsCompleted)
+            {
+                // if the stream is valid and ready
+                if (package.stream != null && package.stream.CanRead)
+                {
+                   
+             
+                    try
+                    {
+                        // end the current read
+                        package.stream.EndRead(package.result);
 
-                    
-            //    }
-            //    catch (OperationCanceledException)
-            //    {
-            //        Debug.WriteLine("OperationCanceledException");
-            //    }
+                        // parse it
+                        if (ParseInputReport(package))
+                        {
+                            // post an event
+                           // if (WiimoteChanged != null)
+                            //    WiimoteChanged(this, new WiimoteChangedEventArgs(mWiimoteState));
+                        }
 
-            //}
+
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        Debug.WriteLine("OperationCanceledException");
+                    }
+
+                }
+
+
+                package.isReady = true;
+            }
+
+           
+          
         }
 
 
@@ -162,8 +173,8 @@ namespace ws.winx.platform.windows
           
 
             if (info.VID == VID && info.PID == PID)
-            {  
-                 
+            {
+                _hidInterface = info.hidInterface as WinHIDInterface;
 
                 // open a read/write handle to our device using the DevicePath returned
                 SafeFileHandle handle = UnsafeNativeMethods.CreateFile(info.DevicePath, FileAccess.ReadWrite, FileShare.ReadWrite, IntPtr.Zero, FileMode.Open, EFileAttributes.Overlapped, IntPtr.Zero);
@@ -178,17 +189,28 @@ namespace ws.winx.platform.windows
               
 
                 // create new Device
-                joystick = new WiimoteDevice(info.id, 16, 10,4,4);
+                joystick = new WiimoteDevice(info.id, 16, 12,4,4);
 
-                WiiDriver._FileStreams[joystick] = stream;
-                WiiDriver._AsyncPackages[joystick] = handle;
+
+                AsyncPackage aPackage;
+                aPackage = new AsyncPackage();
+                aPackage.device = joystick;
+                aPackage.handle = handle;
+                aPackage.stream = stream;
+
+
+                info.Extension = aPackage;
+
+                
+                
+
 
                
-                             
 
+               
 
                 //inti button structure
-                for (; inx < 10; inx++)
+                for (; inx < 12; inx++)
                 {
                     joystick.Buttons[inx] = new ButtonDetails();
                 }
@@ -207,6 +229,18 @@ namespace ws.winx.platform.windows
                 //AccZ
                 axisDetails = new AxisDetails();
                 joystick.Axis[JoystickAxis.AxisAccZ] = axisDetails;
+
+                 //AccR
+                axisDetails = new AxisDetails();
+                joystick.Axis[JoystickAxis.AxisAccR] = axisDetails;
+
+                //AccU
+                axisDetails = new AxisDetails();
+                joystick.Axis[JoystickAxis.AxisAccU] = axisDetails;
+
+                //AccV
+                axisDetails = new AxisDetails();
+                joystick.Axis[JoystickAxis.AxisAccV] = axisDetails;
 
 
                 //LX
@@ -253,12 +287,14 @@ namespace ws.winx.platform.windows
                 axisDetails.isHat = true;
                 joystick.Axis[JoystickAxis.AxisPovY] = axisDetails;
 
-                __currentDevice = joystick;
+              
 
 
 
                 // start an async read operation on it
-               //BeginAsyncRead();
+
+                //ORIGINAL HANDLING OF INPUT
+                // BeginAsyncRead(package);
 
                 // read the calibration info from the controller
                 try
@@ -275,7 +311,7 @@ namespace ws.winx.platform.windows
                 // force a status check to get the state of any extensions plugged in at startup
                 GetStatus(joystick);
 
-                __currentDevice = null;
+               
 
                 return joystick;
 
@@ -285,130 +321,25 @@ namespace ws.winx.platform.windows
             return null;
         }
 
-        /// <summary>
-        /// Connect to a Wiimote paired to the PC via Bluetooth
-        /// </summary>
-        //public void Connect()
-        //{
-        //    int index = 0;
-        //    bool found = false;
-        //    Guid guid;
-
-        //    // get the GUID of the HID class
-        //    HIDImports.HidD_GetHidGuid(out guid);
-
-        //    // get a handle to all devices that are part of the HID class
-        //    // Fun fact:  DIGCF_PRESENT worked on my machine just fine.  I reinstalled Vista, and now it no longer finds the Wiimote with that parameter enabled...
-        //    IntPtr hDevInfo = HIDImports.SetupDiGetClassDevs(ref guid, null, IntPtr.Zero, HIDImports.DIGCF_DEVICEINTERFACE);// | HIDImports.DIGCF_PRESENT);
-
-        //    // create a new interface data struct and initialize its size
-        //    HIDImports.SP_DEVICE_INTERFACE_DATA diData = new HIDImports.SP_DEVICE_INTERFACE_DATA();
-        //    diData.cbSize = Marshal.SizeOf(diData);
-
-        //    // get a device interface to a single device (enumerate all devices)
-        //    while (HIDImports.SetupDiEnumDeviceInterfaces(hDevInfo, IntPtr.Zero, ref guid, index, ref diData))
-        //    {
-        //        UInt32 size;
-
-        //        // get the buffer size for this device detail instance (returned in the size parameter)
-        //        HIDImports.SetupDiGetDeviceInterfaceDetail(hDevInfo, ref diData, IntPtr.Zero, 0, out size, IntPtr.Zero);
-
-        //        // create a detail struct and set its size
-        //        HIDImports.SP_DEVICE_INTERFACE_DETAIL_DATA diDetail = new HIDImports.SP_DEVICE_INTERFACE_DETAIL_DATA();
-
-        //        // yeah, yeah...well, see, on Win x86, cbSize must be 5 for some reason.  On x64, apparently 8 is what it wants.
-        //        // someday I should figure this out.  Thanks to Paul Miller on this...
-        //        diDetail.cbSize = (uint)(IntPtr.Size == 8 ? 8 : 5);
-
-        //        // actually get the detail struct
-        //        if (HIDImports.SetupDiGetDeviceInterfaceDetail(hDevInfo, ref diData, ref diDetail, size, out size, IntPtr.Zero))
-        //        {
-        //            Debug.WriteLine(index + " " + diDetail.DevicePath + " " + Marshal.GetLastWin32Error());
-
-        //            // open a read/write handle to our device using the DevicePath returned
-        //            mHandle = HIDImports.CreateFile(diDetail.DevicePath, FileAccess.ReadWrite, FileShare.ReadWrite, IntPtr.Zero, FileMode.Open, HIDImports.EFileAttributes.Overlapped, IntPtr.Zero);
-
-        //            // create an attributes struct and initialize the size
-        //            HIDImports.HIDD_ATTRIBUTES attrib = new HIDImports.HIDD_ATTRIBUTES();
-        //            attrib.Size = Marshal.SizeOf(attrib);
-
-        //            // get the attributes of the current device
-        //            if (HIDImports.HidD_GetAttributes(mHandle.DangerousGetHandle(), ref attrib))
-        //            {
-        //                // if the vendor and product IDs match up
-        //                if (attrib.VendorID == VID && attrib.ProductID == PID)
-        //                {
-        //                    Debug.WriteLine("Found it!");
-        //                    found = true;
-
-        //                    // create a nice .NET FileStream wrapping the handle above
-        //                    mStream = new FileStream(mHandle, FileAccess.ReadWrite, REPORT_LENGTH, true);
-
-        //                    // start an async read operation on it
-        //                    BeginAsyncRead();
-
-        //                    // read the calibration info from the controller
-        //                    try
-        //                    {
-        //                        ReadCalibration();
-        //                    }
-        //                    catch
-        //                    {
-        //                        // if we fail above, try the alternate HID writes
-        //                        mAltWriteMethod = true;
-        //                        ReadCalibration();
-        //                    }
-
-        //                    // force a status check to get the state of any extensions plugged in at startup
-        //                    GetStatus();
-
-        //                    break;
-        //                }
-        //                else
-        //                {
-        //                    // otherwise this isn't the controller, so close up the file handle
-        //                    mHandle.Close();
-        //                }
-        //            }
-        //        }
-        //        else
-        //        {
-        //            // failed to get the detail struct
-        //            throw new WiimoteException("SetupDiGetDeviceInterfaceDetail failed on index " + index);
-        //        }
-
-        //        // move to the next device
-        //        index++;
-        //    }
-
-        //    // clean up our list
-        //    HIDImports.SetupDiDestroyDeviceInfoList(hDevInfo);
-
-        //    // if we didn't find a Wiimote, throw an exception
-        //    if (!found)
-        //        throw new WiimoteException("Wiimote not found in HID device list.");
-        //}
+  
 
    
 
-        internal struct AsyncronPackage{
-        }
 
         ///// <summary>
         ///// Start reading asynchronously from the controller
         ///// </summary>
-        new AsyncronPackage(device, buff)
-            new AsyncCallback(OnReadData)
-        private void BeginAsyncRead(WiimoteDevice device )
+        private void BeginAsyncRead(AsyncPackage package)
         {
-            FileStream stream = WiiDriver._FileStreams[device];
+           
+            FileStream stream=package.stream;
 
             // if the stream is valid and ready
             if (stream != null && stream.CanRead)
             {
                 // setup the read and the callback
                 byte[] buff = new byte[REPORT_LENGTH];
-                stream.BeginRead(buff, 0, REPORT_LENGTH, , );
+                stream.BeginRead(buff, 0, REPORT_LENGTH,new AsyncCallback(OnReadData) ,package );
             }
         }
 
@@ -418,16 +349,12 @@ namespace ws.winx.platform.windows
         /// <param name="ar">State information for the callback</param>
         private void OnReadData(IAsyncResult ar)
         {
-            AsyncronPackage package = ((AsyncronPackage)ar.AsyncState);
+            AsyncPackage package = ((AsyncPackage)ar.AsyncState);
+ 
 
-            WiimoteDevice device = package.device;
+            FileStream mStream =package.stream;
 
-            //ar.AsyncWaitHandle.WaitOne(
-
-            FileStream mStream = WiiDriver._FileStreams[device];
-
-            // grab the byte buffer
-            byte[] buff = (byte[])package.buff;
+          
 
             try
             {
@@ -435,7 +362,7 @@ namespace ws.winx.platform.windows
                 mStream.EndRead(ar);
 
                 // parse it
-                ParseInputReport(package, buff);
+                ParseInputReport(package);
                 //if (ParseInputReport(device,buff))
                // {
                     // post an event
@@ -457,8 +384,10 @@ namespace ws.winx.platform.windows
         /// </summary>
         /// <param name="buff">Data buffer to parse</param>
         /// <returns>Returns a boolean noting whether an event needs to be posted</returns>
-        private bool ParseInputReport(WiimoteDevice device, byte[] buff)
+        private bool ParseInputReport(AsyncPackage package)
         {
+            byte[] buff=package.buffer;
+            WiimoteDevice device=package.device;
             InputReport type = (InputReport)buff[0];
 
             switch (type)
@@ -514,16 +443,17 @@ namespace ws.winx.platform.windows
 
 
                     //if (mWiimoteState.Extension != extension)
-                    if (device.Extension != extension)
+                    if (device.hasExtensionDevice != extension)
                     {
-                        device.Extension = extension;
+                        device.hasExtensionDevice = extension;
 
                         if (extension)
                         {
 
 
                             // start reading again
-                            BeginAsyncRead(device);
+                            //ORIGINAL HANDLING OF INPUT
+                           // BeginAsyncRead(package);
 
                             InitializeExtension(device);
                         }
@@ -567,7 +497,7 @@ namespace ws.winx.platform.windows
                 device.ExtensionType = WiiExtensionType.Guitar;
             else if (buff[0] == 0xff)	// partially inserted case...reset back to nothing inserted
             {
-                device.Extension = false;
+                device.hasExtensionDevice = false;
                 device.ExtensionType = WiiExtensionType.None;
                 return;
             }
@@ -801,14 +731,6 @@ namespace ws.winx.platform.windows
           //  mWiimoteState.IRState.IRSensors[0].RawPosition.X = buff[6] | ((buff[8] >> 4) & 0x03) << 8;
          //   mWiimoteState.IRState.IRSensors[0].RawPosition.Y = buff[7] | ((buff[8] >> 6) & 0x03) << 8;
 
-
-            float sensor1RawX;
-            float sensor1RawY;
-
-           
-           
-
-           AxisDetails irAxisDetails;
                
               var sensor=device.IR_SENSORS[0];
 
@@ -941,10 +863,12 @@ namespace ws.winx.platform.windows
         /// <param name="offset">Offset into data buffer</param>
         private void ParseExtension(WiimoteDevice device, byte[] buff, int offset)
         {
+            AxisDetails axisDetails;
+
             switch (device.ExtensionType)
             {
                 case WiiExtensionType.Nunchuk:
-                      AxisDetails axisDetails;
+                     
 
                      axisDetails = device.Axis[JoystickAxis.AxisX] as AxisDetails;
                    
@@ -964,82 +888,192 @@ namespace ws.winx.platform.windows
                   //  mWiimoteState.NunchukState.RawJoystick.Y = buff[offset + 1];
 
 
+                    //Acceleration axes
+                    axisDetails = device.Axis[JoystickAxis.AxisAccR] as AxisDetails;
 
-                    mWiimoteState.NunchukState.AccelState.RawValues.X = buff[offset + 2];
-                    mWiimoteState.NunchukState.AccelState.RawValues.Y = buff[offset + 3];
-                    mWiimoteState.NunchukState.AccelState.RawValues.Z = buff[offset + 4];
-
-                    mWiimoteState.NunchukState.C = (buff[offset + 5] & 0x02) == 0;
-                    mWiimoteState.NunchukState.Z = (buff[offset + 5] & 0x01) == 0;
-
-                    mWiimoteState.NunchukState.AccelState.Values.X = (float)((float)mWiimoteState.NunchukState.AccelState.RawValues.X - mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.X0) /
-                                                    ((float)mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.XG - mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.X0);
-                    mWiimoteState.NunchukState.AccelState.Values.Y = (float)((float)mWiimoteState.NunchukState.AccelState.RawValues.Y - mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.Y0) /
-                                                    ((float)mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.YG - mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.Y0);
-                    mWiimoteState.NunchukState.AccelState.Values.Z = (float)((float)mWiimoteState.NunchukState.AccelState.RawValues.Z - mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.Z0) /
-                                                    ((float)mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.ZG - mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.Z0);
+                      if(axisDetails.max>0f){
+                        axisDetails.value=((float)buff[offset + 2]-axisDetails.min)/(axisDetails.max-axisDetails.min);
+                    }
 
 
-                    if (mWiimoteState.NunchukState.CalibrationInfo.MaxX != 0x00)
-                        mWiimoteState.NunchukState.Joystick.X = (float)((float)mWiimoteState.NunchukState.RawJoystick.X - mWiimoteState.NunchukState.CalibrationInfo.MidX) /
-                                                ((float)mWiimoteState.NunchukState.CalibrationInfo.MaxX - mWiimoteState.NunchukState.CalibrationInfo.MinX);
+                     axisDetails = device.Axis[JoystickAxis.AxisAccU] as AxisDetails;
+                   
+                    if(axisDetails.max>0f){
+                        axisDetails.value=((float)buff[offset + 3]-axisDetails.min)/(axisDetails.max-axisDetails.min);
+                    }
 
-                    if (mWiimoteState.NunchukState.CalibrationInfo.MaxY != 0x00)
-                        mWiimoteState.NunchukState.Joystick.Y = (float)((float)mWiimoteState.NunchukState.RawJoystick.Y - mWiimoteState.NunchukState.CalibrationInfo.MidY) /
-                                                ((float)mWiimoteState.NunchukState.CalibrationInfo.MaxY - mWiimoteState.NunchukState.CalibrationInfo.MinY);
+                    axisDetails = device.Axis[JoystickAxis.AxisAccV] as AxisDetails;
+                   
+                    if(axisDetails.max>0f){
+                        axisDetails.value=((float)buff[offset + 4]-axisDetails.min)/(axisDetails.max-axisDetails.min);
+                    }
+
+
+                    //mWiimoteState.NunchukState.AccelState.RawValues.X = buff[offset + 2];
+                    //mWiimoteState.NunchukState.AccelState.RawValues.Y = buff[offset + 3];
+                    //mWiimoteState.NunchukState.AccelState.RawValues.Z = buff[offset + 4];
+
+                    device.Buttons[7].value=(float)(buff[offset + 5] & 0x02);
+                     device.Buttons[8].value=(float)((buff[offset + 5] & 0x01));
+
+                   // mWiimoteState.NunchukState.C = (buff[offset + 5] & 0x02) == 0;
+                   // mWiimoteState.NunchukState.Z = (buff[offset + 5] & 0x01) == 0;
+
+                    //mWiimoteState.NunchukState.AccelState.Values.X = (float)((float)mWiimoteState.NunchukState.AccelState.RawValues.X - mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.X0) /
+                    //                                ((float)mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.XG - mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.X0);
+                    //mWiimoteState.NunchukState.AccelState.Values.Y = (float)((float)mWiimoteState.NunchukState.AccelState.RawValues.Y - mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.Y0) /
+                    //                                ((float)mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.YG - mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.Y0);
+                    //mWiimoteState.NunchukState.AccelState.Values.Z = (float)((float)mWiimoteState.NunchukState.AccelState.RawValues.Z - mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.Z0) /
+                    //                                ((float)mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.ZG - mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.Z0);
+
+
+                    //if (mWiimoteState.NunchukState.CalibrationInfo.MaxX != 0x00)
+                    //    mWiimoteState.NunchukState.Joystick.X = (float)((float)mWiimoteState.NunchukState.RawJoystick.X - mWiimoteState.NunchukState.CalibrationInfo.MidX) /
+                    //                            ((float)mWiimoteState.NunchukState.CalibrationInfo.MaxX - mWiimoteState.NunchukState.CalibrationInfo.MinX);
+
+                    //if (mWiimoteState.NunchukState.CalibrationInfo.MaxY != 0x00)
+                    //    mWiimoteState.NunchukState.Joystick.Y = (float)((float)mWiimoteState.NunchukState.RawJoystick.Y - mWiimoteState.NunchukState.CalibrationInfo.MidY) /
+                    //                            ((float)mWiimoteState.NunchukState.CalibrationInfo.MaxY - mWiimoteState.NunchukState.CalibrationInfo.MinY);
 
                     break;
 
                 case WiiExtensionType.ClassicController:
-                    mWiimoteState.ClassicControllerState.RawJoystickL.X = (byte)(buff[offset] & 0x3f);
-                    mWiimoteState.ClassicControllerState.RawJoystickL.Y = (byte)(buff[offset + 1] & 0x3f);
-                    mWiimoteState.ClassicControllerState.RawJoystickR.X = (byte)((buff[offset + 2] >> 7) | (buff[offset + 1] & 0xc0) >> 5 | (buff[offset] & 0xc0) >> 3);
-                    mWiimoteState.ClassicControllerState.RawJoystickR.Y = (byte)(buff[offset + 2] & 0x1f);
 
-                    mWiimoteState.ClassicControllerState.RawTriggerL = (byte)(((buff[offset + 2] & 0x60) >> 2) | (buff[offset + 3] >> 5));
-                    mWiimoteState.ClassicControllerState.RawTriggerR = (byte)(buff[offset + 3] & 0x1f);
 
-                    mWiimoteState.ClassicControllerState.ButtonState.TriggerR = (buff[offset + 4] & 0x02) == 0;
-                    mWiimoteState.ClassicControllerState.ButtonState.Plus = (buff[offset + 4] & 0x04) == 0;
-                    mWiimoteState.ClassicControllerState.ButtonState.Home = (buff[offset + 4] & 0x08) == 0;
-                    mWiimoteState.ClassicControllerState.ButtonState.Minus = (buff[offset + 4] & 0x10) == 0;
-                    mWiimoteState.ClassicControllerState.ButtonState.TriggerL = (buff[offset + 4] & 0x20) == 0;
+                    //AXES
 
-                    mWiimoteState.ClassicControllerState.ButtonState.Down = (buff[offset + 4] & 0x40) == 0;
-                    mWiimoteState.ClassicControllerState.ButtonState.Right = (buff[offset + 4] & 0x80) == 0;
-                    mWiimoteState.ClassicControllerState.ButtonState.Up = (buff[offset + 5] & 0x01) == 0;
-                    mWiimoteState.ClassicControllerState.ButtonState.Left = (buff[offset + 5] & 0x02) == 0;
 
-                    mWiimoteState.ClassicControllerState.ButtonState.ZR = (buff[offset + 5] & 0x04) == 0;
-                    mWiimoteState.ClassicControllerState.ButtonState.X = (buff[offset + 5] & 0x08) == 0;
-                    mWiimoteState.ClassicControllerState.ButtonState.A = (buff[offset + 5] & 0x10) == 0;
-                    mWiimoteState.ClassicControllerState.ButtonState.Y = (buff[offset + 5] & 0x20) == 0;
-                    mWiimoteState.ClassicControllerState.ButtonState.B = (buff[offset + 5] & 0x40) == 0;
-                    mWiimoteState.ClassicControllerState.ButtonState.ZL = (buff[offset + 5] & 0x80) == 0;
+                    //mWiimoteState.ClassicControllerState.RawJoystickL.X = (byte)(buff[offset] & 0x3f);
+                    //mWiimoteState.ClassicControllerState.RawJoystickL.Y = (byte)(buff[offset + 1] & 0x3f);
+                   // mWiimoteState.ClassicControllerState.RawJoystickR.X = (byte)((buff[offset + 2] >> 7) | (buff[offset + 1] & 0xc0) >> 5 | (buff[offset] & 0xc0) >> 3);
+                   // mWiimoteState.ClassicControllerState.RawJoystickR.Y = (byte)(buff[offset + 2] & 0x1f);
 
-                    if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxXL != 0x00)
-                        mWiimoteState.ClassicControllerState.JoystickL.X = (float)((float)mWiimoteState.ClassicControllerState.RawJoystickL.X - mWiimoteState.ClassicControllerState.CalibrationInfo.MidXL) /
-                        (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxXL - mWiimoteState.ClassicControllerState.CalibrationInfo.MinXL);
+                   
 
-                    if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxYL != 0x00)
-                        mWiimoteState.ClassicControllerState.JoystickL.Y = (float)((float)mWiimoteState.ClassicControllerState.RawJoystickL.Y - mWiimoteState.ClassicControllerState.CalibrationInfo.MidYL) /
-                        (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxYL - mWiimoteState.ClassicControllerState.CalibrationInfo.MinYL);
+                     axisDetails = device.Axis[JoystickAxis.AxisX] as AxisDetails;
+                   
+                    if(axisDetails.max>0f){
+                        axisDetails.value = ((float)(buff[offset] & 0x3f) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                    }
 
-                    if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxXR != 0x00)
-                        mWiimoteState.ClassicControllerState.JoystickR.X = (float)((float)mWiimoteState.ClassicControllerState.RawJoystickR.X - mWiimoteState.ClassicControllerState.CalibrationInfo.MidXR) /
-                        (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxXR - mWiimoteState.ClassicControllerState.CalibrationInfo.MinXR);
+                       axisDetails = device.Axis[JoystickAxis.AxisY] as AxisDetails;
+                   
+                    if(axisDetails.max>0f){
+                        axisDetails.value = ((float)(buff[offset + 1] & 0x3f) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                    }
 
-                    if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxYR != 0x00)
-                        mWiimoteState.ClassicControllerState.JoystickR.Y = (float)((float)mWiimoteState.ClassicControllerState.RawJoystickR.Y - mWiimoteState.ClassicControllerState.CalibrationInfo.MidYR) /
-                        (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxYR - mWiimoteState.ClassicControllerState.CalibrationInfo.MinYR);
 
-                    if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxTriggerL != 0x00)
-                        mWiimoteState.ClassicControllerState.TriggerL = (mWiimoteState.ClassicControllerState.RawTriggerL) /
-                        (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxTriggerL - mWiimoteState.ClassicControllerState.CalibrationInfo.MinTriggerL);
+                     axisDetails = device.Axis[JoystickAxis.AxisZ] as AxisDetails;
+                   
+                    if(axisDetails.max>0f){
+                        axisDetails.value = ((float)((buff[offset + 2] >> 7) | (buff[offset + 1] & 0xc0) >> 5 | (buff[offset] & 0xc0) >> 3) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                    }
 
-                    if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxTriggerR != 0x00)
-                        mWiimoteState.ClassicControllerState.TriggerR = (mWiimoteState.ClassicControllerState.RawTriggerR) /
-                        (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxTriggerR - mWiimoteState.ClassicControllerState.CalibrationInfo.MinTriggerR);
+                       axisDetails = device.Axis[JoystickAxis.AxisR] as AxisDetails;
+                   
+                    if(axisDetails.max>0f){
+                        axisDetails.value = ((float)(buff[offset + 2] & 0x1f) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                    }
+
+
+
+                  // mWiimoteState.ClassicControllerState.RawTriggerL = (byte)(((buff[offset + 2] & 0x60) >> 2) | (buff[offset + 3] >> 5));
+                  //  mWiimoteState.ClassicControllerState.RawTriggerR = (byte)(buff[offset + 3] & 0x1f);
+                    
+                  //  mWiimoteState.ClassicControllerState.ButtonState.TriggerL = (buff[offset + 4] & 0x20) == 0;
+                  //  mWiimoteState.ClassicControllerState.ButtonState.TriggerR = (buff[offset + 4] & 0x02) == 0;
+
+
+                         axisDetails = device.Axis[JoystickAxis.AxisU] as AxisDetails;
+                   
+                    if(axisDetails.max>0f){
+                        axisDetails.value = ((float)(((buff[offset + 2] & 0x60) >> 2) | (buff[offset + 3] >> 5)) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                    }
+
+                       axisDetails = device.Axis[JoystickAxis.AxisV] as AxisDetails;
+                   
+                    if(axisDetails.max>0f){
+                        axisDetails.value = ((float)(buff[offset + 3] & 0x1f) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                    }
+
+                    //mWiimoteState.ClassicControllerState.ButtonState.Plus = (buff[offset + 4] & 0x04) == 0;
+                    //mWiimoteState.ClassicControllerState.ButtonState.Home = (buff[offset + 4] & 0x08) == 0;
+                    //mWiimoteState.ClassicControllerState.ButtonState.Minus = (buff[offset + 4] & 0x10) == 0;
+               
+                    device.Buttons[4].value = (float)(buff[1] & 0x10); 
+                    device.Buttons[3].value = (float)(buff[2] & 0x80);
+                    device.Buttons[2].value = (float)(buff[2] & 0x10);
+                    
+                     
+
+                    //POV
+                    //mWiimoteState.ClassicControllerState.ButtonState.Down = (buff[offset + 4] & 0x40) == 0;
+                    //mWiimoteState.ClassicControllerState.ButtonState.Right = (buff[offset + 4] & 0x80) == 0;
+                    //mWiimoteState.ClassicControllerState.ButtonState.Up = (buff[offset + 5] & 0x01) == 0;
+                    //mWiimoteState.ClassicControllerState.ButtonState.Left = (buff[offset + 5] & 0x02) == 0;
+
+                    //POV
+                   axisDetails = device.Axis[JoystickAxis.AxisPovY] as AxisDetails;
+
+                    axisDetails.value = 0;
+
+                    if ((buff[offset + 5] & 0x01) == 0)
+                        axisDetails.value = 1f;
+                    else if ((buff[offset + 4] & 0x40) == 0)
+                        axisDetails.value = -1f;
+
+                    axisDetails = device.Axis[JoystickAxis.AxisPovX] as AxisDetails;
+                    axisDetails.value = 0;
+
+                    if ((buff[offset + 4] & 0x80) == 0)
+                        axisDetails.value = 1f;
+                    else if ((buff[offset + 5] & 0x02) == 0)
+                        axisDetails.value = -1f;
+
+
+
+                    //BUTTONS
+
+
+                    device.Buttons[7].value = (float)(buff[offset + 5] & 0x04);
+                    device.Buttons[8].value = (float)(buff[offset + 5] & 0x08);
+                    device.Buttons[0].value = (float)(buff[offset + 5] & 0x10);
+                     device.Buttons[9].value  = (float)(buff[offset + 5] & 0x20);
+                     device.Buttons[1].value = (float)(buff[offset + 5] & 0x40);
+                     device.Buttons[10].value = (float)(buff[offset + 5] & 0x80);
+
+
+
+                    //mWiimoteState.ClassicControllerState.ButtonState.ZR = (buff[offset + 5] & 0x04) == 0;
+                    //mWiimoteState.ClassicControllerState.ButtonState.X = (buff[offset + 5] & 0x08) == 0;
+                    //mWiimoteState.ClassicControllerState.ButtonState.A = (buff[offset + 5] & 0x10) == 0;
+                    //mWiimoteState.ClassicControllerState.ButtonState.Y = (buff[offset + 5] & 0x20) == 0;
+                    //mWiimoteState.ClassicControllerState.ButtonState.B = (buff[offset + 5] & 0x40) == 0;
+                    //mWiimoteState.ClassicControllerState.ButtonState.ZL = (buff[offset + 5] & 0x80) == 0;
+
+                    //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxXL != 0x00)
+                    //    mWiimoteState.ClassicControllerState.JoystickL.X = (float)((float)mWiimoteState.ClassicControllerState.RawJoystickL.X - mWiimoteState.ClassicControllerState.CalibrationInfo.MidXL) /
+                    //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxXL - mWiimoteState.ClassicControllerState.CalibrationInfo.MinXL);
+
+                    //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxYL != 0x00)
+                    //    mWiimoteState.ClassicControllerState.JoystickL.Y = (float)((float)mWiimoteState.ClassicControllerState.RawJoystickL.Y - mWiimoteState.ClassicControllerState.CalibrationInfo.MidYL) /
+                    //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxYL - mWiimoteState.ClassicControllerState.CalibrationInfo.MinYL);
+
+                    //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxXR != 0x00)
+                    //    mWiimoteState.ClassicControllerState.JoystickR.X = (float)((float)mWiimoteState.ClassicControllerState.RawJoystickR.X - mWiimoteState.ClassicControllerState.CalibrationInfo.MidXR) /
+                    //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxXR - mWiimoteState.ClassicControllerState.CalibrationInfo.MinXR);
+
+                    //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxYR != 0x00)
+                    //    mWiimoteState.ClassicControllerState.JoystickR.Y = (float)((float)mWiimoteState.ClassicControllerState.RawJoystickR.Y - mWiimoteState.ClassicControllerState.CalibrationInfo.MidYR) /
+                    //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxYR - mWiimoteState.ClassicControllerState.CalibrationInfo.MinYR);
+
+                    //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxTriggerL != 0x00)
+                    //    mWiimoteState.ClassicControllerState.TriggerL = (mWiimoteState.ClassicControllerState.RawTriggerL) /
+                    //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxTriggerL - mWiimoteState.ClassicControllerState.CalibrationInfo.MinTriggerL);
+
+                    //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxTriggerR != 0x00)
+                    //    mWiimoteState.ClassicControllerState.TriggerR = (mWiimoteState.ClassicControllerState.RawTriggerR) /
+                    //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxTriggerR - mWiimoteState.ClassicControllerState.CalibrationInfo.MinTriggerR);
                     break;
 
                
@@ -1118,9 +1152,9 @@ namespace ws.winx.platform.windows
         /// </summary>
         /// <param name="type">Report type</param>
         /// <param name="continuous">Continuous data</param>
-        public void SetReportType(InputReport type, bool continuous)
+        void SetReportType(WiimoteDevice device,InputReport type, bool continuous)
         {
-            SetReportType(type, IRSensitivity.Maximum, continuous);
+            SetReportType(device,type, IRSensitivity.Maximum, continuous);
         }
 
         /// <summary>
@@ -1129,7 +1163,7 @@ namespace ws.winx.platform.windows
         /// <param name="type">Report type</param>
         /// <param name="irSensitivity">IR sensitivity</param>
         /// <param name="continuous">Continuous data</param>
-        public void SetReportType(WiimoteDevice device,InputReport type, IRSensitivity irSensitivity, bool continuous)
+        void SetReportType(WiimoteDevice device,InputReport type, IRSensitivity irSensitivity, bool continuous)
         {
             switch (type)
             {
@@ -1147,7 +1181,7 @@ namespace ws.winx.platform.windows
             ClearReport();
             mBuff[0] = (byte)OutputReport.Type;
            // mBuff[1] = (byte)((continuous ? 0x04 : 0x00) | (byte)(mWiimoteState.Rumble ? 0x01 : 0x00));
-            mBuff[1] = (byte)((continuous ? 0x04 : 0x00) | device.RumbleBit);
+            mBuff[1] = (byte)((continuous ? 0x04 : 0x00) | (uint)device.RumbleBit);
             mBuff[2] = (byte)type;
 
             WriteReport(device);
@@ -1160,7 +1194,7 @@ namespace ws.winx.platform.windows
         /// <param name="led2">LED 2</param>
         /// <param name="led3">LED 3</param>
         /// <param name="led4">LED 4</param>
-        public void SetLEDs(WiimoteDevice device, bool led1, bool led2, bool led3, bool led4)
+        void SetLEDs(WiimoteDevice device, bool led1, bool led2, bool led3, bool led4)
         {
             device.LED[0]=led1;
             device.LED[1]=led2;
@@ -1188,7 +1222,7 @@ namespace ws.winx.platform.windows
         /// Set the LEDs on the Wiimote
         /// </summary>
         /// <param name="leds">The value to be lit up in base2 on the Wiimote</param>
-        public void SetLEDs(WiimoteDevice device, int leds)
+        void SetLEDs(WiimoteDevice device, int leds)
         {
 
      
@@ -1213,7 +1247,7 @@ namespace ws.winx.platform.windows
                         ((leds & 0x02) > 0 ? 0x20 : 0x00) |
                         ((leds & 0x04) > 0 ? 0x40 : 0x00) |
                         ((leds & 0x08) > 0 ? 0x80 : 0x00) |
-                        device.RumbleBit);
+                        (uint)device.RumbleBit);
 
             WriteReport(device);
         }
@@ -1222,7 +1256,7 @@ namespace ws.winx.platform.windows
         /// Toggle rumble
         /// </summary>
         /// <param name="on">On or off</param>
-        public void SetRumble(WiimoteDevice device,bool on)
+        void SetRumble(WiimoteDevice device,bool on)
         {
             device.Rumble = on;
 
@@ -1236,12 +1270,12 @@ namespace ws.winx.platform.windows
         /// <summary>
         /// Retrieve the current status of the Wiimote and extensions.  Replaces GetBatteryLevel() since it was poorly named.
         /// </summary>
-        public void GetStatus(WiimoteDevice device)
+        void GetStatus(WiimoteDevice device)
         {
             ClearReport();
 
             mBuff[0] = (byte)OutputReport.Status;
-            mBuff[1] = device.RumbleBit;
+            mBuff[1] = (byte)device.RumbleBit;
             //mBuff[1] = GetRumbleBit();
 
             WriteReport(device);
@@ -1252,7 +1286,7 @@ namespace ws.winx.platform.windows
         /// </summary>
         /// <param name="mode">The data report mode</param>
         /// <param name="irSensitivity">IR sensitivity</param>
-        private void EnableIR(WiimoteDevice device, IRMode mode, IRSensitivity irSensitivity)
+        void EnableIR(WiimoteDevice device, IRMode mode, IRSensitivity irSensitivity)
         {
             device.Mode = mode;
 
@@ -1303,18 +1337,18 @@ namespace ws.winx.platform.windows
         /// <summary>
         /// Disable the IR sensor
         /// </summary>
-        private void DisableIR(WiimoteDevice device)
+        void DisableIR(WiimoteDevice device)
         {
             device.Mode = IRMode.Off;
 
             ClearReport();
             mBuff[0] = (byte)OutputReport.IR;
-            mBuff[1] = device.RumbleBit;
+            mBuff[1] = (byte)device.RumbleBit;
             WriteReport(device);
 
             ClearReport();
             mBuff[0] = (byte)OutputReport.IR2;
-            mBuff[1] = device.RumbleBit;
+            mBuff[1] = (byte)device.RumbleBit;
             WriteReport(device);
         }
 
@@ -1331,13 +1365,17 @@ namespace ws.winx.platform.windows
         /// </summary>
         private void WriteReport(WiimoteDevice device)
         {
-            FileStream stream;
+            AsyncPackage package = (AsyncPackage)_hidInterface.DeviceHIDInfos[device].Extension;
+
+
+            FileStream stream=package.stream;
+
             if (mAltWriteMethod)
             {
 
-                UnsafeNativeMethods.HidD_SetOutputReport(WiiDriver._AsyncPackages[device].DangerousGetHandle(), mBuff, (uint)mBuff.Length);
+                UnsafeNativeMethods.HidD_SetOutputReport(package.handle.DangerousGetHandle(), mBuff, (uint)mBuff.Length);
             }
-            else if ((stream = WiiDriver._FileStreams[device]) != null)
+            else if (stream != null)
             {
                 stream.Write(mBuff, 0, REPORT_LENGTH);
             }
@@ -1351,7 +1389,7 @@ namespace ws.winx.platform.windows
         /// <param name="address">Address to read</param>
         /// <param name="size">Length to read</param>
         /// <returns>Data buffer</returns>
-        public byte[] ReadData(WiimoteDevice device,int address, short size)
+        byte[] ReadData(WiimoteDevice device,int address, short size)
         {
             ClearReport();
 
@@ -1360,7 +1398,7 @@ namespace ws.winx.platform.windows
             mSize = size;
 
             mBuff[0] = (byte)OutputReport.ReadMemory;
-            mBuff[1] = (byte)(((address & 0xff000000) >> 24) | device.RumbleBit);
+            mBuff[1] = (byte)(((address & 0xff000000) >> 24) | (uint)device.RumbleBit);
             mBuff[2] = (byte)((address & 0x00ff0000) >> 16);
             mBuff[3] = (byte)((address & 0x0000ff00) >> 8);
             mBuff[4] = (byte)(address & 0x000000ff);
@@ -1381,7 +1419,7 @@ namespace ws.winx.platform.windows
         /// </summary>
         /// <param name="address">Address to write</param>
         /// <param name="data">Byte to write</param>
-        public void WriteData(WiimoteDevice device,int address, byte data)
+        void WriteData(WiimoteDevice device,int address, byte data)
         {
             WriteData(device,address, 1, new byte[] { data });
         }
@@ -1393,7 +1431,7 @@ namespace ws.winx.platform.windows
         /// <param name="size">Length of buffer</param>
         /// <param name="buff">Data buffer</param>
 
-        public void WriteData(WiimoteDevice device,int address, byte size, byte[] buff)
+        void WriteData(WiimoteDevice device,int address, byte size, byte[] buff)
         {
             ClearReport();
 
@@ -1716,21 +1754,8 @@ namespace ws.winx.platform.windows
              // close up our handles
             if (disposing)
             {
-                foreach (var handle in WiiDriver._AsyncPackages)
-                {
-                    handle.Value.Close();
-
-                }
-
-                WiiDriver._AsyncPackages.Clear();
-
-                foreach (var stream in WiiDriver._FileStreams)
-                {
-                    stream.Value.Close();
-
-                }
-
-                WiiDriver._FileStreams.Clear();
+               
+             
             }
 
 
@@ -1746,77 +1771,6 @@ namespace ws.winx.platform.windows
 
 
 
-            #region IAxisDetails implementation
-
-
-            public byte mid
-            {
-                get
-                {
-                    return _mid;
-                }
-                set
-                {
-                    _mid = value;
-                }
-            }
-
-            public byte min
-            {
-                get
-                {
-                    return _min;
-                }
-                set
-                {
-                    _min = value;
-                }
-            }
-
-
-            public byte max
-            {
-                get
-                {
-                    return _max;
-                }
-                set
-                {
-                    _max = value;
-                }
-            }
-
-
-            public bool isNullable
-            {
-                get
-                {
-                    return _isNullable;
-                }
-                set
-                {
-                    _isNullable = value;
-                }
-            }
-
-
-            public bool isHat
-            {
-                get
-                {
-                    return _isHat;
-                }
-                set
-                {
-                    _isHat = value;
-                }
-            }
-
-#endregion
-
-        }
-        #endregion
-
         #region AxisDetails
         public sealed class AxisDetails : IAxisDetails
         {
@@ -1824,9 +1778,9 @@ namespace ws.winx.platform.windows
             #region Fields
             float _value;
             int _uid;
-            byte _min;
-            byte _max;
-            byte _mid;
+            int _min;
+			int _max;
+			int _mid;
             JoystickButtonState _buttonState;
             bool _isNullable;
             bool _isHat;
@@ -1835,7 +1789,7 @@ namespace ws.winx.platform.windows
             #region IAxisDetails implementation
 
 
-            public byte mid
+			public int mid
             {
                 get
                 {
@@ -1847,7 +1801,7 @@ namespace ws.winx.platform.windows
                 }
             }
 
-            public byte min
+			public int min
             {
                 get
                 {
@@ -1860,7 +1814,7 @@ namespace ws.winx.platform.windows
             }
 
 
-            public byte max
+			public int max
             {
                 get
                 {

@@ -27,7 +27,7 @@ namespace ws.winx.platform.windows
 
         JoystickDevicesCollection _joysticks;
 
-        internal readonly Dictionary<IJoystickDevice, IHIDDeviceInfo> DeviceHIDInfos;
+        public readonly Dictionary<IJoystickDevice, IHIDDeviceInfo> DeviceHIDInfos;
 
         #endregion
 
@@ -243,10 +243,13 @@ namespace ws.winx.platform.windows
             if (joyDevice == null)
             {//set default driver as resolver if no custom driver match device
                 joyDevice = defaultDriver.ResolveDevice(deviceInfo);
+
+               
                 if (joyDevice != null)
                 {
                     _joysticks[deviceInfo.device] = joyDevice;
                     joyDevice.driver = __defaultJoystickDriver;
+					DeviceHIDInfos[joyDevice] = deviceInfo;
                     Debug.Log("Device PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + __defaultJoystickDriver.GetType().ToString());
 
                 }

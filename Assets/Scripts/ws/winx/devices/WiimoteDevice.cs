@@ -14,15 +14,15 @@ namespace ws.winx.devices
 	{
       
 
-        protected int _rumbleBit;
+        protected uint _rumbleBit;
         protected bool _rumble;
         protected WiiExtensionType _ExtensionType;
-        protected bool _extension;
+        protected bool _extensionDevice;
         protected byte _battery;
         protected IRMode _irmode;
         
         #region IRSensor
-        public sealed struct IRSensor{
+        public class IRSensor{
 
             public IRSensor()
             {
@@ -141,15 +141,15 @@ namespace ws.winx.devices
         }
 
 
-        public bool Extension
+        public bool hasExtensionDevice
         {
             get
             {
-                return _extension;
+                return _extensionDevice;
             }
             set
             {
-                _extension = value;
+                _extensionDevice = value;
 
              
             }
@@ -165,11 +165,11 @@ namespace ws.winx.devices
             {
                 _rumble = value;
 
-                _rumbleBit = _rumble ? 0x1 : 0x0;
+                _rumbleBit = _rumble ? (uint)0x1 : (uint)0x0;
             }
         }
 
-        internal int RumbleBit
+        internal uint RumbleBit
         {
             get
             {

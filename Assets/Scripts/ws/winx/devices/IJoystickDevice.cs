@@ -1,4 +1,4 @@
-﻿using ws.winx.platform;
+using ws.winx.platform;
 using System;
 using System.Collections.Generic;
 using System.Text;

@@ -25,11 +25,11 @@ public class Game : MonoBehaviour {
 
 	
 
-
+		Animator animator;
 
 	// Use this for initialization
 	void Start () {
-
+			animator=GameObject.FindObjectOfType<Animator>();
 		
 			//supporting devices with custom drivers
 			InputManager.AddDriver(new XInputDriver());
@@ -47,12 +47,12 @@ public class Game : MonoBehaviour {
 			//			InputManager.MapStateToInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
 			//			InputManager.MapStateToInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
 
-			InputManager.MapStateToInput("Click_W+C_State", KeyCodeExtension.Alpha0.DOUBLE,KeyCodeExtension.JoystickAxisPovYPositive.SINGLE);
+
+			//easiest way to map state to combination (ex.of single W and C click)
+			InputManager.MapStateToInput("Click_W+C_State", KeyCodeExtension.W.SINGLE,KeyCodeExtension.C.SINGLE);
 
 
-       // MyCodeExtension.GAMEPAD_X.SINGLE
-           // InputManager.MapStateToInput("Vibrator", MyCodeExtension.GAMEPAD_VIBRATOR.SINGLE);
-			
+       			
 			//Event Based input handling
             InputEvent ev = new InputEvent("Click_W+C_State");
 			//InputEvent ev = new InputEvent((int)States.SomeState);
@@ -91,6 +91,7 @@ public class Game : MonoBehaviour {
 
 			if(InputManager.GetInputDown((int)States.Wave)){
 								Debug.Log("Wave Down");
+				animator.Play((int)States.Wave);
 			}
 
 

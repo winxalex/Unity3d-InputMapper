@@ -19,6 +19,7 @@ namespace ws.winx.platform
 			IntPtr device {get;}
 			string DevicePath {get;}
 			int id{get;}
+            object Extension { set; get; }
             
             
 		}
