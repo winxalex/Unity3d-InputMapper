@@ -127,7 +127,7 @@ There is similar HIDInterface for OSX as for WIN but didn't have chance to try i
 <div style="text-align: center;">
 <object class="BLOGGER-youtube-video" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0" data-thumbnail-src="https://i1.ytimg.com/vi/9Y9JcD-rUb0/0.jpg" height="266" width="320"><param name="movie" value="https://www.youtube.com/v/9Y9JcD-rUb0?version=3&f=user_uploads&c=google-webdrive-0&app=youtube_gdata" /><param name="bgcolor" value="#FFFFFF" /><param name="allowFullScreen" value="true" /><embed width="320" height="266"  src="https://www.youtube.com/v/9Y9JcD-rUb0?version=3&f=user_uploads&c=google-webdrive-0&app=youtube_gdata" type="application/x-shockwave-flash" allowfullscreen="true"></embed></object></div>
 <div class="separator" style="clear: both; text-align: center;">
-<br /></div>
+<br /></div>youtube: <a href="http://youtu.be/kX0j69ZgeCw">link</a>
 <div class="separator" style="clear: both; text-align: center;">
 GITHUB:&nbsp;<a href="https://github.com/winalex/Unity3d-InputMapper">https://github.com/winalex/Unity3d-InputMapper</a></div>
 <div class="separator" style="clear: both; text-align: center;">
