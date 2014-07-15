@@ -1181,7 +1181,7 @@ namespace ws.winx.platform.windows
             ClearReport();
             mBuff[0] = (byte)OutputReport.Type;
            // mBuff[1] = (byte)((continuous ? 0x04 : 0x00) | (byte)(mWiimoteState.Rumble ? 0x01 : 0x00));
-            mBuff[1] = (byte)((continuous ? 0x04 : 0x00) | (uint)device.RumbleBit);
+            mBuff[1] = (byte)((continuous ? (uint)0x04 : (uint)0x00) | (uint)device.RumbleBit);
             mBuff[2] = (byte)type;
 
             WriteReport(device);
@@ -1209,10 +1209,10 @@ namespace ws.winx.platform.windows
 
             mBuff[0] = (byte)OutputReport.LEDs;
             mBuff[1] = (byte)(
-                        (led1 ? 0x10 : 0x00) |
-                        (led2 ? 0x20 : 0x00) |
-                        (led3 ? 0x40 : 0x00) |
-                        (led4 ? 0x80 : 0x00) |
+				(led1 ? (uint)0x10 : (uint)0x00) |
+				(led2 ? (uint)0x20 : (uint)0x00) |
+				(led3 ? (uint)0x40 : (uint)0x00) |
+				(led4 ? (uint)0x80 : (uint)0x00) |
                         device.RumbleBit);
 
             WriteReport(device);
@@ -1243,10 +1243,10 @@ namespace ws.winx.platform.windows
 
             mBuff[0] = (byte)OutputReport.LEDs;
             mBuff[1] = (byte)(
-                        ((leds & 0x01) > 0 ? 0x10 : 0x00) |
-                        ((leds & 0x02) > 0 ? 0x20 : 0x00) |
-                        ((leds & 0x04) > 0 ? 0x40 : 0x00) |
-                        ((leds & 0x08) > 0 ? 0x80 : 0x00) |
+				((leds & 0x01) > 0 ? (uint)0x10 : (uint)0x00) |
+				((leds & 0x02) > 0 ? (uint)0x20 : (uint)0x00) |
+				((leds & 0x04) > 0 ? (uint)0x40 : (uint)0x00) |
+				((leds & 0x08) > 0 ? (uint)0x80 : (uint)0x00) |
                         (uint)device.RumbleBit);
 
             WriteReport(device);
