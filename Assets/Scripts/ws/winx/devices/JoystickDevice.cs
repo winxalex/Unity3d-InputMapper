@@ -48,6 +48,11 @@ namespace ws.winx.devices
 						if (buttons < 0)
 								throw new ArgumentOutOfRangeException ("buttons");
 
+			        if(axes<8 && numPOV>0){
+						throw new Exception("POV X and POV Y are 7th and 8th Axis default driver so min axes is 8");
+					}
+			     
+
 						_numAxis=axes;
 						_numButtons=buttons;
 
@@ -348,15 +353,15 @@ namespace ws.winx.devices
 					Update();
 
 
-					int num_axes = _numAxis;
+					int num_axes = _numAxis-numPOV*2;
 						
 					int axis = 0;
-					float joyValue;
-					float joyValueMax = 0;
+					float joyValue=0f;
+					float joyValueMax = 0f;
 					JoystickAxis dominantAxis = JoystickAxis.None;
 					IAxisDetails axisDetails;
 					
-					if (axis < num_axes) { 
+			if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
 						
 						axisDetails=axis_collection[axis];
 						joyValue = axisDetails.value;
@@ -376,8 +381,20 @@ namespace ws.winx.devices
 						
 						axis++; 
 					}
+
+
+//			axisDetails=axis_collection[JoystickAxis.AxisY];
+//			joyValue = axisDetails.value;
+//			UnityEngine.Debug.Log("joyY"+joyValue+"max"+joyValueMax);
+//
+//			axisDetails=axis_collection[JoystickAxis.AxisZ];
+//			joyValue = axisDetails.value;
+//			UnityEngine.Debug.Log("joyZ"+joyValue+"max"+joyValueMax);
+
+
+
 					
-					if (axis < num_axes) { 
+			if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
 						
 						axisDetails=axis_collection[axis];
 						joyValue = axisDetails.value;
@@ -396,7 +413,7 @@ namespace ws.winx.devices
 					}
 					
 					
-					if (axis < num_axes) { 
+			if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
 						
 							axisDetails=axis_collection[axis];
 							joyValue = axisDetails.value;
@@ -417,7 +434,7 @@ namespace ws.winx.devices
 					
 					
 					
-					if (axis < num_axes) { 
+			if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
 						
 						axisDetails=axis_collection[axis];
 						joyValue = axisDetails.value;
@@ -436,10 +453,10 @@ namespace ws.winx.devices
 					}
 					
 					
-					if (axis < num_axes) { 
+			if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
 						
-				axisDetails=axis_collection[axis];
-				joyValue = axisDetails.value;
+						axisDetails=axis_collection[axis];
+						joyValue = axisDetails.value;
 						
 						joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
 						
@@ -454,18 +471,18 @@ namespace ws.winx.devices
 					}
 					
 					
-					if (axis < num_axes) { 
+			if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
 						
-				axisDetails=axis_collection[axis];
-				joyValue = axisDetails.value;
-						
-						joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
-						
-						if (axisDetails.buttonState == JoystickButtonState.Down)
-						if (joyValueMax < joyValue) {
-							joyValueMax = joyValue;
-							dominantAxis = JoystickAxis.AxisV;
-						}
+							axisDetails=axis_collection[axis];
+							joyValue = axisDetails.value;
+									
+									joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
+									
+									if (axisDetails.buttonState == JoystickButtonState.Down)
+									if (joyValueMax < joyValue) {
+										joyValueMax = joyValue;
+										dominantAxis = JoystickAxis.AxisV;
+									}
 						
 						
 						axis++; 
@@ -473,10 +490,10 @@ namespace ws.winx.devices
 					
 					
 					
-					
+
 					
 					if (dominantAxis != JoystickAxis.None) {
-						
+				//UnityEngine.Debug.Log("dominantAxis "+dominantAxis+" state"+axis_collection[dominantAxis].buttonState);
 						
 						//stick.AxisAsButtons [dominantAxis] != JoystickButtonState.Hold;
 						
@@ -506,7 +523,7 @@ namespace ws.winx.devices
 						
 						
 					
-						 
+						 if(numPOV>0){
 							if (axis_collection [JoystickAxis.AxisPovX].buttonState == JoystickButtonState.Down )
 							{
 							    if(axis_collection[JoystickAxis.AxisPovX].value>0)
@@ -522,6 +539,7 @@ namespace ws.winx.devices
 								else
 									return KeyCodeExtension.toCode ((Joysticks)ID, JoystickAxis.AxisPovY,JoystickPovPosition.Backward );
 							}
+			}
 
 					
 					int button = 0;
@@ -991,6 +1009,7 @@ namespace ws.winx.devices
 						details = new TAxisDetails[numAxes];
 				}
 
+
         #endregion
 
         #region Public Members
@@ -1004,8 +1023,7 @@ namespace ws.winx.devices
 				
 				public TAxisDetails this [JoystickAxis axis] {
 						get { 
-								
-				        return details [(int)axis]; 
+							return details [(int)axis]; 
 			    }
 						internal set { details [(int)axis] = value; }
 				}

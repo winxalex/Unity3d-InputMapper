@@ -444,7 +444,6 @@ public class InputMapper : EditorWindow
 								
 								} else {
 										
-
 										toInputCombination (_stateInputCombinations [_selectedStateHash].combinations [_isPrimary], _action);
 								}
 				

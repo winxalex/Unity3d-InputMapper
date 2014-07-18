@@ -116,7 +116,8 @@ namespace ws.winx.platform.windows
 
             if ((int)result != -1)
             {
-                // enumerates array of Win32.RawInputDeviceList,
+              
+				// enumerates array of Win32.RawInputDeviceList,
                 // and populates array of managed RawInputDevice objects
                 for (var index = 0; index < deviceCount; index++)
                 {
@@ -125,6 +126,8 @@ namespace ws.winx.platform.windows
                             new IntPtr((ptrDeviceList.ToInt32() +
                                     (deviceSize * index))),
                             typeof(RawInputDeviceList));
+
+                   
 
                     if (rawInputDeviceList.DeviceType == RawInputDeviceType.HumanInterfaceDevice)
 						resolveDevice(getDeviceInfo(hidInx++,rawInputDeviceList));

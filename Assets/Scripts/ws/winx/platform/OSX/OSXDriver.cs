@@ -479,6 +479,19 @@ namespace ws.winx.platform.osx
 			#region IAxisDetails implementation
 
 
+
+			public bool isTrigger {
+				get {
+					throw new NotImplementedException ();
+				}
+				set {
+					throw new NotImplementedException ();
+				}
+			}
+
+
+
+
 			public int min {
 				get {
 					return _min;

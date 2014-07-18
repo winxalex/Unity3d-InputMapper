@@ -28,6 +28,14 @@ using UnityEngine;
                 private const float ERROR_SUCCESS = 0;
 
 
+                public enum XTYPE : int
+                {
+                    XBOX=0,
+                    XBOX360,
+                    XBOX360W
+                }
+
+
                /// <summary>
                /// 
                /// Need Direct X to be install
@@ -40,64 +48,65 @@ using UnityEngine;
 				}
 
             int[] XPAD_DEVICE=new int[] {
- 	             0x045e, 0x0202, /* "Microsoft X-Box pad v1 (US)", 0, XTYPE_XBOX },*/
-	             0x045e, 0x0289, /* "Microsoft X-Box pad v2 (US)", 0, XTYPE_XBOX */
- 	             0x045e, 0x0285,  /*"Microsoft X-Box pad (Japan)", 0, XTYPE_XBOX */
- 	             0x045e, 0x0287,  /*"Microsoft Xbox Controller S", 0, XTYPE_XBOX */
-	             0x045e, 0x0289,  /*"Microsoft X-Box pad v2 (US)", 0, XTYPE_XBOX */
-	             0x045e, 0x028e, /*Microsoft X-Box 360 pad", 0, XTYPE_XBOX360 */
-	             0x045e, 0x0291,/*Xbox 360 Wireless Receiver (XBOX)", MAP_DPAD_TO_BUTTONS, XTYPE_XBOX360W */
- 	             0x045e, 0x0719,/*Xbox 360 Wireless Receiver", MAP_DPAD_TO_BUTTONS, XTYPE_XBOX360W */
-	             0x0c12, 0x8809,/*RedOctane Xbox Dance Pad", DANCEPAD_MAP_CONFIG, XTYPE_XBOX */
- 	             0x044f, 0x0f07,/*Thrustmaster, Inc. Controller", 0, XTYPE_XBOX */
- 	             0x046d, 0xc242,/*Logitech Chillstream Controller", 0, XTYPE_XBOX360 */
- 	             0x046d, 0xca84,/*Logitech Xbox Cordless Controller", 0, XTYPE_XBOX */
- 	             0x0738, 0x4540,/*Mad Catz Beat Pad", MAP_DPAD_TO_BUTTONS, XTYPE_XBOX */
- 	             0x0738, 0x4556,/*Mad Catz Lynx Wireless Controller", 0, XTYPE_XBOX */
- 	             0x0738, 0x4716,/*Mad Catz Wired Xbox 360 Controller", 0, XTYPE_XBOX360 */
-	             0x0738, 0x4728,/*Mad Catz Street Fighter IV FightPad", XTYPE_XBOX360 */
- 	             0x0738, 0x4738,/*Mad Catz Wired Xbox 360 Controller (SFIV)", MAP_TRIGGERS_TO_BUTTONS, XTYPE_XBOX360 */
- 	             0x0738, 0x6040,/*Mad Catz Beat Pad Pro", MAP_DPAD_TO_BUTTONS, XTYPE_XBOX */
-	             0x0738, 0xbeef,/*Mad Catz JOYTECH NEO SE Advanced GamePad", XTYPE_XBOX360 */
- 	             0x0c12, 0x8802,/*Zeroplus Xbox Controller", 0, XTYPE_XBOX */
-	             0x0c12, 0x8809,/*RedOctane Xbox Dance Pad", DANCEPAD_MAP_CONFIG, XTYPE_XBOX */
- 	             0x0c12, 0x880a,/*Pelican Eclipse PL-2023", 0, XTYPE_XBOX */
- 	             0x0c12, 0x8810,/*Zeroplus Xbox Controller", 0, XTYPE_XBOX */
- 	             0x0c12, 0x9902,/*HAMA VibraX - *FAULTY HARDWARE*", 0, XTYPE_XBOX */
- 	             0x0e6f, 0x0003,/*Logic3 Freebird wireless Controller", 0, XTYPE_XBOX */
- 	             0x0e6f, 0x0005,/*Eclipse wireless Controller", 0, XTYPE_XBOX */
- 	             0x0e6f, 0x0006,/*Edge wireless Controller", 0, XTYPE_XBOX */
-	             0x0e6f, 0x0006,/*Pelican 'TSZ' Wired Xbox 360 Controller", 0, XTYPE_XBOX360 */
-	             0x0e6f, 0x0105,/*HSM3 Xbox360 dancepad", MAP_DPAD_TO_BUTTONS, XTYPE_XBOX360 */
- 	             0x0e6f, 0x0201,/*Pelican PL-3601 'TSZ' Wired Xbox 360 Controller", 0, XTYPE_XBOX360 */
-	             0x0e6f, 0x0213,/*Afterglow Gamepad for Xbox 360", 0, XTYPE_XBOX360 */
- 	             0x0e8f, 0x0201,/*SmartJoy Frag Xpad/PS2 adaptor", 0, XTYPE_XBOX */
-	             0x0f0d, 0x000d,/*Hori Fighting Stick EX2", MAP_TRIGGERS_TO_BUTTONS, XTYPE_XBOX360 */
-	             0x0f0d, 0x0016,/*Hori Real Arcade Pro.EX", MAP_TRIGGERS_TO_BUTTONS, XTYPE_XBOX360 */
- 	             0x0f30, 0x0202,/*Joytech Advanced Controller", 0, XTYPE_XBOX */
- 	             0x0f30, 0x8888,/*BigBen XBMiniPad Controller", 0, XTYPE_XBOX */
- 	             0x102c, 0xff0c,/*Joytech Wireless Advanced Controller", 0, XTYPE_XBOX */
-	             0x12ab, 0x8809,/*Xbox DDR dancepad", MAP_DPAD_TO_BUTTONS, XTYPE_XBOX */
- 	             0x12ab, 0x0004,/*Honey Bee Xbox360 dancepad", MAP_DPAD_TO_BUTTONS, XTYPE_XBOX360 */
-	             0x0e6f, 0x0105,/*HSM3 Xbox360 dancepad", MAP_DPAD_TO_BUTTONS, XTYPE_XBOX360 */
-	             0x12ab, 0x8809,/*Xbox DDR dancepad", MAP_DPAD_TO_BUTTONS, XTYPE_XBOX */
- 	             0x1430, 0x4748,/*RedOctane Guitar Hero X-plorer", 0, XTYPE_XBOX360 */
- 	             0x1430, 0x8888,/*TX6500+ Dance Pad (first generation)", MAP_DPAD_TO_BUTTONS, XTYPE_XBOX */
- 	             0x146b, 0x0601,/*BigBen Interactive XBOX 360 Controller", 0, XTYPE_XBOX360 */
-	             0x045e, 0x028e,/*Microsoft X-Box 360 pad", 0, XTYPE_XBOX360 */
-	             0x1689, 0xfd00,/*Razer Onza Tournament Edition", MAP_DPAD_TO_BUTTONS, XTYPE_XBOX360 */
- 	             0x1bad, 0x0002,/*Harmonix Rock Band Guitar", 0, XTYPE_XBOX360 */
- 	             0x1bad, 0x0003,/*Harmonix Rock Band Drumkit", MAP_DPAD_TO_BUTTONS, XTYPE_XBOX360 */
-	             0x0f0d, 0x0016,/*Hori Real Arcade Pro.EX", MAP_TRIGGERS_TO_BUTTONS, XTYPE_XBOX360 */
-	             0x0f0d, 0x000d,/*Hori Fighting Stick EX2", MAP_TRIGGERS_TO_BUTTONS, XTYPE_XBOX360 */
-	             0x1689, 0xfd00,/*Razer Onza Tournament Edition", MAP_DPAD_TO_BUTTONS, XTYPE_XBOX360 */
-	             0x1bad, 0xf016,/*Mad Catz Xbox 360 Controller", 0, XTYPE_XBOX360 */
-	             0x1bad, 0xf028,/*Street Fighter IV FightPad", 0, XTYPE_XBOX360 */
-	             0x1bad, 0xf901,/*Gamestop Xbox 360 Controller", 0, XTYPE_XBOX360 */
-	             0x1bad, 0xf903,/*Tron Xbox 360 controller", 0, XTYPE_XBOX360 */
-	             0x24c6, 0x5300,/*PowerA MINI PROEX Controller", 0, XTYPE_XBOX360 */
- 	             0xffff, 0xffff,/*Chinese-made Xbox Controller", 0, XTYPE_XBOX */
- 	             0x0000, 0x0000/*Generic X-Box pad", 0, XTYPE_UNKNOWN */
+ 	             0x045e, 0x0202, /* "Microsoft X-Box pad v1 (US)",0*/  (int)XTYPE.XBOX ,
+	             0x045e, 0x0289, /* "Microsoft X-Box pad v2 (US)", 0*/ (int)XTYPE.XBOX ,
+ 	             0x045e, 0x0285,  /*"Microsoft X-Box pad (Japan)", 0*/ (int)XTYPE.XBOX ,
+ 	             0x045e, 0x0287,  /*"Microsoft Xbox Controller S", 0*/(int) XTYPE.XBOX ,
+	             0x045e, 0x0289,  /*"Microsoft X-Box pad v2 (US)", 0*/ (int)XTYPE.XBOX ,
+	             0x045e, 0x028e, /*Microsoft X-Box 360 pad", 0,*/ (int)XTYPE.XBOX360, 
+	             0x045e, 0x0291,/*Xbox 360 Wireless Receiver (XBOX)", MAP_DPAD_TO_BUTTONS*/(int) XTYPE.XBOX360W ,
+ 	             0x045e, 0x0719,/*Xbox 360 Wireless Receiver", MAP_DPAD_TO_BUTTONS*/(int) XTYPE.XBOX360W ,
+	             0x0c12, 0x8809,/*RedOctane Xbox Dance Pad", DANCEPAD_MAP_CONFIG*/ (int)XTYPE.XBOX, 
+ 	             0x044f, 0x0f07,/*Thrustmaster, Inc. Controller", 0*/ (int)XTYPE.XBOX ,
+ 	             0x046d, 0xc242,/*Logitech Chillstream Controller", 0*/ (int)XTYPE.XBOX360 ,
+ 	             0x046d, 0xca84,/*Logitech Xbox Cordless Controller", 0*/ (int)XTYPE.XBOX ,
+ 	             0x0738, 0x4540,/*Mad Catz Beat Pad", MAP_DPAD_TO_BUTTONS*/ (int)XTYPE.XBOX ,
+ 	             0x0738, 0x4556,/*Mad Catz Lynx Wireless Controller", 0*/ (int)XTYPE.XBOX ,
+ 	             0x0738, 0x4716,/*Mad Catz Wired Xbox 360 Controller", */ (int)XTYPE.XBOX360 ,
+	             0x0738, 0x4728,/*Mad Catz Street Fighter IV FightPad", XTYPE_XBOX360 
+ 	             0x0738, 0x4738,/*Mad Catz Wired Xbox 360 Controller (SFIV)", MAP_TRIGGERS_TO_BUTTONS,*/ (int)XTYPE.XBOX360 ,
+ 	             0x0738, 0x6040,/*Mad Catz Beat Pad Pro", MAP_DPAD_TO_BUTTONS,*/ (int)XTYPE.XBOX, 
+	             0x0738, 0xbeef,/*Mad Catz JOYTECH NEO SE Advanced GamePad",*/ (int)XTYPE.XBOX360 ,
+ 	             0x0c12, 0x8802,/*Zeroplus Xbox Controller", */ (int)XTYPE.XBOX, 
+	             0x0c12, 0x8809,/*RedOctane Xbox Dance Pad", DANCEPAD_MAP_CONFIG,*/ (int)XTYPE.XBOX, 
+ 	             0x0c12, 0x880a,/*Pelican Eclipse PL-2023", */ (int)XTYPE.XBOX, 
+ 	             0x0c12, 0x8810,/*Zeroplus Xbox Controller", */ (int)XTYPE.XBOX, 
+ 	             0x0c12, 0x9902,/*HAMA VibraX - *FAULTY HARDWARE*", */ (int)XTYPE.XBOX, 
+ 	             0x0e6f, 0x0003,/*Logic3 Freebird wireless Controller", */ (int)XTYPE.XBOX, 
+ 	             0x0e6f, 0x0005,/*Eclipse wireless Controller", */ (int)XTYPE.XBOX, 
+ 	             0x0e6f, 0x0006,/*Edge wireless Controller", */ (int)XTYPE.XBOX, 
+	             0x0e6f, 0x0006,/*Pelican 'TSZ' Wired Xbox 360 Controller", */ (int)XTYPE.XBOX360 ,
+	             0x0e6f, 0x0105,/*HSM3 Xbox360 dancepad", MAP_DPAD_TO_BUTTONS,*/ (int)XTYPE.XBOX360 ,
+ 	             0x0e6f, 0x0201,/*Pelican PL-3601 'TSZ' Wired Xbox 360 Controller", */ (int)XTYPE.XBOX360 ,
+	             0x0e6f, 0x0213,/*Afterglow Gamepad for Xbox 360", */ (int)XTYPE.XBOX360 ,
+ 	             0x0e8f, 0x0201,/*SmartJoy Frag Xpad/PS2 adaptor", */ (int)XTYPE.XBOX, 
+	             0x0f0d, 0x000d,/*Hori Fighting Stick EX2", MAP_TRIGGERS_TO_BUTTONS,*/ (int)XTYPE.XBOX360 ,
+	             0x0f0d, 0x0016,/*Hori Real Arcade Pro.EX", MAP_TRIGGERS_TO_BUTTONS, */(int)XTYPE.XBOX360 ,
+ 	             0x0f30, 0x0202,/*Joytech Advanced Controller", */ (int)XTYPE.XBOX, 
+ 	             0x0f30, 0x8888,/*BigBen XBMiniPad Controller", */ (int)XTYPE.XBOX, 
+ 	             0x102c, 0xff0c,/*Joytech Wireless Advanced Controller", */ (int)XTYPE.XBOX, 
+	             0x12ab, 0x8809,/*Xbox DDR dancepad", MAP_DPAD_TO_BUTTONS, */(int)XTYPE.XBOX, 
+ 	             0x12ab, 0x0004,/*Honey Bee Xbox360 dancepad", MAP_DPAD_TO_BUTTONS,*/ (int)XTYPE.XBOX360 ,
+	             0x0e6f, 0x0105,/*HSM3 Xbox360 dancepad", MAP_DPAD_TO_BUTTONS,*/ (int)XTYPE.XBOX360 ,
+	             0x12ab, 0x8809,/*Xbox DDR dancepad", MAP_DPAD_TO_BUTTONS,*/ (int)XTYPE.XBOX, 
+ 	             0x1430, 0x4748,/*RedOctane Guitar Hero X-plorer", */ (int)XTYPE.XBOX360 ,
+ 	             0x1430, 0x8888,/*TX6500+ Dance Pad (first generation)", MAP_DPAD_TO_BUTTONS, (int)XTYPE.XTYPE_XBOX, 
+ 	             0x146b, 0x0601,/*BigBen Interactive XBOX 360 Controller", */ (int)XTYPE.XBOX360 ,
+	             0x045e, 0x028e,/*Microsoft X-Box 360 pad", */ (int)XTYPE.XBOX360 ,
+	             0x1689, 0xfd00,/*Razer Onza Tournament Edition", MAP_DPAD_TO_BUTTONS,*/ (int)XTYPE.XBOX360 ,
+ 	             0x1bad, 0x0002,/*Harmonix Rock Band Guitar", */ (int)XTYPE.XBOX360 ,
+ 	             0x1bad, 0x0003,/*Harmonix Rock Band Drumkit", MAP_DPAD_TO_BUTTONS, */(int)XTYPE.XBOX360 ,
+	             0x0f0d, 0x0016,/*Hori Real Arcade Pro.EX", MAP_TRIGGERS_TO_BUTTONS,*/ (int)XTYPE.XBOX360 ,
+	             0x0f0d, 0x000d,/*Hori Fighting Stick EX2", MAP_TRIGGERS_TO_BUTTONS, */(int)XTYPE.XBOX360 ,
+	             0x1689, 0xfd00,/*Razer Onza Tournament Edition", MAP_DPAD_TO_BUTTONS,*/ (int)XTYPE.XBOX360 ,
+	             0x1bad, 0xf016,/*Mad Catz Xbox 360 Controller", */ (int)XTYPE.XBOX360 ,
+	             0x1bad, 0xf028,/*Street Fighter IV FightPad", */ (int)XTYPE.XBOX360 ,
+	             0x1bad, 0xf901,/*Gamestop Xbox 360 Controller", */ (int)XTYPE.XBOX360 ,
+	             0x1bad, 0xf903,/*Tron Xbox 360 controller", */ (int)XTYPE.XBOX360 ,
+	             0x24c6, 0x5300,/*PowerA MINI PROEX Controller", */ (int)XTYPE.XBOX360 ,
+ 	             0xffff, 0xffff,/*Chinese-made Xbox Controller", */ (int)XTYPE.XBOX
+                 
+ 	            
  };
 
 
@@ -195,16 +204,16 @@ using UnityEngine;
             public IJoystickDevice ResolveDevice(IHIDDeviceInfo info)
 			//public IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension> ResolveDevice(IHIDDeviceInfo info)
 			{
-				bool deviceRecognized=false;
+				int type=-1;
                  int len=XPAD_DEVICE.Length;
-                 for(int i=0;i<len;i+=2){
+                 for(int i=0;i<len;i+=3){
                     if(info.VID==XPAD_DEVICE[i] && info.PID==XPAD_DEVICE[i+1]){
-                    deviceRecognized=true;
+                    type=XPAD_DEVICE[i+2];
                     break;
                     }
                  }
               
-		      if(!deviceRecognized) return null;
+		      if(type<0) return null;
 
                 XInputDevice joystick;
                 int inx = 0;
@@ -212,7 +221,7 @@ using UnityEngine;
 				_hidInterface=info.hidInterface;
 
 
-                joystick = new XInputDevice(info.id, 8, 10);
+                joystick = new XInputDevice(info.id, 8, 10,type);
               
 
                 //inti button structure
@@ -483,9 +492,22 @@ using UnityEngine;
         JoystickButtonState _buttonState;
         bool _isNullable;
         bool _isHat;
+		bool _isTrigger;
 
 
         #region IAxisDetails implementation
+
+	
+
+		public bool isTrigger {
+			get {
+				return _isTrigger;
+			}
+			set {
+				_isTrigger=value;
+			}
+		}
+
 
 
         public int min

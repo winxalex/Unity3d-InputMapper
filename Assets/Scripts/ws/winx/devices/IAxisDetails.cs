@@ -16,6 +16,7 @@ namespace ws.winx.devices
 			int max{get;set;}
 			bool isNullable{get;set;}
 			bool isHat{get;set;}
+			bool isTrigger{get;set;}
 		}
 }
 

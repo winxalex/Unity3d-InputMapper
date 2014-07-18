@@ -1784,9 +1784,25 @@ namespace ws.winx.platform.windows
             JoystickButtonState _buttonState;
             bool _isNullable;
             bool _isHat;
+			bool _isTrigger;
 
 
             #region IAxisDetails implementation
+
+
+
+			public bool isTrigger {
+				get {
+					return _isTrigger;
+				}
+				set {
+					_isTrigger=value;
+				}
+			}
+
+
+
+
 
 
 			public int mid
