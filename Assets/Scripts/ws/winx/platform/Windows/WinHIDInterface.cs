@@ -221,7 +221,7 @@ namespace ws.winx.platform.windows
         }
 
 
-        private static IntPtr CustomWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
+        protected IntPtr CustomWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
         {
             int devType = 0;
 
@@ -670,14 +670,18 @@ namespace ws.winx.platform.windows
         }
 
 
-
+static uint WM_CLOSE = 0x10;
 
         #region UnsafeNativeMethods
 
         public static class UnsafeNativeMethods
         {
 
-          
+            
+            [return: MarshalAs(UnmanagedType.Bool)]
+            [DllImport("user32.dll", SetLastError = true)]
+            static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
 
             [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
             public static extern System.UInt16 RegisterClassW(
@@ -927,10 +931,10 @@ namespace ws.winx.platform.windows
 
             if (receiverWindowHandle != IntPtr.Zero)
             {
-               
+                UnityEngine.Debug.Log("Destroy Receiver"+ UnsafeNativeMethods.DestroyWindow(receiverWindowHandle));
                 receiverWindowHandle = IntPtr.Zero;
 
-                UnityEngine.Debug.Log("Destroy Receiver"+ UnsafeNativeMethods.DestroyWindow(receiverWindowHandle));
+               //
             }
 
             UnityEngine.Debug.Log("Dispose WinHIDInterface");
