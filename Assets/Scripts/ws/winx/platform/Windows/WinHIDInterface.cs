@@ -13,11 +13,16 @@ using System.Runtime.InteropServices;
 using ws.winx.devices;
 using System.Collections.Generic;
 using System.Linq;
+using System.Timers;
+
 
 namespace ws.winx.platform.windows
 {
     public class WinHIDInterface : IHIDInterface
     {
+
+
+       
 
         #region Fields
         private List<IJoystickDriver> __drivers;// = new List<IJoystickDriver>();
@@ -28,6 +33,32 @@ namespace ws.winx.platform.windows
         JoystickDevicesCollection _joysticks;
 
         public readonly Dictionary<IJoystickDevice, IHIDDeviceInfo> DeviceHIDInfos;
+
+         delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+
+         private const int ERROR_CLASS_ALREADY_EXISTS = 1410;
+
+         //GUID_DEVINTERFACE_HID	Class GUID{4D1E55B2-F16F-11CF-88CB-001111000030}
+         private static readonly Guid GUID_DEVINTERFACE_HID = new Guid("4D1E55B2-F16F-11CF-88CB-001111000030"); // HID devices
+		
+         public IntPtr receiverWindowHandle;
+
+
+   
+
+         private WndProc m_wnd_proc_delegate;
+
+         /// <summary>
+         ///     Class of devices. This structure is a DEV_BROADCAST_DEVICEINTERFACE structure.
+         /// </summary>
+         public const uint DBT_DEVTYP_DEVICEINTERFACE = 0x00000005;
+
+         public const int DbtDevicearrival = 0x8000; // system detected a new device        
+         public const int DBT_DEVICEREMOVECOMPLETE = 0x8004; // device is gone      
+         public const int WM_DEVICECHANGE = 0x0219; // device change event      
+
+         private static IntPtr notificationHandle;
 
         #endregion
 
@@ -62,6 +93,14 @@ namespace ws.winx.platform.windows
 
         #endregion
 
+		//public static readonly Guid GUID_DEVCLASS_HIDCLASS = new Guid(0x745a17a0, 0x74d3, 0x11d0, 0xb6, 0xfe, 0x00, 0xa0, 0xc9, 0x0f, 0x57, 0xda);
+        //public static readonly Guid GUID_DEVCLASS_USB = new Guid(0x36fc9e60, 0xc465, 0x11cf, 0x80, 0x56, 0x44, 0x45, 0x53, 0x54, 0x00, 0x00);
+		
+
+	
+		//private static readonly Guid GuidDevinterfaceUSBDevice = new Guid("A5DCBF10-6530-11D2-901F-00C04FB951ED"); // USB devices
+		
+    
 
 
         #region Constructor
@@ -71,14 +110,210 @@ namespace ws.winx.platform.windows
             _joysticks = new JoystickDevicesCollection();
             DeviceHIDInfos = new Dictionary<IJoystickDevice, IHIDDeviceInfo>();
 
+            //Timer aTimer = new Timer(3000);
+           // aTimer.Elapsed += new ElapsedEventHandler(enumerateTimedEvent);
+          //  aTimer.Enabled = true;
+
             Enumerate();
+
+         
+            receiverWindowHandle = CreateReceiverWnd();
+
+            if(receiverWindowHandle!=IntPtr.Zero)
+			RegisterUsbDeviceNotification(receiverWindowHandle);
+		}
+		#endregion
+
+
+        // Specify what you want to happen when the Elapsed event is raised.
+        //private void enumerateTimedEvent(object source, ElapsedEventArgs e)
+        //{
+        //    Update();
+
+        //}
+
+
+
+      
+        /// <summary>
+        /// Registers a window to receive notifications when USB devices are plugged or unplugged.
+        /// </summary>
+        /// <param name="windowHandle">Handle to the window receiving notifications.</param>
+        public void RegisterUsbDeviceNotification(IntPtr windowHandle)
+        {
+            DEV_BROADCAST_DEVICEINTERFACE dbi = new DEV_BROADCAST_DEVICEINTERFACE
+            {
+                dbcc_size = 0,
+
+                dbcc_devicetype = (int)DBT_DEVTYP_DEVICEINTERFACE,
+
+                dbcc_reserved = 0,
+
+                dbcc_classguid = GUID_DEVINTERFACE_HID.ToByteArray()
+                
+            };
+
+
+
+
+			dbi.dbcc_size = Marshal.SizeOf(dbi);
+			IntPtr buffer = Marshal.AllocHGlobal(dbi.dbcc_size);
+            Marshal.StructureToPtr(dbi, buffer, true);
+			
+            notificationHandle =UnsafeNativeMethods.RegisterDeviceNotification(windowHandle, buffer, 0);
+
+
         }
-        #endregion
+
+
+
+         IntPtr CreateReceiverWnd()
+        {
+
+            IntPtr wndHnd=IntPtr.Zero;
+            m_wnd_proc_delegate = CustomWndProc;
+
+            // Create WNDCLASS
+            WNDCLASS wind_class = new WNDCLASS();
+            wind_class.lpszClassName = "InputManager Device Change Notification Reciver Wnd";
+            wind_class.lpfnWndProc = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(m_wnd_proc_delegate);
+
+            UInt16 class_atom =UnsafeNativeMethods.RegisterClassW(ref wind_class);
+
+            int last_error = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
+
+            if (class_atom == 0 && last_error != ERROR_CLASS_ALREADY_EXISTS)
+            {
+                Exception e=new System.Exception("Could not register window class");
+                
+                UnityEngine.Debug.LogException(e);
+
+                return IntPtr.Zero;
+            }
+
+
+            try
+            {
+                // Create window
+               wndHnd= UnsafeNativeMethods.CreateWindowExW(
+                   0,
+                   wind_class.lpszClassName,
+                   String.Empty,
+                   0,
+                   0,
+                   0,
+                   0,
+                   0,
+                   IntPtr.Zero,
+                   IntPtr.Zero,
+                   IntPtr.Zero,
+                   IntPtr.Zero
+                   );
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogException(e);
+            }
+
+
+            return wndHnd;
+           
+        }
+
+
+        private static IntPtr CustomWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
+        {
+            int devType = 0;
+
+            if (msg == WM_DEVICECHANGE)
+            {
+
+                if (lParam != IntPtr.Zero)
+                    devType = Marshal.ReadInt32(lParam, 4);
+
+                switch ((int)wParam)
+                {
+                    case DBT_DEVICEREMOVECOMPLETE:
+
+                        if (devType == WinHIDInterface.DBT_DEVTYP_DEVICEINTERFACE)
+                        {
+                            try
+                            {
+                                DEV_BROADCAST_DEVICEINTERFACE devBroadcastDeviceInterface =
+                                    new DEV_BROADCAST_DEVICEINTERFACE();
+                                DEV_BROADCAST_HDR devBroadcastHeader = new DEV_BROADCAST_HDR();
+                                Marshal.PtrToStructure(lParam, devBroadcastHeader);
+
+                                Int32 stringSize = Convert.ToInt32((devBroadcastHeader.dbch_size - 32) / 2);
+                                Array.Resize(ref devBroadcastDeviceInterface.dbcc_name, stringSize);
+                                Marshal.PtrToStructure(lParam, devBroadcastDeviceInterface);
+                                String deviceNameString = new String(devBroadcastDeviceInterface.dbcc_name, 0, stringSize);
+                                UnityEngine.Debug.Log("Removed " + deviceNameString);
+                            }
+                            catch (Exception e)
+                            {
+                                UnityEngine.Debug.LogException(e);
+                            }
+                        }
 
 
 
 
 
+
+
+                        break;
+                    case DbtDevicearrival:
+                        if (devType == WinHIDInterface.DBT_DEVTYP_DEVICEINTERFACE)
+                        {
+                            try
+                            {
+                                DEV_BROADCAST_DEVICEINTERFACE devBroadcastDeviceInterface =
+                                new DEV_BROADCAST_DEVICEINTERFACE();
+                                DEV_BROADCAST_HDR devBroadcastHeader = new DEV_BROADCAST_HDR();
+                                Marshal.PtrToStructure(lParam, devBroadcastHeader);
+
+                                Int32 stringSize = Convert.ToInt32((devBroadcastHeader.dbch_size - 32) / 2);
+                                Array.Resize(ref devBroadcastDeviceInterface.dbcc_name, stringSize);
+                                Marshal.PtrToStructure(lParam, devBroadcastDeviceInterface);
+                                String deviceNameString = new String(devBroadcastDeviceInterface.dbcc_name, 0, stringSize);
+
+
+
+
+                                UnityEngine.Debug.Log("Connected " + deviceNameString);
+                            }
+                            catch (Exception e)
+                            {
+                                UnityEngine.Debug.LogException(e);
+                            }
+                        }
+
+                        break;
+                }
+            }
+
+            return UnsafeNativeMethods.DefWindowProcW(hWnd, msg, wParam, lParam);
+        }
+    
+
+ 
+
+		
+        /// <summary>
+        /// Unregisters the window for USB device notifications
+        /// </summary>
+        public static void UnregisterUsbDeviceNotification()
+        {
+            if (notificationHandle != IntPtr.Zero)
+            UnsafeNativeMethods.UnregisterDeviceNotification(notificationHandle);
+
+            notificationHandle = IntPtr.Zero;
+        }
+
+
+    
+    
 
 
 
@@ -98,11 +333,21 @@ namespace ws.winx.platform.windows
 
             //_devices = new RawInputDevice[deviceCount];
 
-            if ((int)result == -1 || deviceCount == 0)
+            if ((int)result == -1)
             {
-                // call failed, or no devices found
+                // call failed, 
+                UnityEngine.Debug.LogError("WinHIDInterface faled to enumerate events");
+               
                 return;
             }
+            else if (deviceCount == 0)//TODO compare with current list
+            {
+                 
+            }
+
+
+
+
 
             // allocates memory for an array of Win32.RawInputDeviceList
             IntPtr ptrDeviceList = Marshal.AllocHGlobal((int)(deviceSize * deviceCount));
@@ -116,13 +361,13 @@ namespace ws.winx.platform.windows
 
             if ((int)result != -1)
             {
-              
+                RawInputDeviceList rawInputDeviceList;
 				// enumerates array of Win32.RawInputDeviceList,
                 // and populates array of managed RawInputDevice objects
                 for (var index = 0; index < deviceCount; index++)
                 {
-                    var rawInputDeviceList =
-                        (RawInputDeviceList)Marshal.PtrToStructure(
+                    
+                        rawInputDeviceList =(RawInputDeviceList)Marshal.PtrToStructure(
                             new IntPtr((ptrDeviceList.ToInt32() +
                                     (deviceSize * index))),
                             typeof(RawInputDeviceList));
@@ -130,7 +375,7 @@ namespace ws.winx.platform.windows
                    
 
                     if (rawInputDeviceList.DeviceType == RawInputDeviceType.HumanInterfaceDevice)
-						resolveDevice(getDeviceInfo(hidInx++,rawInputDeviceList));
+						resolveDevice(GetHIDDeviceInfo(hidInx++,rawInputDeviceList));
 
                 }
             }
@@ -140,7 +385,32 @@ namespace ws.winx.platform.windows
         }
 
 
-		protected HIDDeviceInfo getDeviceInfo(int inx,RawInputDeviceList rawInputDeviceList)
+
+        private static string GetDeviceName(DEV_BROADCAST_DEVICEINTERFACE dvi)
+        {
+            //string[] Parts = dvi.dbcc_name.Split('#');
+            //if (Parts.Length >= 3)
+            //{
+            //    string DevType = Parts[0].Substring(Parts[0].IndexOf(@"?\") + 2);
+            //    string DeviceInstanceId = Parts[1];
+            //    string DeviceUniqueID = Parts[2];
+            //    string RegPath = @"SYSTEM\CurrentControlSet\Enum\" + DevType + "\\" + DeviceInstanceId + "\\" + DeviceUniqueID;
+            //    RegistryKey key = Registry.LocalMachine.OpenSubKey(RegPath);
+            //    if (key != null)
+            //    {
+            //        object result = key.GetValue("FriendlyName");
+            //        if (result != null)
+            //            return result.ToString();
+            //        result = key.GetValue("DeviceDesc");
+            //        if (result != null)
+            //            return result.ToString();
+            //    }
+            //}
+            return String.Empty;
+        }
+
+
+		protected HIDDeviceInfo GetHIDDeviceInfo(int inx,RawInputDeviceList rawInputDeviceList)
         {
 
 
@@ -156,9 +426,7 @@ namespace ws.winx.platform.windows
 
 
 
-        private static IntPtr GetDeviceData(
-            IntPtr deviceHandle,
-            RawInputDeviceInfoCommand command)
+        private static IntPtr GetDeviceData(IntPtr deviceHandle,RawInputDeviceInfoCommand command)
         {
             uint dataSize = 0;
             var ptrData = IntPtr.Zero;
@@ -215,7 +483,7 @@ namespace ws.winx.platform.windows
                 return new DeviceInfo();
             }
 
-            var deviceInfo = (DeviceInfo)Marshal.PtrToStructure(
+            DeviceInfo deviceInfo = (DeviceInfo)Marshal.PtrToStructure(
                 ptrDeviceInfo, typeof(DeviceInfo));
 
             Marshal.FreeHGlobal(ptrDeviceInfo);
@@ -237,6 +505,7 @@ namespace ws.winx.platform.windows
                     {
                         _joysticks[deviceInfo.device] = joyDevice;
                         joyDevice.driver = driver;
+                        DeviceHIDInfos[joyDevice] = deviceInfo;
                         Debug.Log("Device PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + driver.GetType().ToString());
 
                         break;
@@ -253,7 +522,7 @@ namespace ws.winx.platform.windows
                     _joysticks[deviceInfo.device] = joyDevice;
                     joyDevice.driver = __defaultJoystickDriver;
 					DeviceHIDInfos[joyDevice] = deviceInfo;
-                    Debug.Log("Device PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + __defaultJoystickDriver.GetType().ToString());
+                    Debug.Log("Device PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + __defaultJoystickDriver.GetType().ToString()+" Path:"+deviceInfo.DevicePath);
 
                 }
                 else
@@ -342,10 +611,135 @@ namespace ws.winx.platform.windows
             public RawInputDeviceType DeviceType;
         }
 
+
+          // Struct for parameters of the WM_DEVICECHANGE message
+        [StructLayout(LayoutKind.Sequential)]
+        public struct DEV_BROADCAST_VOLUME
+        {
+            public int dbcv_size;
+            public int dbcv_devicetype;
+            public int dbcv_reserved;
+            public int dbcv_unitmask;
+        }
+
+
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal class DEV_BROADCAST_HDR
+        {
+            internal Int32 dbch_size;
+            internal Int32 dbch_devicetype;
+            internal Int32 dbch_reserved;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        internal class DEV_BROADCAST_DEVICEINTERFACE
+        {
+            internal Int32 dbcc_size;
+            internal Int32 dbcc_devicetype;
+            internal Int32 dbcc_reserved;
+            [MarshalAs(UnmanagedType.ByValArray,
+           ArraySubType = UnmanagedType.U1,
+           SizeConst = 16)]
+            internal Byte[] dbcc_classguid;
+            [MarshalAs(UnmanagedType.ByValArray,SizeConst = 255)]
+            internal Char[] dbcc_name;
+        }
+        
+		
+
+
+        [System.Runtime.InteropServices.StructLayout(
+              System.Runtime.InteropServices.LayoutKind.Sequential,
+              CharSet = System.Runtime.InteropServices.CharSet.Unicode
+              )]
+        public struct WNDCLASS
+        {
+            public uint style;
+            public IntPtr lpfnWndProc;
+            public int cbClsExtra;
+            public int cbWndExtra;
+            public IntPtr hInstance;
+            public IntPtr hIcon;
+            public IntPtr hCursor;
+            public IntPtr hbrBackground;
+            [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
+            public string lpszMenuName;
+            [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
+            public string lpszClassName;
+        }
+
+
+
+
         #region UnsafeNativeMethods
 
         public static class UnsafeNativeMethods
         {
+
+          
+
+            [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
+            public static extern System.UInt16 RegisterClassW(
+                [System.Runtime.InteropServices.In] ref WNDCLASS lpWndClass
+                );
+
+            [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
+           public static extern IntPtr CreateWindowExW(
+                UInt32 dwExStyle,
+                [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
+			string lpClassName,
+                [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
+			string lpWindowName,
+                UInt32 dwStyle,
+                Int32 x,
+                Int32 y,
+                Int32 nWidth,
+                Int32 nHeight,
+                IntPtr hWndParent,
+                IntPtr hMenu,
+                IntPtr hInstance,
+                IntPtr lpParam
+                );
+
+            [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
+            public static extern System.IntPtr DefWindowProcW(
+                IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam
+                );
+
+            [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
+            public static extern bool DestroyWindow(
+                IntPtr hWnd
+                );
+
+
+			[DllImport("kernel32.dll")]
+			public static extern uint GetLastError();
+			[DllImport("kernel32.dll", CharSet=CharSet.Auto)]
+			public static extern IntPtr GetModuleHandle(string lpModuleName);
+
+            [DllImport("user32", EntryPoint = "SetWindowsHookEx")]
+            public static extern IntPtr SetWindowsHookEx(int idHook, Delegate lpfn, IntPtr hmod, IntPtr dwThreadId);
+
+            [DllImport("user32", EntryPoint = "UnhookWindowsHookEx")]
+            public static extern int UnhookWindowsHookEx(IntPtr hHook);
+
+            [DllImport("user32", EntryPoint = "CallNextHookEx")]
+            public static extern int CallNextHook(IntPtr hHook, int ncode, IntPtr wParam, IntPtr lParam);
+
+            [DllImport("kernel32.dll")]
+            public static extern IntPtr GetCurrentThreadId();
+
+            [DllImport("user32.dll")]
+            public static extern System.IntPtr GetActiveWindow();
+
+            [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            public static extern IntPtr RegisterDeviceNotification(IntPtr recipient, IntPtr notificationFilter, int flags);
+
+            [DllImport("user32.dll")]
+            public static extern bool UnregisterDeviceNotification(IntPtr handle);
+
+           
 
 
             [DllImport("User32.dll", SetLastError = true)]
@@ -522,6 +916,27 @@ namespace ws.winx.platform.windows
 
 
 
+
+        public void Dispose()
+        {
+            UnityEngine.Debug.Log("Try to dispose notificationHandle");
+             UnregisterUsbDeviceNotification();
+
+             UnityEngine.Debug.Log("Try to dispose receiverWindowHandle");
+			
+
+            if (receiverWindowHandle != IntPtr.Zero)
+            {
+               
+                receiverWindowHandle = IntPtr.Zero;
+
+                UnityEngine.Debug.Log("Destroy Receiver"+ UnsafeNativeMethods.DestroyWindow(receiverWindowHandle));
+            }
+
+            UnityEngine.Debug.Log("Dispose WinHIDInterface");
+        }
+
+     
     }
 
 }

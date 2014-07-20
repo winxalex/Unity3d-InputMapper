@@ -39,7 +39,7 @@ namespace ws.winx.input
 
 		internal static IHIDInterface hidInterface{
 			get{ 
-
+                //TODO add conditional compiling
 				if(__hidInterface==null){
 					if((Application.platform & (RuntimePlatform.WindowsPlayer | RuntimePlatform.WindowsEditor))!=0){
                         __hidInterface = new ws.winx.platform.windows.WinHIDInterface(__drivers);
@@ -465,6 +465,20 @@ namespace ws.winx.input
 						return content.ToString();
 
 		}
+
+
+
+        public static void Dispose(){
+
+
+            if (__hidInterface != null)
+            {
+                __hidInterface.Dispose();
+                __hidInterface = null;
+            }
+
+        }
+
 
 
 		#region Settings

@@ -123,5 +123,17 @@ public class Game : MonoBehaviour {
 
 
 	}
+
+
+
+
+
+    /// <summary>
+    /// DONT FORGET TO CLEAN AFTER YOURSELF
+    /// </summary>
+    void OnDestroy()
+    {
+        InputManager.Dispose();
+    }
 }
 }

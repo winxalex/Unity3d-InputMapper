@@ -900,4 +900,14 @@ public class InputMapper : EditorWindow
 		
 				EditorGUILayout.Separator ();
 		}
+
+
+       ///////////////////     ON DESTROY     ////////////////
+        void OnDestroy()
+        {
+            if(_stateInputCombinations!=null)
+            _stateInputCombinations.Clear();
+
+            InputManager.Dispose();
+        }
 }

@@ -12,7 +12,7 @@ using UnityEngine;
 using ws.winx.devices;
 namespace ws.winx.platform
 {
-		public interface IHIDInterface
+		public interface IHIDInterface:IDisposable
 		{
             
 			IJoystickDriver defaultDriver{get;set;}

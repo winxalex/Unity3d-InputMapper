@@ -80,6 +80,9 @@
      <Compile Include="Assets\Scripts\ws\winx\platform\OSX\CoreFoundation.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\OSX\OSXDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\OSX\OSXHIDInterface.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Web\WebHIDBehaviour.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Web\WebHIDInterface.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Windows\USBNotifier.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\WiiDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\WinHIDInterface.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\WinMMDriver.cs" />

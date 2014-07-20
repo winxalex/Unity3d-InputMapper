@@ -618,6 +618,10 @@ namespace ws.winx.platform.osx
 
 
 
+        void IDisposable.Dispose()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 
