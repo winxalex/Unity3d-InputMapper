@@ -45,121 +45,43 @@ namespace ws.winx.platform.windows
 
 
 
-        //        #region Private Members
-        //
-        //
-        //
-        //
-        //				JoystickDevice<WinMMJoyDetails> OpenJoystick (int number)
-        //				{
-        //						JoystickDevice<WinMMJoyDetails> stick = null;
-        //
-        //						JoyCaps caps;
-        //						JoystickError result = UnsafeNativeMethods.joyGetDevCaps (number, out caps, JoyCaps.SizeInBytes);
-        //
-        //
-        //						if (result != JoystickError.NoError)
-        //								return null;
-        //
-        //						int num_axes = caps.NumAxes;
-        //						if ((caps.Capabilities & JoystCapsFlags.HasPov) != 0)
-        //								num_axes += 2;
-        //
-        //						stick = new JoystickDevice<WinMMJoyDetails> (number, num_axes, caps.NumButtons);
-        //						stick.Details = new WinMMJoyDetails (num_axes);
-        //
-        //						// Make sure to reverse the vertical axes, so that +1 points up and -1 points down.
-        //						int axis = 0;
-        //						if (axis < caps.NumAxes) {
-        //								stick.Details.Min [axis] = caps.XMin;
-        //								stick.Details.Max [axis] = caps.XMax;
-        //								axis++;
-        //						}
-        //						if (axis < caps.NumAxes) {
-        //								stick.Details.Min [axis] = caps.YMax;
-        //								stick.Details.Max [axis] = caps.YMin; 
-        //								//	stick.Details.Min[axis] = caps.YMin; stick.Details.Max[axis] = caps.YMax; 
-        //								axis++;
-        //						}
-        //						if (axis < caps.NumAxes) {
-        //								stick.Details.Min [axis] = caps.ZMax;
-        //								stick.Details.Max [axis] = caps.ZMin;
-        //								axis++;
-        //						}
-        //						if (axis < caps.NumAxes) {
-        //								stick.Details.Min [axis] = caps.RMin;
-        //								stick.Details.Max [axis] = caps.RMax;
-        //								axis++;
-        //						}
-        //						if (axis < caps.NumAxes) {
-        //								stick.Details.Min [axis] = caps.UMin;
-        //								stick.Details.Max [axis] = caps.UMax;
-        //								axis++;
-        //						}
-        //						if (axis < caps.NumAxes) {
-        //								stick.Details.Min [axis] = caps.VMax;
-        //								stick.Details.Max [axis] = caps.VMin;
-        //								axis++;
-        //						}
-        //
-        //						if ((caps.Capabilities & JoystCapsFlags.HasPov) != 0) {
-        //								stick.Details.PovType = PovType.Exists;
-        //								if ((caps.Capabilities & JoystCapsFlags.HasPov4Dir) != 0)
-        //										stick.Details.PovType |= PovType.Discrete;
-        //								if ((caps.Capabilities & JoystCapsFlags.HasPovContinuous) != 0)
-        //										stick.Details.PovType |= PovType.Continuous;
-        //						}
-        //
-        //          
-        //						stick.Description = String.Format ("Joystick/Joystick #{0} ({1} axes, {2} buttons)", number, stick.Axis.Count, stick.numButtons);
-        //						// Todo: Try to get the device name from the registry. Oh joy!
-        //						//string key_path = String.Format("{0}\\{1}\\{2}", RegistryJoyConfig, caps.RegKey, RegstryJoyCurrent);
-        //						//RegistryKey key = Registry.LocalMachine.OpenSubKey(key_path, false);
-        //						//if (key == null)
-        //						//    key = Registry.CurrentUser.OpenSubKey(key_path, false);
-        //						//if (key == null)
-        //						//    stick.Description = String.Format("USB Joystick {0} ({1} axes, {2} buttons)", number, stick.Axis.Count, stick.Button.Count);
-        //						//else
-        //						//{
-        //						//    key.Close();
-        //						//}
-        //
-        //						if (stick != null)
-        //								UnityEngine.Debug.Log (String.Format ("Found joystick on device number {0}", number));
-        //						return stick;
-        //				}
-        //
-        //        #endregion
-
-     
-
-		#region IJoystickDriver implementation
+        #region IJoystickDriver implementation
 
 
         public void Update(IJoystickDevice joystick)
-		//public void Update (IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension> joystick)
-		{
-			           
+        //public void Update (IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension> joystick)
+        {
+            // UnityEngine.Debug.Log("Update Driver called from:" + joystick.PID+" ID:"+joystick.ID);
 
-	    
+            //try
+            //{
+            //    throw new Exception("test");
+            //}
+            //catch (Exception e)
+            //{
+            //    UnityEngine.Debug.Log(e.StackTrace);
+            //}
+
+
+
 
 
             //thru to get joystick info
             JoystickError result = UnsafeNativeMethods.joyGetPosEx(joystick.ID, ref info);
 
-//			if (result == JoystickError.NoError && joystick.ID==3){
-//			   UnityEngine.Debug.Log("Update Joy"+joystick.PID+"++"+joystick.VID+" i"+info.Buttons);
-//			}
+            //			if (result == JoystickError.NoError && joystick.ID==3){
+            //			   UnityEngine.Debug.Log("Update Joy"+joystick.PID+"++"+joystick.VID+" i"+info.Buttons);
+            //			}
 
-//                        for(int i=0;i<16;i++){
-//			
-//                                result= UnsafeNativeMethods.joyGetPosEx(i, ref info);
-//                //UnityEngine.Debug.Log(result);
-//                            if (result == JoystickError.NoError){
-//                               // break;
-//                                UnityEngine.Debug.Log("ID:"+i+" on PID:"+joystick.PID+" ");
-//                            }
-//                        }
+            //                        for(int i=0;i<16;i++){
+            //			
+            //                                result= UnsafeNativeMethods.joyGetPosEx(i, ref info);
+            //                //UnityEngine.Debug.Log(result);
+            //                            if (result == JoystickError.NoError){
+            //                               // break;
+            //                                UnityEngine.Debug.Log("ID:"+i+" on PID:"+joystick.PID+" ");
+            //                            }
+            //                        }
 
             if (result == JoystickError.NoError)
             {
@@ -179,7 +101,7 @@ namespace ws.winx.platform.windows
                 IAxisDetails axisDetails;
 
                 int axisIndex = 0;
-                int numAxis = joystick.Axis.Count-joystick.numPOV*2;//minus POV axes
+                int numAxis = joystick.Axis.Count - joystick.numPOV * 2;//minus POV axes
 
                 joyPositions[0] = info.XPos;
                 joyPositions[1] = info.YPos;
@@ -188,33 +110,33 @@ namespace ws.winx.platform.windows
                 joyPositions[4] = info.UPos;
                 joyPositions[5] = info.VPos;
 
-              //  UnityEngine.Debug.Log("XPos:"+info.XPos+" YPos:" + info.YPos + " ZPos:" + info.ZPos+" RPos:"+info.RPos+" UPos:"+info.UPos);
+                //  UnityEngine.Debug.Log("XPos:"+info.XPos+" YPos:" + info.YPos + " ZPos:" + info.ZPos+" RPos:"+info.RPos+" UPos:"+info.UPos);
 
 
-			//	axisDetails = joystick.Axis[0];
-			
-					//axisDetails.value = CalculateOffset((float)joyPositions[0], axisDetails.min, axisDetails.max);
+                //	axisDetails = joystick.Axis[0];
 
-				//axisDetails = joystick.Axis[1];
-				
-				//axisDetails.value = CalculateOffset((float)joyPositions[1], axisDetails.min, axisDetails.max);
+                //axisDetails.value = CalculateOffset((float)joyPositions[0], axisDetails.min, axisDetails.max);
+
+                //axisDetails = joystick.Axis[1];
+
+                //axisDetails.value = CalculateOffset((float)joyPositions[1], axisDetails.min, axisDetails.max);
 
 
                 while (axisIndex < numAxis)
                 {
                     axisDetails = joystick.Axis[axisIndex];
-					if(axisDetails!=null)
-					if(axisDetails.isTrigger)
-						axisDetails.value=NormalizeTrigger((float)joyPositions[axisIndex], axisDetails.min, axisDetails.max);
-					else
-                   		axisDetails.value = NormalizeAxis((float)joyPositions[axisIndex], axisDetails.min, axisDetails.max);
+                    if (axisDetails != null)
+                        if (axisDetails.isTrigger)
+                            axisDetails.value = NormalizeTrigger((float)joyPositions[axisIndex], axisDetails.min, axisDetails.max);
+                        else
+                            axisDetails.value = NormalizeAxis((float)joyPositions[axisIndex], axisDetails.min, axisDetails.max);
 
 
                     axisIndex++;
                 }
 
 
-				//UnityEngine.Debug.Log("YPos: "+info.YPos+"Joy:"+joystick.ID+" vle"+joystick.Axis[JoystickAxis.AxisY].value);
+                //UnityEngine.Debug.Log("YPos: "+info.YPos+"Joy:"+joystick.ID+" vle"+joystick.Axis[JoystickAxis.AxisY].value);
 
                 //set Point of View(Hat) if exist
                 if ((joystick.numPOV) > 0)
@@ -224,22 +146,22 @@ namespace ws.winx.platform.windows
                     int y = 0;
 
 
-				//	UnityEngine.Debug.Log("Pov is"+info.Pov);
+                    //	UnityEngine.Debug.Log("Pov is"+info.Pov);
 
 
-					if ((JoystickPovPosition)info.Pov != JoystickPovPosition.Centered)
+                    if ((JoystickPovPosition)info.Pov != JoystickPovPosition.Centered)
                     {
-						if (info.Pov > (ushort)JoystickPovPosition.Left || info.Pov < (ushort)JoystickPovPosition.Right)
+                        if (info.Pov > (ushort)JoystickPovPosition.Left || info.Pov < (ushort)JoystickPovPosition.Right)
                         { y = 1; }
                         if ((info.Pov > 0) && (info.Pov < (int)JoystickPovPosition.Backward))
                         { x = 1; }
-						if ((info.Pov > (ushort)JoystickPovPosition.Right) && (info.Pov < (ushort)JoystickPovPosition.Left))
+                        if ((info.Pov > (ushort)JoystickPovPosition.Right) && (info.Pov < (ushort)JoystickPovPosition.Left))
                         { y = -1; }
-						if (info.Pov > (ushort)JoystickPovPosition.Backward)
+                        if (info.Pov > (ushort)JoystickPovPosition.Backward)
                         { x = -1; }
                     }
 
-					//UnityEngine.Debug.Log(x+" "+y);
+                    //UnityEngine.Debug.Log(x+" "+y);
 
 
                     joystick.Axis[JoystickAxis.AxisPovX].value = x;
@@ -254,13 +176,13 @@ namespace ws.winx.platform.windows
 
 
             }
-            else
-            {
-				if(_hidInterface.Devices.ContainsKey(joystick.ID)){
-                _hidInterface.Devices.Remove(joystick.ID);
-                UnityEngine.Debug.LogWarning("Device ID:"+joystick.ID+" PID:" + joystick.PID + " VID:" + joystick.VID + " Disconnected! Removed from HID!");
-				}
-            }
+            //else
+            //{
+            //    if(_hidInterface.Devices.ContainsKey(joystick.ID)){
+            //    _hidInterface.Devices.Remove(joystick.ID);
+            //    UnityEngine.Debug.LogWarning("Device ID:"+joystick.ID+" PID:" + joystick.PID + " VID:" + joystick.VID + " Disconnected! Removed from HID!");
+            //    }
+            //}
         }
 
 
@@ -272,25 +194,23 @@ namespace ws.winx.platform.windows
 
 
 
-        public IJoystickDevice ResolveDevice(IHIDDeviceInfo info) 
-       // public IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension> ResolveDevice(IHIDDeviceInfo info)
+        public IJoystickDevice ResolveDevice(IHIDDeviceInfo info)
         {
-			_hidInterface=info.hidInterface;
+            _hidInterface = info.hidInterface;
 
             return CreateDevice(info);
         }
 
         public IJoystickDevice CreateDevice(IHIDDeviceInfo info)
-       // public IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension> CreateDevice(IHIDDeviceInfo info)
         {
             JoystickDevice joystick;
 
             //Get jostick capabilities
-			JoyCaps caps;
-			JoystickError result=JoystickError.InvalidParameters;
+            JoyCaps caps;
+            JoystickError result = JoystickError.InvalidParameters;
 
-			int i;
-            for (i=0; i < 16; i++)
+            int i;
+            for (i = 0; i < 16; i++)
             {
 
                 result = UnsafeNativeMethods.joyGetDevCaps(i, out caps, JoyCaps.SizeInBytes);
@@ -300,107 +220,106 @@ namespace ws.winx.platform.windows
                 {
 
 
-                      //UnityEngine.Debug.Log("ID:"+i+" on PID:"+info.PID+" VID:"+info.VID+" info:"+info.DevicePath+"Bts"+caps.NumButtons.ToString()+"axes"+caps.NumAxes
-                      //  +"ProdID"+caps.PID+" name:"+caps.ProductName+" regkey"+caps.RegKey+"Man:"+caps.VID);
-
-
-
-
-
-           
-
-            int num_axes = caps.NumAxes;
-                      
-
-			joystick = new JoystickDevice(i, 8, caps.NumButtons);
-			joystick.PID=info.PID;
-			joystick.VID=info.VID;
-            joystick.Extension = new WinDefaultExtension();
-
-			int buttonIndex=0;
-			for(;buttonIndex<caps.NumButtons;buttonIndex++){
-				joystick.Buttons[buttonIndex]=new ButtonDetails();
-			}
-
-
-            // Make sure to reverse the vertical axes, so that +1 points up and -1 points down.
-			int axis = 0;
-			AxisDetails axisDetails;
-					if (axis < num_axes)
-            {
-				axisDetails=new AxisDetails();
-                axisDetails.max = caps.XMax;
-				axisDetails.min = caps.XMin;
-				joystick.Axis[axis]=axisDetails;
-                axis++;
-            }
-			if (axis < num_axes)
-            {
-				axisDetails=new AxisDetails();
-				axisDetails.max = caps.YMax;
-				axisDetails.min = caps.YMin;
-				joystick.Axis[axis]=axisDetails;
-                //	stick.Details.Min[axis] = caps.YMin; stick.Details.Max[axis] = caps.YMax; 
-                axis++;
-            }
-			if (axis < num_axes)
-            {
-				axisDetails=new AxisDetails();
-				axisDetails.max = caps.ZMax;
-				axisDetails.min = caps.ZMin;
-				joystick.Axis[axis]=axisDetails;
-                axis++;
-            }
-
-			if (axis < num_axes)
-            {
-				axisDetails=new AxisDetails();
-				axisDetails.min = caps.RMin;
-				axisDetails.max = caps.RMax;
-				joystick.Axis[axis]=axisDetails;
-                axis++;
-            }
-
-			if (axis < num_axes)
-            {
-				axisDetails=new AxisDetails();
-				axisDetails.min = caps.UMin;
-				axisDetails.max = caps.UMax;
-				joystick.Axis[axis]=axisDetails;
-                axis++;
-            }
-
-			if (axis < num_axes)
-            {
-				axisDetails=new AxisDetails();
-				axisDetails.max = caps.VMax;
-				axisDetails.min = caps.VMin;
-				joystick.Axis[axis]=axisDetails;
-                axis++;
-            }
-
-            if ((caps.Capabilities & JoystCapsFlags.HasPov) != 0)
-            {
-				joystick.Axis[JoystickAxis.AxisPovX]=new AxisDetails();
-				joystick.Axis[JoystickAxis.AxisPovY]=new AxisDetails();
-
-
-                joystick.numPOV = 1;
-                WinDefaultExtension extension = joystick.Extension as WinDefaultExtension;
-
-                extension.PovType = PovType.Exists;
-                if ((caps.Capabilities & JoystCapsFlags.HasPov4Dir) != 0)
-                    extension.PovType |= PovType.Discrete;
-                if ((caps.Capabilities & JoystCapsFlags.HasPovContinuous) != 0)
-                    extension.PovType |= PovType.Continuous;
-            }
+                    //UnityEngine.Debug.Log("ID:"+i+" on PID:"+info.PID+" VID:"+info.VID+" info:"+info.DevicePath+"Bts"+caps.NumButtons.ToString()+"axes"+caps.NumAxes
+                    //  +"ProdID"+caps.PID+" name:"+caps.ProductName+" regkey"+caps.RegKey+"Man:"+caps.VID);
 
 
 
 
 
 
-            return joystick;
+
+                    int num_axes = caps.NumAxes;
+
+
+                    joystick = new JoystickDevice(i, info.PID, info.VID, 8, caps.NumButtons, this);
+                    joystick.Extension = new WinDefaultExtension();
+
+                    int buttonIndex = 0;
+                    for (; buttonIndex < caps.NumButtons; buttonIndex++)
+                    {
+                        joystick.Buttons[buttonIndex] = new ButtonDetails();
+                    }
+
+
+                    // Make sure to reverse the vertical axes, so that +1 points up and -1 points down.
+                    int axis = 0;
+                    AxisDetails axisDetails;
+                    if (axis < num_axes)
+                    {
+                        axisDetails = new AxisDetails();
+                        axisDetails.max = caps.XMax;
+                        axisDetails.min = caps.XMin;
+                        joystick.Axis[axis] = axisDetails;
+                        axis++;
+                    }
+                    if (axis < num_axes)
+                    {
+                        axisDetails = new AxisDetails();
+                        axisDetails.max = caps.YMax;
+                        axisDetails.min = caps.YMin;
+                        joystick.Axis[axis] = axisDetails;
+                        //	stick.Details.Min[axis] = caps.YMin; stick.Details.Max[axis] = caps.YMax; 
+                        axis++;
+                    }
+                    if (axis < num_axes)
+                    {
+                        axisDetails = new AxisDetails();
+                        axisDetails.max = caps.ZMax;
+                        axisDetails.min = caps.ZMin;
+                        joystick.Axis[axis] = axisDetails;
+                        axis++;
+                    }
+
+                    if (axis < num_axes)
+                    {
+                        axisDetails = new AxisDetails();
+                        axisDetails.min = caps.RMin;
+                        axisDetails.max = caps.RMax;
+                        joystick.Axis[axis] = axisDetails;
+                        axis++;
+                    }
+
+                    if (axis < num_axes)
+                    {
+                        axisDetails = new AxisDetails();
+                        axisDetails.min = caps.UMin;
+                        axisDetails.max = caps.UMax;
+                        joystick.Axis[axis] = axisDetails;
+                        axis++;
+                    }
+
+                    if (axis < num_axes)
+                    {
+                        axisDetails = new AxisDetails();
+                        axisDetails.max = caps.VMax;
+                        axisDetails.min = caps.VMin;
+                        joystick.Axis[axis] = axisDetails;
+                        axis++;
+                    }
+
+                    if ((caps.Capabilities & JoystCapsFlags.HasPov) != 0)
+                    {
+                        joystick.Axis[JoystickAxis.AxisPovX] = new AxisDetails();
+                        joystick.Axis[JoystickAxis.AxisPovY] = new AxisDetails();
+
+
+                        joystick.numPOV = 1;
+                        WinDefaultExtension extension = joystick.Extension as WinDefaultExtension;
+
+                        extension.PovType = PovType.Exists;
+                        if ((caps.Capabilities & JoystCapsFlags.HasPov4Dir) != 0)
+                            extension.PovType |= PovType.Discrete;
+                        if ((caps.Capabilities & JoystCapsFlags.HasPovContinuous) != 0)
+                            extension.PovType |= PovType.Continuous;
+                    }
+
+
+
+
+
+
+                    return joystick;
 
 
                 }
@@ -409,35 +328,42 @@ namespace ws.winx.platform.windows
 
             return null;
 
-			//return (IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension>)joystick;
+            //return (IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension>)joystick;
         }
         #endregion
 
 
+        /// <summary>
+        ///  Normalize raw axis value to 0-1 range.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <param name="dreadZone"></param>
+        /// <returns></returns>
+        public float NormalizeTrigger(float pos, int min, int max, float dreadZone = 0.001f)
+        {
+            float value = pos / (max - min);
+            if (value < dreadZone && value > -dreadZone)
+                return 0;
 
-		public float NormalizeTrigger(float pos, int min, int max, float dreadZone = 0.001f)
-		{
-			float value=pos/(max-min);
-			if(value < dreadZone && value > -dreadZone)
-			   return 0;
-		
-			return value;
+            return value;
 
-		}
+        }
 
 
-		/// <summary>
-		/// Calculates the offset.
-		/// </summary>
-		/// <returns>The offset.</returns>
-		/// <param name="pos">Position.</param>
-		/// <param name="min">Minimum.</param>
-		/// <param name="max">Max.</param>
-		/// <param name="dreadZone">Dread zone.</param>
+        /// <summary>
+        /// Normalize raw axis value to -1 to 1 range.
+        /// </summary>
+        /// <returns>The offset.</returns>
+        /// <param name="pos">Position.</param>
+        /// <param name="min">Minimum.</param>
+        /// <param name="max">Max.</param>
+        /// <param name="dreadZone">Dread zone.</param>
         public float NormalizeAxis(float pos, int min, int max, float dreadZone = 0.001f)
         {
             //value = (ivalue - devicePrivate->axisRanges[axisIndex][0]) / (float) (devicePrivate->axisRanges[axisIndex][1] - devicePrivate->axisRanges[axisIndex][0]) * 2.0f - 1.0f;
-			
+
 
             float value = (2 * (pos - min)) / (max - min) - 1;
             if (value > 1)
@@ -451,7 +377,7 @@ namespace ws.winx.platform.windows
         }
 
 
-       
+
 
         #region IDisposable
 
@@ -515,7 +441,7 @@ namespace ws.winx.platform.windows
         }
 
 
-        
+
         public struct JoyCaps
         {
             public ushort VID;
@@ -567,8 +493,8 @@ namespace ws.winx.platform.windows
             V = 0x20,
             Pov = 0x40,
             Buttons = 0x80,
-//			JOY_RETURNCENTERED=0x00000400,
-			All = X | Y | Z | R | U | V | Pov | Buttons
+            //			JOY_RETURNCENTERED=0x00000400,
+            All = X | Y | Z | R | U | V | Pov | Buttons
         }
 
 
@@ -670,6 +596,9 @@ namespace ws.winx.platform.windows
                 {
 
                     _value = value;
+
+                    //  UnityEngine.Debug.Log("Value:" + _value);
+
                     //if pressed==TRUE
                     //TODO check the code with triggers
                     if (value > 0)
@@ -732,22 +661,25 @@ namespace ws.winx.platform.windows
             int _uid;
             int _min;
             int _max;
-            JoystickButtonState _buttonState=JoystickButtonState.None;
+            JoystickButtonState _buttonState = JoystickButtonState.None;
             bool _isNullable;
             bool _isHat;
-			bool _isTrigger;
+            bool _isTrigger;
 
 
             #region IAxisDetails implementation
 
-			public bool isTrigger {
-				get {
-					return _isTrigger;
-				}
-				set {
-					_isTrigger = value;
-				}
-			}
+            public bool isTrigger
+            {
+                get
+                {
+                    return _isTrigger;
+                }
+                set
+                {
+                    _isTrigger = value;
+                }
+            }
 
 
             public int min
@@ -854,15 +786,18 @@ namespace ws.winx.platform.windows
 
                     }
                     else
-					//!!! value can jump from >0 to <0 without go to 0(might go to "Down" directly for triggers axis)
+                    //!!! value can jump from >0 to <0 without go to 0(might go to "Down" directly for triggers axis)
                     {
-						if(_value>0 && value<0)
-						{
-							_buttonState = JoystickButtonState.PosToUp;
-						}else if(_value<0 && value>0){
-							_buttonState = JoystickButtonState.NegToUp;
-						}else if(_buttonState == JoystickButtonState.None
-                            || _buttonState == JoystickButtonState.PosToUp || _buttonState==JoystickButtonState.NegToUp)
+                        if (_value > 0 && value < 0)
+                        {
+                            _buttonState = JoystickButtonState.PosToUp;
+                        }
+                        else if (_value < 0 && value > 0)
+                        {
+                            _buttonState = JoystickButtonState.NegToUp;
+                        }
+                        else if (_buttonState == JoystickButtonState.None
+                           || _buttonState == JoystickButtonState.PosToUp || _buttonState == JoystickButtonState.NegToUp)
                         {
 
                             _buttonState = JoystickButtonState.Down;
@@ -881,7 +816,7 @@ namespace ws.winx.platform.windows
 
                     _value = value;
 
-					//UnityEngine.Debug.Log("ButtonState:"+_buttonState+"_value:"+_value);
+                    //UnityEngine.Debug.Log("ButtonState:"+_buttonState+"_value:"+_value);
 
                 }//set
             }

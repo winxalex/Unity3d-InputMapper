@@ -189,7 +189,7 @@ namespace ws.winx.platform.windows
               
 
                 // create new Device
-                joystick = new WiimoteDevice(info.id, 16, 12,4,4);
+                joystick = new WiimoteDevice(((IHIDInterface)_hidInterface).Devices.Count,info.PID,info.VID, 16, 12,4,4,this);
 
 
                 AsyncPackage aPackage;

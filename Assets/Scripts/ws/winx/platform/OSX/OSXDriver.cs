@@ -248,10 +248,10 @@ namespace ws.winx.platform.osx
 
 			// The device is not normally available in the InputValueCallback (HandleDeviceValueReceived), so we include
 			// the device identifier as the context variable, so we can identify it and figure out the device later.
-			OSXHIDInterface.NativeMethods.IOHIDDeviceRegisterInputValueCallback(info.device,HandleDeviceValueReceived, info.device);
+			OSXHIDInterface.NativeMethods.IOHIDDeviceRegisterInputValueCallback(info.deviceHandle,HandleDeviceValueReceived, info.deviceHandle);
 
 
-			OSXHIDInterface.NativeMethods.IOHIDDeviceScheduleWithRunLoop(info.device, RunLoop, InputLoopMode);
+			OSXHIDInterface.NativeMethods.IOHIDDeviceScheduleWithRunLoop(info.deviceHandle, RunLoop, InputLoopMode);
 
 			return CreateDevice(info);
 		}
@@ -262,7 +262,7 @@ namespace ws.winx.platform.osx
 		//public IJoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension> CreateDevice(IHIDDeviceInfo info){
 		public IJoystickDevice CreateDevice(IHIDDeviceInfo info){
 
-			IntPtr device=info.device;
+			IntPtr device=info.deviceHandle;
 			//JoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension> joystick;
 			JoystickDevice joystick;
 			int axisIndex=0;
@@ -296,7 +296,7 @@ namespace ws.winx.platform.osx
 						}
 
 
-			joystick=new JoystickDevice(info.id,numAxis,numButtons);
+			joystick=new JoystickDevice(_hidInterface.Devices.Count,info.PID,info.PID,numAxis,numButtons,this);
 			
 			AxisDetails axisDetails;
 

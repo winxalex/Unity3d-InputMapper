@@ -195,11 +195,10 @@ namespace ws.winx.platform.osx
                 //loop thru drivers and attach the driver to device if compatible
                 foreach (var driver in __drivers)
                 {
-                    if ((joyDevice = driver.ResolveDevice(new HIDDeviceInfo(_joysticks.Count+1, vendor_id.ToInt32(), product_id.ToInt32(), device, this, ""))) != null)
+                    if ((joyDevice = driver.ResolveDevice(new HIDDeviceInfo(vendor_id.ToInt32(), product_id.ToInt32(), device, this, ""))) != null)
                     {
                         _joysticks[device] = joyDevice;
-                        joyDevice.driver = driver;
-						joyDevice.description=description;
+                        joyDevice.Name=description;
 
                         break;
                     }
@@ -208,13 +207,13 @@ namespace ws.winx.platform.osx
                 if (joyDevice == null)
                 {//set default driver as resolver if no custom driver match device
 
-                    joyDevice = defaultDriver.ResolveDevice(new HIDDeviceInfo(_joysticks.Count+1, vendor_id.ToInt32(), product_id.ToInt32(), device, this, ""));//always return true
-					joyDevice.description=description;
+                    joyDevice = defaultDriver.ResolveDevice(new HIDDeviceInfo(vendor_id.ToInt32(), product_id.ToInt32(), device, this, ""));//always return true
+					joyDevice.Name=description;
 
 					if (joyDevice != null)
                     {
                         _joysticks[device] = joyDevice;
-                        joyDevice.driver = __defaultJoystickDriver;
+                       
                     }
                         else
 				    {

@@ -13,21 +13,25 @@ namespace ws.winx.platform
 		public class HIDDeviceInfo:IHIDDeviceInfo
 		{
 				object _Extension;
-				int _id;
+				
 				int _VID;
 				int _PID;
-				IntPtr _device;
+				IntPtr _deviceHandle;
 				string _devicePath;
 				IHIDInterface _hidInterface;
+                string _name;
 
-				public HIDDeviceInfo (int id, int VID, int PID, IntPtr device, IHIDInterface hidInterface, string devicePath)
+               
+
+				public HIDDeviceInfo ( int VID, int PID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath,string name="")
 				{
-						_id = id;
+					
 						_VID = VID;
 						_PID = PID;
-						_device = device;
+						_deviceHandle = deviceHandle;
 						_hidInterface = hidInterface;
 						_devicePath = devicePath;
+                        _name = name;
 				}
 
 			
@@ -36,6 +40,7 @@ namespace ws.winx.platform
 
 
 		#region IHIDDeviceInfo implementation
+
 
 
 
@@ -48,11 +53,7 @@ namespace ws.winx.platform
 						}
 				}
 
-				public int id {
-						get {
-								return _id;
-						}
-				}
+			
 
 				public IHIDInterface hidInterface {
 						get {
@@ -75,9 +76,9 @@ namespace ws.winx.platform
 
 				}
 
-				public IntPtr device {
+				public IntPtr deviceHandle {
 						get {
-								return _device;
+								return _deviceHandle;
 						}
 				}
 
@@ -88,7 +89,16 @@ namespace ws.winx.platform
 
 				}
 
+
+                public string Name
+                {
+                    get { return _name; }
+                }
+        }
+
 		#endregion
-		}
+
+
+               
 }
 

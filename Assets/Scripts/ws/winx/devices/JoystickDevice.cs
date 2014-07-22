@@ -40,7 +40,7 @@ namespace ws.winx.devices
 
         #region Constructors
 
-				internal JoystickDevice (int id, int axes, int buttons)
+				internal JoystickDevice (int id,int pid,int vid,int axes, int buttons,IJoystickDriver driver)
 				{
 						if (axes < 0)
 								throw new ArgumentOutOfRangeException ("axes");
@@ -57,6 +57,9 @@ namespace ws.winx.devices
 						_numButtons=buttons;
 
 						_ID = id;
+                        _VID = vid;
+                        _PID = pid;
+                        _driver = driver;
 						axis_collection = new JoystickAxisCollection<IAxisDetails> (axes);
 						button_collection = new JoystickButtonCollection<IButtonDetails> (buttons);
 			            
@@ -79,7 +82,7 @@ namespace ws.winx.devices
 			}
 		}
 
-		public string description {
+		public string Name {
 			get {
 				return _description;
 			}
@@ -92,10 +95,7 @@ namespace ws.winx.devices
 			get {
 				return _driver;
 			}
-			set {
-				_driver=value;
-
-			}
+		
 		}
 
 
@@ -119,13 +119,10 @@ namespace ws.winx.devices
 		}
 
 
-		/// <summary>
-		/// Gets a JoystickAxisCollection containing the state of each axis on this instance. Values are normalized in the [-1, 1] range.
-		/// states are of type JoystickButtonState
-		/// </summary>
-		
-
-
+	
+        /// <summary>
+        /// ID is value 0 to 15 and given by driver
+        /// </summary>
 		public int ID {
 			get { return _ID; }
 			set { _ID = value; }
@@ -136,16 +133,23 @@ namespace ws.winx.devices
         public void Update()
         {
 
-//            if (_lastFrameNum == Time.frameCount){
-//                return;
-//			}
-//            else{ 
-//                _lastFrameNum = Time.frameCount+0;
 //
-//           		 driver.Update(this);// as IJoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension>);
-//			}
+         //   UnityEngine.Debug.Log("Update"+Time.frameCount+" ponter"+_lastFrameNum);
 
-			driver.Update(this);
+            if (_lastFrameNum == Time.frameCount)
+            {
+               // UnityEngine.Debug.Log("skip cos its same frame");
+                return;
+            }
+            else
+            {               
+
+                _lastFrameNum = Time.frameCount + 0;
+                
+                _driver.Update(this);// as IJoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension>);
+            }
+
+			//_driver.Update(this);
 
         }
 
@@ -307,8 +311,13 @@ namespace ws.winx.devices
 						JoystickAxis axis = KeyCodeExtension.toAxis (code);
 						int data = KeyCodeExtension.toData (code);
 
-						if (axis == JoystickAxis.None) 
-								return button_collection [data].buttonState == JoystickButtonState.Down;
+                        if (axis == JoystickAxis.None)   //MO data for axis => buttons data
+                        {
+                            //UnityEngine.Debug.Log("Button state>" + button_collection[data].buttonState);
+                         
+                            return button_collection[data].buttonState == JoystickButtonState.Down;
+
+                        }
 						
 							IAxisDetails axisDetails=axis_collection[axis];
 
@@ -670,126 +679,9 @@ namespace ws.winx.devices
 
      
 
-        #region Internal Members
+      
 
-				
-
-//				internal void SetAxis (JoystickAxis axis, float value)
-//				{
-//					
-//						SetAxisAsButton (axis, value);
-//
-//						axis_collection [axis].value = value;
-//            
-//				}
-
-				
-		  
-//				internal void SetAnyKeyDown (bool value)
-//				{
-//						_anyKeyDown = value;
-//				}
-
-//				internal void SetPOV (int value)
-//				{
-//
-//						SetPOVAxis (value);
-//
-//
-//						if (_POV != value)
-//								_POV = value;
-//		
-//						
-//				}
-//
-//				internal void SetPOVAxis (int pov)
-//				{
-//						float x = 0, y = 0;
-//						
-//						float normX = 0, normY = 0;
-//			            
-//
-//						//TODO optimize 
-//						if (pov != (int)JoystickPovPosition.Centered) {
-//
-//
-//								if (pov == 0) {
-//										//	normX = x = 0;
-//										normY = y = 1;
-//								} else if (pov == (int)JoystickPovPosition.Right) {
-//										normX = x = 1;
-//										//normY = 0;
-//								} else if (pov == (int)JoystickPovPosition.Left) {
-//										normX = x = -1;
-//										//normY = 0;
-//								} else if (pov == (int)JoystickPovPosition.Backward) {
-//										//normX = x = 0;
-//										normY = y = -1;
-//								} else {//calculate
-//
-//										
-//										//normalize pov angle*1000 to from 1 to -1 (discretize)
-//										if (pov > (int)JoystickPovPosition.Left || pov < (int)JoystickPovPosition.Right) {
-//												normY = 1;
-//										}
-//										if (pov > 0 && (pov < (int)JoystickPovPosition.Backward)) {
-//												normX = 1;
-//										}
-//										if ((pov > (int)JoystickPovPosition.Right) && (pov < (int)JoystickPovPosition.Left)) {
-//												normY = -1;
-//										}
-//										if (pov > (int)JoystickPovPosition.Backward) {
-//												normX = -1;
-//										}
-//
-//
-//
-//
-//										//DegToRad
-//										float angle = (float)(0.000174 * pov + 1.57);
-//																				
-//										x = -(float)System.Math.Cos (angle);
-//										y = (float)System.Math.Sin (angle);
-//
-//										// round															
-//										//							if(y<0){
-//										//								if(y>-0.01) y=0;
-//										//								else if(y<-0.99) y=-1;
-//										//							}else{
-//										//								if(y<0.01) y=0;
-//										//								else if(y>0.99) y=1;
-//										//							}
-//										//
-//										//							if(x<0){
-//										//								if(x>-0.01) x=0;
-//										//								else if(x<-0.99) x=-1;
-//										//							}else{
-//										//								if(x<0.01) x=0;
-//										//								else if(x>0.99) x=1;
-//										//							}
-//								}
-//		
-//								
-//						}
-//
-//						//UnityEngine.Debug.Log ("pov:" + pov + " x:y " + x + " " + y+" "+"normx"+normX+"normy:"+normY);
-//
-//						
-//			
-//						//set axis as button state value PosToUp,NetToUp,DOWN,HOLD based on float value
-//						SetAxisAsButton (JoystickAxis.AxisPovX, normX);
-//						SetAxisAsButton (JoystickAxis.AxisPovY, normY);
-//
-//						//set axis float value
-//						axis_collection [JoystickAxis.AxisPovX].value = x;
-//						axis_collection [JoystickAxis.AxisPovY].value = y;
-//
-//				}
-//
-//				
-//
-        #endregion
-
+	
                
                 public IDeviceExtension Extension { get; set; }
                
@@ -803,6 +695,8 @@ namespace ws.winx.devices
                 {
                     get { return button_collection; }
                 }
+
+                public int _lastFrameNum { get; set; }
         }
 
 

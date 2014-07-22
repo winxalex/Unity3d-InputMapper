@@ -16,10 +16,11 @@ namespace ws.winx.platform
 			IHIDInterface hidInterface {get;}
 			int VID{get;}
 			int PID{get;}
-			IntPtr device {get;}
+			IntPtr deviceHandle {get;}
 			string DevicePath {get;}
-			int id{get;}
+			
             object Extension { set; get; }
+            string Name { get; }
             
             
 		}

@@ -170,25 +170,25 @@ using UnityEngine;
                         IAxisDetails axisDetails;
 
                         axisDetails = joystick.Axis[JoystickAxis.AxisX];
-                        axisDetails.value = CalculateOffset((float)gamePad.sThumbLX, axisDetails.min, axisDetails.max);
+                        axisDetails.value = NormalizeAxis((float)gamePad.sThumbLX, axisDetails.min, axisDetails.max);
 
 
                         axisDetails = joystick.Axis[JoystickAxis.AxisY];
-                        axisDetails.value = CalculateOffset((float)gamePad.sThumbLY, axisDetails.min, axisDetails.max);
+                        axisDetails.value = NormalizeAxis((float)gamePad.sThumbLY, axisDetails.min, axisDetails.max);
 
 
                         axisDetails = joystick.Axis[JoystickAxis.AxisZ];
-                        axisDetails.value = CalculateOffset((float)gamePad.sThumbRX, axisDetails.min, axisDetails.max);
+                        axisDetails.value = NormalizeAxis((float)gamePad.sThumbRX, axisDetails.min, axisDetails.max);
 
 
                         axisDetails = joystick.Axis[JoystickAxis.AxisR];
-                        axisDetails.value = CalculateOffset((float)gamePad.sThumbRY, axisDetails.min, axisDetails.max);
+                        axisDetails.value = NormalizeAxis((float)gamePad.sThumbRY, axisDetails.min, axisDetails.max);
 
                         axisDetails = joystick.Axis[JoystickAxis.AxisU];
-                        axisDetails.value = CalculateOffset((float)gamePad.bLeftTrigger, axisDetails.min, axisDetails.max);
+                        axisDetails.value = NormalizeAxis((float)gamePad.bLeftTrigger, axisDetails.min, axisDetails.max);
 
                         axisDetails = joystick.Axis[JoystickAxis.AxisV];
-                        axisDetails.value = CalculateOffset((float)gamePad.bRightTrigger, axisDetails.min, axisDetails.max);
+                        axisDetails.value = NormalizeAxis((float)gamePad.bRightTrigger, axisDetails.min, axisDetails.max);
 
 
 
@@ -221,7 +221,7 @@ using UnityEngine;
 				_hidInterface=info.hidInterface;
 
 
-                joystick = new XInputDevice(info.id, 8, 10,type);
+                joystick = new XInputDevice(_hidInterface.Devices.Count,info.PID,info.VID, 8, 10,this,type);
               
 
                 //inti button structure
@@ -285,8 +285,25 @@ using UnityEngine;
 	#endregion
 
 
+            /// <summary>
+            ///  Normalize raw axis value to 0-1 range.
+            /// </summary>
+            /// <param name="pos"></param>
+            /// <param name="min"></param>
+            /// <param name="max"></param>
+            /// <param name="dreadZone"></param>
+            /// <returns></returns>
+            public float NormalizeTrigger(float pos, int min, int max, float dreadZone = 0.001f)
+            {
+                float value = pos / (max - min);
+                if (value < dreadZone && value > -dreadZone)
+                    return 0;
 
-            private float CalculateOffset(float pos, int min, int max, float dreadZone = 0.001f)
+                return value;
+
+            }
+
+            private float NormalizeAxis(float pos, int min, int max, float dreadZone = 0.001f)
             {
                 //UnityEngine.Debug.Log(Min[axis]+" Max:"+Max[axis]);
 

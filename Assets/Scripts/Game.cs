@@ -55,12 +55,12 @@ public class Game : MonoBehaviour {
        			
 			//Event Based input handling
             InputEvent ev = new InputEvent("Click_W+C_State");
-			//InputEvent ev = new InputEvent((int)States.SomeState);
-        
-			ev.INPUT+=new EventHandler(Handle1);
-            ev.INPUT+= new EventHandler(Handle2);
+            //InputEvent ev = new InputEvent((int)States.SomeState);
+
+            ev.INPUT += new EventHandler(Handle1);
+            ev.INPUT += new EventHandler(Handle2);
             ev.UP += new EventHandler(onUp);//this wouldn't fire for combo inputs(single only)
-			ev.DOWN += new EventHandler(onDown);//this wouldn't fire for combo inputs(single only)
+            ev.DOWN += new EventHandler(onDown);//this wouldn't fire for combo inputs(single only)
 	}
 
 
@@ -89,10 +89,35 @@ public class Game : MonoBehaviour {
 	void Update () {
 
 
-			if(InputManager.GetInputDown((int)States.Wave)){
-								Debug.Log("Wave Down");
-				animator.Play((int)States.Wave);
-			}
+        if (InputManager.GetInputDown((int)States.Wave))
+        {
+            Debug.Log("Wave Down");
+            animator.Play((int)States.Wave);
+        }
+
+
+        if (InputManager.GetInputUp((int)States.MyCustomState))
+        {
+            Debug.Log(States.MyCustomState + "-Up");
+            // animator.Play((int)States.Wave);
+        }
+
+        if (InputManager.GetInput((int)States.MyCustomState, false))
+        {
+            Debug.Log(States.MyCustomState + "-Hold");
+            // animator.Play((int)States.Wave);
+        }
+        if (InputManager.GetInputDown((int)States.Wave))
+        {
+            Debug.Log(States.Wave + "-Down");
+            // animator.Play((int)States.Wave);
+        }
+
+        if (InputManager.GetInputUp((int)States.Wave))
+        {
+            Debug.Log(States.Wave + "-Up");
+            // animator.Play((int)States.Wave);
+        }
 
 
 

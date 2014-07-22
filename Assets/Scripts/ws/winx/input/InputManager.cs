@@ -18,6 +18,7 @@ using System.Xml;
 using System.Text;
 using ws.winx.platform;
 using System.ComponentModel;
+using ws.winx.devices;
 
 namespace ws.winx.input
 {
@@ -64,6 +65,25 @@ namespace ws.winx.input
 			get{  if(__settings==null) __settings=new InputSettings(); return __settings;}
 		}
 
+
+        public static List<T> GetJoysticks<T>()
+        {
+            IDeviceCollection devices = InputManager.hidInterface.Devices;
+
+            List<T> Result = new List<T>();
+
+            foreach (IJoystickDevice device in devices)
+            {
+                if (device.GetType() == typeof(T))
+                {
+                    Result.Add((T)device);
+
+                }
+                
+            }
+
+            return Result;
+        }
 
 
 		public static void AddDriver(IJoystickDriver driver){

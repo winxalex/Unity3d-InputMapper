@@ -16,12 +16,12 @@ namespace ws.winx.devices
 	public interface IJoystickDevice
         
 	{
-		int VID{get;set;}
-		int PID{get;set;}
-		int ID{get;set;}
+		int VID{get;}
+		int PID{get;}
+		int ID{get;}
         int numPOV { get; set; }
-		IJoystickDriver driver{get;set;} 
-		string description{get;set;}
+		IJoystickDriver driver{get;} 
+		string Name{get;set;}
 
 			
 		      

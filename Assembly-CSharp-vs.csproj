@@ -59,7 +59,6 @@
      <Compile Include="Assets\Scripts\ws\winx\devices\XInputDevice.cs" />
      <Compile Include="Assets\Scripts\ws\winx\examples\MyCodeExtension.cs" />
      <Compile Include="Assets\Scripts\ws\winx\examples\MyJoystickDevice.cs" />
-     <Compile Include="Assets\Scripts\ws\winx\examples\MyXInputDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\gui\UserInterfaceWindow.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\InputAction.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\InputActionType.cs" />
