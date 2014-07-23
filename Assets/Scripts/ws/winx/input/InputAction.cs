@@ -9,8 +9,9 @@ namespace ws.winx.input
 {
 
 
-
+    #if UNITY_STANDALONE
 	[DataContract()]
+    #endif
     public class InputAction
     {
 		/*
@@ -45,18 +46,26 @@ namespace ws.winx.input
 		protected bool _isJoystick=false;
 		protected bool _isMouse=false;
 		protected bool _fromAny=false;
-				
+			
+	    #if UNITY_STANDALONE
 		[IgnoreDataMemberAttribute]
+        #endif
 		protected int _code=0;//KeyCode.None;
 		
+        #if UNITY_STANDALONE
 		[IgnoreDataMemberAttribute]
-		protected InputActionType _type=InputActionType.SINGLE;
+        #endif
+        protected InputActionType _type=InputActionType.SINGLE;
 		
+         #if UNITY_STANDALONE
 		[IgnoreDataMemberAttribute]
-		protected String _codeString;
-		
+        #endif
+        protected String _codeString;
+
+        #if UNITY_STANDALONE
 		[DataMember(Name = "Code")]
-		public String codeString{
+        #endif
+        public String codeString{
 			get{ 
 				if(_codeString==null) _codeString=ToString();
 				return _codeString;

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using WiiExtensionType = ws.winx.platform.windows.WiiDriver.WiiExtensionType;
-using IRMode = ws.winx.platform.windows.WiiDriver.IRMode;
 using UnityEngine;
 using ws.winx.platform;
 
@@ -11,6 +9,61 @@ using ws.winx.platform;
 
 namespace ws.winx.devices
 {
+    /// <summary>
+    /// The extension plugged into the Wiimote
+    /// </summary>
+    //[DataContract]
+    public enum WiiExtensionType : byte
+    {
+        /// <summary>
+        /// No extension
+        /// </summary>
+        None = 0x00,
+        /// <summary>
+        /// Nunchuk extension
+        /// </summary>
+        Nunchuk = 0xfe,
+        /// <summary>
+        /// Classic Controller extension
+        /// </summary>
+        ClassicController = 0xfd,
+
+        // hmm...what's 0xfc?
+
+        /// <summary>
+        /// Guitar controller from Guitar Hero
+        /// </summary>
+        Guitar = 0xfb
+    };
+
+
+    /// <summary>
+    /// The mode of data reported for the IR sensor
+    /// </summary>
+   // [DataContract]
+    public enum IRMode : byte
+    {
+        /// <summary>
+        /// IR sensor off
+        /// </summary>
+        Off = 0x00,
+        /// <summary>
+        /// Basic mode
+        /// </summary>
+        Basic = 0x01,	// 10 bytes
+        /// <summary>
+        /// Extended mode
+        /// </summary>
+        Extended = 0x03,	// 12 bytes
+        /// <summary>
+        /// Full mode (unsupported)
+        /// </summary>
+        Full = 0x05,	// 16 bytes * 2 (format unknown)
+    };
+
+
+
+
 	class WiimoteDevice:JoystickDevice,IDisposable
 	{
       

@@ -7,7 +7,7 @@ using System.IO;
 using ws.winx.input;
 using System.Runtime.Serialization;
 using System.Linq;
-using ws.winx.platform.windows;
+using ws.winx.platform;
 using ws.winx.devices;
 using ws.winx.input.states;
 
@@ -32,8 +32,9 @@ public class Game : MonoBehaviour {
 			animator=GameObject.FindObjectOfType<Animator>();
 		
 			//supporting devices with custom drivers
-			InputManager.AddDriver(new XInputDriver());
-
+			#if UNITY_STANDALONE_WIN
+			InputManager.AddDriver(new ws.winx.platform.windows.XInputDriver());
+			#endif
 	
 //			
 			//if you want to load some states from .xml and add custom manually first load settings xml
@@ -89,35 +90,31 @@ public class Game : MonoBehaviour {
 	void Update () {
 
 
-        if (InputManager.GetInputDown((int)States.Wave))
-        {
-            Debug.Log("Wave Down");
-            animator.Play((int)States.Wave);
-        }
+        //if (InputManager.GetInputDown((int)States.Wave))
+        //{
+        //    Debug.Log("Wave Down");
+        //    animator.Play((int)States.Wave);
+        //}
 
 
-        if (InputManager.GetInputUp((int)States.MyCustomState))
-        {
-            Debug.Log(States.MyCustomState + "-Up");
-            // animator.Play((int)States.Wave);
-        }
+        //if (InputManager.GetInputUp((int)States.MyCustomState))
+        //{
+        //    Debug.Log(States.MyCustomState + "-Up");
+        //    // animator.Play((int)States.Wave);
+        //}
 
-        if (InputManager.GetInput((int)States.MyCustomState, false))
-        {
-            Debug.Log(States.MyCustomState + "-Hold");
-            // animator.Play((int)States.Wave);
-        }
-        if (InputManager.GetInputDown((int)States.Wave))
-        {
-            Debug.Log(States.Wave + "-Down");
-            // animator.Play((int)States.Wave);
-        }
+        //if (InputManager.GetInput((int)States.MyCustomState, false))
+        //{
+        //    Debug.Log(States.MyCustomState + "-Hold");
+        //    // animator.Play((int)States.Wave);
+        //}
+      
 
-        if (InputManager.GetInputUp((int)States.Wave))
-        {
-            Debug.Log(States.Wave + "-Up");
-            // animator.Play((int)States.Wave);
-        }
+        //if (InputManager.GetInputUp((int)States.Wave))
+        //{
+        //    Debug.Log(States.Wave + "-Up");
+        //    // animator.Play((int)States.Wave);
+        //}
 
 
 

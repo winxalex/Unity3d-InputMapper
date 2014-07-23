@@ -19,7 +19,9 @@ namespace ws.winx.devices
 
         public void SetMotor(float leftMotor, float rightMotor)
         {
-            ((XInputDriver)this.driver).SetMotor(this,leftMotor,rightMotor);
+			#if UNITY_STANDALONE_WINDOWS
+            ((ws.winx.platform.windows.XInputDriver)this.driver).SetMotor(this,leftMotor,rightMotor);
+			#endif
         }
 
        

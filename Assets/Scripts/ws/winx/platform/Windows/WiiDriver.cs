@@ -2,7 +2,7 @@
 //	
 //  Original code by Written by Brian Peek (http://www.brianpeek.com/)
 //////////////////////////////////////////////////////////////////////////////////
-
+#if UNITY_STANDALONE_WIN
 using System;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
@@ -1485,56 +1485,9 @@ namespace ws.winx.platform.windows
     }
 
 
-        /// <summary>
-        /// The extension plugged into the Wiimote
-        /// </summary>
-        [DataContract]
-        public enum WiiExtensionType : byte
-        {
-            /// <summary>
-            /// No extension
-            /// </summary>
-            None = 0x00,
-            /// <summary>
-            /// Nunchuk extension
-            /// </summary>
-            Nunchuk = 0xfe,
-            /// <summary>
-            /// Classic Controller extension
-            /// </summary>
-            ClassicController = 0xfd,
+  
 
-            // hmm...what's 0xfc?
-
-            /// <summary>
-            /// Guitar controller from Guitar Hero
-            /// </summary>
-            Guitar = 0xfb
-        };
-
-        /// <summary>
-        /// The mode of data reported for the IR sensor
-        /// </summary>
-        [DataContract]
-        public enum IRMode : byte
-        {
-            /// <summary>
-            /// IR sensor off
-            /// </summary>
-            Off = 0x00,
-            /// <summary>
-            /// Basic mode
-            /// </summary>
-            Basic = 0x01,	// 10 bytes
-            /// <summary>
-            /// Extended mode
-            /// </summary>
-            Extended = 0x03,	// 12 bytes
-            /// <summary>
-            /// Full mode (unsupported)
-            /// </summary>
-            Full = 0x05,	// 16 bytes * 2 (format unknown)
-        };
+    
 
         /// <summary>
         /// The report format in which the Wiimote should return data
@@ -2100,3 +2053,4 @@ namespace ws.winx.platform.windows
         }
     }
 }
+#endif

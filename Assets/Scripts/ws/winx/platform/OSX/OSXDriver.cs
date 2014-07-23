@@ -7,6 +7,7 @@
 //     the code is regenerated.
 // </auto-generated>
 //------------------------------------------------------------------------------
+#if UNITY_STANDALONE_OSX
 using System;
 using ws.winx.devices;
 //using UnityEngine;
@@ -614,3 +615,4 @@ namespace ws.winx.platform.osx
 }
 
 #endregion
+#endif

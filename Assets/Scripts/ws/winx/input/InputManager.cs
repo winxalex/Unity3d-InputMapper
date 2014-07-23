@@ -40,18 +40,26 @@ namespace ws.winx.input
 
 		internal static IHIDInterface hidInterface{
 			get{ 
-                //TODO add conditional compiling
+               
 				if(__hidInterface==null){
-					if((Application.platform & (RuntimePlatform.WindowsPlayer | RuntimePlatform.WindowsEditor))!=0){
+					//if((Application.platform & (RuntimePlatform.WindowsPlayer | RuntimePlatform.WindowsEditor))!=0){
+
+                        #if UNITY_STANDALONE_WIN
                         __hidInterface = new ws.winx.platform.windows.WinHIDInterface(__drivers);
+                         #endif
                         
 
-					}else				
-					if((Application.platform & (RuntimePlatform.OSXPlayer | RuntimePlatform.OSXEditor))!=0){
+					 #if UNITY_STANDALONE_OSX
 						__hidInterface=new ws.winx.platform.osx.OSXHIDInterface(__drivers);
-					}
+                     #endif
 
-					Debug.Log("init hidInterface");
+
+                    #if UNITY_WEBPLAYER
+
+                    __hidInterface=new ws.winx.platform.web.WebHIDInterface(__drivers);
+                    #endif
+
+                        Debug.Log("HIDInterface initialized");
 				}
 
 
@@ -343,11 +351,15 @@ namespace ws.winx.input
 		/// Create your .xml settings with InputMapper Editor
 		/// </summary>
 		public static InputSettings loadSettings(String path="InputSettings.xml"){
-			//DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<int,InputCombination[]>),"Inputs","");
-			DataContractSerializer serializer = new DataContractSerializer(typeof(InputSettings),"Inputs","");
 			XmlReaderSettings xmlSettings=new XmlReaderSettings();
 			xmlSettings.CloseInput=true;
 			xmlSettings.IgnoreWhitespace=true;
+
+
+			#if UNITY_STANDALONE
+			//DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<int,InputCombination[]>),"Inputs","");
+			DataContractSerializer serializer = new DataContractSerializer(typeof(InputSettings),"Inputs","");
+
 			
 			using(XmlReader reader=XmlReader.Create(path,xmlSettings))
 			{
@@ -355,6 +367,119 @@ namespace ws.winx.input
 				__settings=(InputSettings)serializer.ReadObject(reader);
 
 			}
+			#endif
+
+#if UNITY_WEBPLAYER
+
+
+			using(XmlReader reader=XmlReader.Create(path,xmlSettings))
+			{
+                __settings = new InputSettings();
+
+                int key;
+                InputCombination combination;
+                InputAction action;
+                List<InputAction> actions=null;
+                InputCombination[] combinations=null;
+                string name;
+                InputState state;
+                int i;
+                //XmlNameTable nameTable = reader.NameTable;
+                //XmlNamespaceManager nsManager = new XmlNamespaceManager(nameTable);
+                //nsManager.AddNamespace("d1p1", "http://schemas.datacontract.org/2004/07/ws.winx.input");
+
+                reader.ReadToFollowing("d1p1:doubleDesignator");
+                __settings.doubleDesignator = reader.ReadElementContentAsString();
+
+               
+                __settings.longDesignator = reader.ReadElementContentAsString();
+
+               
+                __settings.spaceDesignator = reader.ReadElementContentAsString();
+
+
+
+               
+                __settings.singleClickSensitivity = reader.ReadElementContentAsFloat();
+
+               
+                __settings.doubleClickSensitivity = reader.ReadElementContentAsFloat();
+
+               
+                __settings.longClickSensitivity = reader.ReadElementContentAsFloat();
+
+               
+                __settings.combinationsClickSensitivity = reader.ReadElementContentAsFloat();
+
+                if(reader.ReadToFollowing("d2p1:KeyValueOfintInputState") ){
+
+
+                    do
+                    {
+                        reader.ReadToDescendant("d2p1:Key");
+
+                        key=reader.ReadElementContentAsInt();
+
+
+                        
+
+                        if(reader.ReadToFollowing("d1p1:InputCombination")){
+
+                            combinations=new InputCombination[2];
+                            i=0;
+
+                            do
+                            {
+                                if (reader.GetAttribute("i:nil") == null)
+                                {
+                                    
+
+                                    if (reader.ReadToDescendant("d1p1:InputAction"))
+                                    {
+                                        actions=new List<InputAction>();
+
+                                        do{
+                                            reader.ReadToDescendant("d1p1:Code");
+
+                                            action=new InputAction(reader.ReadElementContentAsString());
+
+                                            actions.Add(action);
+                                          
+                                        }while(reader.ReadToNextSibling("d1p1:InputAction"));
+
+                                       
+                                    }
+
+                                   
+                                  
+
+                                    combinations[i++]=new InputCombination(actions);
+
+                                    reader.Read();//read </InputCombination>
+
+                                }
+
+
+
+                            } while (reader.ReadToNextSibling("d1p1:InputCombination"));
+
+
+                            
+                        }
+
+                        reader.ReadToFollowing("d1p1:Name");
+                        name=reader.ReadElementContentAsString();
+                        state = new InputState(name, key);
+                        state.combinations = combinations;
+                        __settings.stateInputs[key] = state;
+
+
+                        reader.Read();//</d2p1:KeyValueOfintInputState>
+                        
+                    } while (reader.ReadToNextSibling("d2p1:KeyValueOfintInputState"));
+                }
+			}
+#endif
 
 			return __settings;
 		}
@@ -365,6 +490,7 @@ namespace ws.winx.input
 		public static void saveSettings(String path){
 
 			//DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<int,InputCombination[]>),"Inputs","");
+			#if UNITY_STANDALONE
 			DataContractSerializer serializer = new DataContractSerializer(typeof(InputSettings),"Inputs","");
 			
 
@@ -390,7 +516,7 @@ namespace ws.winx.input
 
 
 			}
-
+			#endif
 
 
 		}
@@ -502,65 +628,81 @@ namespace ws.winx.input
 
 
 		#region Settings
+
+		#if UNITY_STANDALONE
 		[DataContract]
+#endif
 		public class InputSettings{
 
 
 
 			
-
+			#if UNITY_STANDALONE
 			[DataMember(Order=4)]
+			#endif
 			public float singleClickSensitivity{
 				get{ return InputAction.SINGLE_CLICK_SENSITIVITY; }
 				set{ InputAction.SINGLE_CLICK_SENSITIVITY=value; }
 
 			}
 
+			#if UNITY_STANDALONE
 			[DataMember(Order=5)]
+			#endif
 			public float doubleClickSensitivity{
 				get{ return InputAction.DOUBLE_CLICK_SENSITIVITY; }
 				set{ InputAction.DOUBLE_CLICK_SENSITIVITY=value; }
 				
 			}
 
+			#if UNITY_STANDALONE
 			[DataMember(Order=6)]
+			#endif
 			public float longClickSensitivity{
 				get{ return InputAction.LONG_CLICK_SENSITIVITY; }
 				set{ InputAction.LONG_CLICK_SENSITIVITY=value; }
 				
 			}
 
+			#if UNITY_STANDALONE
 			[DataMember(Order=7)]
+			#endif
 			public float combinationsClickSensitivity{
 				get{ return InputAction.COMBINATION_CLICK_SENSITIVITY; }
 				set{ InputAction.COMBINATION_CLICK_SENSITIVITY=value; }
 				
 			}
 
+			#if UNITY_STANDALONE
 			[DataMember(Order=1)]
+			#endif
 			public string doubleDesignator{
 				get{ return InputAction.DOUBLE_DESIGNATOR; }
 				set{ InputAction.DOUBLE_DESIGNATOR=value; }
 				
 			}
 
-
+			#if UNITY_STANDALONE
 			[DataMember(Order=2)]
+			#endif
 			public string longDesignator{
 				get{ return InputAction.LONG_DESIGNATOR; }
 				set{ InputAction.LONG_DESIGNATOR=value; }
 				
 			}
 
-
+			#if UNITY_STANDALONE
 			[DataMember(Order=3)]
+			#endif
 			public string spaceDesignator{
 				get{ return InputAction.SPACE_DESIGNATOR.ToString(); }
 				set{ InputAction.SPACE_DESIGNATOR=value[0]; }
 				
 			}
 
+			#if UNITY_STANDALONE
 			[DataMember(Name="StateInputs",Order=8)]
+			#endif
 			protected Dictionary<int,InputState> _stateInputs;
 			
 			public Dictionary<int,InputState> stateInputs{

@@ -7,6 +7,7 @@
 //     the code is regenerated.
 // </auto-generated>
 //------------------------------------------------------------------------------
+#if UNITY_STANDALONE_OSX
 using System;
 using System.Collections.Generic;
 using ws.winx.devices;
@@ -624,3 +625,4 @@ namespace ws.winx.platform.osx
     }
 }
 
+#endif

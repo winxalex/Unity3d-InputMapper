@@ -1,3 +1,4 @@
+#if UNITY_STANDALONE_WIN
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,7 +20,7 @@ namespace ws.winx.platform.windows
         JoyInfoEx info;
         int[] joyPositions;
         bool disposed;
-        IHIDInterface _hidInterface;
+        
 
 
         #endregion
@@ -49,7 +50,6 @@ namespace ws.winx.platform.windows
 
 
         public void Update(IJoystickDevice joystick)
-        //public void Update (IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension> joystick)
         {
             // UnityEngine.Debug.Log("Update Driver called from:" + joystick.PID+" ID:"+joystick.ID);
 
@@ -176,13 +176,7 @@ namespace ws.winx.platform.windows
 
 
             }
-            //else
-            //{
-            //    if(_hidInterface.Devices.ContainsKey(joystick.ID)){
-            //    _hidInterface.Devices.Remove(joystick.ID);
-            //    UnityEngine.Debug.LogWarning("Device ID:"+joystick.ID+" PID:" + joystick.PID + " VID:" + joystick.VID + " Disconnected! Removed from HID!");
-            //    }
-            //}
+          
         }
 
 
@@ -196,7 +190,7 @@ namespace ws.winx.platform.windows
 
         public IJoystickDevice ResolveDevice(IHIDDeviceInfo info)
         {
-            _hidInterface = info.hidInterface;
+          
 
             return CreateDevice(info);
         }
@@ -847,3 +841,4 @@ namespace ws.winx.platform.windows
 
     }
 }
+#endif
