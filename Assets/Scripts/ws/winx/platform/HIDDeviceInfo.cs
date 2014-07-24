@@ -20,13 +20,14 @@ namespace ws.winx.platform
 				string _devicePath;
 				IHIDInterface _hidInterface;
                 string _name;
+                int _index;
 
                
 
-				public HIDDeviceInfo ( int VID, int PID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath,string name="")
+				public HIDDeviceInfo (int index, int VID, int PID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath,string name="")
 				{
-					
-						_VID = VID;
+                        _index = index;
+					    _VID = VID;
 						_PID = PID;
 						_deviceHandle = deviceHandle;
 						_hidInterface = hidInterface;
@@ -93,6 +94,12 @@ namespace ws.winx.platform
                 public string Name
                 {
                     get { return _name; }
+                }
+
+
+                public int index
+                {
+                    get { return _index; }
                 }
         }
 

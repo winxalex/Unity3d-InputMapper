@@ -377,7 +377,7 @@ namespace ws.winx.input
                 __settings = new InputSettings();
 
                 int key;
-                InputCombination combination;
+               
                 InputAction action;
                 List<InputAction> actions=null;
                 InputCombination[] combinations=null;

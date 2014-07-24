@@ -14,6 +14,7 @@ namespace ws.winx.platform
 		public interface IHIDDeviceInfo
 		{
 			IHIDInterface hidInterface {get;}
+            int index { get; }
 			int VID{get;}
 			int PID{get;}
 			IntPtr deviceHandle {get;}

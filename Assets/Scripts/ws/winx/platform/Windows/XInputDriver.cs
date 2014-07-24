@@ -224,7 +224,7 @@ namespace ws.winx.platform.windows
             _hidInterface = info.hidInterface;
 
 
-            joystick = new XInputDevice(_hidInterface.Devices.Count, info.PID, info.VID, 8, 10, this, type);
+            joystick = new XInputDevice(info.index, info.PID, info.VID, 8, 10, this, type);
 
 
             //inti button structure

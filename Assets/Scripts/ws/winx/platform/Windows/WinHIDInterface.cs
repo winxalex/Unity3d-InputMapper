@@ -507,7 +507,7 @@ namespace ws.winx.platform.windows
 
 
                 //!!! deviceHandle set to IntPtr.Zero (think not needed in widows)
-                return new HIDDeviceInfo(Convert.ToInt32(VID_PID_Parts[0].Replace("VID_", ""), 16), Convert.ToInt32(VID_PID_Parts[1].Replace("PID_", ""), 16), IntPtr.Zero, this, devicePath, name);
+                return new HIDDeviceInfo(_joysticks.Count,Convert.ToInt32(VID_PID_Parts[0].Replace("VID_", ""), 16), Convert.ToInt32(VID_PID_Parts[1].Replace("PID_", ""), 16), IntPtr.Zero, this, devicePath, name);
             }
 
             return null;
@@ -525,7 +525,7 @@ namespace ws.winx.platform.windows
             string name = ReadRegKey(HKEY_CURRENT_USER, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + "VID_" + deviceInfo.HIDInfo.VendorID.ToString("X4") + "&PID_" + deviceInfo.HIDInfo.ProductID.ToString("X4"), REGSTR_VAL_JOYOEMNAME);
 
 
-            return new HIDDeviceInfo(Convert.ToInt32(deviceInfo.HIDInfo.VendorID), Convert.ToInt32(deviceInfo.HIDInfo.ProductID), rawInputDeviceList.DeviceHandle, this, devicePath, name);
+            return new HIDDeviceInfo(_joysticks.Count,Convert.ToInt32(deviceInfo.HIDInfo.VendorID), Convert.ToInt32(deviceInfo.HIDInfo.ProductID), rawInputDeviceList.DeviceHandle, this, devicePath, name);
 
             //this have problems with   
             // return GetHIDDeviceInfo(GetDevicePath(rawInputDeviceList.DeviceHandle));
@@ -1030,6 +1030,11 @@ namespace ws.winx.platform.windows
             {
                 return JoystickDevices.ContainsKey(key);
             }
+
+			public void Clear(){
+				JoystickIDToDevice.Clear();
+				JoystickDevices.Clear();
+			}
 
             public System.Collections.IEnumerator GetEnumerator()
             {
