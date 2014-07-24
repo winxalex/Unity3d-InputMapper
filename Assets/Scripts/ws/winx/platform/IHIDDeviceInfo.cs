@@ -19,7 +19,8 @@ namespace ws.winx.platform
 			int PID{get;}
 			IntPtr deviceHandle {get;}
 			string DevicePath {get;}
-			
+            int numAxes { get; }
+            int numButtons { get; }
             object Extension { set; get; }
             string Name { get; }
             

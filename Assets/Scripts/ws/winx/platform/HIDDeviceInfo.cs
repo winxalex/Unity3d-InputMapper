@@ -21,11 +21,16 @@ namespace ws.winx.platform
 				IHIDInterface _hidInterface;
                 string _name;
                 int _index;
+                int _numAxes;
+                int _numButtons;
 
                
 
-				public HIDDeviceInfo (int index, int VID, int PID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath,string name="")
+				public HIDDeviceInfo (int index, int VID, int PID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath,string name="",
+                    int numAxes=8,int numButtons=32)
 				{
+                    _numAxes = numAxes;
+                    _numButtons = numButtons;
                         _index = index;
 					    _VID = VID;
 						_PID = PID;
@@ -47,10 +52,10 @@ namespace ws.winx.platform
 
 				public object Extension {
 						get {
-								throw new NotImplementedException ();
+                            return _Extension;
 						}
 						set {
-								throw new NotImplementedException ();
+                            _Extension = value;
 						}
 				}
 
@@ -94,12 +99,30 @@ namespace ws.winx.platform
                 public string Name
                 {
                     get { return _name; }
+                    internal set { _name = value; }
                 }
 
 
                 public int index
                 {
                     get { return _index; }
+                    internal set
+                    {
+                        _index = value;
+                    }
+                }
+
+
+                public int numAxes
+                {
+                    get { return _numAxes; }
+                    internal set { _numAxes = value; }
+                }
+
+                public int numButtons
+                {
+                    get { return _numButtons; }
+                    internal set { _numButtons = value; }
                 }
         }
 
