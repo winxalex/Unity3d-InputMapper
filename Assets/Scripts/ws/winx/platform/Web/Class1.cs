@@ -90,7 +90,23 @@ using System.Text;
             public string id
             {
                 get { return Name; }
-                set { Name = value; }
+                set {
+
+                    //fasdfasfasfsafaff (Vendor: 044f Product: b653)
+                    int inx = value.IndexOf("(");
+                    if (inx > -1)
+                    {
+						Name = value.Substring(0, inx - 1);
+						String[] parts = value.Substring(inx, value.Length - inx-1).Replace("Product", "").Split(':');
+						
+						PID = Convert.ToInt32(parts[2].Trim(), 16);
+						VID = Convert.ToInt32(parts[1].Trim(), 16);
+                    }
+                    else
+                        Name = value;
+                
+                
+                }
             }
 
 
@@ -222,7 +238,10 @@ using System.Text;
                             // ditch the colon
                             json.Read();
 
-                            __info.GetType().GetProperty(name).SetValue(__info,ParseValue(),null);
+                            System.Reflection.PropertyInfo prop=__info.GetType().GetProperty(name);
+
+                            if(prop!=null)
+                            prop.SetValue(__info,ParseValue(),null);
 
                             // value
                            // table[name] = ParseValue();

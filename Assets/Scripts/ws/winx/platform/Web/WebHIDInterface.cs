@@ -29,13 +29,26 @@ namespace ws.winx.platform.web
             __drivers = drivers;
             _joysticks = new JoystickDevicesCollection();
 
-         Json.GamePadInfo info=   Json.Deserialize("{\"buttons\":[1,0,0,0,0,0,0,0,0,0],\"axes\":[1.031280517578125,1,0,0,0,1,1,1,0,3.2857143878936768],\"timestamp\":17,\"index\":1,\"id\":\"Thrustmaster force feedback wheel (Vendor: 044f Product: b653)\"}") as Json.GamePadInfo;
+         //Json.GamePadInfo info=   Json.Deserialize("{\"buttons\":[1,0,0,0,0,0,0,0,0,0],\"axes\":[1.031280517578125,1,0,0,0,1,1,1,0,3.2857143878936768],\"timestamp\":17,\"index\":1,\"id\":\"Thrustmaster force feedback wheel (Vendor: 044f Product: b653)\"}") as Json.GamePadInfo;
 
       //Dictionary<string,object> obj=      Json.Deserialize("{\"0\":{\"buttons\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],\"axes\":[0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0,1.6666666269302368],\"timestamp\":1964503,\"index\":0,\"id\":\" (Vendor: feed Product: face)\"},\"1\":{\"buttons\":[1,0,0,0,0,0,0,0,0,0],\"axes\":[1.031280517578125,1,0,0,0,1,1,1,0,3.2857143878936768],\"timestamp\":17,\"index\":1,\"id\":\"Thrustmaster force feedback wheel (Vendor: 044f Product: b653)\"},\"length\":4}") as Dictionary<string,object>;
 
       //Dictionary<string, object> joy = obj["0"] as Dictionary<string, object>;
       //      List<object> buttons=joy["buttons"] as List<object>;
       //      string id= joy["id"] as string;
+
+            //string value="fasdfasfasfsafaff (Vendor: 044f Product: b653)";
+            //        int inx = value.IndexOf("(");
+            //        if (inx > -1)
+            //        {
+            //           String Name = value.Substring(0, inx - 1);
+            //            String[] parts = value.Substring(inx, value.Length - inx-1).Replace("Product", "").Split(':');
+
+            //           int PID = Convert.ToInt32(parts[2].Trim(), 16);
+            //          int  VID = Convert.ToInt32(parts[1].Trim(), 16);
+            //        }
+
+
             _container = new GameObject("WebHIDBehaviourGO");
             w= _container.AddComponent<WebHIDBehaviour>();
             w.DeviceDisconnectedEvent += new EventHandler<WebMessageArgs>(DeviceDisconnectedEventHandler);
@@ -82,7 +95,8 @@ namespace ws.winx.platform.web
                     joyDevice = driver.ResolveDevice(deviceInfo);
                     if (joyDevice != null)
                     {
-                        AddDeviceToHIDInterface(joyDevice, deviceInfo);
+                        //new IntPtr just for compatibility
+                        _joysticks[new IntPtr(joyDevice.ID)] = joyDevice;
                         Debug.Log("Device PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + driver.GetType().ToString());
 
                         break;
@@ -96,8 +110,9 @@ namespace ws.winx.platform.web
 
                 if (joyDevice != null)
                 {
-                    
-                    AddDeviceToHIDInterface(joyDevice, deviceInfo);
+
+                    //new IntPtr just for compatibility
+                    _joysticks[new IntPtr(joyDevice.ID)] = joyDevice;
 
                     Debug.Log("Device PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + deviceInfo.DevicePath + " Name:" + joyDevice.Name);
 
@@ -114,12 +129,7 @@ namespace ws.winx.platform.web
         }
 
 
-        private void AddDeviceToHIDInterface(IJoystickDevice joyDevice, HIDDeviceInfo deviceInfo)
-        {
-           // _joysticks[ ] = joyDevice;
-            throw new NotImplementedException();
-         
-        }
+      
 
 
         public void GamePadEventsSupportHandler(object sender, WebMessageArgs args)
@@ -129,13 +139,21 @@ namespace ws.winx.platform.web
 
         public void DeviceConnectedEventHandler(object sender,WebMessageArgs args)
         {
-               ResolveDevice(Json.Deserialize(args.Message) as Json.GamePadInfo);
+            Json.GamePadInfo info=Json.Deserialize(args.Message) as Json.GamePadInfo;
+             if(!_joysticks.ContainsKey(info.index))
+             {
+               ResolveDevice(info);
+             }
         }
 
         public void DeviceDisconnectedEventHandler(object sender, WebMessageArgs args)
         {
+          
             int id = Int32.Parse(args.Message);
+            Debug.Log("Device "+_joysticks[id].Name+" index:" +id+" Removed");
             _joysticks.Remove(id);
+
+             
         }
       
         
@@ -204,30 +222,24 @@ namespace ws.winx.platform.web
 
 
 
-            public IJoystickDevice this[int ID]
-            //public IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension> this[int index]
+            public IJoystickDevice this[int index]
             {
-                get { return JoystickDevices[JoystickIDToDevice[ID]]; }
-                //				internal set { 
-                //
-                //							JoystickIndexToDevice [JoystickDevices.Count]=
-                //							JoystickDevices[]
-                //						}
+                get { return JoystickDevices[JoystickIDToDevice[index]]; }
+                				
             }
 
 
 
             public IJoystickDevice this[IntPtr pidPointer]
             {
-                get { return JoystickDevices[pidPointer]; }
-                internal set
+                get { throw new Exception("Devices should be retrived only thru index"); }
+
+                set
                 {
-                    JoystickIDToDevice[value.ID] = pidPointer;
                     JoystickDevices[pidPointer] = value;
-
-                    _isEnumeratorDirty = true;
-
+                    JoystickIDToDevice[value.ID] = pidPointer;
                 }
+               
             }
 
 
@@ -271,6 +283,8 @@ namespace ws.winx.platform.web
             #endregion
 
         #endregion
+
+
 
            
         }

@@ -33,14 +33,18 @@ public class Game : MonoBehaviour {
 		
 			//supporting devices with custom drivers
 			#if UNITY_STANDALONE_WIN
-			InputManager.AddDriver(new ws.winx.platform.windows.XInputDriver());
-			#endif
-	
-//			
-			//if you want to load some states from .xml and add custom manually first load settings xml
-			InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath,"InputSettings.xml"));
+			    InputManager.AddDriver(new ws.winx.platform.windows.XInputDriver());
+                 //if you want to load some states from .xml and add custom manually first load settings xml
+			    InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath,"InputSettings.xml"));
+            #endif
 
-        
+            #if UNITY_WEBPLAYER
+            UnityEngine.Debug.Log(Path.Combine(Path.Combine(Application.dataPath,"StreamingAssets"),"InputSettings.xml"));
+            InputManager.loadSettingsWWW(@"http://localhost:8080/web/StreamingAssets/InputSettings.xml");
+            #endif
+			
+
+         //   UnityEngine.Debug.Log(InputManager.Log());
        
 			//		adding input-states pairs manually
 			//			InputManager.MapStateToInput("My State1",new InputCombination(KeyCodeExtension.toCode(Joysticks.Joystick1,JoystickAxis.AxisPovX,JoystickPovPosition.Forward),(int)KeyCode.Joystick4Button9,(int)KeyCode.P,(int)KeyCode.JoystickButton0));
@@ -52,7 +56,9 @@ public class Game : MonoBehaviour {
 			//easiest way to map state to combination (ex.of single W and C click)
 			InputManager.MapStateToInput("Click_W+C_State", KeyCodeExtension.W.SINGLE,KeyCodeExtension.C.SINGLE);
 
+          //  UnityEngine.Debug.Log("After:"+InputManager.Log());
 
+            UnityEngine.Debug.Log("After:");
        			
 			//Event Based input handling
             InputEvent ev = new InputEvent("Click_W+C_State");

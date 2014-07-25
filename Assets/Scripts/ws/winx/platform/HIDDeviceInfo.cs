@@ -72,6 +72,10 @@ namespace ws.winx.platform
 						get {
 								return _VID;
 						}
+                    internal set
+                    {
+                        _VID = value;
+                    }
 
 				}
 
@@ -79,6 +83,9 @@ namespace ws.winx.platform
 						get {
 								return _PID;
 						}
+                    internal set {
+                    _PID=value;
+                        }
 
 				}
 

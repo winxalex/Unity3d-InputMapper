@@ -56,6 +56,8 @@ namespace ws.winx.devices
 						_numAxis=axes;
 						_numButtons=buttons;
 
+                       
+
 						_ID = id;
                         _VID = vid;
                         _PID = pid;
@@ -166,8 +168,8 @@ namespace ws.winx.devices
 						JoystickAxis axis = KeyCodeExtension.toAxis(code);
 						int data = KeyCodeExtension.toData (code);
 						float axisValue = axis_collection [axis].value;
-						
-						
+
+                        // axis_collection [axis].isHat
 						if (axis == JoystickAxis.AxisPovX) {
 								if ((data + 1) * 9000 == (int)JoystickPovPosition.Left && axisValue < 0)
 										return axisValue;

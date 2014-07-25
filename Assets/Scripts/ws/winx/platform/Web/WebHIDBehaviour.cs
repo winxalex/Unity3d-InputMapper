@@ -42,6 +42,8 @@ namespace ws.winx.platform.web
         public void onHaveGamepadEvents(string message)
         {
 
+             UnityEngine.Debug.Log("onHaveGamepadEvents:" + message);
+
             if (GamePadEventsSupportEvent!=null)
             {
                 GamePadEventsSupportEvent(this, new WebMessageArgs(message));
@@ -49,7 +51,7 @@ namespace ws.winx.platform.web
 
 
 
-            UnityEngine.Debug.Log("onHaveGamepadEvents:" + message);
+          
 
 
             if (message== "1")
@@ -68,9 +70,9 @@ namespace ws.winx.platform.web
             {
                
 
-                Timer aTimer = new Timer(500);
-                aTimer.Elapsed += new ElapsedEventHandler(checkGamepadsTimedEvent);
-                aTimer.Enabled = true;
+                Timer enumeratorTimer = new Timer(1000);
+                enumeratorTimer.Elapsed += new ElapsedEventHandler(EnumerateGamepadsTimedEventHandler);
+                enumeratorTimer.Enabled = true;
             }
                
            
@@ -98,6 +100,7 @@ namespace ws.winx.platform.web
         private string ENUMERATE_COMMAND = "var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);" +
                                               "for (var i = 0; i < gamepads.length; i++) {"+
                                                 "if (gamepads[i]) {"+
+                                              
                                                   "UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onDeviceConnectedEvent',JSON.stringify(gamepads[i]));"+
                                                " }"+
                                               "}";
@@ -115,9 +118,9 @@ namespace ws.winx.platform.web
        
         
         
-        void checkGamepadsTimedEvent(object sender, EventArgs e)
+        void EnumerateGamepadsTimedEventHandler(object sender, EventArgs e)
         {
-            if(!_isInitialized)//try to Enumerate
+           // UnityEngine.Debug.Log(ENUMERATE_COMMAND);
                 Application.ExternalEval(ENUMERATE_COMMAND);
            
   

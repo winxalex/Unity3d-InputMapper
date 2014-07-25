@@ -24,11 +24,12 @@ namespace ws.winx.platform.web
 
             JoystickDevice joystick;
 
-            int numAxes = 0; //info.Extension.axes;
-            int numButtons = 0; //info.Extension.buttons;
-           // info.
+            int numAxes = info.numAxes; //info.Extension.axes;
+            int numButtons = info.numButtons; //info.Extension.buttons;
 
-              joystick = new JoystickDevice(info.index, info.PID, info.VID, 8,32, this);
+         
+              joystick = new JoystickDevice(info.index, info.PID, info.VID, Math.Max(8,numAxes),numButtons, this);
+              joystick.Name = info.Name;
 
                     
 
@@ -39,12 +40,11 @@ namespace ws.winx.platform.web
                         joystick.Buttons[index] = new ButtonDetails();
                     }
 
-                    AxisDetails axisDetails;
+             
                     for (index = 0; index < numAxes; index++)
                     {
                                              
-                            axisDetails = new AxisDetails();
-                           joystick.Axis[index] = axisDetails;
+                          joystick.Axis[index] = new AxisDetails();
                        
                     }
 
@@ -77,9 +77,9 @@ namespace ws.winx.platform.web
                   pInfo=obj.GetType().GetProperty("value");
 
                   if(pInfo!=null)
-                    device.Buttons[i].value=(float)pInfo.GetValue(obj,null);
+                    device.Buttons[i++].value=(float)pInfo.GetValue(obj,null);
                   else
-                      device.Buttons[i].value = (float)obj;
+                      device.Buttons[i++].value = (float)obj;
                
              }
 

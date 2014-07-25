@@ -369,10 +369,23 @@ namespace ws.winx.input
 			}
 			#endif
 
+
+
+			return __settings;
+		}
+
 #if UNITY_WEBPLAYER
+        public static IEnumerator loadSettingsWWW(string path)
+        {
 
+            XmlReaderSettings xmlSettings = new XmlReaderSettings();
+            xmlSettings.CloseInput = true;
+            xmlSettings.IgnoreWhitespace = true;
+              WWW webReq = new WWW(path);
+            yield return webReq;
 
-			using(XmlReader reader=XmlReader.Create(path,xmlSettings))
+            UnityEngine.Debug.Log("Pass"+webReq.text);
+			using(XmlReader reader=XmlReader.Create(new StringReader(webReq.text),xmlSettings))
 			{
                 __settings = new InputSettings();
 
@@ -479,10 +492,8 @@ namespace ws.winx.input
                     } while (reader.ReadToNextSibling("d2p1:KeyValueOfintInputState"));
                 }
 			}
+        }
 #endif
-
-			return __settings;
-		}
 
 		/// <summary>
 		/// Saves the settings to InputSettings.xml.
