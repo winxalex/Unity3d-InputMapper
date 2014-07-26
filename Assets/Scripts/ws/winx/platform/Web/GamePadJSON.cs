@@ -91,13 +91,21 @@ using System.Text;
             {
                 get { return Name; }
                 set {
-
-                    //fasdfasfasfsafaff (Vendor: 044f Product: b653)
-                    int inx = value.IndexOf("(");
-                    if (inx > -1)
+                    String[] parts;
+                    int inx;
+                    parts=value.Split('-');
+                    //044f-b653-NAME FF
+                    //Name (Vendor: 044f Product: b653) Chrome
+                    if(parts.Length>2){
+                        Name = parts[2];
+                        PID = Convert.ToInt32(parts[1].Trim(), 16);
+                        VID = Convert.ToInt32(parts[0].Trim(), 16);
+                    }
+                    else              
+                    if ((inx = value.IndexOf("("))> -1)
                     {
 						Name = value.Substring(0, inx - 1);
-						String[] parts = value.Substring(inx, value.Length - inx-1).Replace("Product", "").Split(':');
+						parts = value.Substring(inx, value.Length - inx-1).Replace("Product", "").Split(':');
 						
 						PID = Convert.ToInt32(parts[2].Trim(), 16);
 						VID = Convert.ToInt32(parts[1].Trim(), 16);

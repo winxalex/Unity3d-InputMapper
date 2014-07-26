@@ -30,7 +30,7 @@ namespace ws.winx.platform.web
             __drivers = drivers;
             _joysticks = new JoystickDevicesCollection();
 
-                
+            //"{"id":"feed-face-VJoy Virtual Joystick","axes":[0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0,0,0,0,0,0,-1,0,0,0,0,0,0],"buttons":[{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}],"index":0}"
 
             _container = new GameObject("WebHIDBehaviourGO");
             w= _container.AddComponent<WebHIDBehaviour>();
@@ -124,7 +124,9 @@ namespace ws.winx.platform.web
 
         public void DeviceConnectedEventHandler(object sender,WebMessageArgs args)
         {
+            UnityEngine.Debug.Log(args.Message);
             Json.GamePadInfo info=Json.Deserialize(args.Message) as Json.GamePadInfo;
+          
              if(!_joysticks.ContainsKey(info.index))
              {
                  info.hidInterface = this;

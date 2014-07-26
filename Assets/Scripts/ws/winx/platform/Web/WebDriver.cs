@@ -62,30 +62,24 @@ namespace ws.winx.platform.web
 
              Json.GamePadInfo info = Json.Deserialize(args.Message) as Json.GamePadInfo;
 
-             //UnityEngine.Debug.Log("onPositionUpdate:Joy" + info.index);
+            // UnityEngine.Debug.Log("onPositionUpdate:Joy" + info.index);
              int i=0;
             
              JoystickDevice device = _hidInterface.Devices[info.index] as JoystickDevice;
 
             // UnityEngine.Debug.Log(device);
             // UnityEngine.Debug.Log(info.axes);
-            // UnityEngine.Debug.Log(info.axes.Count+" "+device.Axis.Count);
+            // UnityEngine.Debug.Log(info.axes.Count + " " + device.Axis.Count);
 
 
             //UPDATING AXIS BUTTONS
-             PropertyInfo pInfo;
-             //UnityEngine.Debug.Log("buttons" + info.buttons);
-             //UnityEngine.Debug.Log("buttons" + info.buttons.Count);
+            
+            // UnityEngine.Debug.Log("buttons" + info.buttons);
+            // UnityEngine.Debug.Log("buttons" + info.buttons.Count);
              foreach (var obj in info.buttons)
              {
 
-                 pInfo = obj.GetType().GetProperty("value");
-
-                // UnityEngine.Debug.Log("has value:" + (pInfo != null)+" type "+obj.GetType());
-
-                 if (pInfo != null)
-                     device.Buttons[i++].value = Convert.ToSingle(pInfo.GetValue(obj, null));
-                 else
+                
                      device.Buttons[i++].value = Convert.ToSingle(obj);
 
              }
@@ -99,6 +93,7 @@ namespace ws.winx.platform.web
                  value=Convert.ToSingle(obj);
                 if(value < dreadZone && value > -dreadZone)value = 0;
 
+                 //LAST 4 axes are POV probably
                 //if (numAxes > 8)
                 //{
                 //    if (i == (int)JoystickAxis.AxisPovX)
