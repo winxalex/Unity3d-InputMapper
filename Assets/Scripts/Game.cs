@@ -62,7 +62,7 @@ namespace ws.winx
 
 
 
-
+            //!!!When you are using UI(quiering any key) disable Game key actions cos of incomaptiblity both to function as once
             UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
             if (ui.enabled)
             {

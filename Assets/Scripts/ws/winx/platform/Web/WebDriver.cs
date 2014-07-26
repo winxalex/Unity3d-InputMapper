@@ -49,8 +49,9 @@ namespace ws.winx.platform.web
                        
                     }
 
-
-
+                    joystick.numPOV = 1;
+                   // joystick.Axis[index - 1].isHat = true;
+                   //joystick.Axis[index - 2].isHat = true;
 
                     return joystick;
 
@@ -61,20 +62,20 @@ namespace ws.winx.platform.web
 
              Json.GamePadInfo info = Json.Deserialize(args.Message) as Json.GamePadInfo;
 
-             UnityEngine.Debug.Log(args + " " + info.index);
+             //UnityEngine.Debug.Log("onPositionUpdate:Joy" + info.index);
              int i=0;
             
              JoystickDevice device = _hidInterface.Devices[info.index] as JoystickDevice;
 
-             UnityEngine.Debug.Log(device);
-             UnityEngine.Debug.Log(info.axes);
-             UnityEngine.Debug.Log(info.axes.Count+" "+device.Axis.Count);
+            // UnityEngine.Debug.Log(device);
+            // UnityEngine.Debug.Log(info.axes);
+            // UnityEngine.Debug.Log(info.axes.Count+" "+device.Axis.Count);
 
 
-            
+            //UPDATING AXIS BUTTONS
              PropertyInfo pInfo;
-             UnityEngine.Debug.Log("buttons" + info.buttons);
-             UnityEngine.Debug.Log("buttons" + info.buttons.Count);
+             //UnityEngine.Debug.Log("buttons" + info.buttons);
+             //UnityEngine.Debug.Log("buttons" + info.buttons.Count);
              foreach (var obj in info.buttons)
              {
 
@@ -90,29 +91,76 @@ namespace ws.winx.platform.web
              }
 
              i = 0;
+             float value = 0;
+             float dreadZone=0.001f;//TODO this shouldn't be hard coded
+             int numAxes=device.Axis.Count;
              foreach (var obj in info.axes){
 
+                 value=Convert.ToSingle(obj);
+                if(value < dreadZone && value > -dreadZone)value = 0;
+
+                //if (numAxes > 8)
+                //{
+                //    if (i == (int)JoystickAxis.AxisPovX)
+                //    {
+                //        device.Axis[numAxes - 2].value = Convert.ToSingle(Math.Min(1f, Math.Max(-1, value)));
+                //        i++;
+                //        continue;
+                //    }
+                //    else if (i == (int)JoystickAxis.AxisPovY)
+                //    {
+                //        device.Axis[numAxes - 1].value = Convert.ToSingle(Math.Min(1f, Math.Max(-1, value)));
+                //        i++;
+                //        continue;
+                //    }
+                //    else if (i == numAxes - 2)
+                //    {
+                //        device.Axis[JoystickAxis.AxisPovX].value = Convert.ToSingle(Math.Min(1f, Math.Max(-1, value)));
+                //        i++;
+                //        continue;
+                //    }
+                //    else if (i == numAxes - 1)
+                //    {
+                //        device.Axis[JoystickAxis.AxisPovY].value = Convert.ToSingle(Math.Min(1f, Math.Max(-1, value)));
+                //        i++;
+                //        continue;
+                //    }
+                //}
+                  
+                    
+                
                // UnityEngine.Debug.Log(obj.GetType());
-                 device.Axis[i++].value =Convert.ToSingle(Math.Min(1f, Math.Max(-1, Convert.ToSingle(obj))));
+                 device.Axis[i++].value =Convert.ToSingle(Math.Min(1f, Math.Max(-1,value )));
                //  UnityEngine.Debug.Log("axes value:" +device.Axis[i-1].value);
              }
+             
+             
+            // switch(guess always the last axes are hats
+             //if (numAxes > 8)
+             //{
+             //    value = device.Axis[JoystickAxis.AxisPovX].value;
+             //    device.Axis[JoystickAxis.AxisPovX].value = device.Axis[numAxes - 2].value;
+             //    device.Axis[numAxes - 2].value = value;
 
-           
+             //    value = device.Axis[JoystickAxis.AxisPovY].value;
+             //    device.Axis[JoystickAxis.AxisPovY].value = device.Axis[numAxes - 1].value;
+             //    device.Axis[numAxes - 1].value = value;
+                 
+             //}
 
+
+
+             UnityEngine.Debug.Log(device.Axis[0].value + " " + device.Axis[1].value);
               _isReady = true;
-      //    var b = buttons[i];
-      //var val = controller.buttons[i];
-      //var pressed = val == 1.0;
-      //if (typeof(val) == "object") {
-      //  pressed = val.pressed;
-      //  val = val.value;
-      //}
+      
 
-             //UPDATING AXIS BUTTONS
+             
          }
 
          public void Update(IJoystickDevice joystick)
         {
+
+           // Debug.Log("Update"+_isReady);
             if (_isReady)
             {
                 _isReady = false;

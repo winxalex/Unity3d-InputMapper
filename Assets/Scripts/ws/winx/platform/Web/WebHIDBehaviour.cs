@@ -133,16 +133,16 @@ namespace ws.winx.platform.web
 
             public void joyGetPosEx(int index)
             {
-                UnityEngine.Debug.Log(String.Format(GAMEPAD_COMMAND, index));
+               // UnityEngine.Debug.Log(String.Format(GAMEPAD_COMMAND, index));
                 Application.ExternalEval(String.Format(GAMEPAD_COMMAND, index));
             }
 
 
             public void onJoyGetPosEx(string message){
-                Debug.Log("onJoyGetPos");
+                //Debug.Log("onJoyGetPos");
                 if (PositionUpdateEvent!=null)
                 {
-                    Debug.Log("Send Event");
+                    //Debug.Log("Send Event");
                     PositionUpdateEvent(this, new WebMessageArgs(message));
 
                 }

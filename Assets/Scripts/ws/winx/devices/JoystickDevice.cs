@@ -137,8 +137,9 @@ namespace ws.winx.devices
 
 //
          //   UnityEngine.Debug.Log("Update"+Time.frameCount+" ponter"+_lastFrameNum);
-            if (!Application.isEditor)
-            {
+           
+            //lock is done so no other updates of joystick is done while frame
+            //many Joy.Get could be called in same frame so updates would make values unusable
                 if (_lastFrameNum == Time.frameCount)
                 {
                     // UnityEngine.Debug.Log("skip cos its same frame");
@@ -151,11 +152,8 @@ namespace ws.winx.devices
 
                     _driver.Update(this);// as IJoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension>);
                 }
-            }
-            else
-            {
-                _driver.Update(this);//
-            }
+         
+          
 
 			//_driver.Update(this);
 
@@ -367,7 +365,7 @@ namespace ws.winx.devices
 		/// <returns>The input.</returns>
 		public virtual int GetInput(){
             //Debug.Log("Get Input Joydevice");
-					Update();
+            _driver.Update(this);
 
 
 					int num_axes = _numAxis-numPOV*2;
@@ -539,7 +537,9 @@ namespace ws.winx.devices
 						
 						
 						
-					
+					/////TODO make possible any axes to be POV (add isHatFirstAxis)
+                        // axis_collection [JoystickAxis.AxisPovX].isHat
+
 						 if(numPOV>0){
 							if (axis_collection [JoystickAxis.AxisPovX].buttonState == JoystickButtonState.Down )
 							{

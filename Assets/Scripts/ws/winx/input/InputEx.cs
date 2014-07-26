@@ -565,6 +565,7 @@ namespace ws.winx.input
 
             foreach (IJoystickDevice device in devices)
             {
+                
                 if ((_code = device.GetInput()) != 0)
                     return processInput(_code, time);
             }

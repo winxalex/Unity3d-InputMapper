@@ -30,33 +30,7 @@ namespace ws.winx.platform.web
             __drivers = drivers;
             _joysticks = new JoystickDevicesCollection();
 
-         //Json.GamePadInfo info=   Json.Deserialize("{\"buttons\":[1,0,0,0,0,0,0,0,0,0],\"axes\":[1.031280517578125,1,0,0,0,1,1,1,0,3.2857143878936768],\"timestamp\":17,\"index\":1,\"id\":\"Thrustmaster force feedback wheel (Vendor: 044f Product: b653)\"}") as Json.GamePadInfo;
-
-      //Dictionary<string,object> obj=      Json.Deserialize("{\"0\":{\"buttons\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],\"axes\":[0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0,1.6666666269302368],\"timestamp\":1964503,\"index\":0,\"id\":\" (Vendor: feed Product: face)\"},\"1\":{\"buttons\":[1,0,0,0,0,0,0,0,0,0],\"axes\":[1.031280517578125,1,0,0,0,1,1,1,0,3.2857143878936768],\"timestamp\":17,\"index\":1,\"id\":\"Thrustmaster force feedback wheel (Vendor: 044f Product: b653)\"},\"length\":4}") as Dictionary<string,object>;
-
-      //Dictionary<string, object> joy = obj["0"] as Dictionary<string, object>;
-      //      List<object> buttons=joy["buttons"] as List<object>;
-      //      string id= joy["id"] as string;
-
-            //string value="fasdfasfasfsafaff (Vendor: 044f Product: b653)";
-            //        int inx = value.IndexOf("(");
-            //        if (inx > -1)
-            //        {
-            //           String Name = value.Substring(0, inx - 1);
-            //            String[] parts = value.Substring(inx, value.Length - inx-1).Replace("Product", "").Split(':');
-
-            //           int PID = Convert.ToInt32(parts[2].Trim(), 16);
-            //          int  VID = Convert.ToInt32(parts[1].Trim(), 16);
-            //        }
-
-            try
-            {
-                throw new Exception("dump stack");
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e.StackTrace);
-            }
+                
 
             _container = new GameObject("WebHIDBehaviourGO");
             w= _container.AddComponent<WebHIDBehaviour>();
@@ -250,6 +224,8 @@ namespace ws.winx.platform.web
                 {
                     JoystickDevices[pidPointer] = value;
                     JoystickIDToDevice[value.ID] = pidPointer;
+
+                    _isEnumeratorDirty = true;
                 }
                
             }
