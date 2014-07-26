@@ -7,7 +7,7 @@
 //     the code is regenerated.
 // </auto-generated>
 //------------------------------------------------------------------------------
-#if UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR
 using System;
 using UnityEngine;
 using System.Runtime.InteropServices;
@@ -619,6 +619,9 @@ namespace ws.winx.platform.windows
                     joyDevice = driver.ResolveDevice(deviceInfo);
                     if (joyDevice != null)
                     {
+                        //do not allow duplicates
+                         if(_joysticks.ContainsKey(new IntPtr(deviceInfo.PID))) return;
+
                         AddDeviceToHIDInterface(joyDevice, deviceInfo);
                         Debug.Log("Device PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + driver.GetType().ToString());
 
@@ -633,6 +636,8 @@ namespace ws.winx.platform.windows
 
                 if (joyDevice != null)
                 {
+                    //do not allow duplicates
+                    if (_joysticks.ContainsKey(new IntPtr(deviceInfo.PID))) return;
 
                     AddDeviceToHIDInterface(joyDevice, deviceInfo);
 
@@ -652,6 +657,7 @@ namespace ws.winx.platform.windows
 
         private void AddDeviceToHIDInterface(IJoystickDevice joyDevice, HIDDeviceInfo deviceInfo)
         {
+           
             _joysticks[new IntPtr(deviceInfo.PID)] = joyDevice;
 
             DeviceHIDInfos[joyDevice] = deviceInfo;
@@ -1095,6 +1101,8 @@ namespace ws.winx.platform.windows
 
             _joysticks.Clear();
             DeviceHIDInfos.Clear();
+
+            if(__drivers!=null)
             __drivers.Clear();
 
             UnityEngine.Debug.Log("Dispose WinHIDInterface");

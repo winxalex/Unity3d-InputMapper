@@ -9,7 +9,7 @@ namespace ws.winx.input
 {
 
 
-    #if UNITY_STANDALONE
+	#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 	[DataContract()]
     #endif
     public class InputAction
@@ -47,22 +47,22 @@ namespace ws.winx.input
 		protected bool _isMouse=false;
 		protected bool _fromAny=false;
 			
-	    #if UNITY_STANDALONE
+	    #if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 		[IgnoreDataMemberAttribute]
         #endif
 		protected int _code=0;//KeyCode.None;
 		
-        #if UNITY_STANDALONE
+        #if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 		[IgnoreDataMemberAttribute]
         #endif
         protected InputActionType _type=InputActionType.SINGLE;
 		
-         #if UNITY_STANDALONE
+         #if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 		[IgnoreDataMemberAttribute]
         #endif
         protected String _codeString;
 
-        #if UNITY_STANDALONE
+        #if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 		[DataMember(Name = "Code")]
         #endif
         public String codeString{

@@ -3,6 +3,7 @@ using UnityEngine;
 using ws.winx.input;
 using System.Collections.Generic;
 using System.IO;
+using System.Collections;
 
 namespace ws.winx.gui
 {
@@ -11,7 +12,13 @@ namespace ws.winx.gui
     {
 		protected Rect _buttonRect = new Rect (0, 0, 100, 15);
 		protected Rect _layerLabelRect = new Rect (0, 0, 100, 15);
-		protected static Dictionary<int,InputState> _stateInputCombinations;
+        protected Dictionary<int, InputState> _stateInputCombinations;
+
+        public Dictionary<int, InputState> StateInputCombinations
+        {
+            get { return _stateInputCombinations; }
+            set { _stateInputCombinations = value; }
+        }
 		protected static bool _settingsLoaded=false;
 		protected int _selectedStateHash = 0;
 		protected string _combinationSeparator=InputAction.SPACE_DESIGNATOR.ToString();
@@ -32,6 +39,20 @@ namespace ws.winx.gui
 		public GUISkin guiSkin;
 		public TextAsset settingsXML;
 		//public bool allowDuplicates=false;
+
+        void Start()
+        {
+            
+        
+            if (!_settingsLoaded && settingsXML != null)
+            {
+                loadInputSettings();
+                _settingsLoaded = true;
+            }
+
+
+        
+        }
 
 		
 		/// <summary>
@@ -72,9 +93,14 @@ namespace ws.winx.gui
 		/// </summary>
 		void saveInputSettings ()
 		{
+            #if UNITY_WEBPLAYER
+                throw new NotImplementedException();//should be thru webserver side service
+            #endif
 
-			InputManager.saveSettings(Path.Combine(Application.streamingAssetsPath,settingsXML.name+".xml"));
 
+            #if UNITY_STANDALONE
+			            InputManager.saveSettings(Path.Combine(Application.streamingAssetsPath,settingsXML.name+".xml"));
+            #endif
 		}
 
 
@@ -83,26 +109,33 @@ namespace ws.winx.gui
 		/// </summary>
 		void loadInputSettings(){
 
-			//Path.Combine(Application.streamingAssetsPath, settingsXML.name+".xml");
+			 //UnityEngine.Debug.Log("loadInputSettings");
 
-			//clone
+			//clone(cos maybe some are added manually)
 			_stateInputCombinations = new Dictionary<int,InputState> (InputManager.Settings.stateInputs);
-			 
-			InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath,settingsXML.name+".xml"));
-	
-			var stateInputs = InputManager.Settings.stateInputs;
 
-			//concat//concate with priority of keys/items loaded from .xml
-			foreach (var KeyValuePair in _stateInputCombinations) {
-				if (!stateInputs.ContainsKey (KeyValuePair.Key))
-					InputManager.Settings.stateInputs.Add (KeyValuePair.Key, KeyValuePair.Value);
-				
-				
-			}
+            //load settngs from TextAsset(seem its utf-8 so not need of reading BOM)
+            InputManager.loadSettingsFromText(settingsXML.text,false);
+
+	
+            var stateInputs = InputManager.Settings.stateInputs;
+
+            //concat//concate with priority of keys/items loaded from .xml
+            foreach (var KeyValuePair in _stateInputCombinations)
+            {
+                if (!stateInputs.ContainsKey(KeyValuePair.Key))
+                    InputManager.Settings.stateInputs.Add(KeyValuePair.Key, KeyValuePair.Value);
+
+
+            }
+
+            //clone(cos maybe some are added manually)
+            //_stateInputCombinations = new Dictionary<int, InputState>(InputManager.Settings.stateInputs);
 
 
 			_stateInputCombinations=stateInputs;
-		
+
+
 		}
 
 
@@ -176,11 +209,7 @@ namespace ws.winx.gui
 			GUILayout.Label("InputEx");
 
 				
-				if(!_settingsLoaded && settingsXML!=null) 
-				{ 
-					loadInputSettings();
-					_settingsLoaded=true;
-				}
+				
 
 
 					_scrollPosition=GUILayout.BeginScrollView(_scrollPosition,false,true);

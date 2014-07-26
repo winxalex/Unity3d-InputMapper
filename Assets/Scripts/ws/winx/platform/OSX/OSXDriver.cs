@@ -7,7 +7,7 @@
 //     the code is regenerated.
 // </auto-generated>
 //------------------------------------------------------------------------------
-#if UNITY_STANDALONE_OSX
+#if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
 using System;
 using ws.winx.devices;
 //using UnityEngine;
@@ -42,7 +42,7 @@ namespace ws.winx.platform.osx
 	sealed class OSXDriver: IJoystickDriver
 		{
 
-		#region Fields
+#region Fields
 
 		readonly CFRunLoop RunLoop = CF.CFRunLoopGetMain();
 		readonly CFString InputLoopMode = CF.RunLoopModeDefault;
@@ -51,12 +51,12 @@ namespace ws.winx.platform.osx
 		
 	
 		
-		#endregion
+        #endregion
 
 
 
 
-        #region Constructor
+#region Constructor
         public OSXDriver()
 				{
 				
@@ -66,7 +66,7 @@ namespace ws.winx.platform.osx
         #endregion
 
 
-        #region Private Members
+#region Private Members
 
 
 
@@ -225,7 +225,7 @@ namespace ws.winx.platform.osx
 
 
 
-		#endregion
+        #endregion
 
 
 
@@ -234,7 +234,7 @@ namespace ws.winx.platform.osx
 
 
 
-		#region IJoystickDriver implementation
+#region IJoystickDriver implementation
 
          public void Update(IJoystickDevice joystick)
 		//public void Update (IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension> joystick)
@@ -297,7 +297,7 @@ namespace ws.winx.platform.osx
 						}
 
 
-			joystick=new JoystickDevice(_hidInterface.Devices.Count,info.PID,info.PID,numAxis,numButtons,this);
+			joystick=new JoystickDevice(info.index,info.PID,info.PID,numAxis,numButtons,this);
 			
 			AxisDetails axisDetails;
 
@@ -383,16 +383,16 @@ namespace ws.winx.platform.osx
 		
 
 
-		#region ButtonDetails
+#region ButtonDetails
 		public sealed class ButtonDetails:IButtonDetails{
 			
-			#region Fields
+#region Fields
 			
 			float _value;
 			uint _uid;
 			JoystickButtonState _buttonState;
 
-			#region IDeviceDetails implementation
+#region IDeviceDetails implementation
 
 
 			public uint uid {
@@ -449,12 +449,12 @@ namespace ws.winx.platform.osx
 					}
 				}
 			}
-			#endregion
-			#endregion
+            #endregion
+            #endregion
 
-			#region Constructor
+#region Constructor
 			public ButtonDetails(uint uid=0){this.uid=uid; }
-			#endregion
+            #endregion
 			
 			
 			
@@ -463,12 +463,12 @@ namespace ws.winx.platform.osx
 			
 		}
 		
-		#endregion
+        #endregion
 		
-		#region AxisDetails
+#region AxisDetails
 		public sealed class AxisDetails:IAxisDetails{
 
-			#region Fields
+#region Fields
 			float _value;
 			int _uid;
 			int _min;
@@ -477,7 +477,7 @@ namespace ws.winx.platform.osx
 			bool _isNullable;
 			bool _isHat;
 
-			#region IAxisDetails implementation
+#region IAxisDetails implementation
 
 
 
@@ -533,10 +533,10 @@ namespace ws.winx.platform.osx
 			}
 
 
-			#endregion
+            #endregion
 
 
-			#region IDeviceDetails implementation
+#region IDeviceDetails implementation
 
 
 			public uint uid {
@@ -549,7 +549,7 @@ namespace ws.winx.platform.osx
 			}
 
 
-			#endregion
+            #endregion
 
 			public JoystickButtonState buttonState{
 				get{return _buttonState; }
@@ -593,11 +593,11 @@ namespace ws.winx.platform.osx
 				}//set
 			}
 
-			#endregion
+            #endregion
 			
 		}
 		
-		#endregion
+        #endregion
 
 
 
@@ -614,5 +614,5 @@ namespace ws.winx.platform.osx
 		}
 }
 
-#endregion
+        #endregion
 #endif

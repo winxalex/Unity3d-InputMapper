@@ -7,7 +7,7 @@
 //     the code is regenerated.
 // </auto-generated>
 //------------------------------------------------------------------------------
-#if UNITY_STANDALONE_OSX
+#if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
 using System;
 using System.Collections.Generic;
 using ws.winx.devices;
@@ -42,7 +42,7 @@ namespace ws.winx.platform.osx
     sealed class OSXHIDInterface : IHIDInterface
     {
 
-        #region Fields
+#region Fields
 
         readonly IOHIDManagerRef hidmanager;
 
@@ -70,7 +70,7 @@ namespace ws.winx.platform.osx
 
         #endregion
 
-        #region IHIDInterface implementation
+#region IHIDInterface implementation
         public IJoystickDriver defaultDriver
         {
             get { if (__defaultJoystickDriver == null) { __defaultJoystickDriver = new OSXDriver(); } return __defaultJoystickDriver; }
@@ -100,7 +100,7 @@ namespace ws.winx.platform.osx
 
 
 
-        #region Contsructor
+#region Contsructor
 
         public OSXHIDInterface(List<IJoystickDriver> drivers)
         {
@@ -144,7 +144,7 @@ namespace ws.winx.platform.osx
         }
         #endregion
 
-        #region Private Members
+#region Private Members
 
 
 
@@ -196,7 +196,7 @@ namespace ws.winx.platform.osx
                 //loop thru drivers and attach the driver to device if compatible
                 foreach (var driver in __drivers)
                 {
-                    if ((joyDevice = driver.ResolveDevice(new HIDDeviceInfo(vendor_id.ToInt32(), product_id.ToInt32(), device, this, ""))) != null)
+                    if ((joyDevice = driver.ResolveDevice(new HIDDeviceInfo(_joysticks.Count,vendor_id.ToInt32(), product_id.ToInt32(), device, this, ""))) != null)
                     {
                         _joysticks[device] = joyDevice;
                         joyDevice.Name=description;
@@ -208,7 +208,7 @@ namespace ws.winx.platform.osx
                 if (joyDevice == null)
                 {//set default driver as resolver if no custom driver match device
 
-                    joyDevice = defaultDriver.ResolveDevice(new HIDDeviceInfo(vendor_id.ToInt32(), product_id.ToInt32(), device, this, ""));//always return true
+                    joyDevice = defaultDriver.ResolveDevice(new HIDDeviceInfo(_joysticks.Count,vendor_id.ToInt32(), product_id.ToInt32(), device, this, ""));//always return true
 					joyDevice.Name=description;
 
 					if (joyDevice != null)
@@ -263,7 +263,7 @@ namespace ws.winx.platform.osx
 
 
 
-        #region NativeMethods
+#region NativeMethods
 
         internal class NativeMethods
         {
@@ -471,7 +471,7 @@ namespace ws.winx.platform.osx
 
         #endregion
 
-        #region IntPtrEqualityComparer
+#region IntPtrEqualityComparer
         // Simple equality comparer to allow IntPtrs as keys in dictionaries
         // without causing boxing/garbage generation.
         // Seriously, Microsoft, shouldn't this have been in the BCL out of the box?
@@ -489,14 +489,14 @@ namespace ws.winx.platform.osx
         }
         #endregion
 
-        #region JoystickDevicesCollection
+#region JoystickDevicesCollection
 
         /// <summary>
         /// Defines a collection of JoystickAxes.
         /// </summary>
         public sealed class JoystickDevicesCollection : IDeviceCollection
         {
-            #region Fields
+#region Fields
             readonly Dictionary<IntPtr, IJoystickDevice> JoystickDevices;
             //readonly Dictionary<IntPtr, IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension>> JoystickDevices;
 
@@ -508,7 +508,7 @@ namespace ws.winx.platform.osx
 
             #endregion
 
-            #region Constructors
+#region Constructors
 
             internal JoystickDevicesCollection()
             {
@@ -522,9 +522,9 @@ namespace ws.winx.platform.osx
 
             #endregion
 
-            #region Public Members
+#region Public Members
 
-            #region IDeviceCollection implementation
+#region IDeviceCollection implementation
 
             public void Remove(IntPtr device)
             {

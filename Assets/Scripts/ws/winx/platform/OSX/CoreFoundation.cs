@@ -24,7 +24,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 #endregion
-
+#if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX 
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -193,3 +193,4 @@ namespace ws.winx.platform.osx.Carbon
             IntPtr cfstrMode, double interval, bool returnAfterSourceHandled);
     }
 }
+#endif

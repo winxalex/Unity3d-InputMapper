@@ -65,6 +65,10 @@ namespace ws.winx.platform
 						get {
 								return _hidInterface;
 						}
+                    internal set
+                    {
+                        _hidInterface = value;
+                    }
 
 				}
 

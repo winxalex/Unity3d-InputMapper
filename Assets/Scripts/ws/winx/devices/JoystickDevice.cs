@@ -137,18 +137,24 @@ namespace ws.winx.devices
 
 //
          //   UnityEngine.Debug.Log("Update"+Time.frameCount+" ponter"+_lastFrameNum);
-
-            if (_lastFrameNum == Time.frameCount)
+            if (!Application.isEditor)
             {
-               // UnityEngine.Debug.Log("skip cos its same frame");
-                return;
+                if (_lastFrameNum == Time.frameCount)
+                {
+                    // UnityEngine.Debug.Log("skip cos its same frame");
+                    return;
+                }
+                else
+                {
+
+                    _lastFrameNum = Time.frameCount + 0;
+
+                    _driver.Update(this);// as IJoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension>);
+                }
             }
             else
-            {               
-
-                _lastFrameNum = Time.frameCount + 0;
-                
-                _driver.Update(this);// as IJoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension>);
+            {
+                _driver.Update(this);//
             }
 
 			//_driver.Update(this);
@@ -360,7 +366,7 @@ namespace ws.winx.devices
 		/// </summary>
 		/// <returns>The input.</returns>
 		public virtual int GetInput(){
-				
+            //Debug.Log("Get Input Joydevice");
 					Update();
 
 

@@ -13,12 +13,12 @@ using System.Runtime.Serialization;
 
 namespace ws.winx.input
 {
-#if UNITY_STANDALONE
+#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 		[DataContract]
 #endif
     public class InputState
     {
-#if UNITY_STANDALONE
+#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 				[DataMember(Name = "InputCombinations")]
 #endif
         public InputCombination[] combinations;
@@ -50,12 +50,12 @@ namespace ws.winx.input
 
         }
 
-#if UNITY_STANDALONE
+#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 				[DataMember(Name = "Name")]
 #endif
         protected string _name;
 
-#if UNITY_STANDALONE
+#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 				[DataMember(Name = "Hash")]
 #endif
         protected int _hash;

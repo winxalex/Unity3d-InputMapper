@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_WEBPLAYER	
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -48,6 +49,14 @@ namespace ws.winx.platform.web
             //          int  VID = Convert.ToInt32(parts[1].Trim(), 16);
             //        }
 
+            try
+            {
+                throw new Exception("dump stack");
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e.StackTrace);
+            }
 
             _container = new GameObject("WebHIDBehaviourGO");
             w= _container.AddComponent<WebHIDBehaviour>();
@@ -96,7 +105,7 @@ namespace ws.winx.platform.web
                     if (joyDevice != null)
                     {
                         //new IntPtr just for compatibility
-                        _joysticks[new IntPtr(joyDevice.ID)] = joyDevice;
+                        _joysticks[new IntPtr(joyDevice.PID)] = joyDevice;
                         Debug.Log("Device PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + driver.GetType().ToString());
 
                         break;
@@ -112,9 +121,11 @@ namespace ws.winx.platform.web
                 {
 
                     //new IntPtr just for compatibility
-                    _joysticks[new IntPtr(joyDevice.ID)] = joyDevice;
+                    _joysticks[new IntPtr(joyDevice.PID)] = joyDevice;
 
-                    Debug.Log("Device PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + deviceInfo.DevicePath + " Name:" + joyDevice.Name);
+                    Debug.Log(_joysticks[deviceInfo.index]);
+
+                    Debug.Log("Device index:" + joyDevice.ID + " PID:" + joyDevice.PID + " VID:" + joyDevice.VID + " attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + deviceInfo.DevicePath + " Name:" + joyDevice.Name);
 
                 }
                 else
@@ -142,7 +153,8 @@ namespace ws.winx.platform.web
             Json.GamePadInfo info=Json.Deserialize(args.Message) as Json.GamePadInfo;
              if(!_joysticks.ContainsKey(info.index))
              {
-               ResolveDevice(info);
+                 info.hidInterface = this;
+                 ResolveDevice(info);
              }
         }
 
@@ -295,3 +307,4 @@ namespace ws.winx.platform.web
         }
     }
 }
+#endif

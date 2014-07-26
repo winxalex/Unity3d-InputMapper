@@ -19,6 +19,7 @@ using System.Text;
 using ws.winx.platform;
 using System.ComponentModel;
 using ws.winx.devices;
+using System.Threading;
 
 namespace ws.winx.input
 {
@@ -44,22 +45,21 @@ namespace ws.winx.input
 				if(__hidInterface==null){
 					//if((Application.platform & (RuntimePlatform.WindowsPlayer | RuntimePlatform.WindowsEditor))!=0){
 
-                        #if UNITY_STANDALONE_WIN
+                        #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
                         __hidInterface = new ws.winx.platform.windows.WinHIDInterface(__drivers);
                          #endif
                         
 
-					 #if UNITY_STANDALONE_OSX
+					 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
 						__hidInterface=new ws.winx.platform.osx.OSXHIDInterface(__drivers);
                      #endif
 
 
-                    #if UNITY_WEBPLAYER
-
-                    __hidInterface=new ws.winx.platform.web.WebHIDInterface(__drivers);
+					#if UNITY_WEBPLAYER && !UNITY_EDITOR
+						__hidInterface=new ws.winx.platform.web.WebHIDInterface(__drivers);
                     #endif
 
-                        Debug.Log("HIDInterface initialized");
+                        Debug.Log(__hidInterface.GetType()+" is Initialized");
 				}
 
 
@@ -345,7 +345,7 @@ namespace ws.winx.input
   
 		
 		
-		
+	#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 		/// <summary>
 		/// Loads the Input settings from InputSettings.xml and deserialize into OO structure.
 		/// Create your .xml settings with InputMapper Editor
@@ -356,7 +356,7 @@ namespace ws.winx.input
 			xmlSettings.IgnoreWhitespace=true;
 
 
-			#if UNITY_STANDALONE
+			
 			//DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<int,InputCombination[]>),"Inputs","");
 			DataContractSerializer serializer = new DataContractSerializer(typeof(InputSettings),"Inputs","");
 
@@ -367,33 +367,72 @@ namespace ws.winx.input
 				__settings=(InputSettings)serializer.ReadObject(reader);
 
 			}
-			#endif
-
+			
 
 
 			return __settings;
 		}
+#endif
 
-#if UNITY_WEBPLAYER
-        public static IEnumerator loadSettingsWWW(string path)
+
+
+
+		#if (UNITY_WEBPLAYER	|| UNITY_EDITOR) && !UNITY_STANDALONE
+		/// <summary>
+		/// Loads the Input settings from InputSettings.xml and deserialize into OO structure.
+		/// Create your .xml settings with InputMapper Editor
+		/// </summary>
+        public static IEnumerator loadSettings(String path)
         {
+             XmlReaderSettings xmlSettings=new XmlReaderSettings();
+			xmlSettings.CloseInput=true;
+			xmlSettings.IgnoreWhitespace=true;
 
+            if (Application.isEditor)
+                path = "file:///" + path;
+
+            WWW www = new WWW(path);
+          // UnityEngine.Debug.Log(path);
+            while (!www.isDone)
+            {
+                yield return null;
+            }
+
+            
+          
+
+            if (www.error != null)
+            {
+                UnityEngine.Debug.LogError(www.error);
+                yield break;
+            }
+
+            loadSettingsFromText(www.text);
+
+           
+
+          yield break;
+          
+        }
+#endif
+
+        public static void loadSettingsFromText(string text,bool readBOM=true)
+        {
             XmlReaderSettings xmlSettings = new XmlReaderSettings();
             xmlSettings.CloseInput = true;
             xmlSettings.IgnoreWhitespace = true;
-              WWW webReq = new WWW(path);
-            yield return webReq;
-
-            UnityEngine.Debug.Log("Pass"+webReq.text);
-			using(XmlReader reader=XmlReader.Create(new StringReader(webReq.text),xmlSettings))
-			{
+            StringReader stringReader = new StringReader(text);
+            if(readBOM)
+            stringReader.Read();//skip BOM
+            using (XmlReader reader = XmlReader.Create(stringReader, xmlSettings))
+            {
                 __settings = new InputSettings();
 
                 int key;
-               
+
                 InputAction action;
-                List<InputAction> actions=null;
-                InputCombination[] combinations=null;
+                List<InputAction> actions = null;
+                InputCombination[] combinations = null;
                 string name;
                 InputState state;
                 int i;
@@ -404,69 +443,72 @@ namespace ws.winx.input
                 reader.ReadToFollowing("d1p1:doubleDesignator");
                 __settings.doubleDesignator = reader.ReadElementContentAsString();
 
-               
+
                 __settings.longDesignator = reader.ReadElementContentAsString();
 
-               
+
                 __settings.spaceDesignator = reader.ReadElementContentAsString();
 
 
 
-               
+
                 __settings.singleClickSensitivity = reader.ReadElementContentAsFloat();
 
-               
+
                 __settings.doubleClickSensitivity = reader.ReadElementContentAsFloat();
 
-               
+
                 __settings.longClickSensitivity = reader.ReadElementContentAsFloat();
 
-               
+
                 __settings.combinationsClickSensitivity = reader.ReadElementContentAsFloat();
 
-                if(reader.ReadToFollowing("d2p1:KeyValueOfintInputState") ){
+                if (reader.ReadToFollowing("d2p1:KeyValueOfintInputState"))
+                {
 
 
                     do
                     {
                         reader.ReadToDescendant("d2p1:Key");
 
-                        key=reader.ReadElementContentAsInt();
+                        key = reader.ReadElementContentAsInt();
 
 
-                        
 
-                        if(reader.ReadToFollowing("d1p1:InputCombination")){
 
-                            combinations=new InputCombination[2];
-                            i=0;
+                        if (reader.ReadToFollowing("d1p1:InputCombination"))
+                        {
+
+                            combinations = new InputCombination[2];
+                            i = 0;
 
                             do
                             {
                                 if (reader.GetAttribute("i:nil") == null)
                                 {
-                                    
+
 
                                     if (reader.ReadToDescendant("d1p1:InputAction"))
                                     {
-                                        actions=new List<InputAction>();
+                                        actions = new List<InputAction>();
 
-                                        do{
+                                        do
+                                        {
                                             reader.ReadToDescendant("d1p1:Code");
 
-                                            action=new InputAction(reader.ReadElementContentAsString());
+                                            action = new InputAction(reader.ReadElementContentAsString());
 
                                             actions.Add(action);
-                                          
-                                        }while(reader.ReadToNextSibling("d1p1:InputAction"));
 
-                                       
+                                        } while (reader.ReadToNextSibling("d1p1:InputAction"));
+
+
                                     }
 
-                                   
-                                  
 
-                                    combinations[i++]=new InputCombination(actions);
+
+
+                                    combinations[i++] = new InputCombination(actions);
 
                                     reader.Read();//read </InputCombination>
 
@@ -477,31 +519,57 @@ namespace ws.winx.input
                             } while (reader.ReadToNextSibling("d1p1:InputCombination"));
 
 
-                            
+
                         }
 
                         reader.ReadToFollowing("d1p1:Name");
-                        name=reader.ReadElementContentAsString();
+                        name = reader.ReadElementContentAsString();
                         state = new InputState(name, key);
                         state.combinations = combinations;
                         __settings.stateInputs[key] = state;
 
 
                         reader.Read();//</d2p1:KeyValueOfintInputState>
-                        
+
                     } while (reader.ReadToNextSibling("d2p1:KeyValueOfintInputState"));
                 }
-			}
-        }
-#endif
+            }
 
+            stringReader.Close();
+        }
+
+
+
+        static IEnumerator WaitAndPrint(float waitTime)
+        {
+            yield return new WaitForSeconds(waitTime);
+            Debug.Log("WaitAndPrint " + Time.time);
+        }
+
+		#if (UNITY_EDITOR || UNITY_WEBPLAYER) && !UNITY_STANDALONE
+		public static IEnumerator saveSettings(String path){
+
+			//TODO manual serialization
+
+			WWWForm wwwForm=new WWWForm();
+			//wwwForm.AddField(
+
+			WWW www=new WWW(path);
+
+
+			yield return www;
+		}
+		#endif
+
+
+		#if (UNITY_STANDALONE || UNITY_EDITOR)&& !UNITY_WEBPLAYER
 		/// <summary>
 		/// Saves the settings to InputSettings.xml.
 		/// </summary>
 		public static void saveSettings(String path){
 
 			//DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<int,InputCombination[]>),"Inputs","");
-			#if UNITY_STANDALONE
+			 
 			DataContractSerializer serializer = new DataContractSerializer(typeof(InputSettings),"Inputs","");
 			
 
@@ -527,12 +595,12 @@ namespace ws.winx.input
 
 
 			}
-			#endif
+
 
 
 		}
 
-       
+		#endif     
       
 
 
@@ -640,7 +708,7 @@ namespace ws.winx.input
 
 		#region Settings
 
-		#if UNITY_STANDALONE
+		#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 		[DataContract]
 #endif
 		public class InputSettings{
@@ -648,7 +716,7 @@ namespace ws.winx.input
 
 
 			
-			#if UNITY_STANDALONE
+			#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 			[DataMember(Order=4)]
 			#endif
 			public float singleClickSensitivity{
@@ -657,7 +725,7 @@ namespace ws.winx.input
 
 			}
 
-			#if UNITY_STANDALONE
+			#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 			[DataMember(Order=5)]
 			#endif
 			public float doubleClickSensitivity{
@@ -666,7 +734,7 @@ namespace ws.winx.input
 				
 			}
 
-			#if UNITY_STANDALONE
+			#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 			[DataMember(Order=6)]
 			#endif
 			public float longClickSensitivity{
@@ -675,7 +743,7 @@ namespace ws.winx.input
 				
 			}
 
-			#if UNITY_STANDALONE
+			#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 			[DataMember(Order=7)]
 			#endif
 			public float combinationsClickSensitivity{
@@ -684,7 +752,7 @@ namespace ws.winx.input
 				
 			}
 
-			#if UNITY_STANDALONE
+			#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 			[DataMember(Order=1)]
 			#endif
 			public string doubleDesignator{
@@ -693,7 +761,7 @@ namespace ws.winx.input
 				
 			}
 
-			#if UNITY_STANDALONE
+			#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 			[DataMember(Order=2)]
 			#endif
 			public string longDesignator{
@@ -702,7 +770,7 @@ namespace ws.winx.input
 				
 			}
 
-			#if UNITY_STANDALONE
+			#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 			[DataMember(Order=3)]
 			#endif
 			public string spaceDesignator{
@@ -711,7 +779,7 @@ namespace ws.winx.input
 				
 			}
 
-			#if UNITY_STANDALONE
+			#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 			[DataMember(Name="StateInputs",Order=8)]
 			#endif
 			protected Dictionary<int,InputState> _stateInputs;

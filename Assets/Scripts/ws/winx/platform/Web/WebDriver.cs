@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_WEBPLAYER	
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ namespace ws.winx.platform.web
 {
 	public class WebDriver:IJoystickDriver
 	{
-        protected bool _isReady;
+        protected bool _isReady=true;
         protected WebHIDBehaviour _webHidBehavior;
         protected IHIDInterface _hidInterface;
 
@@ -59,32 +60,46 @@ namespace ws.winx.platform.web
          protected void onPositionUpdate(object sender,WebMessageArgs args){
 
              Json.GamePadInfo info = Json.Deserialize(args.Message) as Json.GamePadInfo;
+
+             UnityEngine.Debug.Log(args + " " + info.index);
              int i=0;
             
              JoystickDevice device = _hidInterface.Devices[info.index] as JoystickDevice;
-             
 
+             UnityEngine.Debug.Log(device);
+             UnityEngine.Debug.Log(info.axes);
+             UnityEngine.Debug.Log(info.axes.Count+" "+device.Axis.Count);
+
+
+            
+             PropertyInfo pInfo;
+             UnityEngine.Debug.Log("buttons" + info.buttons);
+             UnityEngine.Debug.Log("buttons" + info.buttons.Count);
+             foreach (var obj in info.buttons)
+             {
+
+                 pInfo = obj.GetType().GetProperty("value");
+
+                // UnityEngine.Debug.Log("has value:" + (pInfo != null)+" type "+obj.GetType());
+
+                 if (pInfo != null)
+                     device.Buttons[i++].value = Convert.ToSingle(pInfo.GetValue(obj, null));
+                 else
+                     device.Buttons[i++].value = Convert.ToSingle(obj);
+
+             }
+
+             i = 0;
              foreach (var obj in info.axes){
 
-                
-                 device.Axis[i++].value = Math.Min(1, Math.Max(-1, (float)obj));
+               // UnityEngine.Debug.Log(obj.GetType());
+                 device.Axis[i++].value =Convert.ToSingle(Math.Min(1f, Math.Max(-1, Convert.ToSingle(obj))));
+               //  UnityEngine.Debug.Log("axes value:" +device.Axis[i-1].value);
              }
 
-             i=0;
-             PropertyInfo pInfo;
-              foreach (var obj in info.buttons){
+           
 
-                  pInfo=obj.GetType().GetProperty("value");
-
-                  if(pInfo!=null)
-                    device.Buttons[i++].value=(float)pInfo.GetValue(obj,null);
-                  else
-                      device.Buttons[i++].value = (float)obj;
-               
-             }
-
-
-
+              _isReady = true;
       //    var b = buttons[i];
       //var val = controller.buttons[i];
       //var pressed = val == 1.0;
@@ -100,6 +115,7 @@ namespace ws.winx.platform.web
         {
             if (_isReady)
             {
+                _isReady = false;
                 _webHidBehavior.joyGetPosEx(joystick.ID);
             }
 
@@ -390,3 +406,4 @@ namespace ws.winx.platform.web
         #endregion
     }
 }
+#endif
