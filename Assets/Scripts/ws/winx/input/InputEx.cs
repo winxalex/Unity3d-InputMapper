@@ -216,6 +216,10 @@ namespace ws.winx.input
             }
         }
 
+        /// <summary>
+        /// any key on any joystick device
+        /// </summary>
+        /// <returns></returns>
         static bool anyKeyDownOnAny()
         {
             IDeviceCollection devices = InputManager.hidInterface.Devices;

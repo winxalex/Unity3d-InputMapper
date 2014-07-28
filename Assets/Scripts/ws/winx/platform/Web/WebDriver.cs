@@ -143,9 +143,9 @@ namespace ws.winx.platform.web
                  
              //}
 
+             _webHidBehavior.Log("numaxis: "+ device.Axis[7].value.ToString() + device.Axis[8].value.ToString());
 
-
-             UnityEngine.Debug.Log(device.Axis[0].value + " " + device.Axis[1].value);
+            // UnityEngine.Debug.Log(device.Axis[0].value + " " + device.Axis[1].value);
               _isReady = true;
       
 

@@ -60,29 +60,42 @@ namespace ws.winx.gui
 		/// </summary>
 		void Update(){
 
-			if (_selectedStateHash != 0)
-			{
-					_action = InputEx.GetInput();
-			
-			 if(_action != null && (_action.code ^ (int)KeyCode.Escape)!=0 && (_action.code^(int)KeyCode.Return)!=0) {
-				
-				
-				if((_action.code^(int)KeyCode.Backspace)==0){
-					_stateInputCombinations[_selectedStateHash].combinations[_isPrimary].Clear();
-					_stateInputCombinations[_selectedStateHash].combinations[_isPrimary].Add(new InputAction(KeyCode.None));
-				}
-				else{
-					toInputCombination (_stateInputCombinations [_selectedStateHash].combinations[_isPrimary], _action);
-				}
-				
+            if (_selectedStateHash != 0)
+            {
+               // UnityEngine.Debug.Log("Edit mode true");
+                //Use is mapping states so no quering keys during gameplay
+                InputManager.EditMode = true;
+
+                _action = InputEx.GetInput();
+
+                if (_action != null && (_action.code ^ (int)KeyCode.Escape) != 0 && (_action.code ^ (int)KeyCode.Return) != 0)
+                {
 
 
-//					Debug.Log ("Action:"+_action+" "+_action.code);
-				}
-				
-				
-				//Debug.Log ("Action:"+action);
-			}
+                    if ((_action.code ^ (int)KeyCode.Backspace) == 0)
+                    {
+                        _stateInputCombinations[_selectedStateHash].combinations[_isPrimary].Clear();
+                        _stateInputCombinations[_selectedStateHash].combinations[_isPrimary].Add(new InputAction(KeyCode.None));
+                    }
+                    else
+                    {
+                        toInputCombination(_stateInputCombinations[_selectedStateHash].combinations[_isPrimary], _action);
+                    }
+
+
+
+                    //					Debug.Log ("Action:"+_action+" "+_action.code);
+                }
+
+
+                //Debug.Log ("Action:"+action);
+            }
+            else
+            {
+               // UnityEngine.Debug.Log("Edit mode false");
+                //Continue gameplay
+                InputManager.EditMode = false;
+            }
 			
 
 		}

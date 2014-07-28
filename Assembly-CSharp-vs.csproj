@@ -79,7 +79,7 @@
      <Compile Include="Assets\Scripts\ws\winx\platform\OSX\CoreFoundation.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\OSX\OSXDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\OSX\OSXHIDInterface.cs" />
-     <Compile Include="Assets\Scripts\ws\winx\platform\Web\Class1.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Web\GamePadJSON.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Web\WebDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Web\WebHIDBehaviour.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Web\WebHIDInterface.cs" />
@@ -88,9 +88,11 @@
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\WinMMDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\XInputDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\unity\Tags.cs" />
+     <None Include="Assets\StreamingAssets\Copy of InputSettingsBck.xml" />
      <None Include="Assets\StreamingAssets\InputSettings.xml" />
      <None Include="Assets\Necromancer GUI\Kingthings.txt" />
      <None Include="Assets\Necromancer GUI\Readme.txt" />
+     <None Include="Assets\StreamingAssets\InputSettingsBck.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

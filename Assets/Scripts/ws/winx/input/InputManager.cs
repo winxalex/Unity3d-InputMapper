@@ -21,19 +21,25 @@ using System.ComponentModel;
 using ws.winx.devices;
 using System.Threading;
 
-namespace ws.winx.input
+namespace ws.winx.input 
 {
 
     public static class InputManager
     {
        
-
-       
+		       
        
 		private static InputCombination[] __inputCombinations;
 		private static InputSettings __settings;//=new InputSettings();
 		private static IHIDInterface __hidInterface;//=new ws.winx.platform.windows.WinHIDInterface();
         private static List<IJoystickDriver> __drivers;
+
+
+        /// <summary>
+        /// Edit Mode = true stops all keys quering and checks while gameplay. Useful when use open UI to map keys to states
+        /// 
+        /// </summary>
+        public static bool EditMode = false;
 
 
 
@@ -74,6 +80,11 @@ namespace ws.winx.input
 		}
 
 
+        /// <summary>
+        /// Returns joystick list of Type T (Idea is to get Joystick and set/use some special ablitiy like SetMotor)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static List<T> GetJoysticks<T>()
         {
             IDeviceCollection devices = InputManager.hidInterface.Devices;
@@ -93,7 +104,10 @@ namespace ws.winx.input
             return Result;
         }
 
-
+        /// <summary>
+        /// Add driver that would support custom device (see WinMMDriver,OSXDriver...for HOW TO)
+        /// </summary>
+        /// <param name="driver"></param>
 		public static void AddDriver(IJoystickDriver driver){
             if(__drivers==null) __drivers= new List<IJoystickDriver>();
             __drivers.Add(driver);
@@ -377,7 +391,7 @@ namespace ws.winx.input
 
 
 
-		#if (UNITY_WEBPLAYER	|| UNITY_EDITOR) && !UNITY_STANDALONE
+		#if (UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE
 		/// <summary>
 		/// Loads the Input settings from InputSettings.xml and deserialize into OO structure.
 		/// Create your .xml settings with InputMapper Editor
@@ -407,23 +421,11 @@ namespace ws.winx.input
                 yield break;
             }
 
-            loadSettingsFromText(www.text);
-
            
+            StringReader stringReader = new StringReader(www.text);
 
-          yield break;
-          
-        }
-#endif
-
-        public static void loadSettingsFromText(string text,bool readBOM=true)
-        {
-            XmlReaderSettings xmlSettings = new XmlReaderSettings();
-            xmlSettings.CloseInput = true;
-            xmlSettings.IgnoreWhitespace = true;
-            StringReader stringReader = new StringReader(text);
-            if(readBOM)
             stringReader.Read();//skip BOM
+
             using (XmlReader reader = XmlReader.Create(stringReader, xmlSettings))
             {
                 __settings = new InputSettings();
@@ -536,6 +538,145 @@ namespace ws.winx.input
             }
 
             stringReader.Close();
+
+           
+
+          
+
+          yield break;
+          
+        }
+#endif
+
+        public static void loadSettingsFromText(string text,bool readBOM=true)
+        {
+            XmlReaderSettings xmlSettings = new XmlReaderSettings();
+            xmlSettings.CloseInput = true;
+            xmlSettings.IgnoreWhitespace = true;
+            StringReader stringReader = new StringReader(text);
+
+          
+            if(readBOM)
+            stringReader.Read();//skip BOM
+
+            using (XmlReader reader = XmlReader.Create(stringReader, xmlSettings))
+            {
+                __settings = new InputSettings();
+
+                int key;
+
+                InputAction action;
+                List<InputAction> actions = null;
+                InputCombination[] combinations = null;
+                string name;
+                InputState state;
+                int i;
+                //XmlNameTable nameTable = reader.NameTable;
+                //XmlNamespaceManager nsManager = new XmlNamespaceManager(nameTable);
+                //nsManager.AddNamespace("d1p1", "http://schemas.datacontract.org/2004/07/ws.winx.input");
+
+                reader.ReadToFollowing("d1p1:doubleDesignator");
+                __settings.doubleDesignator = reader.ReadElementContentAsString();
+
+
+                __settings.longDesignator = reader.ReadElementContentAsString();
+
+
+                __settings.spaceDesignator = reader.ReadElementContentAsString();
+
+
+
+
+                __settings.singleClickSensitivity = reader.ReadElementContentAsFloat();
+
+
+                __settings.doubleClickSensitivity = reader.ReadElementContentAsFloat();
+
+
+                __settings.longClickSensitivity = reader.ReadElementContentAsFloat();
+
+
+                __settings.combinationsClickSensitivity = reader.ReadElementContentAsFloat();
+
+                if (reader.ReadToFollowing("d2p1:KeyValueOfintInputState"))
+                {
+
+
+                    do
+                    {
+                        reader.ReadToDescendant("d2p1:Key");
+
+                        key = reader.ReadElementContentAsInt();
+
+
+
+
+                        if (reader.ReadToFollowing("d1p1:InputCombination"))
+                        {
+
+                            combinations = new InputCombination[2];
+                            i = 0;
+
+                            do
+                            {
+                                if (reader.GetAttribute("i:nil") == null)
+                                {
+
+
+                                    if (reader.ReadToDescendant("d1p1:InputAction"))
+                                    {
+                                        actions = new List<InputAction>();
+
+                                        do
+                                        {
+                                            reader.ReadToDescendant("d1p1:Code");
+
+                                            action = new InputAction(reader.ReadElementContentAsString());
+
+                                            actions.Add(action);
+
+                                        } while (reader.ReadToNextSibling("d1p1:InputAction"));
+
+
+                                    }
+
+
+
+
+                                    combinations[i++] = new InputCombination(actions);
+
+                                    reader.Read();//read </InputCombination>
+
+                                }
+
+
+
+                            } while (reader.ReadToNextSibling("d1p1:InputCombination"));
+
+
+
+                        }
+
+                        reader.ReadToFollowing("d1p1:Name");
+                        name = reader.ReadElementContentAsString();
+                        state = new InputState(name, key);
+                        state.combinations = combinations;
+                        __settings.stateInputs[key] = state;
+
+
+                        reader.Read();//</d2p1:KeyValueOfintInputState>
+
+                    } while (reader.ReadToNextSibling("d2p1:KeyValueOfintInputState"));
+                }
+            }
+
+            stringReader.Close();
+
+           // UnityEngine.Debug.Log("end reader");
+
+          
+
+
         }
 
 
@@ -546,7 +687,7 @@ namespace ws.winx.input
             Debug.Log("WaitAndPrint " + Time.time);
         }
 
-		#if (UNITY_EDITOR || UNITY_WEBPLAYER) && !UNITY_STANDALONE
+		#if UNITY_WEBPLAYER && !UNITY_EDITOR
 		public static IEnumerator saveSettings(String path){
 
 			//TODO manual serialization
@@ -561,6 +702,121 @@ namespace ws.winx.input
 		}
 		#endif
 
+
+        #if UNITY_WEBPLAYER && UNITY_EDITOR
+       public static void saveSettings(string path){
+           XmlWriterSettings xmlSettings = new XmlWriterSettings();
+           xmlSettings.Indent = true;
+           xmlSettings.CloseOutput = true;//this would close stream after write 
+          
+
+         string HEADFORMAT="<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+
+"<Inputs xmlns:d1p1=\"http://schemas.datacontract.org/2004/07/ws.winx.input\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\">"+
+ " <d1p1:doubleDesignator>{0}</d1p1:doubleDesignator>"+
+ " <d1p1:longDesignator>{1}</d1p1:longDesignator>"+
+ " <d1p1:spaceDesignator>{2}</d1p1:spaceDesignator>"+
+ " <d1p1:singleClickSensitivity>{3}</d1p1:singleClickSensitivity>"+
+ " <d1p1:doubleClickSensitivity>{4}</d1p1:doubleClickSensitivity>"+
+"  <d1p1:longClickSensitivity>{5}</d1p1:longClickSensitivity>"+
+"  <d1p1:combinationsClickSensitivity>{6}</d1p1:combinationsClickSensitivity>"+
+"  <d1p1:StateInputs xmlns:d2p1=\"http://schemas.microsoft.com/2003/10/Serialization/Arrays\">"+
+ " {7}"+
+ "      </d1p1:StateInputs>"+
+"</Inputs>";
+
+           string STATEFORMAT=" <d2p1:KeyValueOfintInputState>"+
+     " <d2p1:Key>{0}</d2p1:Key>"+
+     " <d2p1:Value>"+
+      "  <d1p1:Hash>{0}</d1p1:Hash>"+
+       " <d1p1:InputCombinations>"+
+          " {1}"+
+       
+       " </d1p1:InputCombinations>"+
+      "  <d1p1:Name>{2}</d1p1:Name>"+
+     " </d2p1:Value>"+
+    "</d2p1:KeyValueOfintInputState>";
+
+
+string COMBINATIONFORMAT=
+        "   <d1p1:InputCombination>"+
+       "     <d1p1:InputActions>"+
+      "{0}"+
+       "     </d1p1:InputActions>"+
+      "   </d1p1:InputCombination>";
+
+string ACTIONFORMAT=
+           "       <d1p1:InputAction>"+
+     "         <d1p1:Code>{0}</d1p1:Code>"+
+       "       </d1p1:InputAction>";
+           string actionsString;
+
+          // 
+           Dictionary<int,InputState> stateInputs=InputManager.Settings.stateInputs;
+           InputCombination[] combinations;
+           InputCombination combination;
+           
+           int key;
+           StringBuilder sb = new StringBuilder(10000);
+           StringBuilder combinationSB = new StringBuilder(100);
+
+           
+           foreach(KeyValuePair<int,InputState> stateInput in stateInputs){
+               key=stateInput.Key;
+               combinations=stateInput.Value.combinations;
+
+               combinationSB.Length = 0;
+              
+
+               if((combination=combinations[0])!=null){
+                   actionsString = "";
+
+                   foreach(InputAction action in combination.actions){
+                       actionsString+=String.Format(ACTIONFORMAT,action.ToString());
+                   }
+
+                   combinationSB.AppendFormat(COMBINATIONFORMAT, actionsString);
+               }
+
+               if ((combination = combinations[1]) != null)
+               {
+                   actionsString = "";
+                   foreach (InputAction action in combination.actions)
+                   {
+                       actionsString += String.Format(ACTIONFORMAT, action.ToString());
+                   }
+
+                   combinationSB.AppendFormat(COMBINATIONFORMAT, actionsString);
+               }
+
+
+               sb.AppendFormat(STATEFORMAT, key,  combinationSB.ToString(), stateInput.Value.name);
+
+               //stateInput.Value.name
+           }
+
+
+
+           using (XmlWriter writer = XmlWriter.Create(path, xmlSettings))
+           {
+              InputSettings settings=InputManager.Settings;
+               writer.WriteRaw(
+                   String.Format(HEADFORMAT,settings.doubleDesignator,settings.longDesignator,settings.spaceDesignator,settings.singleClickSensitivity,settings.doubleClickSensitivity,settings.longClickSensitivity,settings.combinationsClickSensitivity,
+                               sb.ToString()));
+               
+
+
+
+               //Write the XML to file and close the writer.
+               writer.Flush();
+               writer.Close();
+
+
+           }
+
+
+
+       }
+#endif
 
 		#if (UNITY_STANDALONE || UNITY_EDITOR)&& !UNITY_WEBPLAYER
 		/// <summary>
@@ -621,7 +877,10 @@ namespace ws.winx.input
 		/// <param name="dreadzone">Dreadzone.</param>
 		/// <param name="gravity">Gravity.</param>
 		public static float GetInput(int stateNameHash,float sensitivity=0.3f,float dreadzone=0.1f,float gravity=0.3f){
-			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
+           //Use is mapping states so no quering keys during gameplay
+            if (InputManager.EditMode) return 0f;
+            
+            __inputCombinations=__settings.stateInputs[stateNameHash].combinations;
 
 
             return __inputCombinations[0].GetAxis(sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetAxis(sensitivity, dreadzone, gravity) : 0);
@@ -635,6 +894,8 @@ namespace ws.winx.input
 		/// <param name="stateNameHash">State name hash.</param>
 		/// <param name="atOnce" default="false">Affect only in combo inputs!!!(default=false)Function returns true when combination pressed in row  If set to <c>true</c> function return true when all keys/buttons are pressed.</param>
 		public static bool GetInput(int stateNameHash,bool atOnce=false){
+            //Use is mapping states so no quering keys during gameplay
+            if (InputManager.EditMode) return false;
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
             return __inputCombinations[0].GetInput(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInput(atOnce));
         }
@@ -645,6 +906,8 @@ namespace ws.winx.input
 		/// <returns><c>true</c>, if input binded to state happen, <c>false</c> otherwise.</returns>
 		/// <param name="stateNameHash">State name hash.</param>
 		public static bool GetInputUp(int stateNameHash){
+            //Use is mapping states so no quering keys during gameplay
+            if (InputManager.EditMode) return false;
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
             return __inputCombinations[0].GetInputUp() || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp());
 		}
@@ -656,6 +919,8 @@ namespace ws.winx.input
 		/// <param name="stateNameHash">State name hash.</param>
 		
 		public static bool GetInputDown(int stateNameHash){
+            //Use is mapping states so no quering keys during gameplay
+            if (InputManager.EditMode) return false;
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
             return __inputCombinations[0].GetInputDown() || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputDown());
 		}

@@ -43,7 +43,7 @@ namespace ws.winx.platform.web
         public void onHaveGamepadEvents(string message)
         {
 
-             UnityEngine.Debug.Log("onHaveGamepadEvents:" + message);
+             Log("onHaveGamepadEvents:" + message);
 
             if (GamePadEventsSupportEvent!=null)
             {
@@ -117,7 +117,7 @@ namespace ws.winx.platform.web
                                           "UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onDeviceDisconnectedEvent','{0}');"+
                                           "}}";
 
-
+        //FF JSON doesn't work well
         private string GAMEPAD_COMMAND_COMPLEX = "var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);" +
                                         "if(gamepads.length>0 && gamepads[{0}]){{" +
                                         "var gamepad=gamepads[{0}]; var buttons = [];  for (var i = 0; i < gamepad.buttons.length; i++)   buttons[i] = gamepad.buttons[i].value;"+
@@ -153,11 +153,17 @@ namespace ws.winx.platform.web
                 
                 if (PositionUpdateEvent!=null)
                 {
-                    Debug.Log("onJoyGetPos" + message);
+                   // Log("onJoyGetPos" + message);
                     //Debug.Log("Send Event");
                     PositionUpdateEvent(this, new WebMessageArgs(message));
 
                 }
+            }
+
+
+            public void Log(string message)
+            {
+                Application.ExternalEval("console.log('" + message + "')");
             }
 
         void Start()

@@ -189,7 +189,10 @@ public class InputMapper : EditorWindow
 				
 				_lastSettingsXML = settingsXML = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri(fullPath).ToString(), typeof(TextAsset)) as TextAsset;
 
-		_lastSettingsXML = settingsXML = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri(fullPath).ToString(), typeof(TextAsset)) as TextAsset;
+                if (_lastSettingsXML != null)
+                    loadInputSettings(_lastSettingsXML.text);
+
+		//_lastSettingsXML = settingsXML = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri(fullPath).ToString(), typeof(TextAsset)) as TextAsset;
 		//Debug.Log ("Loading Text asset"+settingsXML.name+" from "+path+" full path:"+ fullPath+" rell:"+relRoot+"relativePath:"+relRoot.MakeRelativeUri(fullPath).ToString());
 
 	
@@ -200,10 +203,10 @@ public class InputMapper : EditorWindow
 		/// <summary>
 		/// Loads the input settings 
 		/// </summary>
-		void loadInputSettings (string path)
+		void loadInputSettings (string text)
 		{
 
-				if (path != null && path.Length > 1 && File.Exists (path)) {
+				if (text != null && text.Length > 1) {
 
 						Debug.Log ("Loading..." + _stateInputCombinations);
 
@@ -212,7 +215,8 @@ public class InputMapper : EditorWindow
 						//Debug.Log ("Clone..." + _stateInputCombinations.Count);		
 						
 						//load
-						InputManager.loadSettings (path);
+                        InputManager.loadSettingsFromText(text,false);
+						//InputManager.loadSettings (path);
 
 						//assign settings
 						_doubleClickDesignator = InputManager.Settings.doubleDesignator;
@@ -430,31 +434,37 @@ public class InputMapper : EditorWindow
 		void Update ()
 		{
 				InputState state;
-				if (_selectedStateHash != 0) {
-						_action = InputEx.GetInput ();
-			
-						if (_action != null && (_action.code ^ (int)KeyCode.Escape) != 0 && (_action.code ^ (int)KeyCode.Return) != 0) {
-				
+                if (_selectedStateHash != 0)
+                {
+                    _action = InputEx.GetInput();
 
-				
-								if ((_action.code ^ (int)KeyCode.Backspace) == 0) {
-										state = _stateInputCombinations [_selectedStateHash];
-										state.combinations [_isPrimary].Clear ();
-										state.combinations [_isPrimary].Add (new InputAction (KeyCode.None));
-								
-								} else {
-										
-										toInputCombination (_stateInputCombinations [_selectedStateHash].combinations [_isPrimary], _action);
-								}
-				
-				
-				
-//								Debug.Log ("Action:" + _action + " " + _action.code);
-						}
-			
-			
-						//Debug.Log ("Action:"+action);
-				}
+                    if (_action != null && (_action.code ^ (int)KeyCode.Escape) != 0 && (_action.code ^ (int)KeyCode.Return) != 0)
+                    {
+
+
+
+                        if ((_action.code ^ (int)KeyCode.Backspace) == 0)
+                        {
+                            state = _stateInputCombinations[_selectedStateHash];
+                            state.combinations[_isPrimary].Clear();
+                            state.combinations[_isPrimary].Add(new InputAction(KeyCode.None));
+
+                        }
+                        else
+                        {
+
+                            toInputCombination(_stateInputCombinations[_selectedStateHash].combinations[_isPrimary], _action);
+                        }
+
+
+
+                        //								Debug.Log ("Action:" + _action + " " + _action.code);
+                    }
+
+
+                    //Debug.Log ("Action:"+action);
+                }
+               
 
 				
 
@@ -579,7 +589,7 @@ public class InputMapper : EditorWindow
 						string path = EditorUtility.OpenFilePanel ("Open XML Input Settings file", "", "xml");
 
 					if(path.Length>0){
-			  			 loadInputSettings (path);
+			  			 //loadInputSettings (path);
 
 						loadTextAsset (path);
 				
@@ -624,7 +634,8 @@ public class InputMapper : EditorWindow
 
 				//loadingSettings 
 				if ((!_settingsLoaded && settingsXML != null)) { 
-						loadInputSettings (AssetDatabase.GetAssetPath (settingsXML));
+						//loadInputSettings (AssetDatabase.GetAssetPath (settingsXML));
+                         loadInputSettings(settingsXML.text);
 						_settingsLoaded = true;
 				}
 

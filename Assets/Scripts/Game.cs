@@ -48,14 +48,14 @@ namespace ws.winx
             //if you want to load some states from .xml and add custom manually first load settings xml
             //!!!Application.streamingAssetPath gives "Raw" folder in web player
         
-#if UNITY_STANDALONE
+#if UNITY_STANDALONE && UNITY_EDITOR
             
                    InputManager.loadSettings(Path.Combine(Path.Combine(Application.dataPath, "StreamingAssets"), "InputSettings.xml"));
                 UnityEngine.Debug.Log("Standalone");
 #endif
 
-#if UNITY_WEBPLAYER && !UNITYSTANDALONE
-            UnityEngine.Debug.Log("WebPlayer");
+#if (UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE
+            UnityEngine.Debug.Log("WebPlayer " + Path.Combine(Path.Combine(Application.dataPath, "StreamingAssets"), "InputSettings.xml"));
             yield return StartCoroutine(InputManager.loadSettings(Path.Combine(Path.Combine(Application.dataPath, "StreamingAssets"), "InputSettings.xml")));
 
 #endif
@@ -90,7 +90,7 @@ namespace ws.winx
             //easiest way to map state to combination (ex.of single W and C click)
             InputManager.MapStateToInput("Click_W+C_State", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
 
-            UnityEngine.Debug.Log("Lo:" + InputManager.Log());
+            UnityEngine.Debug.Log("Log:" + InputManager.Log());
 
 
             ////Event Based input handling

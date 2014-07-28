@@ -136,10 +136,10 @@ namespace ws.winx.devices
         {
 
 //
-         //   UnityEngine.Debug.Log("Update"+Time.frameCount+" ponter"+_lastFrameNum);
+        //    UnityEngine.Debug.Log("Update"+Time.frameCount+" ponter"+_lastFrameNum);
            
             //lock is done so no other updates of joystick is done while frame
-            //many Joy.Get could be called in same frame so updates would make values unusable
+            //many Joy.GetXXX could be called in same frame so updates would make JosytickDevice values unusable
                 if (_lastFrameNum == Time.frameCount)
                 {
                     // UnityEngine.Debug.Log("skip cos its same frame");
@@ -365,7 +365,11 @@ namespace ws.winx.devices
 		/// <returns>The input.</returns>
 		public virtual int GetInput(){
             //Debug.Log("Get Input Joydevice");
-            _driver.Update(this);
+
+            //there is no  Time.frameCount in Editor (edit mode - editor scripts)
+            if(Application.isPlaying) Update();
+            else  _driver.Update(this);
+            
 
 
 					int num_axes = _numAxis-numPOV*2;
