@@ -123,10 +123,10 @@ namespace ws.winx.gui
 
 
 #if UNITY_STANDALONE
-                        if(savePath == null)
+			           if(settingsXML == null)
 			                 InputManager.saveSettings(Path.Combine(Application.streamingAssetsPath,settingsXML.name+".xml"));
                         else
-                            InputManager.saveSettings(savePath);
+				InputManager.saveSettings(Path.Combine(Application.streamingAssetsPath,"InputSettings.xml"));
 
 #endif
 				}
@@ -260,6 +260,7 @@ namespace ws.winx.gui
 						GUILayout.Space (20);
 
 						if (_selectedStateHash == 0 && GUILayout.Button ("Save")) {
+
 								saveInputSettings ();
 						}
 

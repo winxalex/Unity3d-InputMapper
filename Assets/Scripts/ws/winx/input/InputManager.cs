@@ -390,118 +390,8 @@ namespace ws.winx.input
 #endif
 
 
-        //public class Timer
-        //{
-        //    private SynchronizationContext syncContext;
-        //    public Timer()
-        //    {
-        //        syncContext = SynchronizationContext.Current;
-        //    }
 
-        //    public event EventHandler Tick;
-
-        //    private void OnTick()
-        //    {
-        //        syncContext.Send(state =>
-        //        {
-        //            if (Tick != null)
-        //                Tick(this, EventArgs.Empty);
-        //        }, null);
-        //    }
-
-        //    //TODO other stuff to actually fire the tick event
-        //}
-
-        public static System.Timers.Timer timer;
-        private static SynchronizationContext syncContext;
-       // private static WWW www=null;
-		public static int mainThreadID;
-
-		public static ExecutionContext m_ExecContext;
-
-		public static void load(WWW www)//(string path)
-        {
-           // if (Application.isEditor)
-           //     path = "file:///" + path;
-
-            
-
-			m_ExecContext = ExecutionContext.Capture ();//SynchronizationContext.Current;
-           
-			mainThreadID=System.Threading.Thread.CurrentThread.ManagedThreadId;
-			UnityEngine.Debug.Log("onStart"+System.Threading.Thread.CurrentThread.ManagedThreadId);
-
-           // timer = new Timer();
-
-           // timer = new Timer(onTimer, www, 0, 500);
-           // Marshal.Po
-          
-            timer = new System.Timers.Timer(500);
-			timer.Elapsed += new System.Timers.ElapsedEventHandler((sender, args) => checkWWW(sender, args, www));
-            timer.Enabled = true;
-			//timer.SynchronizingObject=this;
-
-
-        }
-//
-//        public static bool check(object state)
-//        {
-//            return www.isDone;
-//        }
-
-        //public static void onTimer(object obj)
-        public static void checkWWW(object sender, System.Timers.ElapsedEventArgs args, WWW www)
-        {
-            //if (!string.IsNullOrEmpty(www.error))
-            //{
-            //    Debug.LogError("Load Failed");
-            //    (sender as System.Timers.Timer).Stop();
-            //    //dispatch Error event
-            //    return;
-            //}
-			//System.Runtime.Serialization.Formatters.B
-			Debug.Log("TimeEvent at "+System.Threading.Thread.CurrentThread.ManagedThreadId);
-			if(mainThreadID==System.Threading.Thread.CurrentThread.ManagedThreadId){
-				Debug.Log("Check on "+System.Threading.Thread.CurrentThread.ManagedThreadId);
-				Debug.Log(www.isDone);
-			}
-				//				Debug.Log("Created on "+System.Threading.Thread.CurrentThread.ManagedThreadId);
-//			if(www==null && mainThreadID==System.Threading.Thread.CurrentThread.ManagedThreadId){
-//				Debug.Log("Created on "+System.Threading.Thread.CurrentThread.ManagedThreadId);
-//				www = new WWW(path);
-//
-//			}
-
-			//Invoke((MethodInvoker)delegate { QChanged(sender, e); });
-           // WWW www = obj as WWW;
-
-           // bool result=action();
-			//if(mainThreadID==System.Threading.Thread.CurrentThread.ManagedThreadId)
-			//ExecutionContext.Run(m_ExecContext.CreateCopy(),CallbackInContext,www);
-           // UnityEngine.Debug.Log(result);
-
-             //syncContext.Send(bla =>
-             //   {
-             //       Debug.Log("www is Enter"+bla);
-             //       if (www.isDone)
-             //       {
-             //           //(sender as System.Timers.Timer).Stop();
-             //           Debug.Log("www is Donew");
-
-             //       }
-             //   }, null);
-
-           
-        }
-
-		static void CallbackInContext(object state)
-		{
-			UnityEngine.Debug.Log("Calle"+System.Threading.Thread.CurrentThread.ManagedThreadId);
-            Debug.Log(m_ExecContext.GetHashCode() + " " + System.Threading.Thread.CurrentThread.GetHashCode());
-
-			// The state is not used in this example.
-			if((state as WWW).isDone==true) UnityEngine.Debug.Log("Mile");
-		}
+   
 
 
 		#if (UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE
@@ -794,26 +684,30 @@ namespace ws.winx.input
 
 
 
-        static IEnumerator WaitAndPrint(float waitTime)
-        {
-            yield return new WaitForSeconds(waitTime);
-            Debug.Log("WaitAndPrint " + Time.time);
-        }
+       
 
 		#if UNITY_WEBPLAYER && !UNITY_EDITOR
 		public static IEnumerator saveSettings(String url){
 
-			WWWForm wwwForm=new WWWForm();
-			wwwForm.AddField("data",formatOutput);
+        //V1
+			//WWWForm wwwForm=new WWWForm();
+			//wwwForm.AddField("data",formatOutput);
 
-			WWW www=new WWW(url,wwwForm);
+			//WWW www=new WWW(url,wwwForm);
 
+           
+            string str=formatOutput();
+            byte[] bytes = new byte[str.Length * sizeof(char)];
+            System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+            WWW www=new WWW(url,bytes);
+           
+           
 
 			yield return www;
 
             if(www.error!=null) UnityEngine.Debug.LogError(www.error);
 		}
-		#endif
+#endif
 
 
         public static string formatOutput()

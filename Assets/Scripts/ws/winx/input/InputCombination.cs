@@ -158,6 +158,9 @@ namespace ws.winx.input
 		public void Add(InputAction action){
 			_actionsList.Add(action);
 			_combinationString=ToString(_actionsList);
+
+            //if(_actionsList.Count>0)
+            initPointer();
 		}
 
 		public void Clear(){
