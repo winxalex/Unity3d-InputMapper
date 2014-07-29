@@ -49,9 +49,9 @@
       </d2p1:Value>
     </d2p1:KeyValueOfintInputState>
     <d2p1:KeyValueOfintInputState>
-      <d2p1:Key>-648469621</d2p1:Key>
+      <d2p1:Key>-977892492</d2p1:Key>
       <d2p1:Value>
-        <d1p1:Hash>-648469621</d1p1:Hash>
+        <d1p1:Hash>-977892492</d1p1:Hash>
         <d1p1:InputCombinations>
           <d1p1:InputCombination>
             <d1p1:InputActions>
@@ -65,7 +65,7 @@
           </d1p1:InputCombination>
           <d1p1:InputCombination i:nil="true" />
         </d1p1:InputCombinations>
-        <d1p1:Name>Click_W+C_State</d1p1:Name>
+        <d1p1:Name>ManualAddedSTATE</d1p1:Name>
       </d2p1:Value>
     </d2p1:KeyValueOfintInputState>
   </d1p1:StateInputs>

@@ -30,8 +30,8 @@ namespace ws.winx
 
 
 
-        Animator animator;
-		bool _settingsLoaded;
+        Animator animator=null;
+		bool _settingsLoaded=false;
 
 
         // Use this for initialization
@@ -52,7 +52,7 @@ namespace ws.winx
             //if you want to load some states from .xml and add custom manually first load settings xml
             //!!!Application.streamingAssetPath gives "Raw" folder in web player
         
-#if UNITY_STANDALONE && UNITY_EDITOR
+#if UNITY_STANDALONE || UNITY_EDITOR
 			UnityEngine.Debug.Log("Standalone");
                    InputManager.loadSettings(Path.Combine(Path.Combine(Application.dataPath, "StreamingAssets"), "InputSettings.xml"));
 
@@ -70,13 +70,13 @@ namespace ws.winx
 			
 			
 			//easiest way to map state to combination (ex.of single W and C click)
-			InputManager.MapStateToInput("Click_W+C_State", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
+            InputManager.MapStateToInput("ManualAddedSTATE", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
 			
 			UnityEngine.Debug.Log("Log:" + InputManager.Log());
 			
 			
 			////Event Based input handling
-			InputEvent ev = new InputEvent("Click_W+C_State");
+            InputEvent ev = new InputEvent("ManualAddedSTATE");
 			//InputEvent ev = new InputEvent((int)States.SomeState);
 			
 			ev.INPUT += new EventHandler(Handle1);
@@ -159,13 +159,13 @@ namespace ws.winx
 			
 			
 			//easiest way to map state to combination (ex.of single W and C click)
-			InputManager.MapStateToInput("Click_W+C_State", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
+			InputManager.MapStateToInput("ManualAddedSTATE", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
 			
 			UnityEngine.Debug.Log("Log:" + InputManager.Log());
 			
 			
 			////Event Based input handling
-			InputEvent ev = new InputEvent("Click_W+C_State");
+			InputEvent ev = new InputEvent("ManualAddedSTATE");
 			//InputEvent ev = new InputEvent((int)States.SomeState);
 			
 			ev.INPUT += new EventHandler(Handle1);
@@ -186,7 +186,7 @@ namespace ws.winx
         {
              Debug.Log(((WWW)args.data).error);
         }
-		#endif
+#endif
 
 
 
@@ -197,7 +197,9 @@ namespace ws.winx
 			//Use is mapping states so no quering keys during gameplay
 			if (InputManager.EditMode ||  !_settingsLoaded) return ;
 
-            if (InputManager.GetInputDown((int)States.Wave))
+
+            //Input.GetInput allows combos (combined input actions)
+            if (InputManager.GetInputDown((int)States.Wave) || InputManager.GetInput((int)States.Wave,true))
             {
                 Debug.Log("Wave Down");
                 animator.Play((int)States.Wave);

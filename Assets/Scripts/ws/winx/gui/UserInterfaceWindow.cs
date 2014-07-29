@@ -43,7 +43,8 @@ namespace ws.winx.gui
 				public int maxCombosNum = 3;
 				public GUISkin guiSkin;
 				public TextAsset settingsXML;
-				//public bool allowDuplicates=false;
+                public Rect windowRect = new Rect(0, 0, 600, 430);
+			//public bool allowDuplicates=false;
 
 				void Start ()
 				{
@@ -191,7 +192,7 @@ namespace ws.winx.gui
 				{
 						GUI.skin = guiSkin;
 
-						GUI.Window (1, new Rect (0, 0, 600, 400), CreateWindow, new GUIContent ());
+						GUI.Window (1,windowRect , CreateWindow, new GUIContent ());
 						//GUI.Window(1, new Rect(0, 0, Screen.width, Screen.height), CreateWindow,new GUIContent());
 
 
@@ -288,7 +289,7 @@ namespace ws.winx.gui
 
 						//(AnimatorEnum)hash
 						//GUILayout.Label(stateName.Remove(0,stateName.IndexOf("Layer")+6).Replace("_"," "),_stateNameLabelStyle);
-
+                        GUILayout.Label(stateName, _stateNameLabelStyle);
 
 
 						if (_selectedStateHash != hash) {

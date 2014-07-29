@@ -51,8 +51,9 @@ namespace ws.winx.input
         }
 
 #if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
-				[DataMember(Name = "Name")]
+                [DataMember(Name = "Name")]
 #endif
+              
         protected string _name;
 
 #if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
