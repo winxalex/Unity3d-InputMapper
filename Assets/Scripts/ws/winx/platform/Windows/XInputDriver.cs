@@ -19,7 +19,7 @@ namespace ws.winx.platform.windows
     {
 
         XInputState state;
-        IHIDInterface _hidInterface;
+//        IHIDInterface _hidInterface;
         int _lastFrameNum = -1;
         IntPtr xInputStatePtr;
 
@@ -221,7 +221,7 @@ namespace ws.winx.platform.windows
             XInputDevice joystick;
             int inx = 0;
 
-            _hidInterface = info.hidInterface;
+           // _hidInterface = info.hidInterface;
 
 
             joystick = new XInputDevice(info.index, info.PID, info.VID, 8, 10, this, type);

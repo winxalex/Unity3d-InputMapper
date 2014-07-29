@@ -20,6 +20,7 @@ using ws.winx.platform;
 using System.ComponentModel;
 using ws.winx.devices;
 using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace ws.winx.input 
 {
@@ -42,7 +43,7 @@ namespace ws.winx.input
         public static bool EditMode = false;
 
 
-
+     
       
 
 		internal static IHIDInterface hidInterface{
@@ -389,6 +390,118 @@ namespace ws.winx.input
 #endif
 
 
+        //public class Timer
+        //{
+        //    private SynchronizationContext syncContext;
+        //    public Timer()
+        //    {
+        //        syncContext = SynchronizationContext.Current;
+        //    }
+
+        //    public event EventHandler Tick;
+
+        //    private void OnTick()
+        //    {
+        //        syncContext.Send(state =>
+        //        {
+        //            if (Tick != null)
+        //                Tick(this, EventArgs.Empty);
+        //        }, null);
+        //    }
+
+        //    //TODO other stuff to actually fire the tick event
+        //}
+
+        public static System.Timers.Timer timer;
+        private static SynchronizationContext syncContext;
+       // private static WWW www=null;
+		public static int mainThreadID;
+
+		public static ExecutionContext m_ExecContext;
+
+		public static void load(WWW www)//(string path)
+        {
+           // if (Application.isEditor)
+           //     path = "file:///" + path;
+
+            
+
+			m_ExecContext = ExecutionContext.Capture ();//SynchronizationContext.Current;
+           
+			mainThreadID=System.Threading.Thread.CurrentThread.ManagedThreadId;
+			UnityEngine.Debug.Log("onStart"+System.Threading.Thread.CurrentThread.ManagedThreadId);
+
+           // timer = new Timer();
+
+           // timer = new Timer(onTimer, www, 0, 500);
+           // Marshal.Po
+          
+            timer = new System.Timers.Timer(500);
+			timer.Elapsed += new System.Timers.ElapsedEventHandler((sender, args) => checkWWW(sender, args, www));
+            timer.Enabled = true;
+			//timer.SynchronizingObject=this;
+
+
+        }
+//
+//        public static bool check(object state)
+//        {
+//            return www.isDone;
+//        }
+
+        //public static void onTimer(object obj)
+        public static void checkWWW(object sender, System.Timers.ElapsedEventArgs args, WWW www)
+        {
+            //if (!string.IsNullOrEmpty(www.error))
+            //{
+            //    Debug.LogError("Load Failed");
+            //    (sender as System.Timers.Timer).Stop();
+            //    //dispatch Error event
+            //    return;
+            //}
+			//System.Runtime.Serialization.Formatters.B
+			Debug.Log("TimeEvent at "+System.Threading.Thread.CurrentThread.ManagedThreadId);
+			if(mainThreadID==System.Threading.Thread.CurrentThread.ManagedThreadId){
+				Debug.Log("Check on "+System.Threading.Thread.CurrentThread.ManagedThreadId);
+				Debug.Log(www.isDone);
+			}
+				//				Debug.Log("Created on "+System.Threading.Thread.CurrentThread.ManagedThreadId);
+//			if(www==null && mainThreadID==System.Threading.Thread.CurrentThread.ManagedThreadId){
+//				Debug.Log("Created on "+System.Threading.Thread.CurrentThread.ManagedThreadId);
+//				www = new WWW(path);
+//
+//			}
+
+			//Invoke((MethodInvoker)delegate { QChanged(sender, e); });
+           // WWW www = obj as WWW;
+
+           // bool result=action();
+			//if(mainThreadID==System.Threading.Thread.CurrentThread.ManagedThreadId)
+			//ExecutionContext.Run(m_ExecContext.CreateCopy(),CallbackInContext,www);
+           // UnityEngine.Debug.Log(result);
+
+             //syncContext.Send(bla =>
+             //   {
+             //       Debug.Log("www is Enter"+bla);
+             //       if (www.isDone)
+             //       {
+             //           //(sender as System.Timers.Timer).Stop();
+             //           Debug.Log("www is Donew");
+
+             //       }
+             //   }, null);
+
+           
+        }
+
+		static void CallbackInContext(object state)
+		{
+			UnityEngine.Debug.Log("Calle"+System.Threading.Thread.CurrentThread.ManagedThreadId);
+            Debug.Log(m_ExecContext.GetHashCode() + " " + System.Threading.Thread.CurrentThread.GetHashCode());
+
+			// The state is not used in this example.
+			if((state as WWW).isDone==true) UnityEngine.Debug.Log("Mile");
+		}
 
 
 		#if (UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE
@@ -539,11 +652,11 @@ namespace ws.winx.input
 
             stringReader.Close();
 
-           
+         
 
           
 
-          yield break;
+          //yield break;
           
         }
 #endif
@@ -688,20 +801,115 @@ namespace ws.winx.input
         }
 
 		#if UNITY_WEBPLAYER && !UNITY_EDITOR
-		public static IEnumerator saveSettings(String path){
-
-			//TODO manual serialization
+		public static IEnumerator saveSettings(String url){
 
 			WWWForm wwwForm=new WWWForm();
-			//wwwForm.AddField(
+			wwwForm.AddField("data",formatOutput);
 
-			WWW www=new WWW(path);
+			WWW www=new WWW(url,wwwForm);
 
 
 			yield return www;
+
+            if(www.error!=null) UnityEngine.Debug.LogError(www.error);
 		}
 		#endif
 
+
+        public static string formatOutput()
+        {
+
+            string HEADFORMAT = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+   "<Inputs xmlns:d1p1=\"http://schemas.datacontract.org/2004/07/ws.winx.input\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+    " <d1p1:doubleDesignator>{0}</d1p1:doubleDesignator>" +
+    " <d1p1:longDesignator>{1}</d1p1:longDesignator>" +
+    " <d1p1:spaceDesignator>{2}</d1p1:spaceDesignator>" +
+    " <d1p1:singleClickSensitivity>{3}</d1p1:singleClickSensitivity>" +
+    " <d1p1:doubleClickSensitivity>{4}</d1p1:doubleClickSensitivity>" +
+   "  <d1p1:longClickSensitivity>{5}</d1p1:longClickSensitivity>" +
+   "  <d1p1:combinationsClickSensitivity>{6}</d1p1:combinationsClickSensitivity>" +
+   "  <d1p1:StateInputs xmlns:d2p1=\"http://schemas.microsoft.com/2003/10/Serialization/Arrays\">" +
+    " {7}" +
+    "      </d1p1:StateInputs>" +
+   "</Inputs>";
+
+            string STATEFORMAT = " <d2p1:KeyValueOfintInputState>" +
+      " <d2p1:Key>{0}</d2p1:Key>" +
+      " <d2p1:Value>" +
+       "  <d1p1:Hash>{0}</d1p1:Hash>" +
+        " <d1p1:InputCombinations>" +
+           " {1}" +
+
+        " </d1p1:InputCombinations>" +
+       "  <d1p1:Name>{2}</d1p1:Name>" +
+      " </d2p1:Value>" +
+     "</d2p1:KeyValueOfintInputState>";
+
+
+            string COMBINATIONFORMAT =
+                    "   <d1p1:InputCombination>" +
+                   "     <d1p1:InputActions>" +
+                  "{0}" +
+                   "     </d1p1:InputActions>" +
+                  "   </d1p1:InputCombination>";
+
+            string ACTIONFORMAT =
+                       "       <d1p1:InputAction>" +
+                 "         <d1p1:Code>{0}</d1p1:Code>" +
+                   "       </d1p1:InputAction>";
+            string actionsString;
+
+            // 
+            Dictionary<int, InputState> stateInputs = InputManager.Settings.stateInputs;
+            InputCombination[] combinations;
+            InputCombination combination;
+
+            int key;
+            StringBuilder sb = new StringBuilder(10000);
+            StringBuilder combinationSB = new StringBuilder(100);
+
+
+            foreach (KeyValuePair<int, InputState> stateInput in stateInputs)
+            {
+                key = stateInput.Key;
+                combinations = stateInput.Value.combinations;
+
+                combinationSB.Length = 0;
+
+
+                if ((combination = combinations[0]) != null)
+                {
+                    actionsString = "";
+
+                    foreach (InputAction action in combination.actions)
+                    {
+                        actionsString += String.Format(ACTIONFORMAT, action.ToString());
+                    }
+
+                    combinationSB.AppendFormat(COMBINATIONFORMAT, actionsString);
+                }
+
+                if ((combination = combinations[1]) != null)
+                {
+                    actionsString = "";
+                    foreach (InputAction action in combination.actions)
+                    {
+                        actionsString += String.Format(ACTIONFORMAT, action.ToString());
+                    }
+
+                    combinationSB.AppendFormat(COMBINATIONFORMAT, actionsString);
+                }
+
+
+                sb.AppendFormat(STATEFORMAT, key, combinationSB.ToString(), stateInput.Value.name);
+
+                //stateInput.Value.name
+            }
+
+            InputSettings settings = InputManager.Settings;
+            return String.Format(HEADFORMAT, settings.doubleDesignator, settings.longDesignator, settings.spaceDesignator, settings.singleClickSensitivity, settings.doubleClickSensitivity, settings.longClickSensitivity, settings.combinationsClickSensitivity,
+                                sb.ToString());
+        }
 
         #if UNITY_WEBPLAYER && UNITY_EDITOR
        public static void saveSettings(string path){
@@ -710,98 +918,13 @@ namespace ws.winx.input
            xmlSettings.CloseOutput = true;//this would close stream after write 
           
 
-         string HEADFORMAT="<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+
-"<Inputs xmlns:d1p1=\"http://schemas.datacontract.org/2004/07/ws.winx.input\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\">"+
- " <d1p1:doubleDesignator>{0}</d1p1:doubleDesignator>"+
- " <d1p1:longDesignator>{1}</d1p1:longDesignator>"+
- " <d1p1:spaceDesignator>{2}</d1p1:spaceDesignator>"+
- " <d1p1:singleClickSensitivity>{3}</d1p1:singleClickSensitivity>"+
- " <d1p1:doubleClickSensitivity>{4}</d1p1:doubleClickSensitivity>"+
-"  <d1p1:longClickSensitivity>{5}</d1p1:longClickSensitivity>"+
-"  <d1p1:combinationsClickSensitivity>{6}</d1p1:combinationsClickSensitivity>"+
-"  <d1p1:StateInputs xmlns:d2p1=\"http://schemas.microsoft.com/2003/10/Serialization/Arrays\">"+
- " {7}"+
- "      </d1p1:StateInputs>"+
-"</Inputs>";
-
-           string STATEFORMAT=" <d2p1:KeyValueOfintInputState>"+
-     " <d2p1:Key>{0}</d2p1:Key>"+
-     " <d2p1:Value>"+
-      "  <d1p1:Hash>{0}</d1p1:Hash>"+
-       " <d1p1:InputCombinations>"+
-          " {1}"+
-       
-       " </d1p1:InputCombinations>"+
-      "  <d1p1:Name>{2}</d1p1:Name>"+
-     " </d2p1:Value>"+
-    "</d2p1:KeyValueOfintInputState>";
-
-
-string COMBINATIONFORMAT=
-        "   <d1p1:InputCombination>"+
-       "     <d1p1:InputActions>"+
-      "{0}"+
-       "     </d1p1:InputActions>"+
-      "   </d1p1:InputCombination>";
-
-string ACTIONFORMAT=
-           "       <d1p1:InputAction>"+
-     "         <d1p1:Code>{0}</d1p1:Code>"+
-       "       </d1p1:InputAction>";
-           string actionsString;
-
-          // 
-           Dictionary<int,InputState> stateInputs=InputManager.Settings.stateInputs;
-           InputCombination[] combinations;
-           InputCombination combination;
-           
-           int key;
-           StringBuilder sb = new StringBuilder(10000);
-           StringBuilder combinationSB = new StringBuilder(100);
-
-           
-           foreach(KeyValuePair<int,InputState> stateInput in stateInputs){
-               key=stateInput.Key;
-               combinations=stateInput.Value.combinations;
-
-               combinationSB.Length = 0;
-              
-
-               if((combination=combinations[0])!=null){
-                   actionsString = "";
-
-                   foreach(InputAction action in combination.actions){
-                       actionsString+=String.Format(ACTIONFORMAT,action.ToString());
-                   }
-
-                   combinationSB.AppendFormat(COMBINATIONFORMAT, actionsString);
-               }
-
-               if ((combination = combinations[1]) != null)
-               {
-                   actionsString = "";
-                   foreach (InputAction action in combination.actions)
-                   {
-                       actionsString += String.Format(ACTIONFORMAT, action.ToString());
-                   }
-
-                   combinationSB.AppendFormat(COMBINATIONFORMAT, actionsString);
-               }
-
-
-               sb.AppendFormat(STATEFORMAT, key,  combinationSB.ToString(), stateInput.Value.name);
-
-               //stateInput.Value.name
-           }
 
 
 
            using (XmlWriter writer = XmlWriter.Create(path, xmlSettings))
            {
-              InputSettings settings=InputManager.Settings;
-               writer.WriteRaw(
-                   String.Format(HEADFORMAT,settings.doubleDesignator,settings.longDesignator,settings.spaceDesignator,settings.singleClickSensitivity,settings.doubleClickSensitivity,settings.longClickSensitivity,settings.combinationsClickSensitivity,
-                               sb.ToString()));
+             
+               writer.WriteRaw( formatOutput());
                
 
 
@@ -814,7 +937,7 @@ string ACTIONFORMAT=
            }
 
 
-
+			Debug.Log(InputManager.Log());
        }
 #endif
 
@@ -919,8 +1042,8 @@ string ACTIONFORMAT=
 		/// <param name="stateNameHash">State name hash.</param>
 		
 		public static bool GetInputDown(int stateNameHash){
-            //Use is mapping states so no quering keys during gameplay
-            if (InputManager.EditMode) return false;
+			//Use is mapping states so no quering keys during gameplay
+			if (InputManager.EditMode) return false;
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
             return __inputCombinations[0].GetInputDown() || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputDown());
 		}
@@ -1062,7 +1185,8 @@ string ACTIONFORMAT=
 
 
 
-      
+
+
     }
 }
 

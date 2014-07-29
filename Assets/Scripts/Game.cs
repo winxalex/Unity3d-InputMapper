@@ -12,6 +12,7 @@ using ws.winx.devices;
 using ws.winx.input.states;
 using System.Collections;
 using ws.winx.gui;
+using ws.winx.unity;
 
 namespace ws.winx
 {
@@ -30,12 +31,15 @@ namespace ws.winx
 
 
         Animator animator;
+		bool _settingsLoaded;
+
 
         // Use this for initialization
-        IEnumerator Start()
+        void Start()
         {
             animator = GameObject.FindObjectOfType<Animator>();
 
+            
 
 
             //supporting devices with custom drivers
@@ -49,60 +53,63 @@ namespace ws.winx
             //!!!Application.streamingAssetPath gives "Raw" folder in web player
         
 #if UNITY_STANDALONE && UNITY_EDITOR
-            
+			UnityEngine.Debug.Log("Standalone");
                    InputManager.loadSettings(Path.Combine(Path.Combine(Application.dataPath, "StreamingAssets"), "InputSettings.xml"));
-                UnityEngine.Debug.Log("Standalone");
+
+			UserInterfaceWindow ui=this.GetComponent<UserInterfaceWindow>();
+			if(ui!=null && ui.settingsXML==null){
+				ui.StateInputCombinations=InputManager.Settings.stateInputs;
+			}
+
+
+			//		adding input-states pairs manually
+			//			InputManager.MapStateToInput("My State1",new InputCombination(KeyCodeExtension.toCode(Joysticks.Joystick1,JoystickAxis.AxisPovX,JoystickPovPosition.Forward),(int)KeyCode.Joystick4Button9,(int)KeyCode.P,(int)KeyCode.JoystickButton0));
+			//			InputManager.MapStateToInput("My State2",new InputCombination(KeyCode.Joystick4Button9,KeyCode.P,KeyCode.JoystickButton0));
+			//			InputManager.MapStateToInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
+			//			InputManager.MapStateToInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
+			
+			
+			//easiest way to map state to combination (ex.of single W and C click)
+			InputManager.MapStateToInput("Click_W+C_State", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
+			
+			UnityEngine.Debug.Log("Log:" + InputManager.Log());
+			
+			
+			////Event Based input handling
+			InputEvent ev = new InputEvent("Click_W+C_State");
+			//InputEvent ev = new InputEvent((int)States.SomeState);
+			
+			ev.INPUT += new EventHandler(Handle1);
+			ev.INPUT += new EventHandler(Handle2);
+			ev.UP += new EventHandler(onUp);//this wouldn't fire for combo inputs(single only)
+			ev.DOWN += new EventHandler(onDown);//this wouldn't fire for combo inputs(single only)
+
+
+
+			_settingsLoaded=true;
 #endif
 
-#if (UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE
-            UnityEngine.Debug.Log("WebPlayer " + Path.Combine(Path.Combine(Application.dataPath, "StreamingAssets"), "InputSettings.xml"));
-            yield return StartCoroutine(InputManager.loadSettings(Path.Combine(Path.Combine(Application.dataPath, "StreamingAssets"), "InputSettings.xml")));
 
+#if(UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE
+    Loader request = new Loader();
+            request.Add(Path.Combine(Path.Combine(Application.dataPath, "StreamingAssets"), "InputSettings.xml"));
+            request.LoadComplete += new EventHandler<LoaderEvtArgs>(onLoadComplete);
+            request.Error += new EventHandler<LoaderEvtArgs>(onLoadItemComplete);
+            request.LoadItemComplete += new EventHandler<LoaderEvtArgs>(onLoadItemComplete);
+            request.load();
 #endif
 
 
-
-            //!!!When you are using UI(quiering any key) disable Game key actions cos of incomaptiblity both to function as once
-            UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
-            if (ui.enabled)
-            {
-                if (ui.settingsXML == null)
-                {
-                    //I'm cloning loaded state inputs and want to add some other hardcoded not to be displayed in UI
-                    ui.StateInputCombinations = new Dictionary<int, InputState>(InputManager.Settings.stateInputs);
-                }
-            }
+          
            
 
 
 
 
 
-            //   UnityEngine.Debug.Log(InputManager.Log());
-
-            //		adding input-states pairs manually
-            //			InputManager.MapStateToInput("My State1",new InputCombination(KeyCodeExtension.toCode(Joysticks.Joystick1,JoystickAxis.AxisPovX,JoystickPovPosition.Forward),(int)KeyCode.Joystick4Button9,(int)KeyCode.P,(int)KeyCode.JoystickButton0));
-            //			InputManager.MapStateToInput("My State2",new InputCombination(KeyCode.Joystick4Button9,KeyCode.P,KeyCode.JoystickButton0));
-            //			InputManager.MapStateToInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
-            //			InputManager.MapStateToInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
+            
 
 
-            //easiest way to map state to combination (ex.of single W and C click)
-            InputManager.MapStateToInput("Click_W+C_State", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
-
-            UnityEngine.Debug.Log("Log:" + InputManager.Log());
-
-
-            ////Event Based input handling
-            InputEvent ev = new InputEvent("Click_W+C_State");
-            //InputEvent ev = new InputEvent((int)States.SomeState);
-
-            ev.INPUT += new EventHandler(Handle1);
-            ev.INPUT += new EventHandler(Handle2);
-            ev.UP += new EventHandler(onUp);//this wouldn't fire for combo inputs(single only)
-            ev.DOWN += new EventHandler(onDown);//this wouldn't fire for combo inputs(single only)
-
-			yield break;
         }
 
 
@@ -126,11 +133,69 @@ namespace ws.winx
             Debug.Log("Handle2");
         }
 
+		#if (UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE
+        void onLoadComplete(object sender, LoaderEvtArgs args)
+        {
+            Debug.Log(((List<WWW>)args.data).ElementAt(0).text);
+
+
+			UnityEngine.Debug.Log("WebPlayer " + Path.Combine(Path.Combine(Application.dataPath, "StreamingAssets"), "InputSettings.xml"));
+			InputManager.loadSettingsFromText(((List<WWW>)args.data).ElementAt(0).text);
+			
+
+			UserInterfaceWindow ui=this.GetComponent<UserInterfaceWindow>();
+
+
+			if(ui!=null && ui.settingsXML==null){
+				ui.StateInputCombinations=InputManager.Settings.stateInputs;
+			}
+			//   UnityEngine.Debug.Log(InputManager.Log());
+			
+			//		adding input-states pairs manually
+			//			InputManager.MapStateToInput("My State1",new InputCombination(KeyCodeExtension.toCode(Joysticks.Joystick1,JoystickAxis.AxisPovX,JoystickPovPosition.Forward),(int)KeyCode.Joystick4Button9,(int)KeyCode.P,(int)KeyCode.JoystickButton0));
+			//			InputManager.MapStateToInput("My State2",new InputCombination(KeyCode.Joystick4Button9,KeyCode.P,KeyCode.JoystickButton0));
+			//			InputManager.MapStateToInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
+			//			InputManager.MapStateToInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
+			
+			
+			//easiest way to map state to combination (ex.of single W and C click)
+			InputManager.MapStateToInput("Click_W+C_State", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
+			
+			UnityEngine.Debug.Log("Log:" + InputManager.Log());
+			
+			
+			////Event Based input handling
+			InputEvent ev = new InputEvent("Click_W+C_State");
+			//InputEvent ev = new InputEvent((int)States.SomeState);
+			
+			ev.INPUT += new EventHandler(Handle1);
+			ev.INPUT += new EventHandler(Handle2);
+			ev.UP += new EventHandler(onUp);//this wouldn't fire for combo inputs(single only)
+			ev.DOWN += new EventHandler(onDown);//this wouldn't fire for combo inputs(single only)
+
+            _settingsLoaded = true;
+        }
+
+        void onLoadItemComplete(object sender, LoaderEvtArgs args)
+        {
+            Debug.Log(((WWW)args.data).text);
+        }
+
+
+        void onLoadError(object sender, LoaderEvtArgs args)
+        {
+             Debug.Log(((WWW)args.data).error);
+        }
+		#endif
+
+
 
         // Update is called once per frame
         void Update()
         {
 
+			//Use is mapping states so no quering keys during gameplay
+			if (InputManager.EditMode ||  !_settingsLoaded) return ;
 
             if (InputManager.GetInputDown((int)States.Wave))
             {
