@@ -38,25 +38,43 @@ namespace ws.winx.input
                     if(pair.Value[0]!=null && InputManager.GetInput(pair.Key,false)){
                         delegates= pair.Value[0].GetInvocationList();
                         foreach(Delegate d in delegates)
-                            ((EventHandler)d).BeginInvoke(this, args, null, null);
+                            ((EventHandler)d).BeginInvoke(this, args, EndAsyncEvent, null);
                     }
 
                     if (pair.Value[1] != null && InputManager.GetInputUp(pair.Key))
                     {
                         delegates = pair.Value[1].GetInvocationList();
                         foreach (Delegate d in delegates)
-                            ((EventHandler)d).BeginInvoke(this, args, null, null);
+                            ((EventHandler)d).BeginInvoke(this, args, EndAsyncEvent, null);
                     }
 
                     if (pair.Value[2] != null && InputManager.GetInputDown(pair.Key))
                     {
                         delegates = pair.Value[2].GetInvocationList();
                         foreach (Delegate d in delegates)
-                            ((EventHandler)d).BeginInvoke(this, args, null, null);
+                            ((EventHandler)d).BeginInvoke(this, args, EndAsyncEvent, null);
                     }
 
                   
 
+                }
+            }
+
+
+
+            private void EndAsyncEvent(IAsyncResult iar)
+            {
+                var ar = (System.Runtime.Remoting.Messaging.AsyncResult)iar;
+                var invokedMethod = (EventHandler)ar.AsyncDelegate;
+
+                try
+                {
+                    invokedMethod.EndInvoke(iar);
+                }
+                catch
+                {
+                    // Handle any exceptions that were thrown by the invoked method
+                    Console.WriteLine("An event listener went kaboom!");
                 }
             }
 

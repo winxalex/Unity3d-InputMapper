@@ -254,8 +254,8 @@ namespace ws.winx.platform.web
                 set
                 {
 
-JoystickButtonState wasState=_buttonState;
-float wasValue=_value;
+//JoystickButtonState wasState=_buttonState;
+//float wasValue=_value;
 
   
 

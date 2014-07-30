@@ -39,12 +39,14 @@ namespace ws.winx
         {
             animator = GameObject.FindObjectOfType<Animator>();
 
-            
 
+           // InputManager.defaultDriver = new UnityDriver();
+            InputManager.AddDriver(new UnityDriver());
 
             //supporting devices with custom drivers
 #if UNITY_STANDALONE_WIN
-			    InputManager.AddDriver(new ws.winx.platform.windows.XInputDriver());
+            
+			   // InputManager.AddDriver(new ws.winx.platform.windows.XInputDriver());
 #endif
 
 
@@ -61,6 +63,7 @@ namespace ws.winx
 
 				ui.StateInputCombinations=InputManager.Settings.stateInputs;
 			}
+            //else be sure that 
 
 
 			//		adding input-states pairs manually
@@ -138,6 +141,8 @@ namespace ws.winx
         void onLoadComplete(object sender, LoaderEvtArgs args)
         {
            // Debug.Log(((List<WWW>)args.data).ElementAt(0).text);
+
+            if (System.Threading.Thread.CurrentThread.ManagedThreadId != 1) return;
 
 
 			UnityEngine.Debug.Log("WebPlayer " + Path.Combine(Path.Combine(Application.dataPath, "StreamingAssets"), "InputSettings.xml"));

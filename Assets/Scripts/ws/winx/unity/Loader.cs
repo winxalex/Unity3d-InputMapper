@@ -114,8 +114,8 @@ namespace ws.winx.unity
 
                             if (Error != null)
                             {
-                                Error(this,new LoaderEvtArgs(www));
-                                
+                                //Error(this,new LoaderEvtArgs(www));
+                                Dispatch(Error, new LoaderEvtArgs(www));
                             }
                             else
                             {
@@ -126,8 +126,9 @@ namespace ws.winx.unity
                            
 
                         }else 
-							if (LoadItemComplete != null) 
-								LoadItemComplete(this, new LoaderEvtArgs(www));
+							if (LoadItemComplete != null)
+                                Dispatch(LoadItemComplete, new LoaderEvtArgs(www));
+								//LoadItemComplete(this, new LoaderEvtArgs(www));
                        
                         queueList.RemoveAt(i);
                     }
@@ -141,7 +142,9 @@ namespace ws.winx.unity
                {
                    _isRunning = false;
 
-                    if (LoadComplete != null) LoadComplete(this, new LoaderEvtArgs(wwwList));
+                   if (LoadComplete != null)
+                       //Dispatch(LoadComplete, new LoaderEvtArgs(wwwList));
+                        LoadComplete(this, new LoaderEvtArgs(wwwList));
 
                     yield break; 
                }
@@ -149,6 +152,31 @@ namespace ws.winx.unity
 
                 yield return new WaitForSeconds(0.5f);
             }
+        }
+
+
+        private void EndAsyncEvent(IAsyncResult iar)
+        {
+            var ar = (System.Runtime.Remoting.Messaging.AsyncResult)iar;
+            var invokedMethod = (EventHandler<LoaderEvtArgs>)ar.AsyncDelegate;
+
+            try
+            {
+                invokedMethod.EndInvoke(iar);
+            }
+            catch
+            {
+                // Handle any exceptions that were thrown by the invoked method
+                Console.WriteLine("An event listener went kaboom!");
+            }
+        }
+
+
+        protected void Dispatch(Delegate del,LoaderEvtArgs args)
+        {
+            Delegate[] delegates = del.GetInvocationList();
+            foreach (Delegate d in delegates)
+                ((EventHandler<LoaderEvtArgs>)d).BeginInvoke(this, args, EndAsyncEvent, null);
         }
 	
 public void  Dispose()

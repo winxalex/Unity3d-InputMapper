@@ -89,6 +89,7 @@
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\XInputDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\unity\Loader.cs" />
      <Compile Include="Assets\Scripts\ws\winx\unity\Tags.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\unity\UnityDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\utils\Extensions.cs" />
      <None Include="Assets\StreamingAssets\Copy of InputSettingsBck.xml" />
      <None Include="Assets\StreamingAssets\InputSettings.xml" />
