@@ -52,12 +52,13 @@ namespace ws.winx
             //if you want to load some states from .xml and add custom manually first load settings xml
             //!!!Application.streamingAssetPath gives "Raw" folder in web player
         
-#if UNITY_STANDALONE || UNITY_EDITOR
+#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 			UnityEngine.Debug.Log("Standalone");
-                   InputManager.loadSettings(Path.Combine(Path.Combine(Application.dataPath, "StreamingAssets"), "InputSettings.xml"));
-
+                  
 			UserInterfaceWindow ui=this.GetComponent<UserInterfaceWindow>();
 			if(ui!=null && ui.settingsXML==null){
+                InputManager.loadSettings(Path.Combine(Path.Combine(Application.dataPath, "StreamingAssets"), "InputSettings.xml"));
+
 				ui.StateInputCombinations=InputManager.Settings.stateInputs;
 			}
 
@@ -91,8 +92,8 @@ namespace ws.winx
 
 
 #if(UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE
-    Loader request = new Loader();
-            request.Add(Path.Combine(Path.Combine(Application.dataPath, "StreamingAssets"), "InputSettings.xml"));
+            Loader request = new Loader();
+            request.Add(Application.dataPath+"/StreamingAssets/InputSettings.xml");
             request.LoadComplete += new EventHandler<LoaderEvtArgs>(onLoadComplete);
             request.Error += new EventHandler<LoaderEvtArgs>(onLoadItemComplete);
             request.LoadItemComplete += new EventHandler<LoaderEvtArgs>(onLoadItemComplete);
@@ -100,14 +101,14 @@ namespace ws.winx
 #endif
 
 
-          
-           
 
 
 
 
 
-            
+
+
+
 
 
         }
@@ -136,19 +137,22 @@ namespace ws.winx
 		#if (UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE
         void onLoadComplete(object sender, LoaderEvtArgs args)
         {
-            Debug.Log(((List<WWW>)args.data).ElementAt(0).text);
+           // Debug.Log(((List<WWW>)args.data).ElementAt(0).text);
 
 
 			UnityEngine.Debug.Log("WebPlayer " + Path.Combine(Path.Combine(Application.dataPath, "StreamingAssets"), "InputSettings.xml"));
-			InputManager.loadSettingsFromText(((List<WWW>)args.data).ElementAt(0).text);
+			
 			
 
 			UserInterfaceWindow ui=this.GetComponent<UserInterfaceWindow>();
 
 
-			if(ui!=null && ui.settingsXML==null){
-				ui.StateInputCombinations=InputManager.Settings.stateInputs;
-			}
+            if (ui != null)//without settingsXML defined =>load them manually and attach them
+            {
+                InputManager.loadSettingsFromText(((List<WWW>)args.data).ElementAt(0).text);
+                ui.StateInputCombinations = InputManager.Settings.stateInputs;
+            }
+          
 			//   UnityEngine.Debug.Log(InputManager.Log());
 			
 			//		adding input-states pairs manually
@@ -178,7 +182,7 @@ namespace ws.winx
 
         void onLoadItemComplete(object sender, LoaderEvtArgs args)
         {
-            Debug.Log(((WWW)args.data).text);
+           // Debug.Log(((WWW)args.data).text);
         }
 
 
@@ -199,7 +203,7 @@ namespace ws.winx
 
 
             //Input.GetInput allows combos (combined input actions)
-            if (InputManager.GetInputDown((int)States.Wave) || InputManager.GetInput((int)States.Wave,true))
+            if (InputManager.GetInputDown((int)States.Wave))// || InputManager.GetInput((int)States.Wave,true))
             {
                 Debug.Log("Wave Down");
                 animator.Play((int)States.Wave);

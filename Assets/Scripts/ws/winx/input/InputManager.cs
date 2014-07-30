@@ -357,11 +357,11 @@ namespace ws.winx.input
 			if(InputManager.GetInputDown(stateNameHash)) 
 				animator.CrossFade(stateNameHash,transitionDuration,layer,normailizeTime);
     	}
-  
-		
-		
-	#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
-		/// <summary>
+
+
+
+#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
+        /// <summary>
 		/// Loads the Input settings from InputSettings.xml and deserialize into OO structure.
 		/// Create your .xml settings with InputMapper Editor
 		/// </summary>
@@ -394,162 +394,162 @@ namespace ws.winx.input
    
 
 
-		#if (UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE
-		/// <summary>
-		/// Loads the Input settings from InputSettings.xml and deserialize into OO structure.
-		/// Create your .xml settings with InputMapper Editor
-		/// </summary>
-        public static IEnumerator loadSettings(String path)
-        {
-             XmlReaderSettings xmlSettings=new XmlReaderSettings();
-			xmlSettings.CloseInput=true;
-			xmlSettings.IgnoreWhitespace=true;
+//        #if (UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE
+//        /// <summary>
+//        /// Loads the Input settings from InputSettings.xml and deserialize into OO structure.
+//        /// Create your .xml settings with InputMapper Editor
+//        /// </summary>
+//        public static IEnumerator loadSettings(String path)
+//        {
+//             XmlReaderSettings xmlSettings=new XmlReaderSettings();
+//            xmlSettings.CloseInput=true;
+//            xmlSettings.IgnoreWhitespace=true;
 
-            if (Application.isEditor)
-                path = "file:///" + path;
+//            if (Application.isEditor)
+//                path = "file:///" + path;
 
-            WWW www = new WWW(path);
-          // UnityEngine.Debug.Log(path);
-            while (!www.isDone)
-            {
-                yield return null;
-            }
+//            WWW www = new WWW(path);
+//          // UnityEngine.Debug.Log(path);
+//            while (!www.isDone)
+//            {
+//                yield return null;
+//            }
 
             
           
 
-            if (www.error != null)
-            {
-                UnityEngine.Debug.LogError(www.error);
-                yield break;
-            }
+//            if (www.error != null)
+//            {
+//                UnityEngine.Debug.LogError(www.error);
+//                yield break;
+//            }
 
            
-            StringReader stringReader = new StringReader(www.text);
+//            StringReader stringReader = new StringReader(www.text);
 
-            stringReader.Read();//skip BOM
+//            stringReader.Read();//skip BOM
 
-            using (XmlReader reader = XmlReader.Create(stringReader, xmlSettings))
-            {
-                __settings = new InputSettings();
+//            using (XmlReader reader = XmlReader.Create(stringReader, xmlSettings))
+//            {
+//                __settings = new InputSettings();
 
-                int key;
+//                int key;
 
-                InputAction action;
-                List<InputAction> actions = null;
-                InputCombination[] combinations = null;
-                string name;
-                InputState state;
-                int i;
-                //XmlNameTable nameTable = reader.NameTable;
-                //XmlNamespaceManager nsManager = new XmlNamespaceManager(nameTable);
-                //nsManager.AddNamespace("d1p1", "http://schemas.datacontract.org/2004/07/ws.winx.input");
+//                InputAction action;
+//                List<InputAction> actions = null;
+//                InputCombination[] combinations = null;
+//                string name;
+//                InputState state;
+//                int i;
+//                //XmlNameTable nameTable = reader.NameTable;
+//                //XmlNamespaceManager nsManager = new XmlNamespaceManager(nameTable);
+//                //nsManager.AddNamespace("d1p1", "http://schemas.datacontract.org/2004/07/ws.winx.input");
 
-                reader.ReadToFollowing("d1p1:doubleDesignator");
-                __settings.doubleDesignator = reader.ReadElementContentAsString();
-
-
-                __settings.longDesignator = reader.ReadElementContentAsString();
+//                reader.ReadToFollowing("d1p1:doubleDesignator");
+//                __settings.doubleDesignator = reader.ReadElementContentAsString();
 
 
-                __settings.spaceDesignator = reader.ReadElementContentAsString();
+//                __settings.longDesignator = reader.ReadElementContentAsString();
 
 
-
-
-                __settings.singleClickSensitivity = reader.ReadElementContentAsFloat();
-
-
-                __settings.doubleClickSensitivity = reader.ReadElementContentAsFloat();
-
-
-                __settings.longClickSensitivity = reader.ReadElementContentAsFloat();
-
-
-                __settings.combinationsClickSensitivity = reader.ReadElementContentAsFloat();
-
-                if (reader.ReadToFollowing("d2p1:KeyValueOfintInputState"))
-                {
-
-
-                    do
-                    {
-                        reader.ReadToDescendant("d2p1:Key");
-
-                        key = reader.ReadElementContentAsInt();
+//                __settings.spaceDesignator = reader.ReadElementContentAsString();
 
 
 
 
-                        if (reader.ReadToFollowing("d1p1:InputCombination"))
-                        {
-
-                            combinations = new InputCombination[2];
-                            i = 0;
-
-                            do
-                            {
-                                if (reader.GetAttribute("i:nil") == null)
-                                {
+//                __settings.singleClickSensitivity = reader.ReadElementContentAsFloat();
 
 
-                                    if (reader.ReadToDescendant("d1p1:InputAction"))
-                                    {
-                                        actions = new List<InputAction>();
-
-                                        do
-                                        {
-                                            reader.ReadToDescendant("d1p1:Code");
-
-                                            action = new InputAction(reader.ReadElementContentAsString());
-
-                                            actions.Add(action);
-
-                                        } while (reader.ReadToNextSibling("d1p1:InputAction"));
+//                __settings.doubleClickSensitivity = reader.ReadElementContentAsFloat();
 
 
-                                    }
+//                __settings.longClickSensitivity = reader.ReadElementContentAsFloat();
+
+
+//                __settings.combinationsClickSensitivity = reader.ReadElementContentAsFloat();
+
+//                if (reader.ReadToFollowing("d2p1:KeyValueOfintInputState"))
+//                {
+
+
+//                    do
+//                    {
+//                        reader.ReadToDescendant("d2p1:Key");
+
+//                        key = reader.ReadElementContentAsInt();
 
 
 
 
-                                    combinations[i++] = new InputCombination(actions);
+//                        if (reader.ReadToFollowing("d1p1:InputCombination"))
+//                        {
 
-                                    reader.Read();//read </InputCombination>
+//                            combinations = new InputCombination[2];
+//                            i = 0;
 
-                                }
-
-
-
-                            } while (reader.ReadToNextSibling("d1p1:InputCombination"));
-
-
-
-                        }
-
-                        reader.ReadToFollowing("d1p1:Name");
-                        name = reader.ReadElementContentAsString();
-                        state = new InputState(name, key);
-                        state.combinations = combinations;
-                        __settings.stateInputs[key] = state;
+//                            do
+//                            {
+//                                if (reader.GetAttribute("i:nil") == null)
+//                                {
 
 
-                        reader.Read();//</d2p1:KeyValueOfintInputState>
+//                                    if (reader.ReadToDescendant("d1p1:InputAction"))
+//                                    {
+//                                        actions = new List<InputAction>();
 
-                    } while (reader.ReadToNextSibling("d2p1:KeyValueOfintInputState"));
-                }
-            }
+//                                        do
+//                                        {
+//                                            reader.ReadToDescendant("d1p1:Code");
 
-            stringReader.Close();
+//                                            action = new InputAction(reader.ReadElementContentAsString());
+
+//                                            actions.Add(action);
+
+//                                        } while (reader.ReadToNextSibling("d1p1:InputAction"));
+
+
+//                                    }
+
+
+
+
+//                                    combinations[i++] = new InputCombination(actions);
+
+//                                    reader.Read();//read </InputCombination>
+
+//                                }
+
+
+
+//                            } while (reader.ReadToNextSibling("d1p1:InputCombination"));
+
+
+
+//                        }
+
+//                        reader.ReadToFollowing("d1p1:Name");
+//                        name = reader.ReadElementContentAsString();
+//                        state = new InputState(name, key);
+//                        state.combinations = combinations;
+//                        __settings.stateInputs[key] = state;
+
+
+//                        reader.Read();//</d2p1:KeyValueOfintInputState>
+
+//                    } while (reader.ReadToNextSibling("d2p1:KeyValueOfintInputState"));
+//                }
+//            }
+
+//            stringReader.Close();
 
          
 
           
 
-          //yield break;
+//          //yield break;
           
-        }
-#endif
+//        }
+//#endif
 
         public static void loadSettingsFromText(string text,bool readBOM=true)
         {

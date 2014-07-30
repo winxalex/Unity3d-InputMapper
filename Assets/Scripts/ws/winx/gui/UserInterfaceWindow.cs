@@ -37,9 +37,9 @@ namespace ws.winx.gui
 				/// </summary>
 				/// 
 
-#if UNITY_WEBPLAYER
+
         public string saveURL;
-#endif
+
 				public int maxCombosNum = 3;
 				public GUISkin guiSkin;
 				public TextAsset settingsXML;
@@ -109,7 +109,7 @@ namespace ws.winx.gui
 #if UNITY_WEBPLAYER && !UNITY_EDITOR
             if (saveURL == null) throw new Exception("Save path should point to some web service resposable for saving");
 
-                   InputManager.saveSettings(savePath);
+                   InputManager.saveSettings(saveURL);
 #endif
 
 #if UNITY_WEBPLAYER && UNITY_EDITOR
@@ -124,7 +124,7 @@ namespace ws.winx.gui
 
 
 #if UNITY_STANDALONE
-			           if(settingsXML == null)
+                    if (settingsXML == null)
 			                 InputManager.saveSettings(Path.Combine(Application.streamingAssetsPath,settingsXML.name+".xml"));
                         else
 				InputManager.saveSettings(Path.Combine(Application.streamingAssetsPath,"InputSettings.xml"));

@@ -34,6 +34,7 @@ namespace ws.winx.devices
 				//bool _anyKeyDown = false;
 				int _VID;
 				int _PID;
+                bool _isReady=true;
 //                int _lastFrameNum=-1;
 
         #endregion
@@ -74,6 +75,18 @@ namespace ws.winx.devices
 
 		#region IJoystickDevice implementation
 
+
+                public bool isReady
+                {
+                    get
+                    {
+                        return _isReady;
+                    }
+                   internal set
+                    {
+                        _isReady = value;
+                    }
+                }
 
 		public int numPOV {
 			get {
@@ -313,6 +326,7 @@ namespace ws.winx.devices
 				{
                     Update();
 
+                    //UnityEngine.Debug.Log("GetKeyDown Joy"+this.ID);
 
 						JoystickAxis axis = KeyCodeExtension.toAxis (code);
 						int data = KeyCodeExtension.toData (code);
@@ -364,14 +378,22 @@ namespace ws.winx.devices
 		/// </summary>
 		/// <returns>The input.</returns>
 		public virtual int GetInput(){
-            //Debug.Log("Get Input Joydevice");
+           // Debug.Log("Get Input Joy"+this.ID+" " + Application.isPlaying);
 
             //there is no  Time.frameCount in Editor (edit mode - editor scripts)
-            if(Application.isPlaying) Update();
-            else  _driver.Update(this);
+            if(Application.isPlaying) 
+            {
+                Update();//prevents multiply update in frame
+                //if(Application.isWebPlayer && !this.isReady) retr
+
+
+                
+            }
+            else  
+                _driver.Update(this);
             
 
-
+          
 					int num_axes = _numAxis-numPOV*2;
 						
 					int axis = 0;
@@ -512,9 +534,13 @@ namespace ws.winx.devices
 
 					
 					if (dominantAxis != JoystickAxis.None) {
-				//UnityEngine.Debug.Log("dominantAxis "+dominantAxis+" state"+axis_collection[dominantAxis].buttonState);
+
+                        //UnityEngine.Debug.Log("Count" + axis_collection.Count);
+                       // UnityEngine.Debug.Log("dominantAxis "+dominantAxis+" state"+axis_collection[dominantAxis].buttonState);
 						
 						//stick.AxisAsButtons [dominantAxis] != JoystickButtonState.Hold;
+
+                        
 						
 						if (axis_collection[dominantAxis].value > 0)
 							return KeyCodeExtension.toCode ((Joysticks)ID, dominantAxis, (int)JoystickPosition.Positive);
@@ -544,40 +570,47 @@ namespace ws.winx.devices
 					/////TODO make possible any axes to be POV (add isHatFirstAxis)
                         // axis_collection [JoystickAxis.AxisPovX].isHat
 
-						 if(numPOV>0){
-							if (axis_collection [JoystickAxis.AxisPovX].buttonState == JoystickButtonState.Down )
-							{
-							    if(axis_collection[JoystickAxis.AxisPovX].value>0)
-									return KeyCodeExtension.toCode ((Joysticks)ID, JoystickAxis.AxisPovX,JoystickPovPosition.Right );
-				                else
-									return KeyCodeExtension.toCode ((Joysticks)ID, JoystickAxis.AxisPovX,JoystickPovPosition.Left );
-			                }
+                    if (numPOV > 0)
+                    {
+                        if (axis_collection[JoystickAxis.AxisPovX].buttonState == JoystickButtonState.Down)
+                        {
+                            if (axis_collection[JoystickAxis.AxisPovX].value > 0)
+                                return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.AxisPovX, JoystickPovPosition.Right);
+                            else
+                                return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.AxisPovX, JoystickPovPosition.Left);
+                        }
 
-							if (axis_collection [JoystickAxis.AxisPovY].buttonState == JoystickButtonState.Down )
-							{
-								if(axis_collection[JoystickAxis.AxisPovY].value>0)
-									return KeyCodeExtension.toCode ((Joysticks)ID, JoystickAxis.AxisPovY,JoystickPovPosition.Forward );
-								else
-									return KeyCodeExtension.toCode ((Joysticks)ID, JoystickAxis.AxisPovY,JoystickPovPosition.Backward );
-							}
-			}
+                        if (axis_collection[JoystickAxis.AxisPovY].buttonState == JoystickButtonState.Down)
+                        {
+                            if (axis_collection[JoystickAxis.AxisPovY].value > 0)
+                                return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.AxisPovY, JoystickPovPosition.Forward);
+                            else
+                                return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.AxisPovY, JoystickPovPosition.Backward);
+                        }
+                    }
 
 					
 					int button = 0;
-					
-					
-					while (button < _numButtons) {//) {
-						
-						//stick.SetButton (button, (info.Buttons & (1 << button)) != 0);
-						
-						if (button_collection[button].buttonState == JoystickButtonState.Down)
-							return KeyCodeExtension.toCode ((Joysticks)ID, JoystickAxis.None, button);
-						
-						//UnityEngine.Debug.Log("AfterbuttonState "+stick.Buttons[button]);
-						
-						button++;
-						
-					}//while buttons
+
+                   // UnityEngine.Debug.Log("GetInput took state:"+button_collection[button].buttonState);
+                   // if (button_collection[button].buttonState == JoystickButtonState.Down)
+                    //            return KeyCodeExtension.toCode ((Joysticks)ID, JoystickAxis.None, button);
+
+
+
+                    while (button < _numButtons)
+                    {//) {
+
+                        //stick.SetButton (button, (info.Buttons & (1 << button)) != 0);
+
+                        if (button_collection[button].buttonState == JoystickButtonState.Down)
+                            return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.None, button);
+
+                        // UnityEngine.Debug.Log("AfterbuttonState " + button_collection[0]);
+
+                        button++;
+
+                    }//while buttons
 		
 			return 0;
 
@@ -709,6 +742,9 @@ namespace ws.winx.devices
                 }
 
                 public int _lastFrameNum { get; set; }
+
+
+               
         }
 
 

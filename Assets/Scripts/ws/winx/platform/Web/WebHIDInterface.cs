@@ -124,7 +124,7 @@ namespace ws.winx.platform.web
 
         public void DeviceConnectedEventHandler(object sender,WebMessageArgs args)
         {
-            UnityEngine.Debug.Log(args.Message);
+           // UnityEngine.Debug.Log(args.Message);
             Json.GamePadInfo info=Json.Deserialize(args.Message) as Json.GamePadInfo;
           
              if(!_joysticks.ContainsKey(info.index))

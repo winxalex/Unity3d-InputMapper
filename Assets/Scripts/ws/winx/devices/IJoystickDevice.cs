@@ -20,6 +20,7 @@ namespace ws.winx.devices
 		int PID{get;}
 		int ID{get;}
         int numPOV { get; set; }
+        bool isReady { get; }
 		IJoystickDriver driver{get;} 
 		string Name{get;set;}
 

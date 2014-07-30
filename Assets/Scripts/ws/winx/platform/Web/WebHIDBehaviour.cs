@@ -145,7 +145,7 @@ namespace ws.winx.platform.web
                 if(_hasEvents)
                     Application.ExternalEval(String.Format(GAMEPAD_COMMAND_COMPLEX, index));
                 else
-                Application.ExternalEval(String.Format(GAMEPAD_COMMAND, index));
+                    Application.ExternalEval(String.Format(GAMEPAD_COMMAND, index));
             }
 
 

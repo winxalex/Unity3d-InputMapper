@@ -49,7 +49,11 @@ namespace ws.winx.platform.web
                        
                     }
 
-                    joystick.numPOV = 1;
+                    //joystick.numPOV = 1;
+               
+
+
+
                    // joystick.Axis[index - 1].isHat = true;
                    //joystick.Axis[index - 2].isHat = true;
 
@@ -60,12 +64,23 @@ namespace ws.winx.platform.web
 
          protected void onPositionUpdate(object sender,WebMessageArgs args){
 
+            
+          
+
              Json.GamePadInfo info = Json.Deserialize(args.Message) as Json.GamePadInfo;
 
-            // UnityEngine.Debug.Log("onPositionUpdate:Joy" + info.index);
-             int i=0;
+               
+
             
-             JoystickDevice device = _hidInterface.Devices[info.index] as JoystickDevice;
+            
+            
+             JoystickDevice device = _hidInterface.Devices[info.index] as JoystickDevice; 
+ 
+             //Device has already been updated in this call
+             if(device.isReady) return;
+
+            // UnityEngine.Debug.Log("onPositionUpdate:Joy" + info.index);
+             
 
             // UnityEngine.Debug.Log(device);
             // UnityEngine.Debug.Log(info.axes);
@@ -74,20 +89,37 @@ namespace ws.winx.platform.web
 
             //UPDATING AXIS BUTTONS
             
-            // UnityEngine.Debug.Log("buttons" + info.buttons);
+            //UnityEngine.Debug.Log("buttons" + info.buttons.);
             // UnityEngine.Debug.Log("buttons" + info.buttons.Count);
+            
+            int i=0;
+              
              foreach (var obj in info.buttons)
              {
+                 
+                 //if(i==0) {_webHidBehavior.Log("button:"+obj+" "+obj.GetType()+" "+Convert.ToSingle(obj));
+                 //    device.Buttons[i++].value = Convert.ToSingle(obj);
+                 //}
 
-                
-                     device.Buttons[i++].value = Convert.ToSingle(obj);
+                 device.Buttons[i++].value = Convert.ToSingle(obj);
 
              }
 
+
+//_webHidBehavior.Log(device.Buttons[0].value.ToString() + device.Buttons[1].value.ToString()+device.Buttons[2].value.ToString());
+
+             
              i = 0;
              float value = 0;
+
              float dreadZone=0.001f;//TODO this shouldn't be hard coded
+            // string axisValues="";
            //  int numAxes=device.Axis.Count;
+
+
+             //!!! FF gives 7 axis and the last 2 are POW on test Thrustmaster
+             //!!! Chrome gives 10 axis and last 4 are POW 2 by 2 but they give some strange values 
+
              foreach (var obj in info.axes){
 
                  value=Convert.ToSingle(obj);
@@ -125,7 +157,9 @@ namespace ws.winx.platform.web
                     
                 
                // UnityEngine.Debug.Log(obj.GetType());
+
                  device.Axis[i++].value =Convert.ToSingle(Math.Min(1f, Math.Max(-1,value )));
+                    // axisValues
                //  UnityEngine.Debug.Log("axes value:" +device.Axis[i-1].value);
              }
              
@@ -143,10 +177,13 @@ namespace ws.winx.platform.web
                  
              //}
 
-			_webHidBehavior.Log("numaxis: "+ device.Axis[7].value.ToString() + device.Axis[8].value.ToString()+device.Axis[9].value.ToString());
+
+//_webHidBehavior.Log("numaxis: "+device.Axis[0].value.ToString()+device.Axis[1].value.ToString()+ device.Axis[2].value.ToString() + device.Axis[8].value.ToString()+device.Axis[9].value.ToString());
+
+			//_webHidBehavior.Log("numaxis: "+ device.Axis[7].value.ToString() + device.Axis[8].value.ToString()+device.Axis[9].value.ToString());
 
             // UnityEngine.Debug.Log(device.Axis[0].value + " " + device.Axis[1].value);
-              _isReady = true;
+              device.isReady = true;
       
 
              
@@ -156,9 +193,10 @@ namespace ws.winx.platform.web
         {
 
            // Debug.Log("Update"+_isReady);
-            if (_isReady)
+            if (joystick.isReady)
             {
-                _isReady = false;
+                // Debug.Log("Request Update Joy"+joystick.ID);
+                ((JoystickDevice)joystick).isReady = false;
                 _webHidBehavior.joyGetPosEx(joystick.ID);
             }
 
@@ -171,17 +209,17 @@ namespace ws.winx.platform.web
 
 
 
-        #region ButtonDetails
+#region ButtonDetails
         public sealed class ButtonDetails : IButtonDetails
         {
 
-            #region Fields
+#region Fields
 
             float _value;
             uint _uid;
-            JoystickButtonState _buttonState;
+            JoystickButtonState _buttonState=JoystickButtonState.None;
 
-            #region IDeviceDetails implementation
+#region IDeviceDetails implementation
 
 
             public uint uid
@@ -216,12 +254,16 @@ namespace ws.winx.platform.web
                 set
                 {
 
+JoystickButtonState wasState=_buttonState;
+float wasValue=_value;
+
+  
+
                     _value = value;
 
-                    //  UnityEngine.Debug.Log("Value:" + _value);
+                    
 
-                    //if pressed==TRUE
-                    //TODO check the code with triggers
+                   
                     if (value > 0)
                     {
                         if (_buttonState == JoystickButtonState.None
@@ -255,14 +297,20 @@ namespace ws.winx.platform.web
                         }
 
                     }
-                }
-            }
-            #endregion
-            #endregion
 
-            #region Constructor
+//UnityEngine.Debug.Log("Prev val:"+wasValue+"+Value:" + _value+"Pre state:"+wasState+" _buttonState:"+_buttonState);
+                }
+
+
+
+
+            }
+#endregion
+#endregion
+
+#region Constructor
             public ButtonDetails(uint uid = 0) { this.uid = uid; }
-            #endregion
+#endregion
 
 
 
@@ -271,13 +319,13 @@ namespace ws.winx.platform.web
 
         }
 
-        #endregion
+#endregion
 
-        #region AxisDetails
+#region AxisDetails
         public sealed class AxisDetails : IAxisDetails
         {
 
-            #region Fields
+#region Fields
             float _value;
             int _uid;
             int _min;
@@ -288,7 +336,7 @@ namespace ws.winx.platform.web
             bool _isTrigger;
 
 
-            #region IAxisDetails implementation
+#region IAxisDetails implementation
 
             public bool isTrigger
             {
@@ -355,10 +403,10 @@ namespace ws.winx.platform.web
             }
 
 
-            #endregion
+#endregion
 
 
-            #region IDeviceDetails implementation
+#region IDeviceDetails implementation
 
 
             public uint uid
@@ -374,7 +422,7 @@ namespace ws.winx.platform.web
             }
 
 
-            #endregion
+#endregion
 
             public JoystickButtonState buttonState
             {
@@ -442,11 +490,11 @@ namespace ws.winx.platform.web
                 }//set
             }
 
-            #endregion
+#endregion
 
         }
 
-        #endregion
+#endregion
     }
 }
 #endif
