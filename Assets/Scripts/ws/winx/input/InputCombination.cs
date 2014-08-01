@@ -28,7 +28,12 @@ namespace ws.winx.input
 
 
 		private InputAction __currentInputAction;
-		private float __lastInputTime;
+        /// <summary>
+        /// time when action in combination has started
+        /// (by diffrence this time with the current time and comparing to Combination sensitivity we could know 
+        /// if combination sequence should be reseted)
+        /// </summary>
+		private float __actionHappenTime;
 		private float __range;
 		private KeyCode __lastCode;
 
@@ -229,48 +234,40 @@ namespace ws.winx.input
 			return true;
 		}
 
+        
+
 		//TODO this with corutine to compare performace
 		internal bool GetCombinationInput()
 		{
 
 
-							bool isDown=InputEx.GetKeyDown(_pointer.Current);
-							InputAction action;
+                            
+          
 							int code=0;
-
-
-							if(isDown) //return false;
-							{
-								code=_pointer.Current.code;
-								//UnityEngine.Debug.Log("Code:"+code);
-							}
-
-							
-				//UnityEngine.Debug.Log("Code:"+code);
-
-							//action= InputEx.GetInput();//
-				//if this was last code in combination
-
-
-				    //if current action code isDown and has type=single
-				if((isDown && _pointer.Current.type==InputActionType.SINGLE)
-				   //process code ("Q(-)","W(x2)"...same with joys.. and if code and type are ok go in
-				   || ((action=InputEx.processInput(code,Time.time))!=null
-							&& action.code==_pointer.Current.code && action.type==_pointer.Current.type)){
-	//				UnityEngine.Debug.Log("CODE:"+_pointer.Current.codeString+" Action:"+action);
+                           
+            
+                             //TODO
+                            //if(_pointer.Current!=_pointer.Head &&    InputEx.LastCode!=prevActionCode //then something jump between
+                           // reset
+      
+                if (InputEx.GetAction(_pointer.Current))//and
+                   
+                {// if code and type are ok go in
+                   // UnityEngine.Debug.Log("CODE:" + _pointer.Current.codeString + " Action:" + action);
+                      //          return false;
 
 							   //save time when action happened if not saved or reseted
-								if(__lastInputTime==0){__lastInputTime=Time.time;}
+								if(__actionHappenTime==0){__actionHappenTime=Time.time;}
 
 
-						        
-								
-								if(Time.time<__lastInputTime+InputAction.COMBINATION_CLICK_SENSITIVITY){
+
+                                //check if time from one action to the other is less then InputAction.COMBINATION_CLICK_SENSITIVITY
+								if(Time.time<__actionHappenTime+InputAction.COMBINATION_CLICK_SENSITIVITY){
 
 								   //get the time when current action of combination happened
-									__lastInputTime=Time.time;
+									__actionHappenTime=Time.time;
 
-									//just move to next if possible or reset if couldn't
+									//just move to next if possible => combination happend or reset if couldn't
 									if(!_pointer.MoveNext()){
 										_pointer=_actionsList.GetEnumerator();//Reset pointer
 										_pointer.MoveNext();//start from beginin
@@ -279,27 +276,31 @@ namespace ws.winx.input
 								}else{//reset cos time has passed for next action
 									_pointer=_actionsList.GetEnumerator();//Reset pointer
 									_pointer.MoveNext();//start from beginin
-									__lastInputTime=0;
-
-	//					UnityEngine.Debug.Log("Reset Time Cos Time Pass:"+Time.time+" Time Allowed:"+(__lastInputTime+InputAction.COMBINATION_CLICK_SENSITIVITY));
+									__actionHappenTime=0;
+                                    InputEx.LastCode = 0;
+                                    UnityEngine.Debug.Log("Reset Time Cos Time Pass:" + Time.time + " Time Allowed:" + (__actionHappenTime + InputAction.COMBINATION_CLICK_SENSITIVITY));
 
 								}
 
 
-//								UnityEngine.Debug.Log("CodeAfter:"+_pointer.Current.codeString);
+							//UnityEngine.Debug.Log("CodeAfter:"+_pointer.Current.codeString);
 
-					return false;
+					            return false;
 							}
 						//UnityEngine.Debug.Log("CodeAfter New Between Code or not same type:"+_pointer.Current.codeString);
-			
-						if((__lastInputTime>0 && Time.time>__lastInputTime+InputAction.COMBINATION_CLICK_SENSITIVITY)
-				   ||  (InputEx.anyKeyDown && code==0)){
 
-//						UnityEngine.Debug.Log("Reset in Idle or another key pressed"+Time.time+" Time Allowed:"+(__lastInputTime+InputAction.COMBINATION_CLICK_SENSITIVITY)+"code:"+code);
+                //__lastInputTime>0 (if at least one of the action of the happend) and time to next action is less then InputAction.COMBINATION_CLICK_SENSITIVITY
+						 if((__actionHappenTime>0 && Time.time>__actionHappenTime+InputAction.COMBINATION_CLICK_SENSITIVITY)
+                // ||  (InputEx.anyKeyDown && code==0)){//or some other key was down and that key isn't expected one
+                             || (Time.time>_pointer.Current.startTime+InputAction.COMBINATION_CLICK_SENSITIVITY &&  InputEx.LastCode==_pointer.Current.code)) { // && InputEx.anyKeyDown or waiting for action
+
+						UnityEngine.Debug.Log("Reset in Idle or another key pressed"+Time.time+" Time Allowed:"+(__actionHappenTime+InputAction.COMBINATION_CLICK_SENSITIVITY));
 
 						_pointer=_actionsList.GetEnumerator();//Reset pointer
 						_pointer.MoveNext();//start from beginin
-						__lastInputTime=0;
+						__actionHappenTime=0;
+                        InputEx.LastCode = 0;
+                     
 				}
 
 

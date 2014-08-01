@@ -42,13 +42,17 @@ namespace ws.winx.unity
                    
             int index=joystick.ID;
 
-            for (; i < numAxis; i++)
-            {
-               joystick.Axis[i].value=Input.GetAxis(index.ToString()+i.ToString());//index-of joystick, i-ord number of axis
-                    
+           // Debug.Log("axis value raw:" + Input.GetAxisRaw("10") + " " + Input.GetAxis("11"));
+            //Debug.Log("axis value raw:" + );
+            //   joystick.Axis[0].value=Input.GetAxis("00");//index-of joystick, i-ord number of axis
+              // Debug.Log("axis value:" + joystick.Axis[0].value + " state:" + joystick.Axis[0].buttonState);
+               for (; i < numAxis; i++)
+               {
+                   joystick.Axis[i].value = (Input.GetAxis(index.ToString() + i.ToString())+1f)*0.5f;//index-of joystick, i-ord number of axis
 
 
-            }
+
+               }
 
             for (i=0; i < numButtons; i++)
             {

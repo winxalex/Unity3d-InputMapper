@@ -394,158 +394,210 @@ namespace ws.winx.devices
             
 
           
-					int num_axes = _numAxis-numPOV*2;
+					int num_axes = _numAxis;
 						
 					int axis = 0;
 					float joyValue=0f;
 					float joyValueMax = 0f;
-					JoystickAxis dominantAxis = JoystickAxis.None;
+					
 					IAxisDetails axisDetails;
 					
-			if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
+//            if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
 						
-						axisDetails=axis_collection[axis];
-						joyValue = axisDetails.value;
+//                        axisDetails=axis_collection[axis];
+//                        joyValue = axisDetails.value;
 						
 						
 												
-						joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
+//                        joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
 						
-						if (axisDetails.buttonState == JoystickButtonState.Down) {
-							joyValueMax = joyValue;
-							dominantAxis = JoystickAxis.AxisX;
-						}
+//                        if (axisDetails.buttonState == JoystickButtonState.Down) {
+//                            joyValueMax = joyValue;
+//                            dominantAxis = JoystickAxis.AxisX;
+//                        }
 						
-						//UnityEngine.Debug.Log("X "+joyValue+stick.AxisAsButtons [JoystickAxis.AxisY]);
+//                        //UnityEngine.Debug.Log("X "+joyValue+stick.AxisAsButtons [JoystickAxis.AxisY]);
 						
 						
 						
-						axis++; 
-					}
+//                        axis++; 
+//                    }
 
 
-//			axisDetails=axis_collection[JoystickAxis.AxisY];
-//			joyValue = axisDetails.value;
-//			UnityEngine.Debug.Log("joyY"+joyValue+"max"+joyValueMax);
-//
-//			axisDetails=axis_collection[JoystickAxis.AxisZ];
-//			joyValue = axisDetails.value;
-//			UnityEngine.Debug.Log("joyZ"+joyValue+"max"+joyValueMax);
+////			axisDetails=axis_collection[JoystickAxis.AxisY];
+////			joyValue = axisDetails.value;
+////			UnityEngine.Debug.Log("joyY"+joyValue+"max"+joyValueMax);
+////
+////			axisDetails=axis_collection[JoystickAxis.AxisZ];
+////			joyValue = axisDetails.value;
+////			UnityEngine.Debug.Log("joyZ"+joyValue+"max"+joyValueMax);
 
 
 
 					
-			if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
+//            if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
 						
-						axisDetails=axis_collection[axis];
-						joyValue = axisDetails.value;
+//                        axisDetails=axis_collection[axis];
+//                        joyValue = axisDetails.value;
 
-						joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
+//                        joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
 						
-						if (axisDetails.buttonState == JoystickButtonState.Down)
-						if (joyValueMax < joyValue) {
-							joyValueMax = joyValue;
-							dominantAxis = JoystickAxis.AxisY;
-						}
+//                        if (axisDetails.buttonState == JoystickButtonState.Down)
+//                        if (joyValueMax < joyValue) {
+//                            joyValueMax = joyValue;
+//                            dominantAxis = JoystickAxis.AxisY;
+//                        }
 						
-						//UnityEngine.Debug.Log("Y "+joyValue+stick.AxisAsButtons [JoystickAxis.AxisY]);
+//                        //UnityEngine.Debug.Log("Y "+joyValue+stick.AxisAsButtons [JoystickAxis.AxisY]);
 						
-						axis++; 
-					}
+//                        axis++; 
+//                    }
 					
 					
-			if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
+//            if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
 						
-							axisDetails=axis_collection[axis];
-							joyValue = axisDetails.value;
+//                            axisDetails=axis_collection[axis];
+//                            joyValue = axisDetails.value;
 						
 							
-						joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
+//                        joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
 						
-						if (axisDetails.buttonState == JoystickButtonState.Down)
-						if (joyValueMax < joyValue) {
-							joyValueMax = joyValue;
-							dominantAxis = JoystickAxis.AxisZ;
-						}
+//                        if (axisDetails.buttonState == JoystickButtonState.Down)
+//                        if (joyValueMax < joyValue) {
+//                            joyValueMax = joyValue;
+//                            dominantAxis = JoystickAxis.AxisZ;
+//                        }
 						
 						
 						
-						axis++; 
-					}
+//                        axis++; 
+//                    }
 					
 					
 					
-			if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
+//            if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
 						
-						axisDetails=axis_collection[axis];
-						joyValue = axisDetails.value;
+//                        axisDetails=axis_collection[axis];
+//                        joyValue = axisDetails.value;
 						
-						joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
+//                        joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
 						
-						if (axisDetails.buttonState == JoystickButtonState.Down)
-						if (joyValueMax < joyValue) {
-							joyValueMax = joyValue;
-							dominantAxis = JoystickAxis.AxisR;
-						}
+//                        if (axisDetails.buttonState == JoystickButtonState.Down)
+//                        if (joyValueMax < joyValue) {
+//                            joyValueMax = joyValue;
+//                            dominantAxis = JoystickAxis.AxisR;
+//                        }
 						
 						
 						
-						axis++; 
-					}
+//                        axis++; 
+//                    }
 					
 					
-			if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
+//            if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
 						
-						axisDetails=axis_collection[axis];
-						joyValue = axisDetails.value;
+//                        axisDetails=axis_collection[axis];
+//                        joyValue = axisDetails.value;
 						
-						joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
+//                        joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
 						
-						if (axisDetails.buttonState == JoystickButtonState.Down)
-						if (joyValueMax < joyValue) {
-							joyValueMax = joyValue;
-							dominantAxis = JoystickAxis.AxisU;
-						}
+//                        if (axisDetails.buttonState == JoystickButtonState.Down)
+//                        if (joyValueMax < joyValue) {
+//                            joyValueMax = joyValue;
+//                            dominantAxis = JoystickAxis.AxisU;
+//                        }
 						
 						
-						axis++; 
-					}
+//                        axis++; 
+//                    }
 					
 					
-			if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
+//            if (axis < num_axes && (axisDetails=axis_collection[axis])!=null ) { 
 						
-							axisDetails=axis_collection[axis];
-							joyValue = axisDetails.value;
+//                            axisDetails=axis_collection[axis];
+//                            joyValue = axisDetails.value;
 									
-									joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
+//                                    joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
 									
-									if (axisDetails.buttonState == JoystickButtonState.Down)
-									if (joyValueMax < joyValue) {
-										joyValueMax = joyValue;
-										dominantAxis = JoystickAxis.AxisV;
-									}
+//                                    if (axisDetails.buttonState == JoystickButtonState.Down)
+//                                    if (joyValueMax < joyValue) {
+//                                        joyValueMax = joyValue;
+//                                        dominantAxis = JoystickAxis.AxisV;
+//                                    }
 						
 						
-						axis++; 
-					}
-					
-					
-					
+//                        axis++; 
+//                    }
 
-					
-					if (dominantAxis != JoystickAxis.None) {
+            int dominantAxisInx = -1;
+					//TODO loop thru all
+            while (axis < num_axes)
+            {
+
+                if (axis < num_axes && (axisDetails = axis_collection[axis]) != null)
+                {
+
+                    axisDetails = axis_collection[axis];
+                    joyValue = axisDetails.value;
+
+                    joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
+
+                    if (axisDetails.buttonState == JoystickButtonState.Down)
+                        if (joyValueMax < joyValue)
+                        {
+                            joyValueMax = joyValue;
+                           // dominantAxis = JoystickAxis.AxisV;
+                            dominantAxisInx = axis;
+                        }
+
+
+                    
+                }
+
+                axis++;
+            }
+
+
+           // UnityEngine.Debug.Log(dominantAxisInx);
+					if(dominantAxisInx>-1){
+					//if (dominantAxis != JoystickAxis.None) {
 
                         //UnityEngine.Debug.Log("Count" + axis_collection.Count);
                        // UnityEngine.Debug.Log("dominantAxis "+dominantAxis+" state"+axis_collection[dominantAxis].buttonState);
 						
 						//stick.AxisAsButtons [dominantAxis] != JoystickButtonState.Hold;
 
+                        // index 6 and 7 are reserved for Pov Axes
+                        if (dominantAxisInx ==6) //(int)JoystickAxis.AxisPovX
+                        {
+                            if (axis_collection[dominantAxisInx].value > 0)
+                                return KeyCodeExtension.toCode((Joysticks)ID, dominantAxisInx, JoystickPovPosition.Right);
+                            else
+                                return KeyCodeExtension.toCode((Joysticks)ID, dominantAxisInx, JoystickPovPosition.Left);
+                        }
+
+                        //if (axis_collection[JoystickAxis.AxisPovX].buttonState == JoystickButtonState.Down)
+                        //{
+
+                        if (dominantAxisInx == 7)//(int)JoystickAxis.AxisPovY
+                        {
+
+                            if (axis_collection[dominantAxisInx].value > 0)
+                                return KeyCodeExtension.toCode((Joysticks)ID, dominantAxisInx, JoystickPovPosition.Forward);
+                                else
+                                return KeyCodeExtension.toCode((Joysticks)ID, dominantAxisInx, JoystickPovPosition.Backward);
+                        }
+                  
+                        if (axis_collection[dominantAxisInx].value > 0)
+                            return KeyCodeExtension.toCode((Joysticks)ID, dominantAxisInx, (int)JoystickPosition.Positive);
+						else
+							return KeyCodeExtension.toCode ((Joysticks)ID, dominantAxisInx, (int)JoystickPosition.Negative);
                         
 						
-						if (axis_collection[dominantAxis].value > 0)
-							return KeyCodeExtension.toCode ((Joysticks)ID, dominantAxis, (int)JoystickPosition.Positive);
-						else
-							return KeyCodeExtension.toCode ((Joysticks)ID, dominantAxis, (int)JoystickPosition.Negative);
+                        //if (axis_collection[dominantAxis].value > 0)
+                        //    return KeyCodeExtension.toCode ((Joysticks)ID, dominantAxis, (int)JoystickPosition.Positive);
+                        //else
+                        //    return KeyCodeExtension.toCode ((Joysticks)ID, dominantAxis, (int)JoystickPosition.Negative);
 						
 					}
 					
@@ -570,24 +622,27 @@ namespace ws.winx.devices
 					/////TODO make possible any axes to be POV (add isHatFirstAxis)
                         // axis_collection [JoystickAxis.AxisPovX].isHat
 
-                    if (numPOV > 0)
-                    {
-                        if (axis_collection[JoystickAxis.AxisPovX].buttonState == JoystickButtonState.Down)
-                        {
-                            if (axis_collection[JoystickAxis.AxisPovX].value > 0)
-                                return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.AxisPovX, JoystickPovPosition.Right);
-                            else
-                                return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.AxisPovX, JoystickPovPosition.Left);
-                        }
+                    
+                        //if(num_axes<axis)
+                        //if (axis_collection[JoystickAxis.AxisPovX].buttonState == JoystickButtonState.Down)
+                        //{
+                        //    if (axis_collection[JoystickAxis.AxisPovX].value > 0)
+                        //        return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.AxisPovX, JoystickPovPosition.Right);
+                        //    else
+                        //        return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.AxisPovX, JoystickPovPosition.Left);
+                        //}
 
-                        if (axis_collection[JoystickAxis.AxisPovY].buttonState == JoystickButtonState.Down)
-                        {
-                            if (axis_collection[JoystickAxis.AxisPovY].value > 0)
-                                return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.AxisPovY, JoystickPovPosition.Forward);
-                            else
-                                return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.AxisPovY, JoystickPovPosition.Backward);
-                        }
-                    }
+                        //axis++;
+
+                        //if(num_axes<axis)
+                        //if (axis_collection[JoystickAxis.AxisPovY].buttonState == JoystickButtonState.Down)
+                        //{
+                        //    if (axis_collection[JoystickAxis.AxisPovY].value > 0)
+                        //        return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.AxisPovY, JoystickPovPosition.Forward);
+                        //    else
+                        //        return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.AxisPovY, JoystickPovPosition.Backward);
+                        //}
+                    
 
 					
 					int button = 0;

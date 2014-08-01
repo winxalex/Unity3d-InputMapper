@@ -15,10 +15,24 @@ using ws.winx.devices;
 
 namespace ws.winx.input
 {
+    public class InputExArgs : EventArgs
+    {
+
+        public InputAction action;
+
+        public InputExArgs(InputAction action)
+        {
+
+            this.action = action;
+
+        }
+    }
+
     public class InputEx
     {
 
 
+        public event EventHandler<InputExArgs> InputProcessed;
         public static int MAX_NUM_JOYSTICK_BUTTONS = 20;
         public static int MAX_NUM_MOUSE_BUTTONS = 7;
 
@@ -33,6 +47,12 @@ namespace ws.winx.input
         static int _code;
         static int _codeFromGUIEvent;
         static int _lastCode;
+
+        public static int LastCode
+        {
+            get { return InputEx._lastCode; }
+            internal set { InputEx._lastCode = value; }
+        }
         static InputAction _lastAction;
         //		static 		int _lastFrame=-1;
         static KeyCode _key;
@@ -322,11 +342,11 @@ namespace ws.winx.input
             }
             else
             {
-                     int ID = KeyCodeExtension.toJoystickID(code);
-                     if (InputManager.hidInterface.Devices.ContainsKey(ID))
-                         return InputManager.hidInterface.Devices[ID].GetAxis(code);
-                     else
-                         return 0;
+                int ID = KeyCodeExtension.toJoystickID(code);
+                if (InputManager.hidInterface.Devices.ContainsKey(ID))
+                    return InputManager.hidInterface.Devices[ID].GetAxis(code);
+                else
+                    return 0;
             }
         }
 
@@ -569,7 +589,7 @@ namespace ws.winx.input
 
             foreach (IJoystickDevice device in devices)
             {
-                
+
                 if ((_code = device.GetInput()) != 0)
                     return processInput(_code, time);
             }
@@ -587,11 +607,106 @@ namespace ws.winx.input
             return _lastAction;
         }
 
+        protected static int _lastFrameCount = 0;
 
         /// <summary>
-        /// Processes the input.
+        /// Check if InputActin happened
         /// </summary>
-        /// <returns>The input.</returns>
+        /// <returns>true/false</returns>
+        /// <param name="action">InputAction to be compared with input</param>
+       internal static bool GetAction(InputAction action)
+        {
+
+            if (action.type == InputActionType.SINGLE)
+            {
+                if (InputEx.GetKeyDown(action))
+                {
+                    Debug.Log("Single" + Time.time + ":" + action.startTime + "<" + InputActionType.SINGLE);
+                    _lastCode = action.code;
+                    return true;
+                }
+
+                return false;
+            }
+
+
+            if (action.type == InputActionType.DOUBLE)
+            {
+                if (InputEx.GetKeyDown(action))
+                {
+                    if (_lastCode != action.code)
+                    {//first click
+
+                        _lastCode = action.code;
+                        action.startTime = Time.time;
+                        Debug.Log("First Click" + Time.time + ":" + action.startTime + "<" + InputActionType.DOUBLE);
+                        return false;
+                    }
+                    else
+                    {//InputEx.LastCode==_pointer.Current.code //second click
+                        //check time diffrence if less then
+                        if (Time.time - action.startTime < InputAction.DOUBLE_CLICK_SENSITIVITY)
+                        {
+
+                            _lastCode = 0;//???
+
+                            Debug.Log("Double " + Time.time + ":" + action.startTime + "<" + InputActionType.DOUBLE);
+
+                            return true;
+                        }
+
+                        Debug.Log("Lost Double " + Time.time + ":" + action.startTime + "<" + InputActionType.DOUBLE);
+                    }
+                }
+
+                return false;
+            }
+
+
+            if (action.type == InputActionType.LONG)
+            {
+                if (InputEx.GetKey(action))
+                {//if hold
+                    if (_lastCode != action.code)
+                    {
+
+                        _lastCode = action.code;
+
+                        action.startTime = Time.time;
+
+                        return false;
+                    }
+                    else
+                    {//InputEx.LastCode==_pointer.Current.code //hold
+                        //check time diffrence if less then
+                        if (Time.time - action.startTime >= InputAction.LONG_CLICK_SENSITIVITY)
+                        {
+
+                            _lastCode = 0;//KeyCode.None;
+                            Debug.Log("Long " + (Time.time - action.startTime) + " " + InputActionType.LONG);
+
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+
+            }
+
+
+            return false;
+
+
+        }
+
+
+
+
+        /// <summary>
+        /// Processes the input code into InputAction
+        /// </summary>
+        /// <returns>InputAction (single,double,long) or null.</returns>
         /// <param name="code">Code.</param>
         /// <param name="time">Time.</param>
         internal static InputAction processInput(int code, float time)
@@ -625,7 +740,7 @@ namespace ws.winx.input
                         //take new pressed code as lastCode
                         _lastCode = code;
 
-                        //						Debug.Log("Single "+time+":"+_lastCodeTime+" "+InputActionType.SINGLE);
+                        Debug.Log("Single " + time + ":" + _lastCodeTime + " " + InputActionType.SINGLE);
 
 
 
@@ -638,7 +753,7 @@ namespace ws.winx.input
                         {
                             action = new InputAction(_lastCode, InputActionType.DOUBLE);
                             _lastCode = 0;//KeyCode.None;
-                            //							Debug.Log("Double "+time+":"+_lastCodeTime+"<"+InputActionType.DOUBLE);
+                            Debug.Log("Double " + time + ":" + _lastCodeTime + "<" + InputActionType.DOUBLE);
                         }
 
 
@@ -661,7 +776,7 @@ namespace ws.winx.input
                         {
                             action = new InputAction(_lastCode, InputActionType.LONG);
                             _lastCode = 0;//KeyCode.None;
-                            //						Debug.Log("Long "+(time-_lastCodeTime)+" "+InputActionType.LONG);
+                            Debug.Log("Long " + (time - _lastCodeTime) + " " + InputActionType.LONG);
                         }
                     }
                     else
@@ -671,7 +786,7 @@ namespace ws.winx.input
                             action = new InputAction(_lastCode, InputActionType.SINGLE);
                             _lastCode = 0;//KeyCode.None;
 
-                            //							Debug.Log("Single after wating Double time pass "+(time-_lastCodeTime)+" "+InputActionType.SINGLE);
+                            Debug.Log("Single after wating Double time pass " + (time - _lastCodeTime) + " " + InputActionType.SINGLE);
                         }
 
                     }

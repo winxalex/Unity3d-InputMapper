@@ -30,7 +30,7 @@ namespace ws.winx.input
 		public static float DOUBLE_CLICK_SENSITIVITY = 0.2f;
 		public static float SINGLE_CLICK_SENSITIVITY = 0.3f;
 		public static float LONG_CLICK_SENSITIVITY = 0.4f;
-		public static float COMBINATION_CLICK_SENSITIVITY=0.55f;
+		public static float COMBINATION_CLICK_SENSITIVITY=0.55f;//Combination click sens should be > then long click so you can made combos with long clicks
 
 	
 
@@ -61,6 +61,7 @@ namespace ws.winx.input
 		[IgnoreDataMemberAttribute]
         #endif
         protected String _codeString;
+        public float startTime;
 
         #if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 		[DataMember(Name = "Code")]

@@ -626,6 +626,21 @@ namespace ws.winx.input
 							return toCode (joy, axis,Mathf.CeilToInt((int)pos*0.00011f)-1);
 						//return toCode (joy, axis,((int)pos/9000-1) );
 				}
+
+                /// <summary>
+                /// Tos the code.
+                /// </summary>
+                /// <returns>The code.</returns>
+                /// <param name="joy">Joy.</param>
+                /// <param name="axis">Axis.</param>
+                /// <param name="data">Data. JoystickPovPosition  </param>
+						
+                public static int toCode(Joysticks joy,int axis, JoystickPovPosition pos)
+                {
+                    return toCode(joy, axis, Mathf.CeilToInt((int)pos * 0.00011f) - 1);
+                    //return toCode (joy, axis,((int)pos/9000-1) );
+                }
+
 		
 				/// <summary>
 				/// String code like(Joystick1Button13 or Joystick9AxisYNegative or Joystick10AxisPovXLeft...) to int code 
@@ -667,6 +682,21 @@ namespace ws.winx.input
 //						UnityEngine.Debug.Log("Test"+joy+" "+axis+" "+data);
 						return KeyCodeExtension.MAX_KEY_CODE + ((((int)joy << CODE_AXIS_SHIFT | (int)axis) << CODE_DATA_SHIFT) | data);
 				}
+
+                /// <summary>
+                /// Tos the code.
+                /// </summary>
+                /// <returns>The code.</returns>
+                /// <param name="joy">Joy.</param>
+                /// <param name="axis">Axis.</param>
+                /// <param name="data">Data.</param>
+                public static int toCode(Joysticks joy, int axis, int data)
+                {
+                    //						UnityEngine.Debug.Log("Test"+joy+" "+axis+" "+data);
+                    return KeyCodeExtension.MAX_KEY_CODE + ((((int)joy << CODE_AXIS_SHIFT | axis) << CODE_DATA_SHIFT) | data);
+                }
+
+
 
 		                          
 		}

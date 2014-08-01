@@ -40,15 +40,20 @@ namespace ws.winx
             animator = GameObject.FindObjectOfType<Animator>();
 
 
-           // InputManager.defaultDriver = new UnityDriver();
-            InputManager.AddDriver(new UnityDriver());
+          
+           
 
             //supporting devices with custom drivers
+            //When you add them add specialized first then XInputDriver  then wide range supporting drivers UnityDriver
 #if UNITY_STANDALONE_WIN
             
 			   // InputManager.AddDriver(new ws.winx.platform.windows.XInputDriver());
 #endif
 
+       // !!!Postive аxes mapping only currently(need to find way to distinct postive from negative axis)
+      
+ if(Application.isPlaying)
+          InputManager.AddDriver(new UnityDriver());
 
 
             //if you want to load some states from .xml and add custom manually first load settings xml
@@ -165,22 +170,22 @@ namespace ws.winx
 			//			InputManager.MapStateToInput("My State2",new InputCombination(KeyCode.Joystick4Button9,KeyCode.P,KeyCode.JoystickButton0));
 			//			InputManager.MapStateToInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
 			//			InputManager.MapStateToInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
-			
-			
-			//easiest way to map state to combination (ex.of single W and C click)
-			InputManager.MapStateToInput("ManualAddedSTATE", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
-			
-			UnityEngine.Debug.Log("Log:" + InputManager.Log());
-			
-			
-			////Event Based input handling
-			InputEvent ev = new InputEvent("ManualAddedSTATE");
-			//InputEvent ev = new InputEvent((int)States.SomeState);
-			
-			ev.INPUT += new EventHandler(Handle1);
-			ev.INPUT += new EventHandler(Handle2);
-			ev.UP += new EventHandler(onUp);//this wouldn't fire for combo inputs(single only)
-			ev.DOWN += new EventHandler(onDown);//this wouldn't fire for combo inputs(single only)
+
+
+            ////easiest way to map state to combination (ex.of single W and C click)
+            InputManager.MapStateToInput("ManualAddedSTATE", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
+
+            UnityEngine.Debug.Log("Log:" + InputManager.Log());
+
+
+            ////Event Based input handling
+            InputEvent ev = new InputEvent("ManualAddedSTATE");
+            //InputEvent ev = new InputEvent((int)States.SomeState);
+
+            ev.INPUT += new EventHandler(Handle1);
+            ev.INPUT += new EventHandler(Handle2);
+            ev.UP += new EventHandler(onUp);//this wouldn't fire for combo inputs(single only)
+            ev.DOWN += new EventHandler(onDown);//this wouldn't fire for combo inputs(single only)
 
             _settingsLoaded = true;
         }
@@ -208,7 +213,8 @@ namespace ws.winx
 
 
             //Input.GetInput allows combos (combined input actions)
-            if (InputManager.GetInputDown((int)States.Wave))// || InputManager.GetInput((int)States.Wave,true))
+           // if (InputManager.GetInputDown((int)States.Wave))// || InputManager.GetInput((int)States.Wave,true))
+            if (InputManager.GetInput((int)States.Wave,false))
             {
                 Debug.Log("Wave Down");
                 animator.Play((int)States.Wave);
