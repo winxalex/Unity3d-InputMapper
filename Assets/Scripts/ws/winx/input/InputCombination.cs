@@ -15,65 +15,72 @@ namespace ws.winx.input
     {
 
 
-		public delegate bool InputDelegate(InputAction action);
-		
-		
-		
-		protected List<InputAction> _actionsList;
-		protected String _combinationString;
-		protected List<InputAction>.Enumerator _pointer;
-		protected float _analogValue=0f;
-		protected float _timeDelta;
-		protected bool _isActive=false;
+        public delegate bool InputDelegate(InputAction action);
 
 
-		private InputAction __currentInputAction;
+
+        protected List<InputAction> _actionsList;
+        protected String _combinationString;
+        protected List<InputAction>.Enumerator _pointer;
+        protected float _analogValue = 0f;
+        protected float _timeDelta;
+        protected bool _isActive = false;
+
+
+        private InputAction __currentInputAction;
         /// <summary>
         /// time when action in combination has started
         /// (by diffrence this time with the current time and comparing to Combination sensitivity we could know 
         /// if combination sequence should be reseted)
         /// </summary>
-		private float __actionHappenTime;
-		private float __range;
-		private KeyCode __lastCode;
+        private float __actionHappenTime;
+        private float __range;
+        private KeyCode __lastCode;
 
-		#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
+#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
 		[DataMember(Name = "InputActions")]
 #endif
-		public List<InputAction> actions{
-			get{return _actionsList;}
-			set{ 
-				_actionsList=value; 
-				_combinationString=ToString(value);
-				initPointer();
+        public List<InputAction> actions
+        {
+            get { return _actionsList; }
+            set
+            {
+                _actionsList = value;
+                _combinationString = ToString(value);
+                initPointer();
 
-			}
-		}
+            }
+        }
 
-		public int numActions{
-			get{
-				return _actionsList.Count;
-			}
-		}
-		
-		public bool isActive
-		{
-			get{ return _isActive; }
-			set {  _isActive =value; }
-		}
-		
-		
-		public String combinationString
-		{
-			get{ 
-				if(_combinationString==null) _combinationString=ToString(_actionsList);
-				return _combinationString; 
-			}
-			set {  _combinationString =value; 
-					_actionsList.Clear();
-					parse(combinationString);
-			}
-		}
+        public int numActions
+        {
+            get
+            {
+                return _actionsList.Count;
+            }
+        }
+
+        public bool isActive
+        {
+            get { return _isActive; }
+            set { _isActive = value; }
+        }
+
+
+        public String combinationString
+        {
+            get
+            {
+                if (_combinationString == null) _combinationString = ToString(_actionsList);
+                return _combinationString;
+            }
+            set
+            {
+                _combinationString = value;
+                _actionsList.Clear();
+                parse(combinationString);
+            }
+        }
 
 
         /// <summary>
@@ -94,150 +101,166 @@ namespace ws.winx.input
         }
 
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ws.winx.input.InputCombination"/> class.
-		/// </summary>
-		/// <param name="codes">Codes.</param>
-		public  InputCombination(params KeyCode[] codes){
-			_actionsList=new List<InputAction>();
-			for(int i=0;i<codes.Length;i++)
-				_actionsList.Add(new InputAction(codes[i]));
-			
-			initPointer();
-		}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ws.winx.input.InputCombination"/> class.
+        /// </summary>
+        /// <param name="codes">Codes.</param>
+        public InputCombination(params KeyCode[] codes)
+        {
+            _actionsList = new List<InputAction>();
+            for (int i = 0; i < codes.Length; i++)
+                _actionsList.Add(new InputAction(codes[i]));
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ws.winx.input.InputCombination"/> class.
-		/// </summary>
-		/// <param name="codes">Codes ex. (int)KeyCode.P,(int)Joystick2Button12,InputCodes.toCode (Joysticks joy,JoystickAxis axis,JoystickPosition pos),...</param>
-		public  InputCombination(params int[] codes){
-			//_actionsList=codes.Select(entry => new InputAction(entry)).ToList();
+            initPointer();
+        }
 
-			_actionsList=new List<InputAction>();
-			for(int i=0;i<codes.Length;i++)
-				_actionsList.Add(new InputAction(codes[i]));
-			
-			initPointer();
-			
-			
-		}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ws.winx.input.InputCombination"/> class.
+        /// </summary>
+        /// <param name="codes">Codes ex. (int)KeyCode.P,(int)Joystick2Button12,InputCodes.toCode (Joysticks joy,JoystickAxis axis,JoystickPosition pos),...</param>
+        public InputCombination(params int[] codes)
+        {
+            //_actionsList=codes.Select(entry => new InputAction(entry)).ToList();
 
+            _actionsList = new List<InputAction>();
+            for (int i = 0; i < codes.Length; i++)
+                _actionsList.Add(new InputAction(codes[i]));
+
+            initPointer();
 
 
+        }
 
 
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ws.winx.input.InputCombination"/> class.
-		/// </summary>
-		/// <param name="combinations">Combinations.</param>
-		public  InputCombination(List<InputAction> combinations){
-			_actionsList=combinations;
 
 
-			initPointer();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ws.winx.input.InputCombination"/> class.
+        /// </summary>
+        /// <param name="combinations">Combinations.</param>
+        public InputCombination(List<InputAction> combinations)
+        {
+            _actionsList = combinations;
 
 
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ws.winx.input.InputCombination"/> class.
-		/// </summary>
-		/// <param name="combinationString">Combination string.</param>
-		public  InputCombination(String combinationString){
-			_actionsList=new List<InputAction>();
-
-			this.combinationString=combinationString;
+            initPointer();
 
 
-			initPointer();
+        }
 
-		}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ws.winx.input.InputCombination"/> class.
+        /// </summary>
+        /// <param name="combinationString">Combination string.</param>
+        public InputCombination(String combinationString)
+        {
+            _actionsList = new List<InputAction>();
+
+            this.combinationString = combinationString;
 
 
-		public InputAction GetActionAt(int inx){
-			return _actionsList.ElementAt(inx);
-		}
+            initPointer();
+
+        }
 
 
-		public void Add(InputAction action){
-			_actionsList.Add(action);
-			_combinationString=ToString(_actionsList);
+        public InputAction GetActionAt(int inx)
+        {
+            return _actionsList.ElementAt(inx);
+        }
+
+
+        public void Add(InputAction action)
+        {
+            _actionsList.Add(action);
+            _combinationString = ToString(_actionsList);
 
             //if(_actionsList.Count>0)
             initPointer();
-		}
+        }
 
-		public void Clear(){
-			_actionsList.Clear();
-			_combinationString=String.Empty;
-		}
+        public void Clear()
+        {
+            _actionsList.Clear();
+            _combinationString = String.Empty;
+        }
 
-		public bool Pop(){
-			return _actionsList.Remove(_actionsList.Last());
-		}
+        public bool Pop()
+        {
+            return _actionsList.Remove(_actionsList.Last());
+        }
 
-	
 
-		
-		
-		protected bool GetInputBase(InputDelegate keyCallback,bool atOnce=false){
+
+
+
+        protected bool GetInputBase(InputDelegate keyCallback, bool atOnce = false)
+        {
             if (__currentInputAction.type == InputActionType.SINGLE && _actionsList.Count == 1)
             {
-				
-				return keyCallback(__currentInputAction);
-				
-			}else{
-				if(atOnce)
-					return GetCombinationInput(keyCallback);
-				else
-					return GetCombinationInput();
-			}
 
-		}
-		
-		
-		
-		internal bool GetInput(bool atOnce){
-                  
-				 return GetInputBase(InputEx.GetKey,atOnce); 
-    	}
-		
-		
-		
-		internal bool GetInputUp(){
+                return keyCallback(__currentInputAction);
+
+            }
+            else
+            {
+                if (atOnce)
+                    return GetCombinationInput(keyCallback);
+                else
+                    return GetCombinationInput();
+            }
+
+        }
+
+
+
+        internal bool GetInput(bool atOnce)
+        {
+
+            return GetInputBase(InputEx.GetKey, atOnce);
+        }
+
+
+
+        internal bool GetInputUp()
+        {
             if (_actionsList.Count == 1)
-			    return GetInputBase(InputEx.GetKeyUp);
+                return GetInputBase(InputEx.GetKeyUp);
             else { /*Debug.LogWarning("Use GetInput only with Combos");*/ return false; }
 
-		}
-		
-		internal bool GetInputDown(){
-              if (_actionsList.Count == 1)
-		      return GetInputBase(InputEx.GetKeyDown);
-              else { /*Debug.LogWarning("Use GetInput only with Combos");*/ return false; }
-		}
+        }
+
+        internal bool GetInputDown()
+        {
+            if (_actionsList.Count == 1)
+                return GetInputBase(InputEx.GetKeyDown);
+            else { /*Debug.LogWarning("Use GetInput only with Combos");*/ return false; }
+        }
 
 
         //TODO this with corutine to compare performace
-		internal bool GetCombinationInput(InputDelegate keyCallback){
-			_pointer=_actionsList.GetEnumerator();
-			_pointer.MoveNext();
-			
-			do{
-				if(keyCallback(_pointer.Current)==false) return false;
-				
-			}while(_pointer.MoveNext()!=false);
-			
-			
-			
-			return true;
-		}
+        internal bool GetCombinationInput(InputDelegate keyCallback)
+        {
+            _pointer = _actionsList.GetEnumerator();
+            _pointer.MoveNext();
 
-        
+            do
+            {
+                if (keyCallback(_pointer.Current) == false) return false;
 
-		//TODO this with corutine to compare performace
-		internal bool GetCombinationInput()
+            } while (_pointer.MoveNext() != false);
+
+
+
+            return true;
+        }
+
+
+
+        //TODO this with corutine to compare performace
+        internal bool GetCombinationInput()
 		{
 
 
@@ -278,7 +301,7 @@ namespace ws.winx.input
 									_pointer.MoveNext();//start from beginin
 									__actionHappenTime=0;
                                     InputEx.LastCode = 0;
-                                    UnityEngine.Debug.Log("Reset Time Cos Time Pass:" + Time.time + " Time Allowed:" + (__actionHappenTime + InputAction.COMBINATION_CLICK_SENSITIVITY));
+                                   // UnityEngine.Debug.Log("Reset Time Cos Time Passed (Too late):" + Time.time + " Time Allowed:" + (__actionHappenTime + InputAction.COMBINATION_CLICK_SENSITIVITY));
 
 								}
 
@@ -289,19 +312,54 @@ namespace ws.winx.input
 							}
 						//UnityEngine.Debug.Log("CodeAfter New Between Code or not same type:"+_pointer.Current.codeString);
 
-                //__lastInputTime>0 (if at least one of the action of the happend) and time to next action is less then InputAction.COMBINATION_CLICK_SENSITIVITY
-						 if((__actionHappenTime>0 && Time.time>__actionHappenTime+InputAction.COMBINATION_CLICK_SENSITIVITY)
-                // ||  (InputEx.anyKeyDown && code==0)){//or some other key was down and that key isn't expected one
-                             || (Time.time>_pointer.Current.startTime+InputAction.COMBINATION_CLICK_SENSITIVITY &&  InputEx.LastCode==_pointer.Current.code)) { // && InputEx.anyKeyDown or waiting for action
 
-						UnityEngine.Debug.Log("Reset in Idle or another key pressed"+Time.time+" Time Allowed:"+(__actionHappenTime+InputAction.COMBINATION_CLICK_SENSITIVITY));
+                //combination stated but never continue in allowed time InputAction.COMBINATION_CLICK_SENSITIVITY
+            if(__actionHappenTime>0 && Time.time>__actionHappenTime+InputAction.COMBINATION_CLICK_SENSITIVITY){
+                            // UnityEngine.Debug.Log("Reset in Idle "+Time.time+" Time Allowed:"+(__actionHappenTime+InputAction.COMBINATION_CLICK_SENSITIVITY));
+
+						    _pointer=_actionsList.GetEnumerator();//Reset pointer
+						    _pointer.MoveNext();//start from beginin
+						    __actionHappenTime=0;
+                              InputEx.LastCode = 0;
+                             return false;
+
+                         }
+
+             // time passed while waiting for double/long action to happen => don't reset we aren't idle
+             if(Time.time>_pointer.Current.startTime+InputAction.COMBINATION_CLICK_SENSITIVITY &&  InputEx.LastCode==_pointer.Current.code)// or waiting for double/long action to happen => don't reset we aren't idle
+            {
+
+                //UnityEngine.Debug.Log("Reset in cos time waiting for double/long passed" + Time.time + " Time Allowed:" + (_pointer.Current.startTime + InputAction.COMBINATION_CLICK_SENSITIVITY));
 
 						_pointer=_actionsList.GetEnumerator();//Reset pointer
 						_pointer.MoveNext();//start from beginin
 						__actionHappenTime=0;
                         InputEx.LastCode = 0;
+
+                 return false;
                      
 				}
+
+
+
+
+
+
+               
+                          
+                        if (InputEx.anyKeyDown && InputEx.LastCode!=_pointer.Current.code && __actionHappenTime>0) 
+                         {
+                           // UnityEngine.Debug.Log("Last Code:"+InputEx.LastCode+" current"+_pointer.Current.codeString);
+                           //  UnityEngine.Debug.Log("Reset cos some other key is pressed" + InputEx.anyKeyDown + " Unity anykey:" + Input.anyKeyDown);
+
+						    _pointer=_actionsList.GetEnumerator();//Reset pointer
+						    _pointer.MoveNext();//start from beginin
+						    __actionHappenTime=0;
+                            InputEx.LastCode = 0;
+                            return false;
+                         }
+                     
+				
 
 
 		
@@ -311,157 +369,173 @@ namespace ws.winx.input
 		}
 
 
-		internal float GetAxis(float sensitivity,float dreadzone,float gravity){
-			if(_actionsList.Count>1) return 0;
+        internal float GetAxis(float sensitivity, float dreadzone, float gravity)
+        {
+            if (_actionsList.Count > 1) return 0;
 
-			if(__currentInputAction.code<KeyCodeExtension.MAX_KEY_CODE || KeyCodeExtension.toAxis(__currentInputAction.code)==JoystickAxis.None){//if keys are used as axis
-				return GetVirtualAxis(sensitivity,dreadzone,gravity);
-			}
+            if (__currentInputAction.code < KeyCodeExtension.MAX_KEY_CODE || KeyCodeExtension.toAxis(__currentInputAction.code) == JoystickAxis.None)
+            {//if keys are used as axis
+                return GetVirtualAxis(sensitivity, dreadzone, gravity);
+            }
 
-			//TODO made dreadzone rounding to axis
-			return InputEx.GetAxis(__currentInputAction);
+            //TODO made dreadzone rounding to axis
+            return InputEx.GetAxis(__currentInputAction);
 
-		}
-		
-		
-		internal float GetVirtualAxis(float sensitivity,float dreadzone,float gravity){
-			
+        }
 
-			if (InputEx.GetKey(__currentInputAction))
-			{
-				_isActive=true;
-				_timeDelta += Time.deltaTime * sensitivity;
-				
-				//timeDelta need to go from 0 to 1  (which mean from 0 to 100% of range difference)
-				_analogValue = Mathf.Lerp(0, 1, Mathf.Clamp01(_timeDelta));
-				
-				
-				if(_analogValue<dreadzone)
-				{
-					_analogValue=0;
-				}
-				
-			
-				
-			}else{ //on KeyUp reset _timeDelta
-				if(InputEx.GetKeyUp(__currentInputAction)) 
-				{
-					_isActive=false;
-					_timeDelta = 0f;//reset
-					
-					if(!(gravity>0))_analogValue=0;
-					
-					return _analogValue;
-				}
 
-				
-				//effect of gravity
-				if(_analogValue != 0){
-					
-					_timeDelta += Time.deltaTime * gravity;
-					_analogValue = Mathf.Lerp(_analogValue, 0, Mathf.Clamp01(_timeDelta));
-				}
-			}
-			
-			
-			
-			
-			return _analogValue;
-			
-			
-		}
+        internal float GetVirtualAxis(float sensitivity, float dreadzone, float gravity)
+        {
+
+
+            if (InputEx.GetKey(__currentInputAction))
+            {
+                _isActive = true;
+                _timeDelta += Time.deltaTime * sensitivity;
+
+                //timeDelta need to go from 0 to 1  (which mean from 0 to 100% of range difference)
+                _analogValue = Mathf.Lerp(0, 1, Mathf.Clamp01(_timeDelta));
+
+
+                if (_analogValue < dreadzone)
+                {
+                    _analogValue = 0;
+                }
 
 
 
-		public void reset(){
-			_timeDelta=0f;
-			_analogValue=0f;
-			_isActive=false;
-		}
-		
-		
-		public InputCombination Clone ()
-		{
-			return new InputCombination(_combinationString);
-		}
+            }
+            else
+            { //on KeyUp reset _timeDelta
+                if (InputEx.GetKeyUp(__currentInputAction))
+                {
+                    _isActive = false;
+                    _timeDelta = 0f;//reset
+
+                    if (!(gravity > 0)) _analogValue = 0;
+
+                    return _analogValue;
+                }
 
 
-		/// <summary>
-		/// Returns a <see cref="System.String"/> that represents the current <see cref="ws.winx.input.InputCombination"/>.
-		/// </summary>
-		/// <returns>A <see cref="System.String"/> that represents the current <see cref="ws.winx.input.InputCombination"/>.</returns>
-		public override string ToString ()
-		{
-			return combinationString;
-		}
-		
-		
-		/// <summary>
-		/// Inits the pointer.
-		/// </summary>
-		protected void initPointer(){
-			_pointer=_actionsList.GetEnumerator();
-			
-			_pointer.MoveNext();
-			__currentInputAction=_pointer.Current;
-		}
+                //effect of gravity
+                if (_analogValue != 0)
+                {
+
+                    _timeDelta += Time.deltaTime * gravity;
+                    _analogValue = Mathf.Lerp(_analogValue, 0, Mathf.Clamp01(_timeDelta));
+                }
+            }
 
 
-		/// <summary>
-		/// Tos the string.
-		/// </summary>
-		/// <returns>The string.</returns>
-		/// <param name="list">List.</param>
-		protected string ToString(List<InputAction> list){
-			StringBuilder strBuilder=new StringBuilder();
-			List<InputAction>.Enumerator ptr=list.GetEnumerator();//Reset pointer
-			
-			
-			while(ptr.MoveNext()){
-				strBuilder.Append(ptr.Current.ToString()+InputAction.SPACE_DESIGNATOR);
-			}
-			
-			strBuilder.Remove(strBuilder.Length-1,1);
-			
-			return strBuilder.ToString();
-		}
-		
-		/// <summary>
-		/// Parse the specified combinationString.
-		/// </summary>
-		/// <param name="combinationString">Combination string.</param>
-		protected void parse(String combinationString){
-			
-			int len=combinationString.Length;
-			int inx=0;
-			int lastInx=0;
-			
-			if((inx=combinationString.IndexOf(InputAction.SPACE_DESIGNATOR,inx))>-1){
-				
-				_actionsList.Add(new InputAction(combinationString.Substring(lastInx,inx-lastInx)));
-				lastInx=++inx;
-				
-				while(inx <len)
-				{
-					if((inx=combinationString.IndexOf(InputAction.SPACE_DESIGNATOR,inx))>-1){
-						_actionsList.Add(new InputAction(combinationString.Substring(lastInx,inx-lastInx)));
-						lastInx=++inx;
-					}else{
-						_actionsList.Add(new InputAction(combinationString.Substring(lastInx,len-lastInx)));
-						break;
-					}
-					
-				}
-			}
-			else{
-				_actionsList.Add(new InputAction(combinationString));
-			}
-			
-			
 
-			
-		}
 
-       
+            return _analogValue;
+
+
+        }
+
+
+
+        public void reset()
+        {
+            _timeDelta = 0f;
+            _analogValue = 0f;
+            _isActive = false;
+        }
+
+
+        public InputCombination Clone()
+        {
+            return new InputCombination(_combinationString);
+        }
+
+
+        /// <summary>
+        /// Returns a <see cref="System.String"/> that represents the current <see cref="ws.winx.input.InputCombination"/>.
+        /// </summary>
+        /// <returns>A <see cref="System.String"/> that represents the current <see cref="ws.winx.input.InputCombination"/>.</returns>
+        public override string ToString()
+        {
+            return combinationString;
+        }
+
+
+        /// <summary>
+        /// Inits the pointer.
+        /// </summary>
+        protected void initPointer()
+        {
+            _pointer = _actionsList.GetEnumerator();
+
+            _pointer.MoveNext();
+            __currentInputAction = _pointer.Current;
+        }
+
+
+        /// <summary>
+        /// Tos the string.
+        /// </summary>
+        /// <returns>The string.</returns>
+        /// <param name="list">List.</param>
+        protected string ToString(List<InputAction> list)
+        {
+            StringBuilder strBuilder = new StringBuilder();
+            List<InputAction>.Enumerator ptr = list.GetEnumerator();//Reset pointer
+
+
+            while (ptr.MoveNext())
+            {
+                strBuilder.Append(ptr.Current.ToString() + InputAction.SPACE_DESIGNATOR);
+            }
+
+            strBuilder.Remove(strBuilder.Length - 1, 1);
+
+            return strBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Parse the specified combinationString.
+        /// </summary>
+        /// <param name="combinationString">Combination string.</param>
+        protected void parse(String combinationString)
+        {
+
+            int len = combinationString.Length;
+            int inx = 0;
+            int lastInx = 0;
+
+            if ((inx = combinationString.IndexOf(InputAction.SPACE_DESIGNATOR, inx)) > -1)
+            {
+
+                _actionsList.Add(new InputAction(combinationString.Substring(lastInx, inx - lastInx)));
+                lastInx = ++inx;
+
+                while (inx < len)
+                {
+                    if ((inx = combinationString.IndexOf(InputAction.SPACE_DESIGNATOR, inx)) > -1)
+                    {
+                        _actionsList.Add(new InputAction(combinationString.Substring(lastInx, inx - lastInx)));
+                        lastInx = ++inx;
+                    }
+                    else
+                    {
+                        _actionsList.Add(new InputAction(combinationString.Substring(lastInx, len - lastInx)));
+                        break;
+                    }
+
+                }
+            }
+            else
+            {
+                _actionsList.Add(new InputAction(combinationString));
+            }
+
+
+
+
+        }
+
+
     }
 }

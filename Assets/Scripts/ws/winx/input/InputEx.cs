@@ -639,7 +639,7 @@ namespace ws.winx.input
 
                         _lastCode = action.code;
                         action.startTime = Time.time;
-                        Debug.Log("First Click" + Time.time + ":" + action.startTime + "<" + InputActionType.DOUBLE);
+                        //Debug.Log("First Click" + Time.time + ":" + action.startTime + "<" + InputActionType.DOUBLE);
                         return false;
                     }
                     else
@@ -649,13 +649,13 @@ namespace ws.winx.input
                         {
 
                             _lastCode = 0;//???
-
-                            Debug.Log("Double " + Time.time + ":" + action.startTime + "<" + InputActionType.DOUBLE);
+                            action.startTime = 0;
+                           // Debug.Log("Double " + Time.time + ":" + action.startTime + "<" + InputActionType.DOUBLE);
 
                             return true;
                         }
 
-                        Debug.Log("Lost Double " + Time.time + ":" + action.startTime + "<" + InputActionType.DOUBLE);
+                       // Debug.Log("Lost Double " + Time.time + ":" + action.startTime + "<" + InputActionType.DOUBLE);
                     }
                 }
 
@@ -683,7 +683,8 @@ namespace ws.winx.input
                         {
 
                             _lastCode = 0;//KeyCode.None;
-                            Debug.Log("Long " + (Time.time - action.startTime) + " " + InputActionType.LONG);
+                            action.startTime = 0;
+                           // Debug.Log("Long " + (Time.time - action.startTime) + " " + InputActionType.LONG);
 
                             return true;
                         }
