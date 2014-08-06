@@ -15,9 +15,9 @@ namespace ws.winx.platform.web
     public class WebHIDInterface : IHIDInterface
     {
         #region Fields
-        private List<IJoystickDriver> __drivers;// = new List<IJoystickDriver>();
+        private List<IDriver> __drivers;// = new List<IJoystickDriver>();
        
-        private IJoystickDriver __defaultJoystickDriver;
+        private IDriver __defaultJoystickDriver;
         JoystickDevicesCollection __joysticks;
         GameObject _container;
 
@@ -29,7 +29,7 @@ namespace ws.winx.platform.web
         #endregion
 
 #region Constructors
-        public WebHIDInterface(List<IJoystickDriver> drivers)
+        public WebHIDInterface(List<IDriver> drivers)
         {
             __drivers = drivers;
             __joysticks = new JoystickDevicesCollection();
@@ -55,7 +55,7 @@ namespace ws.winx.platform.web
         }
 
 
-        public IJoystickDriver defaultDriver
+        public IDriver defaultDriver
         {
             get
             {

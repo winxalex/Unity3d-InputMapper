@@ -33,7 +33,7 @@ namespace ws.winx.input
 		private static InputCombination[] __inputCombinations;
 		private static InputSettings __settings;//=new InputSettings();
 		private static IHIDInterface __hidInterface;//=new ws.winx.platform.windows.WinHIDInterface();
-        private static List<IJoystickDriver> __drivers;
+        private static List<IDriver> __drivers;
 
 
         /// <summary>
@@ -109,8 +109,8 @@ namespace ws.winx.input
         /// Add driver that would support custom device (see WinMMDriver,OSXDriver...for HOW TO)
         /// </summary>
         /// <param name="driver"></param>
-		public static void AddDriver(IJoystickDriver driver){
-            if(__drivers==null) __drivers= new List<IJoystickDriver>();
+		public static void AddDriver(IDriver driver){
+            if(__drivers==null) __drivers= new List<IDriver>();
             __drivers.Add(driver);
 		}
 

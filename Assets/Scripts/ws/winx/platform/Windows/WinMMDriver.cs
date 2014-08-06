@@ -11,7 +11,7 @@ using ws.winx.devices;
 
 namespace ws.winx.platform.windows
 {
-    sealed class WinMMDriver : IJoystickDriver
+    sealed class WinMMDriver : IDriver
     {
         #region Fields
 

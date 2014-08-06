@@ -8,21 +8,22 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 using System;
-using UnityEngine;
-using ws.winx.devices;
-using System.Collections.Generic;
 
 namespace ws.winx.platform
 {
-		public interface IHIDInterface:IDisposable
+		public interface IHIDDevice
 		{
-            
-			IDriver defaultDriver{get;set;}
-			IDeviceCollection Devices{get;}
-            Dictionary<IJoystickDevice, HIDDevice> Generics{get;}
-			void Update();
-		    
+           
 
+			IHIDInterface hidInterface {get;}
+            int index { get; }
+			int VID{get;}
+			int PID{get;}
+			IntPtr deviceHandle {get;}
+			string DevicePath {get;}
+            object Extension { set; get; }
+            string Name { get; }
+          
 		}
 }
 

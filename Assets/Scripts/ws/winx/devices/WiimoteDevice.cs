@@ -137,7 +137,7 @@ namespace ws.winx.devices
         private const int REPORT_LENGTH = 22;
 
 
-        public WiimoteDevice(int id,int pid,int vid, int axes, int buttons,int leds,int irs,IJoystickDriver driver)
+        public WiimoteDevice(int id,int pid,int vid, int axes, int buttons,int leds,int irs,IDriver driver)
             : base(id,pid,vid,axes,buttons,driver)
         {
 

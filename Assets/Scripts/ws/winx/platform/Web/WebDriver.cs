@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace ws.winx.platform.web
 {
-	public class WebDriver:IJoystickDriver
+	public class WebDriver:IDriver
 	{
         protected bool _isReady=true;
        // protected WebHIDBehaviour _webHidBehavior;

@@ -17,7 +17,7 @@ using UnityEngine;
 
 namespace ws.winx.platform.windows
 {
-    public class XInputDriver : IJoystickDriver
+    public class XInputDriver : IDriver
     {
 
         XInputState state;

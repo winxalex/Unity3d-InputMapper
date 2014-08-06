@@ -11,7 +11,7 @@ namespace ws.winx.devices
         public readonly int Type;
 
 
-        public XInputDevice(int id,int pid,int vid,int axes,int buttons,IJoystickDriver driver,int type)
+        public XInputDevice(int id,int pid,int vid,int axes,int buttons,IDriver driver,int type)
             : base(id,pid,vid, axes, buttons,driver)
         {
             this.Type = type;

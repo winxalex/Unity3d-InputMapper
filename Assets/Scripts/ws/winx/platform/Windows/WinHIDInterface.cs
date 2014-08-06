@@ -27,10 +27,10 @@ namespace ws.winx.platform.windows
 
 
         #region Fields
-        private List<IJoystickDriver> __drivers;// = new List<IJoystickDriver>();
+        private List<IDriver> __drivers;// = new List<IJoystickDriver>();
 
 
-        private IJoystickDriver __defaultJoystickDriver;
+        private IDriver __defaultJoystickDriver;
 
         JoystickDevicesCollection _joysticks;
 
@@ -70,7 +70,7 @@ namespace ws.winx.platform.windows
         /// <summary>
         /// add or get default driver (Overall driver for unhanlded devices by other specialized driver)
         /// </summary>
-        public IJoystickDriver defaultDriver
+        public IDriver defaultDriver
         {
             get { if (__defaultJoystickDriver == null) { __defaultJoystickDriver = new WinMMDriver(); } return __defaultJoystickDriver; }
             set { __defaultJoystickDriver = value; }
@@ -113,7 +113,7 @@ namespace ws.winx.platform.windows
 
 
         #region Constructor
-        public WinHIDInterface(List<IJoystickDriver> drivers)
+        public WinHIDInterface(List<IDriver> drivers)
         {
             __drivers = drivers;
             _joysticks = new JoystickDevicesCollection();

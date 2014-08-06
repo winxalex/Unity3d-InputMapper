@@ -10,7 +10,7 @@ namespace ws.winx.platform
     /// Defines the interface for JoystickDevice drivers.
     /// </summary>
     //[Obsolete]
-    public interface IJoystickDriver
+    public interface IDriver
     {
 
 		/// <summary>

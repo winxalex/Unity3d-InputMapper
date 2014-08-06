@@ -8,7 +8,7 @@ using ws.winx.devices;
 
 namespace ws.winx.unity
 {
-	public class UnityDriver:IJoystickDriver
+	public class UnityDriver:IDriver
 	{
 
 

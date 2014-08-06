@@ -23,7 +23,7 @@ namespace ws.winx.devices
 		
 
 				
-				IJoystickDriver _driver;
+				IDriver _driver;
 				int _ID = -1;
 				string _description;
 				JoystickAxisCollection<IAxisDetails> axis_collection;
@@ -41,7 +41,7 @@ namespace ws.winx.devices
 
         #region Constructors
 
-				internal JoystickDevice (int id,int pid,int vid,int axes, int buttons,IJoystickDriver driver)
+				internal JoystickDevice (int id,int pid,int vid,int axes, int buttons,IDriver driver)
 				{
 						if (axes < 0)
 								throw new ArgumentOutOfRangeException ("axes");
@@ -106,7 +106,7 @@ namespace ws.winx.devices
 			}
 		}
 
-		public IJoystickDriver driver {
+		public IDriver driver {
 			get {
 				return _driver;
 			}
