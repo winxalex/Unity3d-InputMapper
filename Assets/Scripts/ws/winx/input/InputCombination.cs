@@ -266,7 +266,7 @@ namespace ws.winx.input
 
                             
           
-							int code=0;
+							//int code=0;
                            
             
                              //TODO

@@ -16,30 +16,43 @@ namespace ws.winx.platform.web
     {
         #region Fields
         private List<IJoystickDriver> __drivers;// = new List<IJoystickDriver>();
+       
         private IJoystickDriver __defaultJoystickDriver;
-        JoystickDevicesCollection _joysticks;
+        JoystickDevicesCollection __joysticks;
         GameObject _container;
-        WebHIDBehaviour w;
+
+        //link towards Browser
+        internal readonly WebHIDBehaviour webHIDBehaviour;
+        private Dictionary<IJoystickDevice, HIDDevice> __Generics;
 
        
         #endregion
 
-        #region Constructors
+#region Constructors
         public WebHIDInterface(List<IJoystickDriver> drivers)
         {
             __drivers = drivers;
-            _joysticks = new JoystickDevicesCollection();
+            __joysticks = new JoystickDevicesCollection();
+            __Generics=new Dictionary<IJoystickDevice,HIDDevice>();
 
             //"{"id":"feed-face-VJoy Virtual Joystick","axes":[0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0,0,0,0,0,0,-1,0,0,0,0,0,0],"buttons":[{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}],"index":0}"
 
             _container = new GameObject("WebHIDBehaviourGO");
-            w= _container.AddComponent<WebHIDBehaviour>();
-            w.DeviceDisconnectedEvent += new EventHandler<WebMessageArgs>(DeviceDisconnectedEventHandler);
-            w.DeviceConnectedEvent += new EventHandler<WebMessageArgs>(DeviceConnectedEventHandler);
-            w.GamePadEventsSupportEvent += new EventHandler<WebMessageArgs>(GamePadEventsSupportHandler);
+            webHIDBehaviour= _container.AddComponent<WebHIDBehaviour>();
+            webHIDBehaviour.DeviceDisconnectedEvent += new EventHandler<WebMessageArgs>(DeviceDisconnectedEventHandler);
+            webHIDBehaviour.DeviceConnectedEvent += new EventHandler<WebMessageArgs>(DeviceConnectedEventHandler);
+            webHIDBehaviour.GamePadEventsSupportEvent += new EventHandler<WebMessageArgs>(GamePadEventsSupportHandler);
 
         }
         #endregion
+
+        #region IHIDInterface implementation
+
+        public Dictionary<IJoystickDevice, HIDDevice> Generics
+        {
+            get { return __Generics; }
+
+        }
 
 
         public IJoystickDriver defaultDriver
@@ -57,7 +70,7 @@ namespace ws.winx.platform.web
 
         public IDeviceCollection Devices
         {
-            get { return _joysticks; }
+            get { return __joysticks; }
         }
 
 
@@ -66,7 +79,7 @@ namespace ws.winx.platform.web
         /// Try to attach compatible driver based on device info
         /// </summary>
         /// <param name="deviceInfo"></param>
-        protected void ResolveDevice(HIDDeviceInfo deviceInfo)
+        protected void ResolveDevice(HIDDevice deviceInfo)
         {
 
             IJoystickDevice joyDevice = null;
@@ -79,9 +92,9 @@ namespace ws.winx.platform.web
                     if (joyDevice != null)
                     {
                         //new IntPtr just for compatibility
-                        _joysticks[new IntPtr(joyDevice.PID)] = joyDevice;
+                        __joysticks[new IntPtr(joyDevice.PID)] = joyDevice;
                         Debug.Log("Device PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + driver.GetType().ToString());
-
+                        this.__Generics[joyDevice]=deviceInfo;
                         break;
                     }
                 }
@@ -95,12 +108,12 @@ namespace ws.winx.platform.web
                 {
 
                     //new IntPtr just for compatibility
-                    _joysticks[new IntPtr(joyDevice.PID)] = joyDevice;
+                    __joysticks[new IntPtr(joyDevice.PID)] = joyDevice;
 
-                    Debug.Log(_joysticks[deviceInfo.index]);
+                    Debug.Log(__joysticks[deviceInfo.index]);
 
                     Debug.Log("Device index:" + joyDevice.ID + " PID:" + joyDevice.PID + " VID:" + joyDevice.VID + " attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + deviceInfo.DevicePath + " Name:" + joyDevice.Name);
-
+                     this.__Generics[joyDevice]=deviceInfo;
                 }
                 else
                 {
@@ -113,8 +126,8 @@ namespace ws.winx.platform.web
 
         }
 
+        #endregion
 
-      
 
 
         public void GamePadEventsSupportHandler(object sender, WebMessageArgs args)
@@ -125,11 +138,13 @@ namespace ws.winx.platform.web
         public void DeviceConnectedEventHandler(object sender,WebMessageArgs args)
         {
            // UnityEngine.Debug.Log(args.Message);
-            Json.GamePadInfo info=Json.Deserialize(args.Message) as Json.GamePadInfo;
+            GenericHIDDevice info=Json.Deserialize<GenericHIDDevice>(args.RawMessage) as GenericHIDDevice;
+           
           
-             if(!_joysticks.ContainsKey(info.index))
+             if(!__joysticks.ContainsKey(info.index))
              {
                  info.hidInterface = this;
+                 
                  ResolveDevice(info);
              }
         }
@@ -137,10 +152,12 @@ namespace ws.winx.platform.web
         public void DeviceDisconnectedEventHandler(object sender, WebMessageArgs args)
         {
           
-            int id = Int32.Parse(args.Message);
-            Debug.Log("Device "+_joysticks[id].Name+" index:" +id+" Removed");
-            _joysticks.Remove(id);
-
+            int id = Int32.Parse(args.RawMessage);
+            Debug.Log("Device "+__joysticks[id].Name+" index:" +id+" Removed");
+            this.__Generics.Remove(__joysticks[id]);
+            __joysticks.Remove(id);
+           
+           
              
         }
       
@@ -152,14 +169,14 @@ namespace ws.winx.platform.web
         }
 
 
-        #region JoystickDevicesCollection
+#region JoystickDevicesCollection
 
         /// <summary>
         /// Defines a collection of JoystickAxes.
         /// </summary>
         public sealed class JoystickDevicesCollection : IDeviceCollection
         {
-            #region Fields
+#region Fields
                 readonly Dictionary<IntPtr, IJoystickDevice> JoystickDevices;
                    // readonly Dictionary<IntPtr, IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension>> JoystickDevices;
 
@@ -169,9 +186,9 @@ namespace ws.winx.platform.web
             List<IJoystickDevice> _iterationCacheList;
             bool _isEnumeratorDirty = true;
 
-            #endregion
+#endregion
 
-            #region Constructors
+#region Constructors
 
             internal JoystickDevicesCollection()
             {
@@ -181,13 +198,13 @@ namespace ws.winx.platform.web
                 JoystickDevices = new Dictionary<IntPtr, IJoystickDevice>();
             }
 
-            #endregion
+#endregion
 
-            #region Public Members
+#region Public Members
 
-            #endregion
+#endregion
 
-            #region IDeviceCollection implementation
+#region IDeviceCollection implementation
 
             public void Remove(IntPtr device)
             {
@@ -262,6 +279,13 @@ namespace ws.winx.platform.web
             }
 
 
+            public void Clear()
+            {
+                JoystickIDToDevice.Clear();
+                JoystickDevices.Clear();
+            }
+
+
             /// <summary>
             /// Gets a System.Int32 indicating the available amount of JoystickDevices.
             /// </summary>
@@ -270,9 +294,9 @@ namespace ws.winx.platform.web
                 get { return JoystickDevices.Count; }
             }
 
-            #endregion
+#endregion
 
-        #endregion
+#endregion
 
 
 
@@ -281,8 +305,12 @@ namespace ws.winx.platform.web
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            this.__Generics.Clear();
+            __joysticks.Clear();
         }
+
+
+       
     }
 }
 #endif

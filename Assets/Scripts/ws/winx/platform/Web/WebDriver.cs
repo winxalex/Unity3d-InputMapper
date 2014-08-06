@@ -13,20 +13,24 @@ namespace ws.winx.platform.web
 	public class WebDriver:IJoystickDriver
 	{
         protected bool _isReady=true;
-        protected WebHIDBehaviour _webHidBehavior;
+       // protected WebHIDBehaviour _webHidBehavior;
         protected IHIDInterface _hidInterface;
+        protected EventHandler<WebMessageArgs> onUpdate;
 
-        public IJoystickDevice ResolveDevice(IHIDDeviceInfo info)
+        public IJoystickDevice ResolveDevice(IHIDDevice info)
         {
-            _webHidBehavior = GameObject.Find("WebHIDBehaviourGO").GetComponent<WebHIDBehaviour>();
-            _webHidBehavior.PositionUpdateEvent += new EventHandler<WebMessageArgs>(onPositionUpdate);
+
+            GenericHIDDevice genericDevice = (GenericHIDDevice)info;
 
             _hidInterface = info.hidInterface;
 
+            //(GenericHIDDevice),info.PositionUpdateEvent += new EventHandler<WebMessageArgs>(onPositionUpdate);
+             // onUpdate=new EventHandler<WebMessageArgs>(onPositionUpdate);
+
             JoystickDevice joystick;
 
-            int numAxes = info.numAxes; //info.Extension.axes;
-            int numButtons = info.numButtons; //info.Extension.buttons;
+            int numAxes = genericDevice.numAxes; //info.Extension.axes;
+            int numButtons = genericDevice.numButtons; //info.Extension.buttons;
 
          
               joystick = new JoystickDevice(info.index, info.PID, info.VID, Math.Max(8,numAxes),numButtons, this);
@@ -62,19 +66,19 @@ namespace ws.winx.platform.web
         }
 
 
-         protected void onPositionUpdate(object sender,WebMessageArgs args){
+         protected void onPositionUpdate(object data){
 
-            
-          
 
-             Json.GamePadInfo info = Json.Deserialize(args.Message) as Json.GamePadInfo;
+
+             WebHIDReport report = (WebHIDReport)data;
+            // GenericHIDDevice info = Json.Deserialize(args.Message) as GenericHIDDevice;
 
                
 
             
             
             
-             JoystickDevice device = _hidInterface.Devices[info.index] as JoystickDevice; 
+             JoystickDevice device = _hidInterface.Devices[report.index] as JoystickDevice; 
  
              //Device has already been updated in this call
              if(device.isReady) return;
@@ -94,7 +98,7 @@ namespace ws.winx.platform.web
             
             int i=0;
               
-             foreach (var obj in info.buttons)
+             foreach (var obj in report.buttons)
              {
                  
                  //if(i==0) {_webHidBehavior.Log("button:"+obj+" "+obj.GetType()+" "+Convert.ToSingle(obj));
@@ -120,7 +124,7 @@ namespace ws.winx.platform.web
              //!!! FF gives 7 axis and the last 2 are POW on test Thrustmaster
              //!!! Chrome gives 10 axis and last 4 are POW 2 by 2 but they give some strange values 
 
-             foreach (var obj in info.axes){
+             foreach (var obj in report.axes){
 
                  value=Convert.ToSingle(obj);
                 if(value < dreadZone && value > -dreadZone)value = 0;
@@ -195,9 +199,17 @@ namespace ws.winx.platform.web
            // Debug.Log("Update"+_isReady);
             if (joystick.isReady)
             {
+                if(_hidInterface.Generics.ContainsKey(joystick)){
+                  
                 // Debug.Log("Request Update Joy"+joystick.ID);
                 ((JoystickDevice)joystick).isReady = false;
-                _webHidBehavior.joyGetPosEx(joystick.ID);
+
+                     _hidInterface.Generics[joystick].Read(onPositionUpdate);
+                }
+
+                 //read from generic device
+                 
+                //_webHidBehavior.joyGetPosEx(joystick,onUpdate);
             }
 
 

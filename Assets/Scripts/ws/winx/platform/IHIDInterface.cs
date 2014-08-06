@@ -10,6 +10,8 @@
 using System;
 using UnityEngine;
 using ws.winx.devices;
+using System.Collections.Generic;
+
 namespace ws.winx.platform
 {
 		public interface IHIDInterface:IDisposable
@@ -17,6 +19,7 @@ namespace ws.winx.platform
             
 			IJoystickDriver defaultDriver{get;set;}
 			IDeviceCollection Devices{get;}
+            Dictionary<IJoystickDevice, HIDDevice> Generics{get;}
 			void Update();
 		    
 

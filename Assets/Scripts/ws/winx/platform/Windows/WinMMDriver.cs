@@ -188,14 +188,14 @@ namespace ws.winx.platform.windows
 
 
 
-        public IJoystickDevice ResolveDevice(IHIDDeviceInfo info)
+        public IJoystickDevice ResolveDevice(IHIDDevice hidDevice)
         {
           
 
-            return CreateDevice(info);
+            return CreateDevice(hidDevice);
         }
 
-        public IJoystickDevice CreateDevice(IHIDDeviceInfo info)
+        public IJoystickDevice CreateDevice(IHIDDevice hidDevice)
         {
             JoystickDevice joystick;
 
@@ -210,7 +210,7 @@ namespace ws.winx.platform.windows
                 result = UnsafeNativeMethods.joyGetDevCaps(i, out caps, JoyCaps.SizeInBytes);
 
 
-                if (result == JoystickError.NoError && caps.PID == info.PID && info.VID == caps.VID)
+                if (result == JoystickError.NoError && caps.PID == hidDevice.PID && hidDevice.VID == caps.VID)
                 {
 
 
@@ -226,7 +226,7 @@ namespace ws.winx.platform.windows
                     int num_axes = caps.NumAxes;
 
 
-                    joystick = new JoystickDevice(i, info.PID, info.VID, 8, caps.NumButtons, this);
+                    joystick = new JoystickDevice(i, hidDevice.PID, hidDevice.VID, 8, caps.NumButtons, this);
                     joystick.Extension = new WinDefaultExtension();
 
                     int buttonIndex = 0;

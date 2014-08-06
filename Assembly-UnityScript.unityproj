@@ -52,6 +52,9 @@
      <None Include="Assets\Necromancer GUI\Kingthings.txt" />
      <None Include="Assets\Necromancer GUI\Readme.txt" />
      <None Include="Assets\StreamingAssets\InputSettingsBck.xml" />
+ <Reference Include="nunit.framework">
+ <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Assets/Pluggins/nunit.framework.dll</HintPath>
+ </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

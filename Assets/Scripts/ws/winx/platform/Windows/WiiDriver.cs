@@ -116,7 +116,7 @@ namespace ws.winx.platform.windows
         public void Update(IJoystickDevice joystick)
         {
             
-            HIDDeviceInfo info=_hidInterface.DeviceHIDInfos[joystick] as HIDDeviceInfo;
+            HIDDeviceInfo info=_hidInterface.Generics[joystick] as HIDDeviceInfo;
             AsyncPackage package = (AsyncPackage)info.Extension;
 
             if (package.isReady)
@@ -1365,7 +1365,7 @@ namespace ws.winx.platform.windows
         /// </summary>
         private void WriteReport(WiimoteDevice device)
         {
-            AsyncPackage package = (AsyncPackage)_hidInterface.DeviceHIDInfos[device].Extension;
+            AsyncPackage package = (AsyncPackage)_hidInterface.Generics[device].Extension;
 
 
             FileStream stream=package.stream;

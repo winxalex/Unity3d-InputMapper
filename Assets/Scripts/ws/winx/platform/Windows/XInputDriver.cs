@@ -13,6 +13,8 @@ using System.Runtime.InteropServices;
 using ws.winx.devices;
 using UnityEngine;
 
+
+
 namespace ws.winx.platform.windows
 {
     public class XInputDriver : IJoystickDriver
@@ -202,7 +204,7 @@ namespace ws.winx.platform.windows
 
         }
 
-        public IJoystickDevice ResolveDevice(IHIDDeviceInfo info)
+        public IJoystickDevice ResolveDevice(IHIDDevice info)
         //public IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension> ResolveDevice(IHIDDeviceInfo info)
         {
             int type = -1;

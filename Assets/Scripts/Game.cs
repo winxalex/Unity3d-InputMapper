@@ -14,6 +14,7 @@ using System.Collections;
 using ws.winx.gui;
 using ws.winx.unity;
 
+
 namespace ws.winx
 {
     public class Game : MonoBehaviour
@@ -27,6 +28,15 @@ namespace ws.winx
         //		static int fallState = Animator.StringToHash("Base Layer.Fall");
         //		static int rollState = Animator.StringToHash("Base Layer.Roll");
         //		static int waveState = Animator.StringToHash("Layer2.Wave");
+
+
+      
+        
+       
+        //bool isConnected = usbI.Connect();
+        //Debug.Log(isConnected);
+        //USBHIDDRIVER.USB
+        //bool isConnected = usbI.Connect();
 
 
 
@@ -45,12 +55,12 @@ namespace ws.winx
 
             //supporting devices with custom drivers
             //When you add them add specialized first then XInputDriver  then wide range supporting drivers UnityDriver
-#if UNITY_STANDALONE_WIN
-            
+#if (UNITY_STANDALONE_WIN) 
+            //InputManager.AddDriver(new ws.winx.platform.windows.ThrustMasterDriver());
 			   // InputManager.AddDriver(new ws.winx.platform.windows.XInputDriver());
 #endif
 
-       // !!!Postive аxes mapping only currently(need to find way to distinct postive from negative axis)
+            // !!!Postive аxes mapping only currently(need to find way to distinct postive from negative axis)
       
  if(Application.isPlaying)
           InputManager.AddDriver(new UnityDriver());

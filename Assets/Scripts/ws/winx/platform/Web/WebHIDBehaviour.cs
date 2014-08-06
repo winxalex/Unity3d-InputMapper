@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_WEBPLAYER	
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,11 +10,11 @@ namespace ws.winx.platform.web
 {
     public class WebMessageArgs : EventArgs
     {
-        public readonly string Message;
+        public readonly string RawMessage;
 
         public WebMessageArgs(string message)
         {
-            this.Message = message;
+            this.RawMessage = message;
         }
     }
 
@@ -59,9 +60,11 @@ namespace ws.winx.platform.web
             {
                 _hasEvents=true;
  Application.ExternalEval(
-     "window.addEventListener('gamepadconnected',function(e){  var buttons = [];  for (var i = 0; i < e.gamepad.buttons.length; i++)   buttons[i] = e.gamepad.buttons[i].value; UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onDeviceConnectedEvent',JSON.stringify({ id: e.gamepad.id, axes: e.gamepad.axes, buttons: buttons, index: e.gamepad.index }))});" +
+   //  "window.addEventListener('gamepadconnected',function(e){  var buttons = [];  for (var i = 0; i < e.gamepad.buttons.length; i++)   buttons[i] = e.gamepad.buttons[i].value; UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onDeviceConnectedEvent',JSON.stringify({ id: e.gamepad.id, axes: e.gamepad.axes, buttons: buttons, index: e.gamepad.index }))});" +
+   //  "window.addEventListener('gamepaddisconnected',function(e){ UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onDeviceDisconnectedEvent',e.gamepad.index.toString())});"
+      "window.addEventListener('gamepadconnected',function(e){   UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onDeviceConnectedEvent',JSON.stringify({ id: e.gamepad.id,  numButtons:e.gamepad.buttons.length, numAxes:e.gamepad.axes.length,  index: e.gamepad.index }))});" +
      "window.addEventListener('gamepaddisconnected',function(e){ UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onDeviceDisconnectedEvent',e.gamepad.index.toString())});"
-            
+           
            );
 
 
@@ -100,9 +103,11 @@ namespace ws.winx.platform.web
 
         private string ENUMERATE_COMMAND = "var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);" +
                                               "for (var i = 0; i < gamepads.length; i++) {"+
-                                                "if (gamepads[i]) {"+
+                                              " var gamepad=gamepads[i]; " +
+                                              
+                                                "if (gamepad) {"+
                                                    
-                                                  "UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onDeviceConnectedEvent',JSON.stringify(gamepads[i]));"+
+                                                  "UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onDeviceConnectedEvent',JSON.stringify({ id: gamepad.id, numButtons:gamepad.buttons.length, numAxes:gamepad.axes.length,  index: gamepad.index }));" +
                                                " }"+
                                               "}";
                                           
@@ -112,7 +117,7 @@ namespace ws.winx.platform.web
 
         private string GAMEPAD_COMMAND = "var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);" +
                                           "if(gamepads.length>0 && gamepads[{0}]){{" +
-                                          "UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onJoyGetPosEx',JSON.stringify(gamepads[{0}]));" +
+                                          "UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onRead',JSON.stringify(gamepads[{0}]));" +
                                           "}}else{{"+
                                           "UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onDeviceDisconnectedEvent','{0}');"+
                                           "}}";
@@ -121,7 +126,7 @@ namespace ws.winx.platform.web
         private string GAMEPAD_COMMAND_COMPLEX = "var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);" +
                                         "if(gamepads.length>0 && gamepads[{0}]){{" +
                                         "var gamepad=gamepads[{0}]; var buttons = [];  for (var i = 0; i < gamepad.buttons.length; i++)   buttons[i] = gamepad.buttons[i].value;"+
-                                        "UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onJoyGetPosEx',JSON.stringify({{ id: gamepad.id, axes: gamepad.axes, buttons: buttons, index: gamepad.index }}));" +
+                                        "UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onRead',JSON.stringify({{ id: gamepad.id, axes: gamepad.axes, buttons: buttons, index: gamepad.index }}));" +
                                         "}}";
        
         
@@ -139,7 +144,7 @@ namespace ws.winx.platform.web
            
 
 
-            public void joyGetPosEx(int index)
+            public void Read(int index)
             {
                // UnityEngine.Debug.Log(String.Format(GAMEPAD_COMMAND, index));
                 if(_hasEvents)
@@ -149,10 +154,11 @@ namespace ws.winx.platform.web
             }
 
 
-            public void onJoyGetPosEx(string message){
+            public void onRead(string message){
                 
                 if (PositionUpdateEvent!=null)
                 {
+                   
                    // Log("onJoyGetPos" + message);
                     //Debug.Log("Send Event");
                     PositionUpdateEvent(this, new WebMessageArgs(message));
@@ -179,3 +185,4 @@ namespace ws.winx.platform.web
 
 
 }
+#endif

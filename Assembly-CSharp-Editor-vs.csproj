@@ -64,6 +64,9 @@
  <Reference Include="Mono.TextTemplating">
  <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Assets/Editor/Mono.TextTemplating.dll</HintPath>
  </Reference>
+ <Reference Include="nunit.framework">
+ <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Assets/Pluggins/nunit.framework.dll</HintPath>
+ </Reference>
  <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
  <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Assets/UnityVS/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
  </Reference>

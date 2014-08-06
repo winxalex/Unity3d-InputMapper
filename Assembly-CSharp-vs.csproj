@@ -71,18 +71,24 @@
      <Compile Include="Assets\Scripts\ws\winx\input\InputState.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\KeyCodeExtension.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\states\States.cs" />
-     <Compile Include="Assets\Scripts\ws\winx\platform\HIDDeviceInfo.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\HIDDevice.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\HIDReport.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\IDeviceCollection.cs" />
-     <Compile Include="Assets\Scripts\ws\winx\platform\IHIDDeviceInfo.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\IHIDDevice.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\IHIDInterface.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\IJoystickDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\OSX\CoreFoundation.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\OSX\OSXDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\OSX\OSXHIDInterface.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Web\GamePadJSON.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Web\GenericHIDDevice.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Web\WebDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Web\WebHIDBehaviour.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Web\WebHIDInterface.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Web\WebHIDReport.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Windows\GenericHIDDevice.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Windows\Native.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Windows\ThrustMasterDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\WiiDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\WinHIDInterface.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\WinMMDriver.cs" />
@@ -96,6 +102,9 @@
      <None Include="Assets\Necromancer GUI\Kingthings.txt" />
      <None Include="Assets\Necromancer GUI\Readme.txt" />
      <None Include="Assets\StreamingAssets\InputSettingsBck.xml" />
+ <Reference Include="nunit.framework">
+ <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Assets/Pluggins/nunit.framework.dll</HintPath>
+ </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
