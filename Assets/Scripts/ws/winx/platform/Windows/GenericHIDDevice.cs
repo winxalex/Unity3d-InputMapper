@@ -135,26 +135,35 @@ namespace ws.winx.platform.windows
             IsOpen = ReadHandle.ToInt32() != Native.INVALID_HANDLE_VALUE & WriteHandle.ToInt32() != Native.INVALID_HANDLE_VALUE;
         }
 
-
+       
 
         public void CloseDevice()
         {
             if (!IsOpen) return;
             CloseDeviceIO(ReadHandle);
             CloseDeviceIO(WriteHandle);
+
+            UnityEngine.Debug.Log("Clossing device handles");
+
+                ReadHandle=IntPtr.Zero;
+                 WriteHandle=IntPtr.Zero;
+                
+
             IsOpen = false;
         }
 
-        protected HIDReport Read()
-        {
-            return Read(0);
-        }
+        
 
         override public void Read(ReadCallback callback)
         {
             var readDelegate = new ReadDelegate(Read);
             var asyncState = new HidAsyncState(readDelegate, callback);
             readDelegate.BeginInvoke(EndRead, asyncState);
+        }
+
+        protected HIDReport Read()
+        {
+            return Read(0);
         }
 
         protected HIDReport Read(int timeout)
@@ -221,7 +230,7 @@ namespace ws.winx.platform.windows
 
 
 
-        public void Dispose()
+        override public void Dispose()
         {
 
             if (IsOpen) CloseDevice();

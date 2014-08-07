@@ -55,7 +55,7 @@ namespace ws.winx.unity
 
                }
 
-               Debug.Log(axisValue);
+             //  Debug.Log(axisValue);
 
 
             for (i=0; i < numButtons; i++)

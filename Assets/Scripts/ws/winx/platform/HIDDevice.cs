@@ -11,7 +11,7 @@ using System;
 using ws.winx.devices;
 namespace ws.winx.platform
 {
-		public abstract class HIDDevice:IHIDDevice
+		public abstract class HIDDevice:IHIDDevice,IDisposable
 		{
 
             public delegate void ReadCallback(object data);
@@ -145,6 +145,11 @@ namespace ws.winx.platform
                 }
 
                 public virtual void Write(object data,WriteCallback callback)
+                {
+                    throw new NotImplementedException();
+                }
+
+                public virtual void Dispose()
                 {
                     throw new NotImplementedException();
                 }

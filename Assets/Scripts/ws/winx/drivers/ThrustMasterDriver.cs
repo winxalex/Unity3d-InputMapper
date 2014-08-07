@@ -69,7 +69,7 @@ namespace ws.winx.platform.drivers
         /// <summary>
         /// Move FFD motor of the wheel left or right
         /// </summary>
-        /// <param name="magnitude">0xFF - 0xA7(left) and 0x00-0x64(rights) are measurable by feeling </param>
+        /// <param name="forceXY">0xFF - 0xA7(left) and 0x00-0x64(rights) are measurable by feeling </param>
         internal void SetMotor(IJoystickDevice device, byte forceX,byte forceY,HIDDevice.WriteCallback callback)
         {
             if (__hidInterface.Generics.ContainsKey(device))
@@ -123,12 +123,20 @@ namespace ws.winx.platform.drivers
                 {
                     int numButtons = device.Buttons.Count;
                     int buttonInx = 0;
-                    int buttonInfo = (report.Data[1] | report.Data[2] << 8) & 0x3FF;
+
+                    // last 2bits of data2 + 8 bits of data1 
+                    // 00 BE 
+                    int buttonInfo = (report.Data[1] | ((report.Data[2] & 0x3) << 8)) ;
+
+                    //UnityEngine.Debug.Log("buttonSequence:"+Convert.ToString(buttonInfo, 2));
 
                     while (buttonInx < numButtons)
                     {
                         //stick.SetButton (buttonInx, (info.Buttons & (1 << buttonInx)) != 0);
+                       // UnityEngine.Debug.Log(Convert.ToString(buttonInfo,2));
+                        
                         device.Buttons[buttonInx].value = buttonInfo & (1 << buttonInx);
+                      
                         buttonInx++;
                     }
 
@@ -137,8 +145,12 @@ namespace ws.winx.platform.drivers
                     float x=0;
                     float y=0;
 
-                    int direction=report.Data[2] & 0x3C;
-                    if(direction<16){
+                    //from 2bit to 6bit
+                    int direction=(report.Data[2]>>2) & 0xF;
+
+                   
+
+                    if(direction<0xff){
 
                         //TODO optmize this
                         if (direction==0){
@@ -146,9 +158,9 @@ namespace ws.winx.platform.drivers
                            
                         }else if(direction==1){
                             y=1;
-                            x=-1;
+                            x=1;
                         }else if(direction==2){
-                            x=-1;
+                            x=1;
                         }else if(direction==3){
                             y=-1;
                             x=1;
@@ -156,36 +168,46 @@ namespace ws.winx.platform.drivers
                             y=-1;
                         }else if(direction==5){
                             y=-1;
-                            x=1;
+                            x=-1;
                         }else if(direction==6){
-                            x=1;
+                            x=-1;
                         }
                         else if(direction==7){
-                            x=1;
+                            x=-1;
                             y=1;
                         }
 
 
                     }
+
+                   // UnityEngine.Debug.Log("Direction:" + direction+"x="+x+" y="+y);
                     
                     device.Axis[JoystickAxis.AxisPovX].value=x;
                     device.Axis[JoystickAxis.AxisPovY].value=y;
 
-                    //X-Axis
-                    device.Axis[0].value=NormalizeAxis((float)((report.Data[3]<<2) | (report.Data[2] & 0xC0)),-512,511);
+                    //X-Axis (8 bits of Data3 + 2bits of Data2
+                    device.Axis[0].value = NormalizeAxis((float)((unchecked((sbyte)report.Data[3]) << 2) | (report.Data[2] >> 6)), -512, 511);
+                   // UnityEngine.Debug.Log("AxisX:" + device.Axis[0].value);
+
 
                     //Y-Axis
-                     device.Axis[1].value=NormalizeTrigger((float)((report.Data[3]<<2) | (report.Data[2] & 0xC0)),0,255);
+                     device.Axis[1].value=NormalizeTrigger((float)report.Data[4],0,255);
+                   // UnityEngine.Debug.Log("AxisY:" + device.Axis[1].value);
 
 
                     //Z-Axis
-                     device.Axis[2].value=NormalizeTrigger((float)((report.Data[3]<<2) | (report.Data[2] & 0xC0)),0,255);
+                     device.Axis[2].value=NormalizeTrigger((float)report.Data[5],0,255);
+
+                     device.Axis[3].value = NormalizeTrigger((float)report.Data[6], 0, 255);
 
 
+                    // UnityEngine.Debug.Log("Axis:" + device.Axis[0].value +","+ device.Axis[1].value +","+ device.Axis[2].value+"," + device.Axis[3].value);
 
 
+                }
 
-                } 
+
+                device.isReady = true;
                 
                
             }
@@ -205,11 +227,11 @@ namespace ws.winx.platform.drivers
         {
            float value;
 
-            
+          // UnityEngine.Debug.Log(pos);
 
             if(pos>0) value=pos/max;
 
-            else if(pos<0) value=pos/min;
+            else if(pos<0) value=-pos/min;
 
             else return 0f;
                
@@ -225,7 +247,7 @@ namespace ws.winx.platform.drivers
         }
 
         /// <summary>
-        ///  Normalize raw axis value to 0-1 range.
+        ///  Normalize raw axis value to 1-0 range.
         /// </summary>
         /// <param name="pos"></param>
         /// <param name="min"></param>
@@ -234,7 +256,13 @@ namespace ws.winx.platform.drivers
         /// <returns></returns>
         public float NormalizeTrigger(float pos, int min, int max, float dreadZone = 0.001f)
         {
-            float value = pos / (max - min);
+            float value =1- pos / (max - min);
+
+            //UnityEngine.Debug.Log("trigger:"+pos);
+
+            if (value > 1)
+                return 1;
+
             if (value < dreadZone && value > -dreadZone)
                 return 0;
 

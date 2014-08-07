@@ -856,6 +856,13 @@ namespace ws.winx.platform.windows
             }
 
             _joysticks.Clear();
+
+           
+            foreach (KeyValuePair<IJoystickDevice, HIDDevice> entry in Generics)
+            {
+                entry.Value.Dispose();
+            }
+
             Generics.Clear();
 
             if(__drivers!=null)

@@ -19,7 +19,7 @@ namespace ws.winx.platform.windows
     /// <summary>
     /// Implementation of WiiDriver
     /// </summary>
-    public class WiiDriver : IJoystickDriver, IDisposable
+    public class WiiDriver : IDriver, IDisposable
     {
 
         internal class AsyncPackage{
@@ -113,11 +113,11 @@ namespace ws.winx.platform.windows
         }
 
 
-        public void Update(IJoystickDevice joystick)
+        public void Update(IJoystickDevice device)
         {
             
-            HIDDeviceInfo info=_hidInterface.Generics[joystick] as HIDDeviceInfo;
-            AsyncPackage package = (AsyncPackage)info.Extension;
+            HIDDevice hidDevice=_hidInterface.Generics[device] as HIDDevice;
+            AsyncPackage package = (AsyncPackage)hidDevice.Extension;
 
             if (package.isReady)
             {
@@ -168,16 +168,16 @@ namespace ws.winx.platform.windows
         }
 
 
-        public IJoystickDevice ResolveDevice(IHIDDeviceInfo info)
+        public IJoystickDevice ResolveDevice(IHIDDevice device)
         {
           
 
-            if (info.VID == VID && info.PID == PID)
+            if (device.VID == VID && device.PID == PID)
             {
-                _hidInterface = info.hidInterface as WinHIDInterface;
+                _hidInterface = device.hidInterface as WinHIDInterface;
 
                 // open a read/write handle to our device using the DevicePath returned
-                SafeFileHandle handle = UnsafeNativeMethods.CreateFile(info.DevicePath, FileAccess.ReadWrite, FileShare.ReadWrite, IntPtr.Zero, FileMode.Open, EFileAttributes.Overlapped, IntPtr.Zero);
+                SafeFileHandle handle = UnsafeNativeMethods.CreateFile(device.DevicePath, FileAccess.ReadWrite, FileShare.ReadWrite, IntPtr.Zero, FileMode.Open, EFileAttributes.Overlapped, IntPtr.Zero);
 
                 WiimoteDevice joystick;
                 int inx = 0;
@@ -189,7 +189,7 @@ namespace ws.winx.platform.windows
               
 
                 // create new Device
-                joystick = new WiimoteDevice(((IHIDInterface)_hidInterface).Devices.Count,info.PID,info.VID, 16, 12,4,4,this);
+                joystick = new WiimoteDevice(((IHIDInterface)_hidInterface).Devices.Count,device.PID,device.VID, 16, 12,4,4,this);
 
 
                 AsyncPackage aPackage;
@@ -199,7 +199,7 @@ namespace ws.winx.platform.windows
                 aPackage.stream = stream;
 
 
-                info.Extension = aPackage;
+                device.Extension = aPackage;
 
                 
                 
