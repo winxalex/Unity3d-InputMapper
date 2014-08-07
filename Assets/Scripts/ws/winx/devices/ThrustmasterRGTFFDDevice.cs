@@ -25,5 +25,10 @@ namespace ws.winx.devices
         {
             ((ThrustMasterDriver)this.driver).SetMotor(this, forceX,forceY, callback);
         }
-	}
+
+        public void StopMotor()
+        {
+            ((ThrustMasterDriver)this.driver).StopMotor(this);
+        }
+    }
 }

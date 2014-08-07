@@ -78,6 +78,9 @@ namespace ws.winx.platform.drivers
                 data[0]=0x40;
                 data[1]=forceX;
                 data[2]=forceY;
+               // data[3] = forceY;
+               // data[4] = forceY;
+
 
                 __hidInterface.Generics[device].Write(data, callback);
             }
@@ -272,7 +275,21 @@ namespace ws.winx.platform.drivers
 
 
 
+
+        internal void StopMotor(IJoystickDevice device)
+        {
+            byte[] data=new byte[5];
+            data[0]=0x40;
+            data[1]=0x7f;
+            data[2]=0x00;
+            data[3]=0x00;
+            data[4]=0x00;
+
+
+            this.__hidInterface.Generics[device].Write(data, null);
+               
         }
+    }
     
 
 

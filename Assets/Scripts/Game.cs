@@ -13,6 +13,7 @@ using ws.winx.input.states;
 using System.Collections;
 using ws.winx.gui;
 using ws.winx.unity;
+using System.Timers;
 
 
 namespace ws.winx
@@ -42,6 +43,11 @@ namespace ws.winx
 
         Animator animator=null;
 		bool _settingsLoaded=false;
+        private float vSliderValue;
+        private ThrustmasterRGTFFDDevice device;
+        private byte forceX;
+        private Timer timer;
+        private float vSliderValuePrev;
 
 
         // Use this for initialization
@@ -49,8 +55,11 @@ namespace ws.winx
         {
             animator = GameObject.FindObjectOfType<Animator>();
 
+            vSliderValuePrev = vSliderValue = 128f;
 
-          
+            timer = new Timer(500.0);
+            timer.Elapsed += new ElapsedEventHandler(onTimerElapsed);
+            
            
 
             //supporting devices with custom drivers
@@ -284,6 +293,52 @@ namespace ws.winx
         }
 
 
+        void OnGUI()
+        {
+            //don't take device here in the loop this is just for demo
+                 device=((ThrustmasterRGTFFDDevice)InputManager.hidInterface.Devices[0]);
+
+                 if (device == null) return;
+             
+             
+            vSliderValue = GUI.HorizontalSlider(new Rect(25, 420, 400, 30), vSliderValue, 255.0F, 0.0F);
+            device.SetMotor((byte)0xFF, 0x0, onMotorSet);
+
+            //if (vSliderValue != vSliderValuePrev)
+            //    device.SetMotor(Convert.ToByte(vSliderValue),0xA7,onMotorSet);
+
+            //vSliderValuePrev=vSliderValue;
+           
+
+
+            if(GUI.Button(new Rect(25, 450, 100, 30),"Stop Motor")){
+                timer.Stop();
+                 device.StopMotor();
+                 vSliderValue = 128;
+            }
+
+            if(GUI.Button( new Rect(150, 450, 100, 30),"Rumble")){
+                timer.Stop();
+                 device.StopMotor();
+                 timer.Start();
+            }
+        }
+
+
+       
+
+        void onMotorSet(bool success)
+        {
+        }
+
+        void onTimerElapsed( object sender,ElapsedEventArgs args){
+            forceX+=0xA7;
+            device.SetMotor(forceX, forceX,onMotorSet);
+          }
+
+
+
+
 
 
 
@@ -292,6 +347,8 @@ namespace ws.winx
         /// </summary>
         void OnDestroy()
         {
+            if (device != null)
+                device.StopMotor();
             InputManager.Dispose();
         }
     }
