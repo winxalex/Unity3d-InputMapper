@@ -44,7 +44,7 @@ namespace ws.winx.platform.web
         public void onHaveGamepadEvents(string message)
         {
 
-             Log("onHaveGamepadEvents:" + message);
+             Log("onHaveGamepadEvents:" + (message=="1" ? "true":"false"));
 
             if (GamePadEventsSupportEvent!=null)
             {
@@ -133,7 +133,8 @@ namespace ws.winx.platform.web
         
         void EnumerateGamepadsTimedEventHandler(object sender, EventArgs e)
         {
-           // UnityEngine.Debug.Log(ENUMERATE_COMMAND);
+           
+            //UnityEngine.Debug.Log(ENUMERATE_COMMAND);
                 Application.ExternalEval(ENUMERATE_COMMAND);
            
   

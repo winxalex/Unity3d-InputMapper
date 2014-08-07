@@ -293,21 +293,24 @@ namespace ws.winx
         }
 
 
+
+
         void OnGUI()
         {
             //don't take device here in the loop this is just for demo
-                 device=((ThrustmasterRGTFFDDevice)InputManager.hidInterface.Devices[0]);
+            if(InputManager.hidInterface.Devices.ContainsKey(0))
+            device = InputManager.hidInterface.Devices[0] as ThrustmasterRGTFFDDevice;
 
                  if (device == null) return;
              
              
             vSliderValue = GUI.HorizontalSlider(new Rect(25, 420, 400, 30), vSliderValue, 255.0F, 0.0F);
-            device.SetMotor((byte)0xFF, 0x0, onMotorSet);
+           
 
-            //if (vSliderValue != vSliderValuePrev)
-            //    device.SetMotor(Convert.ToByte(vSliderValue),0xA7,onMotorSet);
+            if (vSliderValue != vSliderValuePrev)
+               device.SetMotor(Convert.ToByte(vSliderValue),0xA7,onMotorSet);
 
-            //vSliderValuePrev=vSliderValue;
+            vSliderValuePrev=vSliderValue;
            
 
 

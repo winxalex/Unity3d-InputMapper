@@ -93,7 +93,8 @@ namespace ws.winx.platform.web
                     {
                         //new IntPtr just for compatibility
                         __joysticks[new IntPtr(joyDevice.PID)] = joyDevice;
-                        Debug.Log("Device PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + driver.GetType().ToString());
+
+                        this.webHIDBehaviour.Log("Device PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + driver.GetType().ToString());
                         this.__Generics[joyDevice]=deviceInfo;
                         break;
                     }
@@ -110,9 +111,9 @@ namespace ws.winx.platform.web
                     //new IntPtr just for compatibility
                     __joysticks[new IntPtr(joyDevice.PID)] = joyDevice;
 
-                    Debug.Log(__joysticks[deviceInfo.index]);
+                   // Debug.Log(__joysticks[deviceInfo.index]);
 
-                    Debug.Log("Device index:" + joyDevice.ID + " PID:" + joyDevice.PID + " VID:" + joyDevice.VID + " attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + deviceInfo.DevicePath + " Name:" + joyDevice.Name);
+                    this.webHIDBehaviour.Log("Device index:" + joyDevice.ID + " PID:" + joyDevice.PID + " VID:" + joyDevice.VID + " attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + deviceInfo.DevicePath + " Name:" + joyDevice.Name);
                      this.__Generics[joyDevice]=deviceInfo;
                 }
                 else
@@ -153,7 +154,7 @@ namespace ws.winx.platform.web
         {
           
             int id = Int32.Parse(args.RawMessage);
-            Debug.Log("Device "+__joysticks[id].Name+" index:" +id+" Removed");
+            this.webHIDBehaviour.Log("Device " + __joysticks[id].Name + " index:" + id + " Removed");
             this.__Generics.Remove(__joysticks[id]);
             __joysticks.Remove(id);
            
