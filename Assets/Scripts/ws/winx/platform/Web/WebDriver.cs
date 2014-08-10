@@ -193,18 +193,18 @@ namespace ws.winx.platform.web
              
          }
 
-         public void Update(IJoystickDevice joystick)
+         public void Update(IJoystickDevice device)
         {
 
            // Debug.Log("Update"+_isReady);
-            if (joystick.isReady)
+            if (device.isReady)
             {
-                if(_hidInterface.Generics.ContainsKey(joystick)){
+                if(_hidInterface.Generics.ContainsKey(device)){
                   
                 // Debug.Log("Request Update Joy"+joystick.ID);
-                ((JoystickDevice)joystick).isReady = false;
+                ((JoystickDevice)device).isReady = false;
 
-                     _hidInterface.Generics[joystick].Read(onPositionUpdate);
+                     _hidInterface.Read(device,onPositionUpdate);
                 }
 
                  //read from generic device

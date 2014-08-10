@@ -3,10 +3,11 @@ using ws.winx.devices;
 using System.IO;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using ws.winx.platform;
 
 
 
-namespace ws.winx.platform.drivers
+namespace ws.winx.drivers
 {
 	public class ThrustMasterDriver:IDriver
 	{

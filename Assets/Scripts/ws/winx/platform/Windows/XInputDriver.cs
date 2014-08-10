@@ -300,7 +300,7 @@ namespace ws.winx.platform.windows
         /// <returns></returns>
         public float NormalizeTrigger(float pos, int min, int max, float dreadZone = 0.001f)
         {
-            float value = pos / (max - min);
+            float value =1- pos / (max - min);
             if (value < dreadZone && value > -dreadZone)
                 return 0;
 

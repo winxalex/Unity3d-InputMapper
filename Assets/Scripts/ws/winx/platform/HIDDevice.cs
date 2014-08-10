@@ -17,6 +17,8 @@ namespace ws.winx.platform
             public delegate void ReadCallback(object data);
             public delegate void WriteCallback(bool success);
 
+            
+
 				object _Extension;
 				
 				int _VID;
@@ -70,6 +72,19 @@ namespace ws.winx.platform
                             _Extension = value;
 						}
 				}
+
+                public virtual int InputReportByteLength
+                {
+                    get;
+                    set;
+                }
+
+
+                public virtual int OutputReportByteLength
+                {
+                    get;
+                    set;
+                }
 
 			
 
@@ -145,6 +160,11 @@ namespace ws.winx.platform
                 }
 
                 public virtual void Write(object data,WriteCallback callback)
+                {
+                    throw new NotImplementedException();
+                }
+
+                public virtual void Write(object data)
                 {
                     throw new NotImplementedException();
                 }

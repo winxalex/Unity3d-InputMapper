@@ -61,7 +61,7 @@ namespace ws.winx.platform.windows
 
         private int _InputReportByteLength=8;
 
-        public int InputReportByteLength
+        override public int InputReportByteLength
         {
             get { return _InputReportByteLength; }
             set {
@@ -69,7 +69,7 @@ namespace ws.winx.platform.windows
         }
         private int _OutputReportByteLength=8;
 
-        public int OutputReportByteLength
+        override public int OutputReportByteLength
         {
             get { return _OutputReportByteLength; }
             set { if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  _OutputReportByteLength = value; }
@@ -187,6 +187,13 @@ namespace ws.winx.platform.windows
         {
 
             this.Write((byte[])data, callback);
+
+        }
+
+        public override void Write(object data)
+        {
+
+            this.Write((byte[])data);
 
         }
        

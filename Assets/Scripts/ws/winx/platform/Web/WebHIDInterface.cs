@@ -48,6 +48,22 @@ namespace ws.winx.platform.web
 
         #region IHIDInterface implementation
 
+
+        public void Read(IJoystickDevice device, HIDDevice.ReadCallback callback)
+        {
+            this.__Generics[device].Read(callback);
+        }
+
+        public void Write(object data, IJoystickDevice device, HIDDevice.WriteCallback callback)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Write(object data, IJoystickDevice device)
+        {
+            throw new NotImplementedException();
+        }
+
         public Dictionary<IJoystickDevice, HIDDevice> Generics
         {
             get { return __Generics; }
@@ -309,6 +325,9 @@ namespace ws.winx.platform.web
             this.__Generics.Clear();
             __joysticks.Clear();
         }
+
+
+
 
 
        

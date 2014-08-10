@@ -67,6 +67,23 @@ namespace ws.winx.platform.windows
         #region IHIDInterface implementation
 
 
+        public void Read(IJoystickDevice device,HIDDevice.ReadCallback callback)
+        {
+            this.__Generics[device].Read(callback);
+
+        }
+
+        public void Write(object data, IJoystickDevice device)
+        {
+            this.__Generics[device].Write(data);
+        }
+
+        public void Write(object data, IJoystickDevice device, HIDDevice.WriteCallback callback)
+        {
+            this.__Generics[device].Write(data,callback);
+        }
+
+
         /// <summary>
         /// add or get default driver (Overall driver for unhanlded devices by other specialized driver)
         /// </summary>
@@ -874,7 +891,10 @@ namespace ws.winx.platform.windows
 
 
 
-       
+
+
+
+      
     }
 
 }
