@@ -1,7 +1,5 @@
 package ws.winx.hid;
 
-import com.unity3d.player.UnityPlayerActivity;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.app.Activity;

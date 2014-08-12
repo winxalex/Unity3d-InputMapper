@@ -13,63 +13,78 @@ public class ReadCallable implements Callable<byte[]> {
 	
 	private static final String TAG = "ReadCallable";
 	private UsbDeviceConnection _connection;
-	private int _inputBufferSize;
+	
 	private UsbEndpoint _fromPoint;
+	private byte[] _inputBuffer;
+	private UsbRequest request;
 
-	public ReadCallable(UsbDeviceConnection connection,UsbEndpoint fromPoint,int bufferSize) {
+	public ReadCallable(UsbDeviceConnection connection,UsbEndpoint fromPoint,byte[] inputBuffer) {
 		_connection=connection;
-		_inputBufferSize=bufferSize;
+		_inputBuffer=inputBuffer;
 		_fromPoint=fromPoint;
+		 request = new UsbRequest();
+ 		
+			
+    	 request.initialize(_connection, _fromPoint);
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		
+		request.cancel();
+		request.close();
+		
+		 Log.d(TAG, "Close request");
+		super.finalize();
 	}
 
 	@Override
 	public byte[] call() throws Exception {
-		UsbRequest request = new UsbRequest();
-    	
 		
-		byte[] inputBuffer=new byte[_inputBufferSize];
-      	 request.initialize(_connection, _fromPoint);
-      	 
-      	 final ByteBuffer buf = ByteBuffer.wrap(inputBuffer);
+    	 
+    	 final ByteBuffer buf = ByteBuffer.wrap(_inputBuffer);
 		
-      	 
-      	 while (true) {
-        	 
-      	   if (!request.queue(buf, _inputBufferSize)) {
-                 Log.e(TAG,"Error queueing request.");
-                 break;
-               }
-      	    	                  
-             // wait for status event
-             if (_connection.requestWait() == request) {
-          	    	                	   
-                 final int nread = buf.get(0);
-                 if (nread > 0) {
-                  // Log.d(TAG, HexDump.dumpHexString(dest, 0, Math.min(8, dest.length)));
-              	  break;
-                 } 
-                 
-                 try {
-                     Thread.sleep(1);
-                 } catch (InterruptedException e) {
-              	   Log.e(TAG, "Error ",e);
-                         	   
-              	   break;
-                 }
-                 
-             } else {
-                 Log.e(TAG, "Read requestWait failed, exiting");
-                 break;
-             }
- 	
-  
-  }
-      	 
-      	 
-      	 
+    	  if (!request.queue(buf, _inputBuffer.length)) {
+             Log.e(TAG,"Error queueing request.");
+            
+             return _inputBuffer;
+           }
+    
+    	    	                 
+           // wait for status event (requestWait() blocks further execution)
+    	   try{
+    		   
+    	   
+	           if (_connection.requestWait() == request) {
+	        	   Log.d(TAG, "Read requestWait succeded, exiting");
+	           } else {
+	              Log.e(TAG, "Read requestWait failed, exiting");
+	      
+	           }
+    	   }catch(Exception e){
+    		  
+    	   }finally{
+    		   request.cancel();
+    		  
+    		   
+    		   
+    	   }
+
 		
+		return _inputBuffer;
+	}
+
+	public void despose() {
+		request.cancel();
+		   request.close();
+		   Log.d(TAG, "Close request");
+	}
+
+	public void cancel() {
+	    request.cancel();
+	
 		
-		return inputBuffer;
 	}
 
 }
