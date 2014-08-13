@@ -1,4 +1,4 @@
-﻿//#if UNITY_ANDROID
+﻿#if UNITY_ANDROID
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace ws.winx.platform.android
 {
-    public class GenericHIDDevice :  HIDDevice
+    public class GenericHIDDevice : HIDDevice  //TODO thru  public ReadWriteListenerProxy(int index ) : base("ws.winx.hid.IReadWriteListener") {}
     {
         ReadWriteListenerProxy _listener;
 
@@ -29,26 +29,48 @@ namespace ws.winx.platform.android
         }
 
 
+        int _InputReportByteLength=8;
 
-      
-        public override void GenericHIDDevice(AndroidJavaObject device)
+        override public int InputReportByteLength
         {
-            this.PID=device.Get<int>("PID");
-            this.VID=device.Get<int>("PID");
-            _device=device;
-            _listener = new ReadWriteListenerProxy();
+            get { return _InputReportByteLength; }
+            set {
+                if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  _InputReportByteLength = value; }
+        }
+        
+        int _OutputReportByteLength=8;
+
+        override public int OutputReportByteLength
+        {
+            get { return _OutputReportByteLength; }
+            set { if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  _OutputReportByteLength = value; }
         }
 
+
+
+
+        public GenericHIDDevice(int inx, AndroidJavaObject device, IHIDInterface hidInterface)
+            : base(inx, device.Get<int>("VID"), device.Get<int>("PID"), IntPtr.Zero, hidInterface, device.Get<string>("path"))
+        {
+            
+            _device=device;
+            _listener = new ReadWriteListenerProxy(inx);
+        }
+
+
+        //	public void read(byte[] into,IReadWriteListener listener, int timeout)
         public override void Read(HIDDevice.ReadCallback callback)
         {
-             _device.Call("read",
+            _listener.addReadCallback(callback);
+            byte[] from=new byte[_InputReportByteLength];
+            _device.Call("read", from, _listener, 0);
         }
 
         //public void write(final byte[] from, IReadWriteListener listener, int timeout)
         public override void Write(object data)
         {
             _device.Call("write",(byte[]) data,_listener,0);
-            
+            //_listener.addWriteCallback(callback);
         }
 
 
@@ -76,4 +98,4 @@ private  AndroidJavaObject _device;
        
     }
 }
-//#endif
+#endif

@@ -32,6 +32,7 @@ public class HIDDeviceWrapper {
 	public final int VID;
 	public final int PID;
 	private UsbInterface __controlInterface;
+	public final String path;
 	
 	private static ExecutorService __executor=Executors.newCachedThreadPool();
 	//private static final ReentrantLock __lock = new ReentrantLock();
@@ -45,7 +46,7 @@ public class HIDDeviceWrapper {
 		this.index=device.getDeviceId();
 		this.VID=device.getVendorId();
 		this.PID=device.getProductId();
-		
+		this.path=device.getDeviceName();
 		
 		_device = device;
 		_usbManager = usbManager;

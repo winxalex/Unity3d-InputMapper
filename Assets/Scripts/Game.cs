@@ -71,8 +71,8 @@ namespace ws.winx
 
             // !!!Postive аxes mapping only currently(need to find way to distinct postive from negative axis)
       
- if(Application.isPlaying)
-          InputManager.AddDriver(new UnityDriver());
+// if(Application.isPlaying)
+     //     InputManager.AddDriver(new UnityDriver());
 
 
             //if you want to load some states from .xml and add custom manually first load settings xml

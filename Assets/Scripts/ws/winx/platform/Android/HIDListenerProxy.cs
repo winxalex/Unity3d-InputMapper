@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_ANDROID
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,13 +9,14 @@ namespace ws.winx.platform.android
 {
     public class HIDListenerProxy : AndroidJavaProxy/* count this as Interface so you need to implement */
 	{
-        public event EventHandler DeviceConnectedEvent;
-        public event EventHandler DeviceDisconnectedEvent;
+        public event EventHandler<AndroidMessageArgs> DeviceConnectedEvent;
+        public event EventHandler<AndroidMessageArgs> DeviceDisconnectedEvent;
         public event EventHandler Error;
 
         public HIDListenerProxy() : base("ws.winx.hid.IHIDListener") { }
-        void onAttached(AndroidJavaClass device) { if(DeviceConnectedEvent!=null) DeviceConnectedEvent(this,);}
-        void onDetached(int pid) { if(DeviceDisconnectedEvent!=null) DeviceDisconnectedEvent(this,);}
-        void onError(String error) { if(Error!=null) Error(this,);}
+        void onAttached(AndroidJavaClass device) { if(DeviceConnectedEvent!=null) DeviceConnectedEvent(this,new AndroidMessageArgs(device));}
+        void onDetached(int pid) { if (DeviceDisconnectedEvent != null) DeviceDisconnectedEvent(this, new AndroidMessageArgs(pid)); }
+        void onError(String error) { if (Error != null) Error(this, new AndroidMessageArgs(error)); }
 	}
 }
+#endif

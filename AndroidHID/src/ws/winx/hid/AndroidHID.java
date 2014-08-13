@@ -91,7 +91,9 @@ public class AndroidHID {
 		
 	}
 	
-	
+	public static void Log(String tag,String message){
+		Log.d(tag,message);
+	}
 	
 	public static void Dispose(){
 		int i = _Generics.size()-1;

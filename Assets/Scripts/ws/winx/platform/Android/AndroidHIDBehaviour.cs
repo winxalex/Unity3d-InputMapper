@@ -1,4 +1,4 @@
-﻿//#if UNITY_ANDROID
+﻿#if UNITY_ANDROID
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,11 +21,10 @@ namespace ws.winx.platform.android
 
 	public class AndroidHIDBehaviour:MonoBehaviour
 	{
-        public event EventHandler<AndroidMessageArgs> DeviceConnectedEvent;
-        public event EventHandler<AndroidMessageArgs> DeviceDisconnectedEvent;
+      
         HIDListenerProxy listener = new HIDListenerProxy();
 
-        public event EventHandler DeviceConnectedEvent
+        public event EventHandler<AndroidMessageArgs> DeviceConnectedEvent
         {
             add
             {
@@ -38,11 +37,11 @@ namespace ws.winx.platform.android
             }
         }
 
-        public event EventHandler DeviceDisconnectedEvent
+        public event EventHandler<AndroidMessageArgs> DeviceDisconnectedEvent
         {
             add
             {
-                listener.DeviceDisconnectedEvent += value;
+                listener.DeviceDisconnectedEvent +=  value;
 
             }
             remove
@@ -51,7 +50,7 @@ namespace ws.winx.platform.android
             }
         }
 
-        AndroidJavaClass pluginTutorialActivityJavaClass;
+        AndroidJavaClass droidHID;
       
 
       
@@ -60,28 +59,25 @@ namespace ws.winx.platform.android
         {
             AndroidJNI.AttachCurrentThread();
             var activity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity");
-            pluginTutorialActivityJavaClass = new AndroidJavaClass("ws.winx.hid.AndroidHID");
-            pluginTutorialActivityJavaClass.CallStatic("Init", activity, listener);
+            droidHID = new AndroidJavaClass("ws.winx.hid.AndroidHID");
+            droidHID.CallStatic("Init", activity, listener);
                 
                 //new AndroidJavaObject("ws.winx.hid.AndroidHID", activity, listener);
 
                 
         }
 
-        public void Read()
-        {
-           //pluginTutorialActivityJavaClass.Call
-        }
 
-        public void Write(byte[] data, AndroidJavaObject device)
-        {
-            //pluginTutorialActivityJavaClass.Call
-        }
+          public void Enumerate(){
+ droidHID.CallStatic("Enumerate");
+}
+
+       
 
         internal void Log(string tag,string message)
         {
-            pluginTutorialActivityJavaClass.CallStatic("Log", tag, message);
+            droidHID.CallStatic("Log", tag, message);
         }
     }
 }
-//#endif
+#endif
