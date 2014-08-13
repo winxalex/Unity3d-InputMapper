@@ -108,6 +108,7 @@ public class HIDDeviceWrapper {
 
 		if(__writeRunnable==null) __writeRunnable=new WriteRunnable(this);
 		
+		
 			HIDDeviceWrapper.__executor.execute(__writeRunnable.read(from).timeout(timeout).addEventListener(listener));
 		
 
@@ -119,7 +120,10 @@ public class HIDDeviceWrapper {
 		if(__readRunnable==null)
 		    __readRunnable=new ReadRunnable(this);
 		
-		    get__executor().execute(__readRunnable.read(into).timeout(timeout).addEventListener(listener));
+		if(__readRunnable.is_isReady())
+			   get__executor().execute(__readRunnable.read(into).timeout(timeout).addEventListener(listener));
+		
+		 
 
 		
 	}

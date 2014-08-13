@@ -57,20 +57,25 @@ namespace ws.winx.platform.android
 
         void Start()
         {
+            UnityEngine.Debug.Log("AndroidHIDBehaviour>Start");
+
             AndroidJNI.AttachCurrentThread();
             var activity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity");
+            UnityEngine.Debug.Log("AndroidHIDBehaviour>" + activity);
+            
             droidHID = new AndroidJavaClass("ws.winx.hid.AndroidHID");
             droidHID.CallStatic("Init", activity, listener);
-                
+
+            UnityEngine.Debug.Log("AndroidHIDBehaviour>" + droidHID);  
                 //new AndroidJavaObject("ws.winx.hid.AndroidHID", activity, listener);
 
-                
+            droidHID.CallStatic("Enumerate");
         }
 
 
-          public void Enumerate(){
- droidHID.CallStatic("Enumerate");
-}
+//          public void Enumerate(){
+  //droidHID.CallStatic("Enumerate");
+//}
 
        
 

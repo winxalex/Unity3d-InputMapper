@@ -14,7 +14,7 @@ namespace ws.winx.platform.android
         public event EventHandler Error;
 
         public HIDListenerProxy() : base("ws.winx.hid.IHIDListener") { }
-        void onAttached(AndroidJavaClass device) { if(DeviceConnectedEvent!=null) DeviceConnectedEvent(this,new AndroidMessageArgs(device));}
+        void onAttached(AndroidJavaObject device) { if(DeviceConnectedEvent!=null) DeviceConnectedEvent(this,new AndroidMessageArgs(device));}
         void onDetached(int pid) { if (DeviceDisconnectedEvent != null) DeviceDisconnectedEvent(this, new AndroidMessageArgs(pid)); }
         void onError(String error) { if (Error != null) Error(this, new AndroidMessageArgs(error)); }
 	}

@@ -14,6 +14,7 @@ using System.Collections;
 using ws.winx.gui;
 using ws.winx.unity;
 using System.Timers;
+using ws.winx.drivers;
 
 
 namespace ws.winx
@@ -38,7 +39,7 @@ namespace ws.winx
         //Debug.Log(isConnected);
         //USBHIDDRIVER.USB
         //bool isConnected = usbI.Connect();
-
+   
 
 
         Animator animator=null;
@@ -64,8 +65,8 @@ namespace ws.winx
 
             //supporting devices with custom drivers
             //When you add them add specialized first then XInputDriver  then wide range supporting drivers UnityDriver
-#if (UNITY_STANDALONE_WIN) 
-            InputManager.AddDriver(new ws.winx.platform.drivers.ThrustMasterDriver());
+#if (UNITY_STANDALONE_WIN || UNITY_ANDROID) 
+            InputManager.AddDriver(new ThrustMasterDriver());
 			   // InputManager.AddDriver(new ws.winx.platform.windows.XInputDriver());
 #endif
 

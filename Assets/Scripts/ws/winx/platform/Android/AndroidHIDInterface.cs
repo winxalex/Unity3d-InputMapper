@@ -31,17 +31,19 @@ namespace ws.winx.platform.android
 
         public AndroidHIDInterface(List<IDriver> drivers)
         {
-
+            UnityEngine.Debug.Log("AndroidHIDInterface");
             __drivers = drivers;
             __joysticks = new JoystickDevicesCollection();
             __Generics = new Dictionary<IJoystickDevice, HIDDevice>();
 
             _container = new GameObject("AndroidHIDBehaviourGO");
             droidHIDBehaviour = _container.AddComponent<AndroidHIDBehaviour>();
-            droidHIDBehaviour.Enumerate();
+          
             droidHIDBehaviour.DeviceDisconnectedEvent += new EventHandler<AndroidMessageArgs>(DeviceDisconnectedEventHandler);
             droidHIDBehaviour.DeviceConnectedEvent += new EventHandler<AndroidMessageArgs>(DeviceConnectedEventHandler);
 
+            
+           // droidHIDBehaviour.Enumerate();
         }
 
 

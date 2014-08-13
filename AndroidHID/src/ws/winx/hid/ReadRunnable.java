@@ -20,6 +20,7 @@ public class ReadRunnable implements Runnable {
 	
 	private IReadWriteListener _listener;
 	private HIDDeviceWrapper _device;
+	private boolean _isReady=false;
 	
 	
 	int _timeout;
@@ -28,6 +29,7 @@ public class ReadRunnable implements Runnable {
 	public ReadRunnable(HIDDeviceWrapper device) {
 	
 		_device=device;
+		_isReady=true;
 		//_readCallable=new ReadCallable(device);
 	}
 
@@ -53,28 +55,59 @@ public class ReadRunnable implements Runnable {
 
 	@Override
 	public void run() {
+		
+	
+		 this._isReady=false;
+		 
+		 try {
+			HIDDeviceWrapper.getEndPointlock().acquire();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		 ByteBuffer buffer = ByteBuffer.wrap(_inputBuffer);
 		 UUID uid=UUID.randomUUID();
 		 
 	        UsbRequest request = new UsbRequest();
-	        request.initialize(_device.get_connection(), _device.get_readEndpoint());
+	        if(!request.initialize(_device.get_connection(), _device.get_readEndpoint())){
+	        	
+		        	   Log.e(TAG,"Cant queue request");
+		        	   return;
+		          
+	        }
+	        
+	        
 	        
 	       // while (true) {
 	            // queue a request on the interrupt endpoint
-	            request.queue(buffer, _inputBuffer.length);
+	           if(!request.queue(buffer, _inputBuffer.length)){
+	        	   
+	        	   Log.e(TAG,"Cant queue request");
+	        	   
+	        	   request.close();
+	        	   return;
+	           }
+	            
+	           
 	           
 	            // wait for status event
 	            if (_device.get_connection().requestWait() == request) {
 	            	
 	            	 Log.d(TAG, uid+"Request succeded");
 	            	 _listener.onRead(_inputBuffer);
+	            	 request.close();
 	            } else {
 	                Log.e(TAG, uid+"RequestWait failed, exiting");
+	                //!!! don't close when failed
 	             //   break;
 	            }
 	      //  }
 		
-		request.close();
+	            this._isReady=true;
+	            
+	            
+	           // HIDDeviceWrapper.getEndPointlock().release();
 		
 	/*	UUID uid=UUID.randomUUID();
 		
@@ -115,5 +148,11 @@ public class ReadRunnable implements Runnable {
 		
      	*/
 	}
+
+	public boolean is_isReady() {
+		return _isReady;
+	}
+
+
 
 }
