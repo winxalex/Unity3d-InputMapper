@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#if UNITY_ANDROID
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,10 +7,22 @@ using UnityEngine;
 
 namespace ws.winx.platform.android
 {
+    public class AndroidMessageArgs : EventArgs
+    {
+         public readonly object data;
+
+         public AndroidMessageArgs(object data)
+        {
+            this.data = data;
+
+        }
+    }
+
+
 	public class AndroidHIDBehaviour:MonoBehaviour
 	{
-        public event EventHandler DeviceConnectedEvent;
-        public event EventHandler DeviceDisconnectedEvent;
+        public event EventHandler<AndroidMessageArgs> DeviceConnectedEvent;
+        public event EventHandler<AndroidMessageArgs> DeviceDisconnectedEvent;
         HIDListenerProxy listener = new HIDListenerProxy();
 
         public event EventHandler DeviceConnectedEvent
@@ -38,7 +51,7 @@ namespace ws.winx.platform.android
             }
         }
 
-        AndroidJavaObject pluginTutorialActivityJavaClass;
+        AndroidJavaClass pluginTutorialActivityJavaClass;
       
 
       
@@ -47,7 +60,10 @@ namespace ws.winx.platform.android
         {
             AndroidJNI.AttachCurrentThread();
             var activity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity");
-            pluginTutorialActivityJavaClass = new AndroidJavaObject("ws.winx.hid.AndroidHID", activity, listener);
+            pluginTutorialActivityJavaClass = new AndroidJavaClass("ws.winx.hid.AndroidHID");
+            pluginTutorialActivityJavaClass.CallStatic("Init", activity, listener);
+                
+                //new AndroidJavaObject("ws.winx.hid.AndroidHID", activity, listener);
 
                 
         }
@@ -64,7 +80,8 @@ namespace ws.winx.platform.android
 
         internal void Log(string tag,string message)
         {
-            pluginTutorialActivityJavaClass.Call("Log", tag, message);
+            pluginTutorialActivityJavaClass.CallStatic("Log", tag, message);
         }
     }
 }
+//#endif

@@ -22,9 +22,9 @@ public class AndroidHID {
 		    "com.android.example.USB_PERMISSION";
 	protected static final String TAG = "AndroidHID";
 	
-	private static UsbManager _usbManager;
-	private static PendingIntent _permissionIntent;
-	private static IHIDListener _IHIDLIstener;
+	private static UsbManager __usbManager;
+	private static PendingIntent __permissionIntent;
+	private static IHIDListener __IHIDLIstener;
 
 	private static SparseArray<HIDDeviceWrapper> _Generics;
 	private static Context _context;
@@ -32,9 +32,9 @@ public class AndroidHID {
 	
 	public static void Init(Context context,IHIDListener listener) {
 
-		_usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
-		_IHIDLIstener=listener;
-		_permissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
+		__usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+		__IHIDLIstener=listener;
+		__permissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(ACTION_USB_PERMISSION);
 		filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
@@ -49,11 +49,21 @@ public class AndroidHID {
 	
 
 	public static void write(byte[] data,int pid,IReadWriteListener listener){
-		_Generics.get(pid).write(data,listener, 0);
+		HIDDeviceWrapper device=_Generics.get(pid);
+		
+		if(device!=null)
+			device.write(data,listener, 0);
+		else
+			Enumerate();
 	}
 	
 	public static void read(byte[] into,int pid,IReadWriteListener listener){
-		_Generics.get(pid).read(into,listener,500);
+		HIDDeviceWrapper device=_Generics.get(pid);
+		
+		if(device!=null)
+		  device.read(into,listener,500);
+		else
+		 Enumerate();
 	}
 	
 	
@@ -61,12 +71,12 @@ public class AndroidHID {
 		
 		UsbDevice device;
 		
-			Iterator<UsbDevice> deviceIterator = _usbManager.getDeviceList().values().iterator();
+			Iterator<UsbDevice> deviceIterator = __usbManager.getDeviceList().values().iterator();
 			while(deviceIterator.hasNext()){
 				device=deviceIterator.next();
 				
 				
-				if(_usbManager.hasPermission(device)){
+				if(__usbManager.hasPermission(device)){
 				
 				//Fancy
 				/*	   intent = new Intent(UsbManager.ACTION_USB_DEVICE_ATTACHED).putExtra(UsbManager.EXTRA_DEVICE, device);
@@ -74,7 +84,7 @@ public class AndroidHID {
 					
 					 AndroidHID.attachDevice(device);
 				}else{
-					_usbManager.requestPermission(device, _permissionIntent);
+					__usbManager.requestPermission(device, __permissionIntent);
 				}
 				
 			}
@@ -87,12 +97,13 @@ public class AndroidHID {
 		int i = _Generics.size()-1;
 		int key;
 		
+		if(__usbReceiver!=null)
 		_context.unregisterReceiver(__usbReceiver);
 		
 		while( i > -1) {
 		   key = _Generics.keyAt(i);
 		   // get the object by the key.
-		   _Generics.get(key).closeDevice();
+		   _Generics.get(key).Dispose();
 		   _Generics.remove(key);
 		   i--;
 		}
@@ -100,11 +111,11 @@ public class AndroidHID {
 	}
 	
 	private static void attachDevice(UsbDevice device){
-		 HIDDeviceWrapper wrapper=new HIDDeviceWrapper(device, _usbManager);
+		 HIDDeviceWrapper wrapper=new HIDDeviceWrapper(device, __usbManager);
     	 wrapper.open();
     	 
 		 _Generics.append(device.getProductId(), wrapper);
-		 _IHIDLIstener.onAttached(wrapper);
+		 __IHIDLIstener.onAttached(wrapper);
 		 
 		 Log.d(TAG, "Device id:"+device.getDeviceId()+" PID:" + device.getProductId()+" VID:"+device.getVendorId()+" Connected!");
          
@@ -116,8 +127,8 @@ public class AndroidHID {
 	        if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
 	            UsbDevice device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
 	            if (device != null) {
-	            	 if(!_usbManager.hasPermission(device)){
-	            		 _usbManager.requestPermission(device,_permissionIntent);
+	            	 if(!__usbManager.hasPermission(device)){
+	            		 __usbManager.requestPermission(device,__permissionIntent);
 	            	 }else{
 	            		 Log.d(TAG, "Device id:"+device.getDeviceId()+" PID:" + device.getProductId()+" VID:"+device.getVendorId()+" Connected!");
 	            		 Log.d(TAG, device.toString());
@@ -130,9 +141,9 @@ public class AndroidHID {
 	        else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
 	            UsbDevice device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
 	            if (device != null) {
-	            	 _IHIDLIstener.onDetached(device.getProductId());
+	            	 __IHIDLIstener.onDetached(device.getProductId());
 	            	 Log.d(TAG, "Device id:"+device.getDeviceId()+" PID:" + device.getProductId()+" VID:"+device.getVendorId()+" Disconnected!");
-                      _Generics.get(device.getProductId()).closeDevice();
+                      _Generics.get(device.getProductId()).Dispose();
                       _Generics.remove(device.getProductId());
 	            	
 	            }

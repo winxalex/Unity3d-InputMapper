@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using ws.winx.devices;
+using ws.winx.unity;
 
 namespace ws.winx.platform.android
 {
@@ -15,7 +16,7 @@ namespace ws.winx.platform.android
 
         private List<IDriver> __drivers;// = new List<IJoystickDriver>();
 
-        private IDriver __defaultJoystickDriver;
+        private IDriver __defaultJoystickDriver=new UnityDriver();
         JoystickDevicesCollection __joysticks;
         GameObject _container;
 
@@ -27,7 +28,7 @@ namespace ws.winx.platform.android
         #endregion
 
 
-        public AndroidHIDInterface(){
+        public AndroidHIDInterface(List<IDriver> drivers){
 
             __drivers = drivers;
             __joysticks = new JoystickDevicesCollection();
@@ -35,17 +36,17 @@ namespace ws.winx.platform.android
 
            _container = new GameObject("AndroidHIDBehaviourGO");
             webHIDBehaviour = _container.AddComponent<AndroidHIDBehaviour>();
-            webHIDBehaviour.DeviceDisconnectedEvent += new EventHandler<>(DeviceDisconnectedEventHandler);
-            webHIDBehaviour.DeviceConnectedEvent += new EventHandler<>(DeviceConnectedEventHandler);
+            webHIDBehaviour.DeviceDisconnectedEvent += new EventHandler<AndroidMessageArgs>(DeviceDisconnectedEventHandler);
+            webHIDBehaviour.DeviceConnectedEvent += new EventHandler<AndroidMessageArgs>(DeviceConnectedEventHandler);
  
         }
 
 
 
-         public void DeviceConnectedEventHandler(object sender,WebMessageArgs args)
+         public void DeviceConnectedEventHandler(object sender,AndroidMessageArgs args)
         {
            // UnityEngine.Debug.Log(args.Message);
-            GenericHIDDevice info=
+            GenericHIDDevice info=args.data;
            
           
              if(!__joysticks.ContainsKey(info.index))
@@ -56,7 +57,7 @@ namespace ws.winx.platform.android
              }
         }
 
-        public void DeviceDisconnectedEventHandler(object sender, WebMessageArgs args)
+        public void DeviceDisconnectedEventHandler(object sender, AndroidMessageArgs args)
         {
           
             int id = Int32.Parse(args.RawMessage);
@@ -73,22 +74,73 @@ namespace ws.winx.platform.android
         {
             get
             {
-                throw new NotImplementedException();
+                return __defaultJoystickDriver;
             }
-            set
-            {
-                throw new NotImplementedException();
+            
+        }
+
+
+        
+        /// <summary>
+        /// Try to attach compatible driver based on device info
+        /// </summary>
+        /// <param name="deviceInfo"></param>
+        protected void ResolveDevice(HIDDevice deviceInfo)
+        {
+
+            IJoystickDevice joyDevice = null;
+
+            //loop thru drivers and attach the driver to device if compatible
+            if (__drivers != null)
+                foreach (var driver in __drivers)
+                {
+                    joyDevice = driver.ResolveDevice(deviceInfo);
+                    if (joyDevice != null)
+                    {
+                        //new IntPtr just for compatibility
+                        __joysticks[new IntPtr(joyDevice.PID)] = joyDevice;
+
+                        this.webHIDBehaviour.Log("WebHIDInterface","Device PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + driver.GetType().ToString());
+                        this.__Generics[joyDevice]=deviceInfo;
+                        break;
+                    }
+                }
+
+            if (joyDevice == null)
+            {//set default driver as resolver if no custom driver match device
+                joyDevice = defaultDriver.ResolveDevice(deviceInfo);
+
+
+                if (joyDevice != null)
+                {
+
+                    //new IntPtr just for compatibility
+                    __joysticks[new IntPtr(joyDevice.PID)] = joyDevice;
+
+                   // Debug.Log(__joysticks[deviceInfo.index]);
+
+                    this.webHIDBehaviour.Log("WebHIDInterface","Device index:" + joyDevice.ID + " PID:" + joyDevice.PID + " VID:" + joyDevice.VID + " attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + deviceInfo.DevicePath + " Name:" + joyDevice.Name);
+                     this.__Generics[joyDevice]=deviceInfo;
+                }
+                else
+                {
+                    Debug.LogWarning("Device PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " not found compatible driver thru WinHIDInterface!");
+
+                }
+
             }
+
+
         }
 
         public IDeviceCollection Devices
         {
-            get { throw new NotImplementedException(); }
+            get {return __joysticks; }
         }
 
         public Dictionary<devices.IJoystickDevice, HIDDevice> Generics
         {
-            get { throw new NotImplementedException(); }
+            get { return __Generics;}
         }
 
         public void Read(devices.IJoystickDevice device, HIDDevice.ReadCallback callback)

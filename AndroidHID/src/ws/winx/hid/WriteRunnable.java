@@ -1,24 +1,38 @@
 package ws.winx.hid;
 
-import java.util.concurrent.Semaphore;
-
-import android.hardware.usb.UsbDeviceConnection;
 import android.util.Log;
 
 public class WriteRunnable implements Runnable {
 
 	
-	private static final String TAG = "ReadRunnable";
-	private UsbDeviceConnection _connection;
-	private byte[] _inputBuffer;
-	private IReadWriteListener _listener;
-	Semaphore __endpointLock;
+	private static final String TAG = "WriteRunnable";
 
-	public WriteRunnable(Semaphore endPointLock,UsbDeviceConnection connection,byte[] into,IReadWriteListener listener) {
-		_connection=connection;
-		_inputBuffer=into;
+	private byte[] __outputBuffer;
+	private IReadWriteListener _listener;
+	private HIDDeviceWrapper __device;
+	int _timeout;
+
+	public WriteRunnable(HIDDeviceWrapper device) {
+		__device=device;
+	}
+	
+	
+	public WriteRunnable addEventListener(IReadWriteListener listener){
 		_listener=listener;
-		__endpointLock=endPointLock;
+		return this;
+		
+	}
+	
+	public WriteRunnable read(byte[] from){
+		__outputBuffer=from;
+		return this;
+		
+	}
+	
+	public WriteRunnable timeout(int timeInMilliSeconds){
+		_timeout=timeInMilliSeconds;
+		return this;
+		
 	}
 
 
@@ -26,10 +40,14 @@ public class WriteRunnable implements Runnable {
 	@Override
 	public void run() {
 		
+		
+	//	java.util.UUID.randomUUID()
 			Log.d(TAG,"Try to aquire write");
 		
 		try {
-			__endpointLock.acquire();
+			HIDDeviceWrapper.getEndPointlock().acquire();
+			
+			Log.d(TAG,"Try to aquire write");
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			Log.e(TAG," Error:",e);
@@ -38,12 +56,14 @@ public class WriteRunnable implements Runnable {
 		Log.d(TAG,"Try continue write");
 		
 		
+		boolean sucess= __device.get_connection().controlTransfer(0x21, 0x09, 0x0240, 0, __outputBuffer, __outputBuffer.length, 0)>-1;
 		
+		HIDDeviceWrapper.getEndPointlock().release();
 		
      	 //_listener.onWrite(_connection.bulkTransfer(_fromPoint, _inputBuffer, _inputBuffer.length, 50)>-1);
-		_listener.onWrite(_connection.controlTransfer(0x21, 0x09, 0x0240, 0, _inputBuffer, _inputBuffer.length, 0)>-1);
+		_listener.onWrite(sucess);
 		
-		__endpointLock.release();
+		
 	}
 
 }
