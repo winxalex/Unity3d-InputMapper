@@ -122,9 +122,20 @@ namespace ws.winx.gui
 
 #endif
 
+#if UNITY_ANDROID
+                    //Try to save to /storage/sdcard0/Android/data/ws.winx.InputManager/files
+
+                         if (settingsXML != null)
+			                  InputManager.saveSettings(Application.persistentDataPath+"/"+settingsXML.name+".xml");
+                         else
+				              InputManager.saveSettings(Application.persistentDataPath+"/InputSettings.xml");
+
+                         Debug.Log("UI>> Try to save to " + Application.persistentDataPath);
+#endif
+				
 
 #if UNITY_STANDALONE
-                    if (settingsXML == null)
+                    if (settingsXML != null)
 			                 InputManager.saveSettings(Path.Combine(Application.streamingAssetsPath,settingsXML.name+".xml"));
                         else
 				InputManager.saveSettings(Path.Combine(Application.streamingAssetsPath,"InputSettings.xml"));

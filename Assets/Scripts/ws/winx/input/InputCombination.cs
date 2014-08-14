@@ -8,7 +8,7 @@ using ws.winx.devices;
 
 namespace ws.winx.input
 {
-#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
+#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 	[DataContract]
 #endif
     public class InputCombination
@@ -37,7 +37,7 @@ namespace ws.winx.input
         private float __range;
         private KeyCode __lastCode;
 
-#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
+#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 		[DataMember(Name = "InputActions")]
 #endif
         public List<InputAction> actions

@@ -364,7 +364,7 @@ namespace ws.winx.input
 
 
 
-#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
+#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
         /// <summary>
 		/// Loads the Input settings from InputSettings.xml and deserialize into OO structure.
 		/// Create your .xml settings with InputMapper Editor
@@ -839,7 +839,7 @@ namespace ws.winx.input
        }
 #endif
 
-		#if (UNITY_STANDALONE || UNITY_EDITOR)&& !UNITY_WEBPLAYER
+		#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID)&& !UNITY_WEBPLAYER
 		/// <summary>
 		/// Saves the settings to InputSettings.xml.
 		/// </summary>
@@ -994,7 +994,7 @@ namespace ws.winx.input
 
 		#region Settings
 
-		#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
+		#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 		[DataContract]
 #endif
 		public class InputSettings{
@@ -1002,7 +1002,7 @@ namespace ws.winx.input
 
 
 			
-			#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
+			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 			[DataMember(Order=4)]
 			#endif
 			public float singleClickSensitivity{
@@ -1011,7 +1011,7 @@ namespace ws.winx.input
 
 			}
 
-			#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
+			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 			[DataMember(Order=5)]
 			#endif
 			public float doubleClickSensitivity{
@@ -1020,7 +1020,7 @@ namespace ws.winx.input
 				
 			}
 
-			#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
+			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 			[DataMember(Order=6)]
 			#endif
 			public float longClickSensitivity{
@@ -1029,7 +1029,7 @@ namespace ws.winx.input
 				
 			}
 
-			#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
+			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 			[DataMember(Order=7)]
 			#endif
 			public float combinationsClickSensitivity{
@@ -1038,7 +1038,7 @@ namespace ws.winx.input
 				
 			}
 
-			#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
+			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 			[DataMember(Order=1)]
 			#endif
 			public string doubleDesignator{
@@ -1047,7 +1047,7 @@ namespace ws.winx.input
 				
 			}
 
-			#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
+			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 			[DataMember(Order=2)]
 			#endif
 			public string longDesignator{
@@ -1056,7 +1056,7 @@ namespace ws.winx.input
 				
 			}
 
-			#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
+			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 			[DataMember(Order=3)]
 			#endif
 			public string spaceDesignator{
@@ -1065,7 +1065,7 @@ namespace ws.winx.input
 				
 			}
 
-			#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
+			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 			[DataMember(Name="StateInputs",Order=8)]
 			#endif
 			protected Dictionary<int,InputState> _stateInputs;
