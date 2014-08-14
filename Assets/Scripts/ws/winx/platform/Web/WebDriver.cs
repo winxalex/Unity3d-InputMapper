@@ -17,7 +17,7 @@ namespace ws.winx.platform.web
         protected IHIDInterface _hidInterface;
         protected EventHandler<WebMessageArgs> onUpdate;
 
-        public IJoystickDevice ResolveDevice(IHIDDevice info)
+        public IDevice ResolveDevice(IHIDDevice info)
         {
 
             GenericHIDDevice genericDevice = (GenericHIDDevice)info;
@@ -193,7 +193,7 @@ namespace ws.winx.platform.web
              
          }
 
-         public void Update(IJoystickDevice device)
+         public void Update(IDevice device)
         {
 
            // Debug.Log("Update"+_isReady);

@@ -120,8 +120,8 @@ namespace ws.winx.platform.windows
 
         #region IJoystickDriver implementation
 
-        public void Update(IJoystickDevice joystick)
-        //public void Update (IJoystickDevice<ws.winx.devices.IAxisDetails, ws.winx.devices.IButtonDetails, ws.winx.devices.IDeviceExtension> joystick)
+        public void Update(IDevice joystick)
+        //public void Update (IDevice<ws.winx.devices.IAxisDetails, ws.winx.devices.IButtonDetails, ws.winx.devices.IDeviceExtension> joystick)
         {
             GamePad gamePad;
 
@@ -204,8 +204,8 @@ namespace ws.winx.platform.windows
 
         }
 
-        public IJoystickDevice ResolveDevice(IHIDDevice info)
-        //public IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension> ResolveDevice(IHIDDeviceInfo info)
+        public IDevice ResolveDevice(IHIDDevice info)
+        //public IDevice<IAxisDetails, IButtonDetails, IDeviceExtension> ResolveDevice(IHIDDeviceInfo info)
         {
             int type = -1;
             int len = XPAD_DEVICE.Length;
@@ -285,7 +285,7 @@ namespace ws.winx.platform.windows
 
 
             return joystick;
-            //return (IJoystickDevice<AxisDetails, ButtonDetails, XInputExtension>)joystick;
+            //return (IDevice<AxisDetails, ButtonDetails, XInputExtension>)joystick;
         }
         #endregion
 

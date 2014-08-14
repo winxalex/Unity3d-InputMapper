@@ -96,7 +96,7 @@ namespace ws.winx.input
 
             List<T> Result = new List<T>();
 
-            foreach (IJoystickDevice device in devices)
+            foreach (IDevice device in devices)
             {
                 if (device.GetType() == typeof(T))
                 {

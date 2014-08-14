@@ -14,14 +14,14 @@ namespace ws.winx.platform
 {
 		public interface IDeviceCollection:IEnumerable
 		{
-			IJoystickDevice this [int index] 
-			//IJoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension> this [int index] 
+			IDevice this [int index] 
+			//IDevice<IAxisDetails,IButtonDetails,IDeviceExtension> this [int index] 
 			{
 				get; 
 		    }
 
-			IJoystickDevice this [IntPtr device]{get;}
-			//IJoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension> this [IntPtr device]{get;}
+			IDevice this [IntPtr device]{get;}
+			//IDevice<IAxisDetails,IButtonDetails,IDeviceExtension> this [IntPtr device]{get;}
 
 			void Remove (IntPtr device);
             void Remove(int inx);

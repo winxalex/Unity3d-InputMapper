@@ -23,7 +23,7 @@ namespace ws.winx.platform.web
 
         //link towards Browser
         internal readonly WebHIDBehaviour webHIDBehaviour;
-        private Dictionary<IJoystickDevice, HIDDevice> __Generics;
+        private Dictionary<IDevice, HIDDevice> __Generics;
 
        
         #endregion
@@ -33,7 +33,7 @@ namespace ws.winx.platform.web
         {
             __drivers = drivers;
             __joysticks = new JoystickDevicesCollection();
-            __Generics=new Dictionary<IJoystickDevice,HIDDevice>();
+            __Generics=new Dictionary<IDevice,HIDDevice>();
 
             //"{"id":"feed-face-VJoy Virtual Joystick","axes":[0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0,0,0,0,0,0,-1,0,0,0,0,0,0],"buttons":[{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}],"index":0}"
 
@@ -49,22 +49,22 @@ namespace ws.winx.platform.web
         #region IHIDInterface implementation
 
 
-        public void Read(IJoystickDevice device, HIDDevice.ReadCallback callback)
+        public void Read(IDevice device, HIDDevice.ReadCallback callback)
         {
             this.__Generics[device].Read(callback);
         }
 
-        public void Write(object data, IJoystickDevice device, HIDDevice.WriteCallback callback)
+        public void Write(object data, IDevice device, HIDDevice.WriteCallback callback)
         {
             throw new NotImplementedException();
         }
 
-        public void Write(object data, IJoystickDevice device)
+        public void Write(object data, IDevice device)
         {
             throw new NotImplementedException();
         }
 
-        public Dictionary<IJoystickDevice, HIDDevice> Generics
+        public Dictionary<IDevice, HIDDevice> Generics
         {
             get { return __Generics; }
 
@@ -98,7 +98,7 @@ namespace ws.winx.platform.web
         protected void ResolveDevice(HIDDevice deviceInfo)
         {
 
-            IJoystickDevice joyDevice = null;
+            IDevice joyDevice = null;
 
             //loop thru drivers and attach the driver to device if compatible
             if (__drivers != null)
@@ -194,13 +194,13 @@ namespace ws.winx.platform.web
         public sealed class JoystickDevicesCollection : IDeviceCollection
         {
 #region Fields
-                readonly Dictionary<IntPtr, IJoystickDevice> JoystickDevices;
-                   // readonly Dictionary<IntPtr, IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension>> JoystickDevices;
+                readonly Dictionary<IntPtr, IDevice> JoystickDevices;
+                   // readonly Dictionary<IntPtr, IDevice<IAxisDetails, IButtonDetails, IDeviceExtension>> JoystickDevices;
 
                 readonly Dictionary<int, IntPtr> JoystickIDToDevice;
 
 
-            List<IJoystickDevice> _iterationCacheList;
+            List<IDevice> _iterationCacheList;
             bool _isEnumeratorDirty = true;
 
 #endregion
@@ -212,7 +212,7 @@ namespace ws.winx.platform.web
                 
                 JoystickIDToDevice = new Dictionary<int, IntPtr>();
 
-                JoystickDevices = new Dictionary<IntPtr, IJoystickDevice>();
+                JoystickDevices = new Dictionary<IntPtr, IDevice>();
             }
 
 #endregion
@@ -244,7 +244,7 @@ namespace ws.winx.platform.web
 
 
 
-            public IJoystickDevice this[int index]
+            public IDevice this[int index]
             {
                 get { return JoystickDevices[JoystickIDToDevice[index]]; }
                 				
@@ -252,7 +252,7 @@ namespace ws.winx.platform.web
 
 
 
-            public IJoystickDevice this[IntPtr pidPointer]
+            public IDevice this[IntPtr pidPointer]
             {
                 get { throw new Exception("Devices should be retrived only thru index"); }
 
@@ -282,7 +282,7 @@ namespace ws.winx.platform.web
                 if (_isEnumeratorDirty)
                 {
 					
-                    _iterationCacheList = JoystickDevices.Values.ToList<IJoystickDevice>();
+                    _iterationCacheList = JoystickDevices.Values.ToList<IDevice>();
 
 					
 

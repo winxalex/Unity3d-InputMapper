@@ -85,7 +85,7 @@ namespace ws.winx.platform.osx
 			int value;
 			OSXHIDInterface.IOHIDElementType  type = NativeMethods.IOHIDElementGetType(element);
 
-			IJoystickDevice stick=_hidInterface.Devices[context];
+			IDevice stick=_hidInterface.Devices[context];
 
 			if (NativeMethods.IOHIDValueGetLength(valRef) > 4) {
 				// Workaround for a strange crash that occurs with PS3 controller; was getting lengths of 39 (!)
@@ -236,14 +236,14 @@ namespace ws.winx.platform.osx
 
 #region IJoystickDriver implementation
 
-         public void Update(IJoystickDevice joystick)
-		//public void Update (IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension> joystick)
+         public void Update(IDevice joystick)
+		//public void Update (IDevice<IAxisDetails, IButtonDetails, IDeviceExtension> joystick)
 		{
             throw new Exception("OSX Default driver is meant to auto update on callback");
 		}
 
-		public IJoystickDevice ResolveDevice(IHIDDeviceInfo info)
-		//public IJoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension> ResolveDevice(IHIDDeviceInfo info)
+		public IDevice ResolveDevice(IHIDDeviceInfo info)
+		//public IDevice<IAxisDetails,IButtonDetails,IDeviceExtension> ResolveDevice(IHIDDeviceInfo info)
 		{
 			_hidInterface=info.hidInterface;
 
@@ -260,8 +260,8 @@ namespace ws.winx.platform.osx
 
 
 
-		//public IJoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension> CreateDevice(IHIDDeviceInfo info){
-		public IJoystickDevice CreateDevice(IHIDDeviceInfo info){
+		//public IDevice<IAxisDetails,IButtonDetails,IDeviceExtension> CreateDevice(IHIDDeviceInfo info){
+		public IDevice CreateDevice(IHIDDeviceInfo info){
 
 			IntPtr device=info.deviceHandle;
 			//JoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension> joystick;
@@ -377,8 +377,8 @@ namespace ws.winx.platform.osx
 
 
              return joystick;
-			//return (IJoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension>)joystick;
-			//return joystick as IJoystickDevice<AxisDetails,ButtonDetails,OSXDefaultExtension>;
+			//return (IDevice<IAxisDetails,IButtonDetails,IDeviceExtension>)joystick;
+			//return joystick as IDevice<AxisDetails,ButtonDetails,OSXDefaultExtension>;
 		}
 		
 

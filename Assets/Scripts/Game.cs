@@ -79,8 +79,8 @@ namespace ws.winx
             //if you want to load some states from .xml and add custom manually first load settings xml
             //!!!Application.streamingAssetPath gives "Raw" folder in web player
         
-#if (UNITY_STANDALONE || UNITY_EDITOR) && !UNITY_WEBPLAYER
-			UnityEngine.Debug.Log("Standalone");
+#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+			//UnityEngine.Debug.Log("Standalone");
                   
 			UserInterfaceWindow ui=this.GetComponent<UserInterfaceWindow>();
 			if(ui!=null && ui.settingsXML==null){
@@ -119,7 +119,7 @@ namespace ws.winx
 #endif
 
 
-#if(UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE
+#if(UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE && !UNITY_ANDROID
             Loader request = new Loader();
             request.Add(Application.dataPath+"/StreamingAssets/InputSettings.xml");
             request.LoadComplete += new EventHandler<LoaderEvtArgs>(onLoadComplete);

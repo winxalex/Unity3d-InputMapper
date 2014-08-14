@@ -22,7 +22,7 @@ namespace ws.winx.platform.android
 	public class AndroidHIDBehaviour:MonoBehaviour
 	{
       
-        HIDListenerProxy listener = new HIDListenerProxy();
+        AndroidHIDListenerProxy listener = new AndroidHIDListenerProxy();
 
         public event EventHandler<AndroidMessageArgs> DeviceConnectedEvent
         {
@@ -57,16 +57,16 @@ namespace ws.winx.platform.android
 
         void Start()
         {
-            UnityEngine.Debug.Log("AndroidHIDBehaviour>Start");
+            UnityEngine.Debug.Log("AndroidHIDBehaviour >>>> Start");
 
             AndroidJNI.AttachCurrentThread();
             var activity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity");
-            UnityEngine.Debug.Log("AndroidHIDBehaviour>" + activity);
+            UnityEngine.Debug.Log("AndroidHIDBehaviour >>>> Acitivty:" + activity);
             
             droidHID = new AndroidJavaClass("ws.winx.hid.AndroidHID");
             droidHID.CallStatic("Init", activity, listener);
 
-            UnityEngine.Debug.Log("AndroidHIDBehaviour>" + droidHID);  
+            UnityEngine.Debug.Log("AndroidHIDBehaviour >>>>> AndroidHID" + droidHID);  
                 //new AndroidJavaObject("ws.winx.hid.AndroidHID", activity, listener);
 
             droidHID.CallStatic("Enumerate");

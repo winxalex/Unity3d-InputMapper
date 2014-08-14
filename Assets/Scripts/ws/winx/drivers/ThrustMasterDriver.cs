@@ -16,7 +16,7 @@ namespace ws.winx.drivers
      
       
 
-        public IJoystickDevice ResolveDevice(IHIDDevice hidDevice)
+        public IDevice ResolveDevice(IHIDDevice hidDevice)
         {
             if (hidDevice.PID == 46675 && hidDevice.VID == 1103)
             {
@@ -55,7 +55,7 @@ namespace ws.winx.drivers
 
      
 
-        public void Update(IJoystickDevice device)
+        public void Update(IDevice device)
         {
 
             if (device.isReady && __hidInterface.Generics.ContainsKey(device))
@@ -71,16 +71,19 @@ namespace ws.winx.drivers
         /// Move FFD motor of the wheel left or right
         /// </summary>
         /// <param name="forceXY">0xFF - 0xA7(left) and 0x00-0x64(rights) are measurable by feeling </param>
-        internal void SetMotor(IJoystickDevice device, byte forceX,byte forceY,HIDDevice.WriteCallback callback)
+        internal void SetMotor(IDevice device, byte forceX,byte forceY,HIDDevice.WriteCallback callback)
         {
             if (__hidInterface.Generics.ContainsKey(device))
             {
-                byte[] data=new byte[3];//maybe 3 is ok too
+                //TODO check if device use sbytes for 0x80 to 0x7f (-128 to 127)
+                //Couldn't figure out if forceY doing something
+
+                byte[] data=new byte[5];
                 data[0]=0x40;
                 data[1]=forceX;
                 data[2]=forceY;
-               // data[3] = forceY;
-               // data[4] = forceY;
+                data[3] = 0x00;
+                data[4] = 0x00;
 
 
                 __hidInterface.Generics[device].Write(data, callback);
@@ -277,12 +280,12 @@ namespace ws.winx.drivers
 
 
 
-        internal void StopMotor(IJoystickDevice device)
+        internal void StopMotor(IDevice device)
         {
             byte[] data=new byte[5];
             data[0]=0x40;
             data[1]=0x7f;
-            data[2]=0x00;
+            data[2]=0xff;
             data[3]=0x00;
             data[4]=0x00;
 

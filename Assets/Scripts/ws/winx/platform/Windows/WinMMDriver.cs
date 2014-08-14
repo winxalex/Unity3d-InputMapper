@@ -49,7 +49,7 @@ namespace ws.winx.platform.windows
         #region IJoystickDriver implementation
 
 
-        public void Update(IJoystickDevice joystick)
+        public void Update(IDevice joystick)
         {
             // UnityEngine.Debug.Log("Update Driver called from:" + joystick.PID+" ID:"+joystick.ID);
 
@@ -188,14 +188,14 @@ namespace ws.winx.platform.windows
 
 
 
-        public IJoystickDevice ResolveDevice(IHIDDevice hidDevice)
+        public IDevice ResolveDevice(IHIDDevice hidDevice)
         {
           
 
             return CreateDevice(hidDevice);
         }
 
-        public IJoystickDevice CreateDevice(IHIDDevice hidDevice)
+        public IDevice CreateDevice(IHIDDevice hidDevice)
         {
             JoystickDevice joystick;
 
@@ -322,7 +322,7 @@ namespace ws.winx.platform.windows
 
             return null;
 
-            //return (IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension>)joystick;
+            //return (IDevice<IAxisDetails, IButtonDetails, IDeviceExtension>)joystick;
         }
         #endregion
 

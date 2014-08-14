@@ -12,7 +12,7 @@ namespace ws.winx.unity
 	{
 
 
-        public devices.IJoystickDevice ResolveDevice(IHIDDevice info)
+        public devices.IDevice ResolveDevice(IHIDDevice info)
         {
              int i = 0;
             JoystickDevice device=new JoystickDevice(info.index, info.PID, info.VID, 12,10, this);
@@ -34,13 +34,13 @@ namespace ws.winx.unity
              return device;
         }
 
-        public void Update(devices.IJoystickDevice joystick)
+        public void Update(devices.IDevice device)
         {
             int i = 0;
-            int numAxis = joystick.Axis.Count;
-            int numButtons=joystick.Buttons.Count;
+            int numAxis = device.Axis.Count;
+            int numButtons=device.Buttons.Count;
                    
-            int index=joystick.ID;
+            int index=device.ID;
 
            // Debug.Log("axis value raw:" + Input.GetAxisRaw("10") + " " + Input.GetAxis("11"));
             //Debug.Log("axis value raw:" + );
@@ -49,7 +49,7 @@ namespace ws.winx.unity
             string axisValue = "";
                for (; i < numAxis; i++)
                {
-                   joystick.Axis[i].value = (Input.GetAxis(index.ToString() + i.ToString())+1f)*0.5f;//index-of joystick, i-ord number of axis
+                   device.Axis[i].value = (Input.GetAxis(index.ToString() + i.ToString())+1f)*0.5f;//index-of joystick, i-ord number of axis
 
                    axisValue += Input.GetAxis(index.ToString() + i.ToString())+" ";
 
@@ -61,7 +61,7 @@ namespace ws.winx.unity
             for (i=0; i < numButtons; i++)
             {
                
-                joystick.Buttons[i].value =Input.GetKey((KeyCode)Enum.Parse(typeof(KeyCode), "Joystick" + (index+1)+"Button"+i))==true ? 1f:0f;
+                device.Buttons[i].value =Input.GetKey((KeyCode)Enum.Parse(typeof(KeyCode), "Joystick" + (index+1)+"Button"+i))==true ? 1f:0f;
 
             }
         }

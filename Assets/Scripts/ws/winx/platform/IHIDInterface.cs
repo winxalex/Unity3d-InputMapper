@@ -19,10 +19,10 @@ namespace ws.winx.platform
             
 			IDriver defaultDriver{get;set;}
 			IDeviceCollection Devices{get;}
-            Dictionary<IJoystickDevice, HIDDevice> Generics{get;}
-            void Read(IJoystickDevice device,HIDDevice.ReadCallback callback);
-            void Write(object data, IJoystickDevice device,HIDDevice.WriteCallback callback);
-            void Write(object data, IJoystickDevice device);
+            Dictionary<IDevice, HIDDevice> Generics{get;}
+            void Read(IDevice device,HIDDevice.ReadCallback callback);
+            void Write(object data, IDevice device,HIDDevice.WriteCallback callback);
+            void Write(object data, IDevice device);
 			void Update();
 		    
 

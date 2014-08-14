@@ -53,7 +53,7 @@ namespace ws.winx.platform.windows
 
       
         private static IntPtr notificationHandle;
-        private Dictionary<IJoystickDevice, HIDDevice> __Generics;
+        private Dictionary<IDevice, HIDDevice> __Generics;
 
      
       
@@ -67,18 +67,18 @@ namespace ws.winx.platform.windows
         #region IHIDInterface implementation
 
 
-        public void Read(IJoystickDevice device,HIDDevice.ReadCallback callback)
+        public void Read(IDevice device,HIDDevice.ReadCallback callback)
         {
             this.__Generics[device].Read(callback);
 
         }
 
-        public void Write(object data, IJoystickDevice device)
+        public void Write(object data, IDevice device)
         {
             this.__Generics[device].Write(data);
         }
 
-        public void Write(object data, IJoystickDevice device, HIDDevice.WriteCallback callback)
+        public void Write(object data, IDevice device, HIDDevice.WriteCallback callback)
         {
             this.__Generics[device].Write(data,callback);
         }
@@ -104,7 +104,7 @@ namespace ws.winx.platform.windows
 
         }
 
-        public Dictionary<IJoystickDevice, HIDDevice> Generics
+        public Dictionary<IDevice, HIDDevice> Generics
         {
             get { return __Generics; }
         }
@@ -134,7 +134,7 @@ namespace ws.winx.platform.windows
         {
             __drivers = drivers;
             _joysticks = new JoystickDevicesCollection();
-            __Generics = new Dictionary<IJoystickDevice, HIDDevice>();
+            __Generics = new Dictionary<IDevice, HIDDevice>();
 
             //Timer aTimer = new Timer(3000);
             // aTimer.Elapsed += new ElapsedEventHandler(enumerateTimedEvent);
@@ -278,7 +278,7 @@ namespace ws.winx.platform.windows
                                 string name = String.Empty;
                                 HIDDevice deviceInfo = GetHIDDeviceInfo(PointerToDevicePath(lParam));
 
-                                IJoystickDevice device = _joysticks[new IntPtr(deviceInfo.PID)];
+                                IDevice device = _joysticks[new IntPtr(deviceInfo.PID)];
                                 if (device != null)
                                 {
                                     name = device.Name;
@@ -622,7 +622,7 @@ namespace ws.winx.platform.windows
         protected void ResolveDevice(HIDDevice deviceInfo)
         {
 
-            IJoystickDevice joyDevice = null;
+            IDevice joyDevice = null;
 
             //loop thru drivers and attach the driver to device if compatible
             if (__drivers != null)
@@ -667,7 +667,7 @@ namespace ws.winx.platform.windows
 
         }
 
-        private void AddDeviceToHIDInterface(IJoystickDevice joyDevice, HIDDevice deviceInfo)
+        private void AddDeviceToHIDInterface(IDevice joyDevice, HIDDevice deviceInfo)
         {
            
             _joysticks[new IntPtr(deviceInfo.PID)] = joyDevice;
@@ -719,13 +719,13 @@ namespace ws.winx.platform.windows
         public sealed class JoystickDevicesCollection : IDeviceCollection
         {
             #region Fields
-            readonly Dictionary<IntPtr, IJoystickDevice> JoystickDevices;
-            // readonly Dictionary<IntPtr, IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension>> JoystickDevices;
+            readonly Dictionary<IntPtr, IDevice> JoystickDevices;
+            // readonly Dictionary<IntPtr, IDevice<IAxisDetails, IButtonDetails, IDeviceExtension>> JoystickDevices;
 
             readonly Dictionary<int, IntPtr> JoystickIDToDevice;
 
 
-            List<IJoystickDevice> _iterationCacheList;//
+            List<IDevice> _iterationCacheList;//
             bool _isEnumeratorDirty = true;
 
             #endregion
@@ -734,7 +734,7 @@ namespace ws.winx.platform.windows
 
             internal JoystickDevicesCollection()
             {
-                JoystickDevices = new Dictionary<IntPtr, IJoystickDevice>(new IntPtrEqualityComparer());
+                JoystickDevices = new Dictionary<IntPtr, IDevice>(new IntPtrEqualityComparer());
               
                 JoystickIDToDevice = new Dictionary<int, IntPtr>();
 
@@ -744,7 +744,7 @@ namespace ws.winx.platform.windows
 
 #region Public Members
 
-            public IJoystickDevice FindBy(int pid)
+            public IDevice FindBy(int pid)
             {
                 return JoystickDevices.Where(z => z.Value.PID == pid).FirstOrDefault().Value;
             }
@@ -773,8 +773,8 @@ namespace ws.winx.platform.windows
 
 
 
-            public IJoystickDevice this[int ID]
-            //public IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension> this[int index]
+            public IDevice this[int ID]
+            //public IDevice<IAxisDetails, IButtonDetails, IDeviceExtension> this[int index]
             {
                 get { return JoystickDevices[JoystickIDToDevice[ID]]; }
                 //				internal set { 
@@ -786,7 +786,7 @@ namespace ws.winx.platform.windows
 
 
 
-            public IJoystickDevice this[IntPtr pidPointer]
+            public IDevice this[IntPtr pidPointer]
             {
                 get { return JoystickDevices[pidPointer]; }
                 internal set
@@ -819,7 +819,7 @@ namespace ws.winx.platform.windows
             {
                 if (_isEnumeratorDirty)
                 {
-                    _iterationCacheList = JoystickDevices.Values.ToList<IJoystickDevice>();
+                    _iterationCacheList = JoystickDevices.Values.ToList<IDevice>();
                     _isEnumeratorDirty = false;
 
 
@@ -875,7 +875,7 @@ namespace ws.winx.platform.windows
             _joysticks.Clear();
 
            
-            foreach (KeyValuePair<IJoystickDevice, HIDDevice> entry in Generics)
+            foreach (KeyValuePair<IDevice, HIDDevice> entry in Generics)
             {
                 entry.Value.Dispose();
             }

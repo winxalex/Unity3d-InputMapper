@@ -23,7 +23,7 @@ namespace ws.winx.platform.android
 
         //link towards Browser
         internal readonly AndroidHIDBehaviour droidHIDBehaviour;
-        private Dictionary<IJoystickDevice, HIDDevice> __Generics;
+        private Dictionary<IDevice, HIDDevice> __Generics;
 
 
         #endregion
@@ -34,7 +34,7 @@ namespace ws.winx.platform.android
             UnityEngine.Debug.Log("AndroidHIDInterface");
             __drivers = drivers;
             __joysticks = new JoystickDevicesCollection();
-            __Generics = new Dictionary<IJoystickDevice, HIDDevice>();
+            __Generics = new Dictionary<IDevice, HIDDevice>();
 
             _container = new GameObject("AndroidHIDBehaviourGO");
             droidHIDBehaviour = _container.AddComponent<AndroidHIDBehaviour>();
@@ -67,10 +67,14 @@ namespace ws.winx.platform.android
         public void DeviceDisconnectedEventHandler(object sender, AndroidMessageArgs args)
         {
 
-            int id = (int)args.data;
-            this.droidHIDBehaviour.Log(TAG, "Device " + __joysticks[id].Name + " index:" + id + " Removed");
-            this.__Generics.Remove(__joysticks[id]);
-            __joysticks.Remove(id);
+            int pid = (int)args.data;
+            IDevice device = __joysticks.FindBy(pid);
+            if (device != null)
+            {
+                this.droidHIDBehaviour.Log(TAG, "Device " + device.Name + " index:" + device.ID + " Removed");
+                this.__Generics.Remove(device);
+                __joysticks.Remove(device.ID);
+            }
 
 
 
@@ -99,7 +103,7 @@ namespace ws.winx.platform.android
         protected void ResolveDevice(HIDDevice deviceInfo)
         {
 
-            IJoystickDevice joyDevice = null;
+            IDevice joyDevice = null;
 
             //loop thru drivers and attach the driver to device if compatible
             if (__drivers != null)
@@ -149,22 +153,22 @@ namespace ws.winx.platform.android
             get { return __joysticks; }
         }
 
-        public Dictionary<devices.IJoystickDevice, HIDDevice> Generics
+        public Dictionary<devices.IDevice, HIDDevice> Generics
         {
             get { return __Generics; }
         }
 
-        public void Read(devices.IJoystickDevice device, HIDDevice.ReadCallback callback)
+        public void Read(devices.IDevice device, HIDDevice.ReadCallback callback)
         {
             this.__Generics[device].Read(callback);
         }
 
-        public void Write(object data, devices.IJoystickDevice device, HIDDevice.WriteCallback callback)
+        public void Write(object data, devices.IDevice device, HIDDevice.WriteCallback callback)
         {
             throw new NotImplementedException();
         }
 
-        public void Write(object data, devices.IJoystickDevice device)
+        public void Write(object data, devices.IDevice device)
         {
             this.__Generics[device].Write(data);
         }
@@ -183,13 +187,13 @@ namespace ws.winx.platform.android
         public sealed class JoystickDevicesCollection : IDeviceCollection
         {
 #region Fields
-            readonly Dictionary<IntPtr, IJoystickDevice> JoystickDevices;
-            // readonly Dictionary<IntPtr, IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension>> JoystickDevices;
+            readonly Dictionary<IntPtr, IDevice> JoystickDevices;
+            // readonly Dictionary<IntPtr, IDevice<IAxisDetails, IButtonDetails, IDeviceExtension>> JoystickDevices;
 
             readonly Dictionary<int, IntPtr> JoystickIDToDevice;
 
 
-            List<IJoystickDevice> _iterationCacheList;
+            List<IDevice> _iterationCacheList;
             bool _isEnumeratorDirty = true;
 
             #endregion
@@ -201,7 +205,7 @@ namespace ws.winx.platform.android
 
                 JoystickIDToDevice = new Dictionary<int, IntPtr>();
 
-                JoystickDevices = new Dictionary<IntPtr, IJoystickDevice>();
+                JoystickDevices = new Dictionary<IntPtr, IDevice>();
             }
 
             #endregion
@@ -233,7 +237,7 @@ namespace ws.winx.platform.android
 
 
 
-            public IJoystickDevice this[int index]
+            public IDevice this[int index]
             {
                 get { return JoystickDevices[JoystickIDToDevice[index]]; }
 
@@ -241,7 +245,7 @@ namespace ws.winx.platform.android
 
 
 
-            public IJoystickDevice this[IntPtr pidPointer]
+            public IDevice this[IntPtr pidPointer]
             {
                 get { throw new Exception("Devices should be retrived only thru index"); }
 
@@ -271,7 +275,7 @@ namespace ws.winx.platform.android
                 if (_isEnumeratorDirty)
                 {
 
-                    _iterationCacheList = JoystickDevices.Values.ToList<IJoystickDevice>();
+                    _iterationCacheList = JoystickDevices.Values.ToList<IDevice>();
 
 
 
@@ -284,7 +288,7 @@ namespace ws.winx.platform.android
 
             }
 
-            public IJoystickDevice FindBy(int pid)
+            public IDevice FindBy(int pid)
             {
                 return JoystickDevices.Where(z => z.Value.PID == pid).FirstOrDefault().Value;
             }

@@ -10,8 +10,8 @@ namespace ws.winx.devices
 		/// Represents a joythis device and provides methods to query its status.
 		/// </summary>
 	public /*abstract*/ class JoystickDevice//<TAxisDetails,TButtonDetails,TDeviceExtension> 
-        :IJoystickDevice
-//		: IJoystickDevice<TAxisDetails,TButtonDetails,TDeviceExtension>
+        :IDevice
+//		: IDevice<TAxisDetails,TButtonDetails,TDeviceExtension>
 			//where TAxisDetails:IAxisDetails
 			//where TButtonDetails:IButtonDetails
 			//where TDeviceExtension:IDeviceExtension
@@ -73,7 +73,7 @@ namespace ws.winx.devices
 
         #region Public Members
 
-		#region IJoystickDevice implementation
+		#region IDevice implementation
 
 
                 public bool isReady
@@ -163,7 +163,7 @@ namespace ws.winx.devices
 
                     _lastFrameNum = Time.frameCount + 0;
 
-                    _driver.Update(this);// as IJoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension>);
+                    _driver.Update(this);// as IDevice<IAxisDetails,IButtonDetails,IDeviceExtension>);
                 }
          
           

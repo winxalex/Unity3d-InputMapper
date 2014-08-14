@@ -244,7 +244,7 @@ namespace ws.winx.input
         {
             IDeviceCollection devices = InputManager.hidInterface.Devices;
 
-            foreach (IJoystickDevice device in devices)
+            foreach (IDevice device in devices)
                 if (device.GetAnyKeyDown())
                     return true;
 
@@ -333,7 +333,7 @@ namespace ws.winx.input
                 IDeviceCollection devices = InputManager.hidInterface.Devices;
                 float axisValue;
 
-                foreach (IJoystickDevice device in devices)
+                foreach (IDevice device in devices)
                     if ((axisValue = device.GetAxis(code)) != 0)
                         return axisValue;
 
@@ -376,7 +376,7 @@ namespace ws.winx.input
                 {
                     IDeviceCollection devices = InputManager.hidInterface.Devices;
 
-                    foreach (IJoystickDevice device in devices)
+                    foreach (IDevice device in devices)
                         if (device.GetKey(code))
                             return true;
 
@@ -429,7 +429,7 @@ namespace ws.winx.input
                 {
                     IDeviceCollection devices = InputManager.hidInterface.Devices;
 
-                    foreach (IJoystickDevice device in devices)
+                    foreach (IDevice device in devices)
                         if (device.GetKeyUp(code))
                             return true;
 
@@ -467,7 +467,7 @@ namespace ws.winx.input
                 if (action.fromAny)
                 {
                     IDeviceCollection devices = InputManager.hidInterface.Devices;
-                    foreach (IJoystickDevice device in devices)
+                    foreach (IDevice device in devices)
                         if (device.GetKeyDown(code))
                             return true;
 
@@ -587,7 +587,7 @@ namespace ws.winx.input
 
 
 
-            foreach (IJoystickDevice device in devices)
+            foreach (IDevice device in devices)
             {
 
                 if ((_code = device.GetInput()) != 0)

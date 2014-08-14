@@ -189,8 +189,8 @@ namespace ws.winx.platform.osx
 
 
 
-                IJoystickDevice joyDevice = null;
-               // IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension> joyDevice = null;
+                IDevice joyDevice = null;
+               // IDevice<IAxisDetails, IButtonDetails, IDeviceExtension> joyDevice = null;
 
 
                 //loop thru drivers and attach the driver to device if compatible
@@ -497,13 +497,13 @@ namespace ws.winx.platform.osx
         public sealed class JoystickDevicesCollection : IDeviceCollection
         {
 #region Fields
-            readonly Dictionary<IntPtr, IJoystickDevice> JoystickDevices;
-            //readonly Dictionary<IntPtr, IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension>> JoystickDevices;
+            readonly Dictionary<IntPtr, IDevice> JoystickDevices;
+            //readonly Dictionary<IntPtr, IDevice<IAxisDetails, IButtonDetails, IDeviceExtension>> JoystickDevices;
 
             //readonly List<IntPtr> JoystickIndexToDevice;
             readonly Dictionary<int, IntPtr> JoystickIDToDevice;
 
-            List<IJoystickDevice> _iterationCacheList;
+            List<IDevice> _iterationCacheList;
             bool _isEnumeratorDirty = true;
 
             #endregion
@@ -512,8 +512,8 @@ namespace ws.winx.platform.osx
 
             internal JoystickDevicesCollection()
             {
-                JoystickDevices = new Dictionary<IntPtr, IJoystickDevice>(new IntPtrEqualityComparer());
-                //JoystickDevices = new Dictionary<IntPtr, IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension>>(new IntPtrEqualityComparer());
+                JoystickDevices = new Dictionary<IntPtr, IDevice>(new IntPtrEqualityComparer());
+                //JoystickDevices = new Dictionary<IntPtr, IDevice<IAxisDetails, IButtonDetails, IDeviceExtension>>(new IntPtrEqualityComparer());
                // JoystickIndexToDevice = new List<IntPtr>();
                 JoystickIDToDevice = new Dictionary<int, IntPtr>();
 
@@ -547,8 +547,8 @@ namespace ws.winx.platform.osx
 
 
 
-            public IJoystickDevice this[int ID]
-            //public IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension> this[int index]
+            public IDevice this[int ID]
+            //public IDevice<IAxisDetails, IButtonDetails, IDeviceExtension> this[int index]
             {
                 get { return JoystickDevices[JoystickIDToDevice[ID]]; }
                 //				internal set { 
@@ -558,8 +558,8 @@ namespace ws.winx.platform.osx
                 //						}
             }
 
-            public IJoystickDevice this[IntPtr device]
-            //public IJoystickDevice<IAxisDetails, IButtonDetails, IDeviceExtension> this[IntPtr device]
+            public IDevice this[IntPtr device]
+            //public IDevice<IAxisDetails, IButtonDetails, IDeviceExtension> this[IntPtr device]
             {
                 get { return JoystickDevices[device]; }
                 internal set
@@ -589,7 +589,7 @@ namespace ws.winx.platform.osx
             {
                 if (_isEnumeratorDirty)
                 {
-                    _iterationCacheList = JoystickDevices.Values.ToList<IJoystickDevice>();
+                    _iterationCacheList = JoystickDevices.Values.ToList<IDevice>();
                     _isEnumeratorDirty = false;
 
                     
