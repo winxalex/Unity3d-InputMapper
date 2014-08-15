@@ -12,12 +12,10 @@ public class ReadRunnable implements Runnable {
 
 	
 	private static final String TAG = "ReadRunnable";
-
-	private byte[] _inputBuffer;
-	
 	private IReadWriteListener _listener;
 	private HIDDeviceWrapper _device;
 	private boolean _isReady=false;
+	ReadData _data;
 	
 	
 	int _timeout;
@@ -27,7 +25,8 @@ public class ReadRunnable implements Runnable {
 	
 		_device=device;
 		_isReady=true;
-		//_readCallable=new ReadCallable(device);
+		_data=new ReadData();
+		
 	}
 
 	public ReadRunnable timeout(int timeInMilliSeconds){
@@ -44,7 +43,8 @@ public class ReadRunnable implements Runnable {
 	}
 	
 	public ReadRunnable read(byte[] into){
-		_inputBuffer=into;
+		
+		_data.Buffer=into;
 		return this;
 		
 	}
@@ -63,7 +63,7 @@ public class ReadRunnable implements Runnable {
 			  Log.e(TAG,"Lock error",e);
 		}
 		
-		 ByteBuffer buffer = ByteBuffer.wrap(_inputBuffer);
+		 ByteBuffer buffer = ByteBuffer.wrap(_data.Buffer);
 		 
 		//UUID uid=UUID.randomUUID();
 		 
@@ -80,7 +80,7 @@ public class ReadRunnable implements Runnable {
 	        Log.d(TAG,"Request"+request);
 	     
 	            // queue a request on the interrupt endpoint
-	           if(!request.queue(buffer, _inputBuffer.length)){
+	           if(!request.queue(buffer, _data.Buffer.length)){
 	        	   
 	        	   Log.e(TAG,"Cant queue request");
 	        	   
@@ -96,7 +96,7 @@ public class ReadRunnable implements Runnable {
 	            //	 Log.d(TAG, uid+"Request succeded");
 	            	 
 	            	 if(_listener!=null)
-	            	 _listener.onRead(new ReadData(_inputBuffer));
+	            	 _listener.onRead(_data);
 	            	 
 	            	 request.close();
 	            } else {

@@ -30,5 +30,10 @@ namespace ws.winx.devices
         {
             ((ThrustMasterDriver)this.driver).StopMotor(this);
         }
+
+        public void StopMotor(HIDDevice.WriteCallback callback)
+        {
+            ((ThrustMasterDriver)this.driver).StopMotor(this,callback);
+        }
     }
 }

@@ -282,17 +282,32 @@ namespace ws.winx.drivers
 
         internal void StopMotor(IDevice device)
         {
-            byte[] data=new byte[5];
-            data[0]=0x40;
-            data[1]=0x7f;
-            data[2]=0xff;
-            data[3]=0x00;
-            data[4]=0x00;
+            byte[] data = new byte[5];
+            data[0] = 0x40;
+            data[1] = 0x7f;
+            data[2] = 0xff;
+            data[3] = 0x00;
+            data[4] = 0x00;
 
 
-            this.__hidInterface.Generics[device].Write(data, null);
+            this.__hidInterface.Generics[device].Write(data);
                
         }
+
+        internal void StopMotor(IDevice device, HIDDevice.WriteCallback callback)
+        {
+            byte[] data = new byte[5];
+            data[0] = 0x40;
+            data[1] = 0x7f;
+            data[2] = 0xff;
+            data[3] = 0x00;
+            data[4] = 0x00;
+
+
+            this.__hidInterface.Generics[device].Write(data, callback);
+        }
+
+    
     }
     
 

@@ -334,7 +334,7 @@ namespace ws.winx
                  if (device == null) return;
              
              
-            vSliderValue = GUI.HorizontalSlider(new Rect(25, 420, 400, 30), vSliderValue, 255.0F, 0.0F);
+            vSliderValue = GUI.HorizontalSlider(new Rect(25, 520, 400, 100), vSliderValue, 255.0F, 0.0F);
            
 
             if (vSliderValue != vSliderValuePrev)
@@ -344,24 +344,44 @@ namespace ws.winx
            
 
 
-            if(GUI.Button(new Rect(25, 450, 100, 30),"Stop Motor")){
-                timer.Stop();
-                 device.StopMotor();
+            if(GUI.Button(new Rect(25, 590, 100, 130),"Stop Motor")){
+                //timer.Stop();
+                StopCoroutine(runEffect());
+                device.StopMotor(onMotorStop);
                  vSliderValue = 128;
             }
 
-            if(GUI.Button( new Rect(150, 450, 100, 30),"Rumble")){
-                timer.Stop();
-                 device.StopMotor();
-                 timer.Start();
+            if(GUI.Button( new Rect(150, 590, 100, 130),"Rumble")){
+               // timer.Stop();
+               // this.InvokeRepeating("runEffect",1,
+
+                device.StopMotor(onMotorStop);
+
+                 StartCoroutine(runEffect());
+                // timer.Start();
             }
         }
 
 
-       
+        void onMotorStop(bool success)
+        {
+            Debug.Log("Motor stop was successful:" + success);
+        }
 
         void onMotorSet(bool success)
         {
+            Debug.Log("Motor command was successful:" + success);
+        }
+
+        IEnumerator runEffect()
+        {
+            while (true)
+            {
+                forceX += 0xA7;
+                device.SetMotor(forceX, forceX, onMotorSet);
+
+                yield return new WaitForSeconds(0.5f);
+            }
         }
 
         void onTimerElapsed( object sender,ElapsedEventArgs args){
