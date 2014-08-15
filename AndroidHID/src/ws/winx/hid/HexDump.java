@@ -19,6 +19,8 @@ package ws.winx.hid;
 /**
  * Clone of Android's HexDump class, for use in debugging. Cosmetic changes
  * only.
+ * 
+ * https://github.com/mik3y/usb-serial-for-android
  */
 public class HexDump {
     private final static char[] HEX_DIGITS = {

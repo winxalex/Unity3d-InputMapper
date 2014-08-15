@@ -13,10 +13,29 @@ namespace ws.winx.platform.android
        HIDDevice.ReadCallback _readCallback;
        HIDDevice.WriteCallback _writeCallback;
         int _ownerIndex;
-         public ReadWriteListenerProxy(int index ) : base("ws.winx.hid.IReadWriteListener") {_ownerIndex=index;}
+        public ReadWriteListenerProxy(int index) : base("ws.winx.hid.IReadWriteListener") { _ownerIndex = index; }
 
         
-        void onRead(byte[] data) {  _readCallback.Invoke(new HIDReport(_ownerIndex,data,HIDReport.ReadStatus.Success));}
+        void onRead(AndroidJavaObject jo) {
+          //  Debug.Log("ReadWriteListenerProxy>>onRead:");
+           //   Debug.Log("ReadWriteListenerProxy>>onRead rawObject:" + bufferObject);
+
+            AndroidJavaObject bufferObject = jo.Get<AndroidJavaObject>("Buffer");
+
+        
+
+            byte[] buffer = AndroidJNIHelper.ConvertFromJNIArray<byte[]>(bufferObject.GetRawObject());
+          //  Debug.Log("ReadWriteListenerProxy>>Call array succeded:");
+
+         //   Debug.Log("ReadWriteListenerProxy>>onRead:" + BitConverter.ToString(buffer));
+            _readCallback.Invoke(new HIDReport(_ownerIndex,buffer,HIDReport.ReadStatus.Success));}
+      
+        
+        
+        /// <summary>
+        /// onWrite Handler
+        /// </summary>
+        /// <param name="success"></param>
         void onWrite(bool success){ if(_writeCallback!=null) _writeCallback.Invoke(success); }
 	
         internal void addReadCallback(HIDDevice.ReadCallback callback)

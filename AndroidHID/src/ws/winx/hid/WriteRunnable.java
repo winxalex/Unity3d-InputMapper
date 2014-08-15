@@ -58,12 +58,16 @@ public class WriteRunnable implements Runnable {
 		
 		boolean sucess= __device.get_connection().controlTransfer(0x21, 0x09, 0x0240, 0, __outputBuffer, __outputBuffer.length, 0)>-1;
 		
-		HIDDeviceWrapper.getEndPointlock().release();
+		
 		
      	 //_listener.onWrite(_connection.bulkTransfer(_fromPoint, _inputBuffer, _inputBuffer.length, 50)>-1);
+		if(_listener!=null){
 		_listener.onWrite(sucess);
 		
+		_listener=null;
+		}
 		
+		HIDDeviceWrapper.getEndPointlock().release();
 	}
 
 }

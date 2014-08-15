@@ -1,11 +1,8 @@
 package ws.winx.hid;
 
 import java.nio.ByteBuffer;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+
+
 
 
 import android.hardware.usb.UsbRequest;
@@ -24,7 +21,7 @@ public class ReadRunnable implements Runnable {
 	
 	
 	int _timeout;
-	ReadCallable _readCallable;
+	
 
 	public ReadRunnable(HIDDeviceWrapper device) {
 	
@@ -62,24 +59,26 @@ public class ReadRunnable implements Runnable {
 		 try {
 			HIDDeviceWrapper.getEndPointlock().acquire();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			  Log.e(TAG,"Lock error",e);
 		}
 		
 		 ByteBuffer buffer = ByteBuffer.wrap(_inputBuffer);
-		 UUID uid=UUID.randomUUID();
+		 
+		//UUID uid=UUID.randomUUID();
+		 
+		//  Log.d(TAG,"Wrapper");
 		 
 	        UsbRequest request = new UsbRequest();
 	        if(!request.initialize(_device.get_connection(), _device.get_readEndpoint())){
 	        	
-		        	   Log.e(TAG,"Cant queue request");
+		       // 	   Log.e(TAG,"Cant queue request");
 		        	   return;
 		          
 	        }
 	        
-	        
-	        
-	       // while (true) {
+	        Log.d(TAG,"Request"+request);
+	     
 	            // queue a request on the interrupt endpoint
 	           if(!request.queue(buffer, _inputBuffer.length)){
 	        	   
@@ -89,27 +88,32 @@ public class ReadRunnable implements Runnable {
 	        	   return;
 	           }
 	            
-	           
+	          // Log.e(TAG,"Queue request");
 	           
 	            // wait for status event
 	            if (_device.get_connection().requestWait() == request) {
 	            	
-	            	 Log.d(TAG, uid+"Request succeded");
-	            	 _listener.onRead(_inputBuffer);
+	            //	 Log.d(TAG, uid+"Request succeded");
+	            	 
+	            	 if(_listener!=null)
+	            	 _listener.onRead(new ReadData(_inputBuffer));
+	            	 
 	            	 request.close();
 	            } else {
-	                Log.e(TAG, uid+"RequestWait failed, exiting");
-	                //!!! don't close when failed
-	             //   break;
+	              //  Log.e(TAG, uid+"RequestWait failed, exiting");
+	                //!!! don't request.close() close when failed
+	           
 	            }
-	      //  }
-		
+	     
 	            this._isReady=true;
 	            
 	            
-	           // HIDDeviceWrapper.getEndPointlock().release();
+	            HIDDeviceWrapper.getEndPointlock().release();
 		
-	/*	UUID uid=UUID.randomUUID();
+	/*
+	 * 
+	 * option with time out not tested on UIThread
+	 * 	UUID uid=UUID.randomUUID();
 		
 		Log.d(TAG,uid+" Try to aquire read");
 		

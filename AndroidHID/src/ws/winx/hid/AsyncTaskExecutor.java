@@ -1,8 +1,10 @@
 package ws.winx.hid;
 
+
+
 import android.os.AsyncTask;
 
-public class AsyncTaskExecutor extends AsyncTask<Void, Void, byte[]> {
+public class AsyncTaskExecutor extends AsyncTask<Void, Void, ReadData> {
 
 	
 	    private IReadWriteListener listener;
@@ -15,12 +17,12 @@ public class AsyncTaskExecutor extends AsyncTask<Void, Void, byte[]> {
 
 	    // required methods
 	    
-	    @Override protected void onPostExecute(byte[] data) {  listener.onRead(data);};
+	    @Override protected void onPostExecute(ReadData data) {  listener.onRead(data);};
 
 	
 
 		@Override
-		protected byte[] doInBackground(Void... params) {
+		protected ReadData doInBackground(Void... params) {
 			return null;
 		}
 	}

@@ -20,14 +20,14 @@ public class AndroidHID {
 
 	private static final String ACTION_USB_PERMISSION =
 		    "com.android.example.USB_PERMISSION";
-	protected static final String TAG = "AndroidHID";
+	protected static final String TAG = "Unity";//"AndroidHID";
 	
 	private static UsbManager __usbManager;
 	private static PendingIntent __permissionIntent;
 	private static IHIDListener __IHIDLIstener;
 
 	private static SparseArray<HIDDeviceWrapper> _Generics;
-	private static Context _context;
+	public static Context context;
 	
 	
 	public static void Init(Context context,IHIDListener listener) {
@@ -40,7 +40,7 @@ public class AndroidHID {
 		filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
 		filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
 		context.registerReceiver(__usbReceiver, filter);
-		_context=context;
+		AndroidHID.context=context;
 		
 		_Generics=new SparseArray<HIDDeviceWrapper>();
 	}
@@ -100,7 +100,7 @@ public class AndroidHID {
 		int key;
 		
 		if(__usbReceiver!=null)
-		_context.unregisterReceiver(__usbReceiver);
+		context.unregisterReceiver(__usbReceiver);
 		
 		while( i > -1) {
 		   key = _Generics.keyAt(i);

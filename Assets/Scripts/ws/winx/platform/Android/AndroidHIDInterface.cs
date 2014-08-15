@@ -53,7 +53,7 @@ namespace ws.winx.platform.android
             AndroidJavaObject device = (AndroidJavaObject)args.data;
 
 
-            if (__joysticks.FindBy(device.Get<int>("PID")) != null)
+            if (__joysticks.FindBy(device.Get<int>("PID")) == null)
             {
                 // UnityEngine.Debug.Log(args.Message);
                 GenericHIDDevice info = new GenericHIDDevice(__joysticks.Count, device, this);

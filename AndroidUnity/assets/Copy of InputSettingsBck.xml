@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Inputs xmlns:d1p1="http://schemas.datacontract.org/2004/07/ws.winx.input" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+  <d1p1:doubleDesignator>(x2)</d1p1:doubleDesignator>
+  <d1p1:longDesignator>(-)</d1p1:longDesignator>
+  <d1p1:spaceDesignator>+</d1p1:spaceDesignator>
+  <d1p1:singleClickSensitivity>0.3</d1p1:singleClickSensitivity>
+  <d1p1:doubleClickSensitivity>0.2</d1p1:doubleClickSensitivity>
+  <d1p1:longClickSensitivity>0.4</d1p1:longClickSensitivity>
+  <d1p1:combinationsClickSensitivity>0.55</d1p1:combinationsClickSensitivity>
+  <d1p1:StateInputs xmlns:d2p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+    <d2p1:KeyValueOfintInputState>
+      <d2p1:Key>1397315813</d2p1:Key>
+      <d2p1:Value>
+        <d1p1:Hash>1397315813</d1p1:Hash>
+        <d1p1:InputCombinations>
+          <d1p1:InputCombination>
+            <d1p1:InputActions>
+              <d1p1:InputAction>
+                <d1p1:Code>Joystick0Button0</d1p1:Code>
+              </d1p1:InputAction>
+            </d1p1:InputActions>
+          </d1p1:InputCombination>
+          <d1p1:InputCombination i:nil="true" />
+        </d1p1:InputCombinations>
+        <d1p1:Name>Wave</d1p1:Name>
+      </d2p1:Value>
+    </d2p1:KeyValueOfintInputState>
+    <d2p1:KeyValueOfintInputState>
+      <d2p1:Key>-1624475888</d2p1:Key>
+      <d2p1:Value>
+        <d1p1:Hash>-1624475888</d1p1:Hash>
+        <d1p1:InputCombinations>
+          <d1p1:InputCombination>
+            <d1p1:InputActions>
+              <d1p1:InputAction>
+                <d1p1:Code>Joystick1AxisPovYForward</d1p1:Code>
+              </d1p1:InputAction>
+            </d1p1:InputActions>
+          </d1p1:InputCombination>
+          <d1p1:InputCombination>
+            <d1p1:InputActions>
+              <d1p1:InputAction>
+                <d1p1:Code>O</d1p1:Code>
+              </d1p1:InputAction>
+            </d1p1:InputActions>
+          </d1p1:InputCombination>
+        </d1p1:InputCombinations>
+        <d1p1:Name>MyCustomState</d1p1:Name>
+      </d2p1:Value>
+    </d2p1:KeyValueOfintInputState>
+  </d1p1:StateInputs>
+</Inputs>

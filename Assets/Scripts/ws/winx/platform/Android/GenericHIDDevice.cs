@@ -63,18 +63,25 @@ namespace ws.winx.platform.android
         {
             _listener.addReadCallback(callback);
             byte[] from=new byte[_InputReportByteLength];
+
+            UnityEngine.Debug.Log("GenericHIDDevice >>>>> try read");  
             _device.Call("read", from, _listener, 0);
+            UnityEngine.Debug.Log("GenericHIDDevice >>>>> read out");  
         }
 
         //public void write(final byte[] from, IReadWriteListener listener, int timeout)
         public override void Write(object data)
         {
-            _device.Call("write",(byte[]) data,_listener,0);
-            //_listener.addWriteCallback(callback);
+            _device.Call("write",(byte[]) data,0);
+           
         }
 
 
-       
+        public override void Write(object data, HIDDevice.WriteCallback callback)
+        {
+            _listener.addWriteCallback(callback);
+            _device.Call("write", (byte[])data, _listener, 0);
+        }
 
 
 

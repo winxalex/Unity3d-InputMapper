@@ -97,7 +97,7 @@ namespace ws.winx.drivers
         {
             HIDReport report=data as HIDReport;
 
-
+            Debug.Log("ThustmasterDriver>>onRead:" + data);
 
             if(report!=null && report.Status==HIDReport.ReadStatus.Success && report.Data[0]==0x01){
                 JoystickDevice device = __hidInterface.Devices[report.index] as JoystickDevice;
