@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using ws.winx.platform;
+using System.Timers;
 
 
 
@@ -13,6 +14,7 @@ namespace ws.winx.drivers
 	{
 
         private IHIDInterface __hidInterface;
+       
      
       
 
@@ -41,10 +43,9 @@ namespace ws.winx.drivers
                     joystick.Axis[index] = new AxisDetails();
 
                 }
-               
 
-               
-                   
+
+           
 
                     return joystick;
             }
@@ -60,8 +61,14 @@ namespace ws.winx.drivers
 
             if (device.isReady && __hidInterface.Generics.ContainsKey(device))
             {
+                Debug.Log("ThustmasterDriver>>Update:"+device.isReady);
+
                 ((JoystickDevice)device).isReady = false;
+
+                Debug.Log("ThustmasterDriver>>Update:" + device.isReady);
                 __hidInterface.Generics[device].Read(onRead);
+
+             
             }
             //throw new NotImplementedException();
         }
@@ -95,11 +102,18 @@ namespace ws.winx.drivers
      
         protected void onRead(object data)
         {
-            HIDReport report=data as HIDReport;
+            HIDReport report = data as HIDReport;
+
+           
 
             Debug.Log("ThustmasterDriver>>onRead:" + data);
 
-            if(report!=null && report.Status==HIDReport.ReadStatus.Success && report.Data[0]==0x01){
+            if (report != null && report.Status == HIDReport.ReadStatus.Success && report.Data[0] == 0x01)
+            {
+
+
+                Debug.Log("ThustmasterDriver>>onRead:processRead" + BitConverter.ToString(report.Data));
+
                 JoystickDevice device = __hidInterface.Devices[report.index] as JoystickDevice;
                 //do something with the data
                 //01 00 BC 87 FF FF FF FF                            ..ј‡яяяя
@@ -133,9 +147,9 @@ namespace ws.winx.drivers
 
                     // last 2bits of data2 + 8 bits of data1 
                     // 00 BE 
-                    int buttonInfo = (report.Data[1] | ((report.Data[2] & 0x3) << 8)) ;
+                    int buttonInfo = (report.Data[1] | ((report.Data[2] & 0x3) << 8));
 
-                    //UnityEngine.Debug.Log("buttonSequence:"+Convert.ToString(buttonInfo, 2));
+             //       UnityEngine.Debug.Log("buttonSequence:"+Convert.ToString(buttonInfo, 2));
 
                     while (buttonInx < numButtons)
                     {
@@ -147,13 +161,15 @@ namespace ws.winx.drivers
                         buttonInx++;
                     }
 
+                //    UnityEngine.Debug.Log("but0:" + device.Buttons[0].value + " " + device.Buttons[0].buttonState);
+
 
                     //HAT
                     float x=0;
                     float y=0;
 
                     //from 2bit to 6bit
-                    int direction=(report.Data[2]>>2) & 0xF;
+                    int direction = (report.Data[2] >> 2) & 0xF;
 
                    
 
@@ -198,26 +214,28 @@ namespace ws.winx.drivers
 
 
                     //Y-Axis
-                     device.Axis[1].value=NormalizeTrigger((float)report.Data[4],0,255);
+                    device.Axis[1].value = NormalizeTrigger((float)report.Data[4], 0, 255);
                    // UnityEngine.Debug.Log("AxisY:" + device.Axis[1].value);
 
 
                     //Z-Axis
-                     device.Axis[2].value=NormalizeTrigger((float)report.Data[5],0,255);
+                    device.Axis[2].value = NormalizeTrigger((float)report.Data[5], 0, 255);
 
-                     device.Axis[3].value = NormalizeTrigger((float)report.Data[6], 0, 255);
+                    device.Axis[3].value = NormalizeTrigger((float)report.Data[6], 0, 255);
 
 
                     // UnityEngine.Debug.Log("Axis:" + device.Axis[0].value +","+ device.Axis[1].value +","+ device.Axis[2].value+"," + device.Axis[3].value);
 
-
+                    device.isReady = true;
                 }
 
 
-                device.isReady = true;
+             
                 
                
-            }
+            }  
+            
+           
         }
 
 

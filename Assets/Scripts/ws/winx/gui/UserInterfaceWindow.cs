@@ -19,13 +19,18 @@ namespace ws.winx.gui
 				}
 
 				protected static bool _settingsLoaded = false;
+                protected static bool _submitButton = false;
 				protected int _selectedStateHash = 0;
 				protected string _combinationSeparator = InputAction.SPACE_DESIGNATOR.ToString ();
 				protected int _isPrimary = 0;
 				protected string _currentInputString;
 				protected GUILayoutOption[] _inputLabelStyle = new GUILayoutOption[] { GUILayout.Width (200) };
+
 				protected GUILayoutOption[] _stateNameLabelStyle = new GUILayoutOption[] { GUILayout.Width (250) };
-				protected InputAction _action;
+#if UNITY_ANDROID || UNITY_IPHONE
+                protected GUILayoutOption[] _submitButtonStyle = new GUILayoutOption[] { GUILayout.Width(80) };
+#endif
+                protected InputAction _action;
 				protected Vector2 _scrollPosition = Vector2.zero;
 				protected InputCombination _previousStateInput = null;
 
@@ -207,6 +212,7 @@ namespace ws.winx.gui
 						//GUI.Window(1, new Rect(0, 0, Screen.width, Screen.height), CreateWindow,new GUIContent());
 
 
+
 						//if event is of key or mouse
 						if (Event.current.isKey) {
 
@@ -305,7 +311,7 @@ namespace ws.winx.gui
 
 						if (_selectedStateHash != hash) {
 
-
+                             
 
 								if (GUILayout.Button (combinations [0].combinationString)) {
 										_selectedStateHash = hash;
@@ -323,16 +329,30 @@ namespace ws.winx.gui
 
 						} else {
 
+                          
+
+                        
+
+
 								currentCombinationString = combinations [_isPrimary].combinationString;
 
 								if (_previousStateInput == null) {
 										_previousStateInput = combinations [_isPrimary].Clone ();
 								}
 
-
+                               
 								GUILayout.Label (currentCombinationString);//, _inputLabelStyle);
 
-								//this.Repaint ();
+#if UNITY_ANDROID || UNITY_IPHONE
+                                if (GUILayout.Button("Submit"))
+                                {
+                                    _selectedStateHash = 0;
+                                    _previousStateInput = null;
+                                    return;
+                                }
+#endif
+
+                            //this.Repaint ();
 						}
 
 

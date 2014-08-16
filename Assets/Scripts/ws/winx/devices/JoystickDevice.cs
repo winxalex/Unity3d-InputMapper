@@ -35,7 +35,7 @@ namespace ws.winx.devices
 				int _VID;
 				int _PID;
                 bool _isReady=true;
-//                int _lastFrameNum=-1;
+                int _lastFrameNum=-1;
 
         #endregion
 
@@ -133,7 +133,7 @@ namespace ws.winx.devices
 			}
 		}
 
-
+     
 	
         /// <summary>
         /// ID is value 0 to 15 and given by driver
@@ -149,20 +149,21 @@ namespace ws.winx.devices
         {
 
 //
-        //    UnityEngine.Debug.Log("Update"+Time.frameCount+" ponter"+_lastFrameNum);
+           // UnityEngine.Debug.Log("Update"+this.ID+" Current frame:"+Time.frameCount+" lastFrame:"+_lastFrameNum);
            
             //lock is done so no other updates of joystick is done while frame
             //many Joy.GetXXX could be called in same frame so updates would make JosytickDevice values unusable
                 if (_lastFrameNum == Time.frameCount)
                 {
-                    // UnityEngine.Debug.Log("skip cos its same frame");
+                 //   UnityEngine.Debug.Log("skip" + this.ID + " cos its same frame");
                     return;
                 }
                 else
                 {
-
-                    _lastFrameNum = Time.frameCount + 0;
-
+                  //  if(this.ID==1)
+                  //  UnityEngine.Debug.Log("Update" + this.ID + " Current frame:" + Time.frameCount + " lastFrame:" + _lastFrameNum);
+                 
+                    _lastFrameNum = Time.frameCount;
                     _driver.Update(this);// as IDevice<IAxisDetails,IButtonDetails,IDeviceExtension>);
                 }
          
@@ -796,10 +797,13 @@ namespace ws.winx.devices
                     get { return button_collection; }
                 }
 
-                public int _lastFrameNum { get; set; }
 
 
-               
+
+
+
+
+              
         }
 
 

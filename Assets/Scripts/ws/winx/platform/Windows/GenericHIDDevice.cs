@@ -12,6 +12,7 @@ using System;
 using System.Threading;
 using System.Runtime.InteropServices;
 using ws.winx.devices;
+using System.Timers;
 namespace ws.winx.platform.windows
 {
     public enum DeviceMode
@@ -57,6 +58,7 @@ namespace ws.winx.platform.windows
 
 
       
+        private HIDReport __lastHIDReport;
 
 
         private int _InputReportByteLength=8;
@@ -90,6 +92,7 @@ namespace ws.winx.platform.windows
                 CloseDeviceIO(hidHandle);
 
                 
+                
             }
             catch (Exception exception)
             {
@@ -98,7 +101,7 @@ namespace ws.winx.platform.windows
         }
 
 
-
+      
 
 
       
@@ -156,10 +159,35 @@ namespace ws.winx.platform.windows
 
         override public void Read(ReadCallback callback)
         {
+
+            //TODO make this fields or use pool
             var readDelegate = new ReadDelegate(Read);
             var asyncState = new HidAsyncState(readDelegate, callback);
+            System.Timers.Timer timers = new System.Timers.Timer(50);
+            timers.Elapsed += new ElapsedEventHandler((sender,args)=>{onReadTimeOut(callback,sender, args);}  
+               
+                );
+            timers.Start();
             readDelegate.BeginInvoke(EndRead, asyncState);
         }
+
+        private void onReadTimeOut(ReadCallback callback,object sender, ElapsedEventArgs args)
+        {
+            System.Timers.Timer timers = ((System.Timers.Timer)sender);
+            timers.Stop();
+            timers = null;
+
+           // UnityEngine.Debug.Log("timeout");
+
+            if ((callback != null)) callback.Invoke(__lastHIDReport);
+           
+        }
+
+        //private void onReadTimeOut(object sender, ElapsedEventArgs args)
+        //{
+        //    UnityEngine.Debug.Log("Timeout");
+        //    // cal
+        //}
 
         protected HIDReport Read()
         {
@@ -276,13 +304,13 @@ namespace ws.winx.platform.windows
 
         #region private
 
-        protected static void EndRead(IAsyncResult ar)
+        protected void EndRead(IAsyncResult ar)
         {
             var hidAsyncState = (HidAsyncState)ar.AsyncState;
             var callerDelegate = (ReadDelegate)hidAsyncState.CallerDelegate;
             var callbackDelegate = (ReadCallback)hidAsyncState.CallbackDelegate;
             var data = callerDelegate.EndInvoke(ar);
-
+            __lastHIDReport = data;
             if ((callbackDelegate != null)) callbackDelegate.Invoke(data);
         }
 

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using ws.winx.devices;
 using UnityEngine;
-
+using System.Timers;
 
 namespace ws.winx.platform.android
 {
@@ -64,9 +64,27 @@ namespace ws.winx.platform.android
             _listener.addReadCallback(callback);
             byte[] from=new byte[_InputReportByteLength];
 
+             System.Timers.Timer timers = new System.Timers.Timer(50);
+            timers.Elapsed += new ElapsedEventHandler((sender,args)=>{onReadTimeOut(callback,sender, args);}  
+               
+                );
+            timers.Start();
+
          //   UnityEngine.Debug.Log("GenericHIDDevice >>>>> try read");  
             _device.Call("read", from, _listener, 0);
           //  UnityEngine.Debug.Log("GenericHIDDevice >>>>> read out");  
+        }
+
+        private void onReadTimeOut(ReadCallback callback,object sender, ElapsedEventArgs args)
+        {
+            System.Timers.Timer timers = ((System.Timers.Timer)sender);
+            timers.Stop();
+            timers = null;
+
+           // UnityEngine.Debug.Log("timeout");
+
+            if ((callback != null)) callback.Invoke(__lastHIDReport);
+           
         }
 
         //public void write(final byte[] from, IReadWriteListener listener, int timeout)
