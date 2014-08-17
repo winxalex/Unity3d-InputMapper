@@ -103,10 +103,8 @@
      <Compile Include="Assets\Scripts\ws\winx\unity\Tags.cs" />
      <Compile Include="Assets\Scripts\ws\winx\unity\UnityDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\utils\Extensions.cs" />
-     <None Include="Assets\StreamingAssets\Copy of InputSettingsBck.xml" />
      <None Include="Assets\StreamingAssets\InputSettings.xml" />
      <None Include="Assets\Pluggins\Android\AndroidManifest.xml" />
-     <None Include="Assets\StreamingAssets\InputSettingsBck.xml" />
  <Reference Include="nunit.framework">
  <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Assets/Pluggins/nunit.framework.dll</HintPath>
  </Reference>

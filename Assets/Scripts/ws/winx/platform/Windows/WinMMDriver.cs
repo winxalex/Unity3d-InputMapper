@@ -253,6 +253,10 @@ namespace ws.winx.platform.windows
                         axisDetails.max = caps.YMax;
                         axisDetails.min = caps.YMin;
                         joystick.Axis[axis] = axisDetails;
+
+                       
+
+                      
                         //	stick.Details.Min[axis] = caps.YMin; stick.Details.Max[axis] = caps.YMax; 
                         axis++;
                     }
@@ -262,6 +266,7 @@ namespace ws.winx.platform.windows
                         axisDetails.max = caps.ZMax;
                         axisDetails.min = caps.ZMin;
                         joystick.Axis[axis] = axisDetails;
+                      
                         axis++;
                     }
 
@@ -271,6 +276,7 @@ namespace ws.winx.platform.windows
                         axisDetails.min = caps.RMin;
                         axisDetails.max = caps.RMax;
                         joystick.Axis[axis] = axisDetails;
+                      
                         axis++;
                     }
 
@@ -310,8 +316,9 @@ namespace ws.winx.platform.windows
 
 
 
+                  //  UnityEngine.Debug.Log(" max:" + caps.YMax + " min:" + caps.YMin + " max:" + caps.ZMax + " min:" + caps.ZMin);
 
-
+                   // UnityEngine.Debug.Log(" max:" + caps.RMax + " min:" + caps.RMin + " max:" + caps.UMax + " min:" + caps.UMin);
 
                     return joystick;
 
@@ -337,7 +344,13 @@ namespace ws.winx.platform.windows
         /// <returns></returns>
         public float NormalizeTrigger(float pos, int min, int max, float dreadZone = 0.001f)
         {
-            float value = pos / (max - min);
+            float value = 1 - pos / (max - min);
+
+            UnityEngine.Debug.Log("trigger:"+pos);
+
+            if (value > 1)
+                return 1;
+
             if (value < dreadZone && value > -dreadZone)
                 return 0;
 

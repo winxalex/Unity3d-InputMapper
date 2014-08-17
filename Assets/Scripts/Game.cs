@@ -262,8 +262,8 @@ namespace ws.winx
 
 
             //Input.GetInput allows combos (combined input actions)
-           // if (InputManager.GetInputDown((int)States.Wave))// || InputManager.GetInput((int)States.Wave,true))
-            if (InputManager.GetInput((int)States.Wave,false))
+            if (InputManager.GetInputDown((int)States.Wave))// || InputManager.GetInput((int)States.Wave,true))
+           // if (InputManager.GetInput((int)States.Wave,false))
             {
                 Debug.Log("Wave Down");
                 animator.Play((int)States.Wave);

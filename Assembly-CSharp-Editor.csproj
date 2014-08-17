@@ -47,16 +47,8 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Editor\InputMapper.cs" />
-     <None Include="Assets\StreamingAssets\Copy of InputSettingsBck.xml" />
      <None Include="Assets\StreamingAssets\InputSettings.xml" />
      <None Include="Assets\Pluggins\Android\AndroidManifest.xml" />
-     <None Include="Assets\StreamingAssets\InputSettingsBck.xml" />
- <Reference Include="AssetStoreTools">
- <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Assets/AssetStoreTools/Editor/AssetStoreTools.dll</HintPath>
- </Reference>
- <Reference Include="AssetStoreToolsExtra">
- <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Assets/AssetStoreTools/Editor/AssetStoreToolsExtra.dll</HintPath>
- </Reference>
  <Reference Include="Mono.TextTemplating">
  <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Assets/Editor/Mono.TextTemplating.dll</HintPath>
  </Reference>

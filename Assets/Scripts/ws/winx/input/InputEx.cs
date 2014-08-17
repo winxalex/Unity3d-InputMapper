@@ -318,6 +318,10 @@ namespace ws.winx.input
         }
 
 
+
+        //!!! IMPORTANT: Input happen every frame. If there is no refresh from the hardware device 
+        // Input give same values just states are refreshed from DOWN->HOLD (value=1 stay) and UP->NONE (value=0 stay)
+
         /// <summary>
         /// Gets the axis.
         /// </summary>
@@ -589,9 +593,13 @@ namespace ws.winx.input
 
             foreach (IDevice device in devices)
             {
-//device.isReady &&
-                if ( (_code = device.GetInput()) != 0)
+
+                //If 
+                if ((_code = device.GetInput()) != 0)
+                {
+                    Debug.Log("Get Input Joy" + device.ID + " " + KeyCodeExtension.toEnumString(_code)+"frame:"+Time.frameCount);
                     return processInput(_code, time);
+                }
             }
 
 
@@ -621,7 +629,7 @@ namespace ws.winx.input
             {
                 if (InputEx.GetKeyDown(action))
                 {
-                    Debug.Log("Single" + Time.time + ":" + action.startTime + "<" + InputActionType.SINGLE);
+                    Debug.Log("Single <" + InputActionType.SINGLE);
                     _lastCode = action.code;
                     return true;
                 }
@@ -716,7 +724,7 @@ namespace ws.winx.input
 
             InputAction action = null;
 
-            //Debug.Log ("process "+code);
+           // Debug.Log ("process "+code);
 
             if (code != 0)
             {//=KeyCode.None 
@@ -728,6 +736,7 @@ namespace ws.winx.input
                     _lastCode = code;
                     _lastCodeTime = time;
 
+                    Debug.Log("Last code " + KeyCodeExtension.toEnumString(_lastCode));
                     //	Debug.Log("Take time "+_lastCodeTime);
                 }
                 else
@@ -741,7 +750,7 @@ namespace ws.winx.input
                         //take new pressed code as lastCode
                         _lastCode = code;
 
-                        Debug.Log("Single " + time + ":" + _lastCodeTime + " " + InputActionType.SINGLE);
+                       Debug.Log("Single " + time + ":" + _lastCodeTime + " " + InputActionType.SINGLE);
 
 
 
@@ -777,7 +786,7 @@ namespace ws.winx.input
                         {
                             action = new InputAction(_lastCode, InputActionType.LONG);
                             _lastCode = 0;//KeyCode.None;
-                            Debug.Log("Long " + (time - _lastCodeTime) + " " + InputActionType.LONG);
+                           Debug.Log("Long " + (time - _lastCodeTime) + " " + InputActionType.LONG);
                         }
                     }
                     else
@@ -787,7 +796,7 @@ namespace ws.winx.input
                             action = new InputAction(_lastCode, InputActionType.SINGLE);
                             _lastCode = 0;//KeyCode.None;
 
-                            Debug.Log("Single after wating Double time pass " + (time - _lastCodeTime) + " " + InputActionType.SINGLE);
+                           Debug.Log("Single after wating Double time pass " + (time - _lastCodeTime) + " " + InputActionType.SINGLE);
                         }
 
                     }

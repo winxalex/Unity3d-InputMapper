@@ -58,18 +58,37 @@ namespace ws.winx.drivers
 
         public void Update(IDevice device)
         {
-
-            if (device.isReady && __hidInterface.Generics.ContainsKey(device))
+            //when device is Ready we have new data from device so no REFRESH is NEEDED
+            //also when device is Ready we call for new READ
+            if (!device.isReady)////REFRESH WITH ALL DATA should move states from UP-> NONE or DOWN -> HOLD
             {
-                Debug.Log("ThustmasterDriver>>Update:"+device.isReady);
+                HIDReport report=__hidInterface.Generics[device].lastReport;
+                if (report != null)
+                {
+                    UnityEngine.Debug.Log("REFRESH AT frame:" + Time.frameCount);
+                    
+                    
+                   // report.Status = 
+                    onRead(new HIDReport(report.index,(byte[])report.Data.Clone(),HIDReport.ReadStatus.Refresh));
+                    
+                }
+            }
+
+            else if (__hidInterface.Generics.ContainsKey(device))
+            {
+                // Debug.Log("ThustmasterDriver>>Update:" + device.isReady);
 
                 ((JoystickDevice)device).isReady = false;
 
-                Debug.Log("ThustmasterDriver>>Update:" + device.isReady);
+                // Debug.Log("ThustmasterDriver>>Update: Lock device" + device.isReady);
                 __hidInterface.Generics[device].Read(onRead);
 
-             
+
             }
+            
+            
+               
+            
             //throw new NotImplementedException();
         }
 
@@ -106,15 +125,17 @@ namespace ws.winx.drivers
 
            
 
-            Debug.Log("ThustmasterDriver>>onRead:" + data);
+           // Debug.Log("ThustmasterDriver>>onRead:" + data);
 
-            if (report != null && report.Status == HIDReport.ReadStatus.Success && report.Data[0] == 0x01)
+            if (report != null && (report.Status == HIDReport.ReadStatus.Success || report.Status==HIDReport.ReadStatus.Refresh) && report.Data[0] == 0x01)
             {
 
 
-                Debug.Log("ThustmasterDriver>>onRead:processRead" + BitConverter.ToString(report.Data));
+              // Debug.Log("ThustmasterDriver>>onRead:processRead" + BitConverter.ToString(report.Data));
 
                 JoystickDevice device = __hidInterface.Devices[report.index] as JoystickDevice;
+
+            //    Debug.Log("ThustmasterDriver>>onRead:Index" + report.index);
                 //do something with the data
                 //01 00 BC 87 FF FF FF FF                            ..ј‡яяяя
                 //01 - is requestID (should be one for bulk data)
@@ -156,12 +177,12 @@ namespace ws.winx.drivers
                         //stick.SetButton (buttonInx, (info.Buttons & (1 << buttonInx)) != 0);
                        // UnityEngine.Debug.Log(Convert.ToString(buttonInfo,2));
                         
-                        device.Buttons[buttonInx].value = buttonInfo & (1 << buttonInx);
+                        device.Buttons[buttonInx].value =Convert.ToSingle(buttonInfo & (1 << buttonInx));
                       
                         buttonInx++;
                     }
 
-                //    UnityEngine.Debug.Log("but0:" + device.Buttons[0].value + " " + device.Buttons[0].buttonState);
+                    UnityEngine.Debug.Log("but0:" + device.Buttons[0].value + " " + device.Buttons[0].buttonState+" frame:");
 
 
                     //HAT
@@ -215,7 +236,7 @@ namespace ws.winx.drivers
 
                     //Y-Axis
                     device.Axis[1].value = NormalizeTrigger((float)report.Data[4], 0, 255);
-                   // UnityEngine.Debug.Log("AxisY:" + device.Axis[1].value);
+                   // UnityEngine.Debug.Log("AxisY:" + device.Axis[1].value + " state: " + device.Axis[1].buttonState);
 
 
                     //Z-Axis
@@ -225,7 +246,7 @@ namespace ws.winx.drivers
 
 
                     // UnityEngine.Debug.Log("Axis:" + device.Axis[0].value +","+ device.Axis[1].value +","+ device.Axis[2].value+"," + device.Axis[3].value);
-
+                    if(report.Status==HIDReport.ReadStatus.Success)//unlock Read only if this were fresh data not Refresh
                     device.isReady = true;
                 }
 
@@ -272,9 +293,9 @@ namespace ws.winx.drivers
         }
 
         /// <summary>
-        ///  Normalize raw axis value to 1-0 range.
+        ///  Normalize raw axis value to 0 - 1 range.
         /// </summary>
-        /// <param name="pos"></param>
+        /// <param name="pos">255(released) - 0(full pressed) </param>
         /// <param name="min"></param>
         /// <param name="max"></param>
         /// <param name="dreadZone"></param>
@@ -283,7 +304,7 @@ namespace ws.winx.drivers
         {
             float value =1- pos / (max - min);
 
-            //UnityEngine.Debug.Log("trigger:"+pos);
+            //UnityEngine.Debug.Log("trigger:"+pos+ "value:"+value);
 
             if (value > 1)
                 return 1;

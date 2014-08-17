@@ -16,7 +16,8 @@ namespace ws.winx.platform
                 WaitFail = 2,
                 NoDataRead = 3,
                 ReadError = 4,
-                NotConnected = 5
+                NotConnected = 5,
+                Refresh = 6
             }
 
             public HIDReport()
@@ -44,8 +45,8 @@ namespace ws.winx.platform
                 Status = status;
             }
 
-            public byte[] Data { get; private set; }
-            public ReadStatus Status { get; private set; }
+            public byte[] Data { get; internal set; }
+            public ReadStatus Status { get; internal set; }
 
 
             public int index { get { return _index; } internal set {_index=value;} }

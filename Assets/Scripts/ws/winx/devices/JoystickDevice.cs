@@ -149,19 +149,21 @@ namespace ws.winx.devices
         {
 
 //
-           // UnityEngine.Debug.Log("Update"+this.ID+" Current frame:"+Time.frameCount+" lastFrame:"+_lastFrameNum);
+            if(this.ID==1)
+            UnityEngine.Debug.Log("Update"+this.ID+" Current frame:"+Time.frameCount+" lastFrame:"+_lastFrameNum);
            
             //lock is done so no other updates of joystick is done while frame
             //many Joy.GetXXX could be called in same frame so updates would make JosytickDevice values unusable
                 if (_lastFrameNum == Time.frameCount)
                 {
-                 //   UnityEngine.Debug.Log("skip" + this.ID + " cos its same frame");
+                    if(this.ID==1)
+                   UnityEngine.Debug.Log("skip" + this.ID + " cos its same frame");
                     return;
                 }
                 else
                 {
-                  //  if(this.ID==1)
-                  //  UnityEngine.Debug.Log("Update" + this.ID + " Current frame:" + Time.frameCount + " lastFrame:" + _lastFrameNum);
+                   if(this.ID==1)
+                    UnityEngine.Debug.Log("Update" + this.ID + " Current frame:" + Time.frameCount + " lastFrame:" + _lastFrameNum);
                  
                     _lastFrameNum = Time.frameCount;
                     _driver.Update(this);// as IDevice<IAxisDetails,IButtonDetails,IDeviceExtension>);
@@ -284,6 +286,8 @@ namespace ws.winx.devices
 				{
 						Update();// 
 
+                       // UnityEngine.Debug.Log("GetKeyUP");
+
 
 						JoystickAxis axis = KeyCodeExtension.toAxis (code);
 						int data = KeyCodeExtension.toData (code);
@@ -326,6 +330,8 @@ namespace ws.winx.devices
 				public virtual bool GetKeyDown (int code)
 				{
                     Update();
+
+                   // if (!this.isReady) return false;
 
                     //UnityEngine.Debug.Log("GetKeyDown Joy"+this.ID);
 
@@ -376,10 +382,12 @@ namespace ws.winx.devices
 
 		/// <summary>
 		/// Gets the input.
+        /// IMPORTANT: If button or axis is already "DOWN" returns 0
 		/// </summary>
 		/// <returns>The input.</returns>
 		public virtual int GetInput(){
-           // Debug.Log("Get Input Joy"+this.ID+" " + Application.isPlaying);
+
+            UnityEngine.Debug.Log("GetInput:" + Time.frameCount);
 
             //there is no  Time.frameCount in Editor (edit mode - editor scripts)
             if(Application.isPlaying) 

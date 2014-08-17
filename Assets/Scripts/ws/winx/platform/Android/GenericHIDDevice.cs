@@ -14,6 +14,11 @@ namespace ws.winx.platform.android
         ReadWriteListenerProxy _listener;
 
         private int _numAxes;
+        protected long _timestamp;
+        private IHIDInterface _hidInterface;
+        private  AndroidJavaObject _device;
+        private HIDReport __lastHIDReport;
+        private Timer timeoutTimer;
 
         public int numAxes
         {
@@ -46,42 +51,77 @@ namespace ws.winx.platform.android
             set { if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  _OutputReportByteLength = value; }
         }
 
-
-
+        ElapsedEventHandler _timeOutEventHandler;
+        Action<object, ElapsedEventArgs> timeoutActionHandler;
 
         public GenericHIDDevice(int inx, AndroidJavaObject device, IHIDInterface hidInterface)
             : base(inx, device.Get<int>("VID"), device.Get<int>("PID"), IntPtr.Zero, hidInterface, device.Get<string>("path"))
         {
-            
+            //0.4s is Default Long so should be greater then >400ms
+           timeoutTimer = new System.Timers.Timer(1550);
+           timeoutTimer.AutoReset = false;
+           timeoutActionHandler = (sender, args) => { onReadTimeOut(null, sender, args); };  
+            _timeOutEventHandler=new ElapsedEventHandler(timeoutActionHandler);
+           timeoutTimer.Elapsed += _timeOutEventHandler;
+               
+
+             
             _device=device;
-            _listener = new ReadWriteListenerProxy(inx);
+            _listener = new ReadWriteListenerProxy();
         }
 
+      
 
         //	public void read(byte[] into,IReadWriteListener listener, int timeout)
         public override void Read(HIDDevice.ReadCallback callback)
         {
-            _listener.addReadCallback(callback);
+            timeoutTimer.Stop();
+
+           
+
+            //TODO: create fields (as read should be called after onRead) or better Object.pool
+            _listener.ReadComplete =  new ReadCallback((bytes) => {
+                UnityEngine.Debug.Log("ReadComplete");
+
+                timeoutTimer.Stop();
+               
+                //if (this.__lastHIDReport == null)
+                //{
+                //    this.__lastHIDReport = new HIDReport(this.index, (byte[])bytes, HIDReport.ReadStatus.Success);
+                //}
+                //else
+                //{
+                //    this.__lastHIDReport.index=this.index;
+                //    this.__lastHIDReport.Data=(byte[])bytes;
+                //    this.__lastHIDReport.Status=HIDReport.ReadStatus.Success;
+                //}
+
+                this.__lastHIDReport = new HIDReport(this.index, (byte[])bytes, HIDReport.ReadStatus.Success);
+                
+                callback.Invoke(this.__lastHIDReport);
+            });
+
+           
+
             byte[] from=new byte[_InputReportByteLength];
 
-             System.Timers.Timer timers = new System.Timers.Timer(50);
-            timers.Elapsed += new ElapsedEventHandler((sender,args)=>{onReadTimeOut(callback,sender, args);}  
-               
-                );
-            timers.Start();
 
+            timeoutActionHandler = (sender, args) => { onReadTimeOut(callback, sender, args); };       
+            timeoutTimer.Start(); 
          //   UnityEngine.Debug.Log("GenericHIDDevice >>>>> try read");  
             _device.Call("read", from, _listener, 0);
-          //  UnityEngine.Debug.Log("GenericHIDDevice >>>>> read out");  
+          //  UnityEngine.Debug.Log("GenericHIDDevice >>>>> read out"); 
+           
         }
 
         private void onReadTimeOut(ReadCallback callback,object sender, ElapsedEventArgs args)
         {
-            System.Timers.Timer timers = ((System.Timers.Timer)sender);
-            timers.Stop();
-            timers = null;
+            System.Timers.Timer timer = ((System.Timers.Timer)sender);
+            timer.Stop();
+            timer = null;
+        
 
-           // UnityEngine.Debug.Log("timeout");
+            UnityEngine.Debug.Log("timeout");
 
             if ((callback != null)) callback.Invoke(__lastHIDReport);
            
@@ -97,17 +137,14 @@ namespace ws.winx.platform.android
 
         public override void Write(object data, HIDDevice.WriteCallback callback)
         {
-            _listener.addWriteCallback(callback);
+            _listener.WriteComplete = callback;
             _device.Call("write", (byte[])data, _listener, 0);
         }
 
 
 
 
-        protected long _timestamp;
-        private ws.winx.platform.HIDDevice.ReadCallback _readCallback;
-        private IHIDInterface _hidInterface;
-private  AndroidJavaObject _device;
+       
 
         public long timestamp
         {
@@ -116,7 +153,16 @@ private  AndroidJavaObject _device;
         }
 
 
+         override public void Dispose()
+        {
+            if (timeoutTimer != null)
+            {
+                timeoutTimer.Stop();
+                timeoutTimer.Elapsed -= _timeOutEventHandler;
+            }
 
+            if (IsOpen) CloseDevice();
+        }
 
       
 

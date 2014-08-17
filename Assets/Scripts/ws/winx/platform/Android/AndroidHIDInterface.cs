@@ -115,7 +115,8 @@ namespace ws.winx.platform.android
                         //new IntPtr just for compatibility
                         __joysticks[new IntPtr(joyDevice.PID)] = joyDevice;
 
-                        this.droidHIDBehaviour.Log("AndroidHIDInterface", "Device PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + driver.GetType().ToString());
+                        Debug.Log("Device index:" + deviceInfo.index + " PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + driver.GetType().ToString());
+                      //  this.droidHIDBehaviour.Log("AndroidHIDInterface", "Device index:"+joyDevice.ID+" PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + driver.GetType().ToString());
                         this.__Generics[joyDevice] = deviceInfo;
                         break;
                     }
@@ -133,8 +134,9 @@ namespace ws.winx.platform.android
                     __joysticks[new IntPtr(joyDevice.PID)] = joyDevice;
 
                     // Debug.Log(__joysticks[deviceInfo.index]);
-
-                    this.droidHIDBehaviour.Log("AndroidHIDInterface", "Device index:" + joyDevice.ID + " PID:" + joyDevice.PID + " VID:" + joyDevice.VID + " attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + deviceInfo.DevicePath + " Name:" + joyDevice.Name);
+                    Debug.Log("Device index:" + deviceInfo.index + " PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + __defaultJoystickDriver.GetType().ToString());
+                     
+                   // this.droidHIDBehaviour.Log("AndroidHIDInterface", "Device index:" + joyDevice.ID + " PID:" + joyDevice.PID + " VID:" + joyDevice.VID + " attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + deviceInfo.DevicePath + " Name:" + joyDevice.Name);
                     this.__Generics[joyDevice] = deviceInfo;
                 }
                 else
@@ -319,7 +321,12 @@ namespace ws.winx.platform.android
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            foreach (KeyValuePair<IDevice, HIDDevice> entry in Generics)
+            {
+                entry.Value.Dispose();
+            }
+
+            Generics.Clear();
         }
     }
 }

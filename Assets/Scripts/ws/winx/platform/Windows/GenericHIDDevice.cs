@@ -55,7 +55,12 @@ namespace ws.winx.platform.windows
         public IntPtr ReadHandle { get; private set; }
         public IntPtr WriteHandle { get; private set; }
         public bool IsOpen { get; private set; }
-
+        System.Timers.Timer timeoutTimer;
+        ElapsedEventHandler _timeOutEventHandler;
+        private volatile bool _requestStop = false;
+        volatile bool _requestReStart = false;
+        volatile bool _autoCallOnTimeout = false;
+        volatile bool _disposeRequested = false;
 
       
         private HIDReport __lastHIDReport;
@@ -91,7 +96,14 @@ namespace ws.winx.platform.windows
 
                 CloseDeviceIO(hidHandle);
 
-                
+                timeoutTimer = new System.Timers.Timer(1550);
+                timeoutTimer.AutoReset = false;
+              
+              
+                timeoutTimer.Elapsed += _timeOutEventHandler;
+
+
+                    
                 
             }
             catch (Exception exception)
@@ -163,24 +175,70 @@ namespace ws.winx.platform.windows
             //TODO make this fields or use pool
             var readDelegate = new ReadDelegate(Read);
             var asyncState = new HidAsyncState(readDelegate, callback);
-            System.Timers.Timer timers = new System.Timers.Timer(50);
-            timers.Elapsed += new ElapsedEventHandler((sender,args)=>{onReadTimeOut(callback,sender, args);}  
-               
-                );
-            timers.Start();
+
+            if (_timeOutEventHandler != null)
+                timeoutTimer.Elapsed -= _timeOutEventHandler;
+                    
+            _timeOutEventHandler=(sender, args) => { onReadTimeOut(callback, sender, args); };
+             timeoutTimer.Elapsed += _timeOutEventHandler;
+
+
+             _autoCallOnTimeout = true;
+
+             _requestReStart = true;
+
+            //reset timer
+            timeoutTimer.Stop();
+           // timeoutTimer.Start();
+           
+            
             readDelegate.BeginInvoke(EndRead, asyncState);
         }
 
         private void onReadTimeOut(ReadCallback callback,object sender, ElapsedEventArgs args)
         {
-            System.Timers.Timer timers = ((System.Timers.Timer)sender);
-            timers.Stop();
-            timers = null;
+            if (_disposeRequested)
+            {
+                UnityEngine.Debug.Log("Dispose in onReadTimeOut");
+                ((System.Timers.Timer)sender).Dispose();
+                return;
+            }
 
-           // UnityEngine.Debug.Log("timeout");
+            if (_autoCallOnTimeout)
+            {
+                UnityEngine.Debug.Log("timeout>> AutoCall onCallback existance " + (callback==null));
 
-            if ((callback != null)) callback.Invoke(__lastHIDReport);
+                if ((callback != null)) callback.Invoke(__lastHIDReport);
+            }
+
+            //if (!_requestReStart)//new on read could set this flag
+            //{
+            //    UnityEngine.Debug.Log("New Read Request timer Restart happend while onReadTimeOut");
+            //    _requestReStart = false;
+              
+                
+ 
+
+            //}
+
+            _autoCallOnTimeout = true;
+            timeoutTimer.Start();
+
+
            
+           
+        }
+
+        public override HIDReport lastReport
+        {
+            get
+            {
+                return __lastHIDReport;
+            }
+            internal set
+            {
+                __lastHIDReport = value;
+            }
         }
 
         //private void onReadTimeOut(object sender, ElapsedEventArgs args)
@@ -267,6 +325,22 @@ namespace ws.winx.platform.windows
 
         override public void Dispose()
         {
+            _disposeRequested = true;
+
+            //if (timeoutTimer != null)
+            //{
+            //    timeoutTimer.Stop();
+
+            //    if(_timeOutEventHandler!=null)
+            //    timeoutTimer.Elapsed -= _timeOutEventHandler;
+
+            //    timeoutTimer.Close();
+            //    timeoutTimer.Dispose();
+
+            //    timeoutTimer = null;
+
+            //    UnityEngine.Debug.Log("Timer disposed");
+            //}
 
             if (IsOpen) CloseDevice();
         }
@@ -306,6 +380,8 @@ namespace ws.winx.platform.windows
 
         protected void EndRead(IAsyncResult ar)
         {
+            _autoCallOnTimeout = false;
+
             var hidAsyncState = (HidAsyncState)ar.AsyncState;
             var callerDelegate = (ReadDelegate)hidAsyncState.CallerDelegate;
             var callbackDelegate = (ReadCallback)hidAsyncState.CallbackDelegate;
