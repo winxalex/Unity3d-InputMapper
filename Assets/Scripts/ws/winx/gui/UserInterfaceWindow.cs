@@ -24,11 +24,15 @@ namespace ws.winx.gui
 				protected string _combinationSeparator = InputAction.SPACE_DESIGNATOR.ToString ();
 				protected int _isPrimary = 0;
 				protected string _currentInputString;
-				protected GUILayoutOption[] _inputLabelStyle = new GUILayoutOption[] { GUILayout.Width (200) };
-
+                protected GUILayoutOption[] _inputLabelStyle = new GUILayoutOption[] { GUILayout.Width(200) };
+            
+               
 				protected GUILayoutOption[] _stateNameLabelStyle = new GUILayoutOption[] { GUILayout.Width (250) };
 #if UNITY_ANDROID || UNITY_IPHONE
-                protected GUILayoutOption[] _submitButtonStyle = new GUILayoutOption[] { GUILayout.Width(80) };
+                protected GUILayoutOption[] _inputButtonStyle = new GUILayoutOption[] { GUILayout.Height(200) };
+                protected GUILayoutOption[] _submitButtonStyle = new GUILayoutOption[] { GUILayout.Width(80),GUILayout.Height (200) };
+#else
+     protected GUILayoutOption[] _inputButtonStyle = new GUILayoutOption[] { GUILayout.Height(30) };
 #endif
                 protected InputAction _action;
 				protected Vector2 _scrollPosition = Vector2.zero;
@@ -311,16 +315,18 @@ namespace ws.winx.gui
 
 						if (_selectedStateHash != hash) {
 
-                             
 
-								if (GUILayout.Button (combinations [0].combinationString)) {
+
+                            if (GUILayout.Button(combinations[0].combinationString, _inputButtonStyle))
+                            {
 										_selectedStateHash = hash;
 										_previousStateInput = null;
 										_isPrimary = 0;
 								}
 
 								if (combinations.Length > 1 && combinations [1] != null)
-								if (GUILayout.Button (combinations [1].combinationString)) {
+                                    if (GUILayout.Button(combinations[1].combinationString, _inputButtonStyle))
+                                    {
 										_selectedStateHash = hash;
 										_previousStateInput = null;
 										_isPrimary = 1;

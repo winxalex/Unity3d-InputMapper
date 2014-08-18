@@ -70,7 +70,6 @@
      <Compile Include="Assets\Scripts\ws\winx\input\InputEventDispatcherBehaviour.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\InputEx.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\InputManager.cs" />
-     <Compile Include="Assets\Scripts\ws\winx\input\InputProcessor.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\InputState.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\KeyCodeExtension.cs" />
      <Compile Include="Assets\Scripts\ws\winx\input\states\States.cs" />

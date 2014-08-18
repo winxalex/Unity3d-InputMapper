@@ -49,6 +49,7 @@ namespace ws.winx
         private byte forceX;
         private Timer timer;
         private float vSliderValuePrev;
+        IEnumerator runEffectEnumerator;
 
 
         // Use this for initialization
@@ -364,7 +365,7 @@ namespace ws.winx
 
             if(GUI.Button(new Rect(25, 590, 100, 130),"Stop Motor")){
                 //timer.Stop();
-                StopCoroutine(runEffect());
+                StopCoroutine(runEffectEnumerator);
                 device.StopMotor(onMotorStop);
                  vSliderValue = 128;
             }
@@ -372,10 +373,11 @@ namespace ws.winx
             if(GUI.Button( new Rect(150, 590, 100, 130),"Rumble")){
                // timer.Stop();
                // this.InvokeRepeating("runEffect",1,
+                runEffectEnumerator = runEffect();
 
                 device.StopMotor(onMotorStop);
 
-                 StartCoroutine(runEffect());
+                 StartCoroutine(runEffectEnumerator);
                 // timer.Start();
             }
         }
@@ -400,6 +402,9 @@ namespace ws.winx
 
                 yield return new WaitForSeconds(0.5f);
             }
+
+           // yield break;
+                 
         }
 
         void onTimerElapsed( object sender,ElapsedEventArgs args){
