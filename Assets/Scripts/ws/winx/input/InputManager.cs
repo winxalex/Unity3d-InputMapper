@@ -336,7 +336,15 @@ namespace ws.winx.input
 	
 		}
 
+        public static bool HasInputState(int stateNameHash)
+        {
+            return __settings.stateInputs.ContainsKey(stateNameHash);
+        }
 
+        public static bool HasInputState(string stateName)
+        {
+            return InputManager.HasInputState(Animator.StringToHash(stateName));
+        }
 	
 
 		//[Not tested] idea for expansion

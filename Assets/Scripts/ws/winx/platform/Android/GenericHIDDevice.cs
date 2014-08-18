@@ -18,7 +18,7 @@ namespace ws.winx.platform.android
         private IHIDInterface _hidInterface;
         private  AndroidJavaObject _device;
         private HIDReport __lastHIDReport;
-        private Timer timeoutTimer;
+        volatile bool IsReadInProgress = false;
 
         public int numAxes
         {
@@ -57,14 +57,9 @@ namespace ws.winx.platform.android
         public GenericHIDDevice(int inx, AndroidJavaObject device, IHIDInterface hidInterface)
             : base(inx, device.Get<int>("VID"), device.Get<int>("PID"), IntPtr.Zero, hidInterface, device.Get<string>("path"))
         {
-            //0.4s is Default Long so should be greater then >400ms
-           timeoutTimer = new System.Timers.Timer(1550);
-           timeoutTimer.AutoReset = false;
-           timeoutActionHandler = (sender, args) => { onReadTimeOut(null, sender, args); };  
-            _timeOutEventHandler=new ElapsedEventHandler(timeoutActionHandler);
-           timeoutTimer.Elapsed += _timeOutEventHandler;
-               
 
+
+            __lastHIDReport = new HIDReport(this.index, new byte[_InputReportByteLength], HIDReport.ReadStatus.Success);
              
             _device=device;
             _listener = new ReadWriteListenerProxy();
@@ -75,57 +70,42 @@ namespace ws.winx.platform.android
         //	public void read(byte[] into,IReadWriteListener listener, int timeout)
         public override void Read(HIDDevice.ReadCallback callback)
         {
-            timeoutTimer.Stop();
 
-           
+            if (IsReadInProgress)
+            {
+                callback.Invoke(__lastHIDReport);
+                return;
+            }
 
             //TODO: create fields (as read should be called after onRead) or better Object.pool
-            _listener.ReadComplete =  new ReadCallback((bytes) => {
-                UnityEngine.Debug.Log("ReadComplete");
-
-                timeoutTimer.Stop();
+            _listener.ReadComplete =  (bytes) => {
+              
                
-                //if (this.__lastHIDReport == null)
-                //{
-                //    this.__lastHIDReport = new HIDReport(this.index, (byte[])bytes, HIDReport.ReadStatus.Success);
-                //}
-                //else
-                //{
-                //    this.__lastHIDReport.index=this.index;
-                //    this.__lastHIDReport.Data=(byte[])bytes;
-                //    this.__lastHIDReport.Status=HIDReport.ReadStatus.Success;
-                //}
+               
+                    this.__lastHIDReport.index=this.index;
+                    this.__lastHIDReport.Data=(byte[])bytes;
+                    this.__lastHIDReport.Status=HIDReport.ReadStatus.Success;
+                
 
-                this.__lastHIDReport = new HIDReport(this.index, (byte[])bytes, HIDReport.ReadStatus.Success);
+             
                 
                 callback.Invoke(this.__lastHIDReport);
-            });
+
+                IsReadInProgress = false;
+            };
+
+            IsReadInProgress = true;
 
            
 
-            byte[] from=new byte[_InputReportByteLength];
 
-
-            timeoutActionHandler = (sender, args) => { onReadTimeOut(callback, sender, args); };       
-            timeoutTimer.Start(); 
          //   UnityEngine.Debug.Log("GenericHIDDevice >>>>> try read");  
-            _device.Call("read", from, _listener, 0);
+            _device.Call("read", new byte[_InputReportByteLength], _listener, 0);
           //  UnityEngine.Debug.Log("GenericHIDDevice >>>>> read out"); 
            
         }
 
-        private void onReadTimeOut(ReadCallback callback,object sender, ElapsedEventArgs args)
-        {
-            System.Timers.Timer timer = ((System.Timers.Timer)sender);
-            timer.Stop();
-            timer = null;
-        
-
-            UnityEngine.Debug.Log("timeout");
-
-            if ((callback != null)) callback.Invoke(__lastHIDReport);
-           
-        }
+     
 
         //public void write(final byte[] from, IReadWriteListener listener, int timeout)
         public override void Write(object data)
@@ -155,13 +135,7 @@ namespace ws.winx.platform.android
 
          override public void Dispose()
         {
-            if (timeoutTimer != null)
-            {
-                timeoutTimer.Stop();
-                timeoutTimer.Elapsed -= _timeOutEventHandler;
-            }
-
-            if (IsOpen) CloseDevice();
+          
         }
 
       

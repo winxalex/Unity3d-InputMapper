@@ -112,6 +112,7 @@ namespace ws.winx
                         Debug.Log("Game>> Try to load from " + Application.persistentDataPath);
                         InputManager.loadSettings(Application.persistentDataPath + "/" + "InputSettings.xml");
                         ui.StateInputCombinations = InputManager.Settings.stateInputs;
+                        manuallyAddStateAndHandlers();
                         return;
 
                     }
@@ -120,17 +121,32 @@ namespace ws.winx
                 {// content of StreamingAssets get packed inside .APK and need to be load with WWW
                     request.Add(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));
                 }
-            }
-            else if (Application.platform == RuntimePlatform.OSXWebPlayer || Application.platform == RuntimePlatform.WindowsWebPlayer)
-            {
-                //UNITY_WEBPLAYER: application path gives "http://localhost/appfolder/"
-                request.Add(Application.dataPath + "/StreamingAssets/InputSettings.xml");
-            }
 
-            request.LoadComplete += new EventHandler<LoaderEvtArgs>(onLoadComplete);
-            request.Error += new EventHandler<LoaderEvtArgs>(onLoadItemComplete);
-            request.LoadItemComplete += new EventHandler<LoaderEvtArgs>(onLoadItemComplete);
-            request.load();
+
+                request.LoadComplete += new EventHandler<LoaderEvtArgs>(onLoadComplete);
+                request.Error += new EventHandler<LoaderEvtArgs>(onLoadItemComplete);
+                request.LoadItemComplete += new EventHandler<LoaderEvtArgs>(onLoadItemComplete);
+                request.load();
+            }
+            else //TARGET=ANDROID but playing in EDITOR => use Standalone setup
+            {
+                if (ui != null && ui.settingsXML == null)
+                {//settingsXML would trigger internal loading mechanism (only for testing)
+
+                    InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));
+
+
+
+                    ui.StateInputCombinations = InputManager.Settings.stateInputs;
+                }
+
+
+                manuallyAddStateAndHandlers();
+
+            }
+           
+
+            
 #endif
 
 #if(UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE && !UNITY_ANDROID
@@ -233,8 +249,10 @@ namespace ws.winx
             //			InputManager.MapStateToInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
             //			InputManager.MapStateToInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
 
+        
 
             ////easiest way to map state to combination (ex.of single W and C click)
+            if(!InputManager.HasInputState("ManualAddedSTATE"))
             InputManager.MapStateToInput("ManualAddedSTATE", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
 
             UnityEngine.Debug.Log("Log:" + InputManager.Log());
