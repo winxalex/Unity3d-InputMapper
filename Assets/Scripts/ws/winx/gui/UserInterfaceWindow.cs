@@ -27,10 +27,10 @@ namespace ws.winx.gui
                 protected GUILayoutOption[] _inputLabelStyle = new GUILayoutOption[] { GUILayout.Width(200) };
             
                
-				protected GUILayoutOption[] _stateNameLabelStyle = new GUILayoutOption[] { GUILayout.Width (250) };
+				protected GUILayoutOption[] _stateNameLabelStyle = new GUILayoutOption[] { GUILayout.Width(250) };
 #if UNITY_ANDROID || UNITY_IPHONE
                 protected GUILayoutOption[] _inputButtonStyle = new GUILayoutOption[] { GUILayout.Height(200) };
-                protected GUILayoutOption[] _submitButtonStyle = new GUILayoutOption[] { GUILayout.Width(80),GUILayout.Height (200) };
+                protected GUILayoutOption[] _submitButtonStyle = new GUILayoutOption[] {GUILayout.Height(200), GUILayout.Width(80) };
 #else
      protected GUILayoutOption[] _inputButtonStyle = new GUILayoutOption[] { GUILayout.Height(30) };
 #endif
@@ -350,7 +350,7 @@ namespace ws.winx.gui
 								GUILayout.Label (currentCombinationString);//, _inputLabelStyle);
 
 #if UNITY_ANDROID || UNITY_IPHONE
-                                if (GUILayout.Button("Submit"))
+                                if (GUILayout.Button("Submit",_submitButtonStyle))
                                 {
                                     _selectedStateHash = 0;
                                     _previousStateInput = null;
