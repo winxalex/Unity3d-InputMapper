@@ -35,7 +35,13 @@ namespace ws.winx.devices
 				int _VID;
 				int _PID;
                 bool _isReady=true;
-                int _lastFrameNum=-1;
+                int _lastFrameNum = -1;
+
+                public int LastFrameNum
+                {
+                    get { return _lastFrameNum; }
+                    set { _lastFrameNum = value; }
+                }
 
         #endregion
 
@@ -149,24 +155,26 @@ namespace ws.winx.devices
         {
 
 //
-            if(this.ID==1)
-            UnityEngine.Debug.Log("Update"+this.ID+" Current frame:"+Time.frameCount+" lastFrame:"+_lastFrameNum);
+           // if(this.ID==1)
+            //UnityEngine.Debug.Log("Update"+this.ID+" Current frame:"+Time.frameCount+" lastFrame:"+_lastFrameNum);
            
             //lock is done so no other updates of joystick is done while frame
             //many Joy.GetXXX could be called in same frame so updates would make JosytickDevice values unusable
                 if (_lastFrameNum == Time.frameCount)
                 {
-                    if(this.ID==1)
-                   UnityEngine.Debug.Log("skip" + this.ID + " cos its same frame");
-                    return;
+                  // if(this.ID==1)
+                  // UnityEngine.Debug.Log("skip" + this.ID + " cos its same frame"+Time.frameCount);
+                    
                 }
                 else
                 {
-                   if(this.ID==1)
-                    UnityEngine.Debug.Log("Update" + this.ID + " Current frame:" + Time.frameCount + " lastFrame:" + _lastFrameNum);
+                  // if(this.ID==1)
+                   // UnityEngine.Debug.Log("Update" + this.ID + " Current frame:" + Time.frameCount + " lastFrame:" + _lastFrameNum);
                  
                     _lastFrameNum = Time.frameCount;
                     _driver.Update(this);// as IDevice<IAxisDetails,IButtonDetails,IDeviceExtension>);
+
+                   
                 }
          
           
@@ -383,17 +391,23 @@ namespace ws.winx.devices
 		/// <summary>
 		/// Gets the input.
         /// IMPORTANT: If button or axis is already "DOWN" returns 0
+        /// GetInput is called in "edit mode" (when mapping in UI) and anykeydown for devices
+        /// during combos process
 		/// </summary>
 		/// <returns>The input.</returns>
 		public virtual int GetInput(){
 
-            UnityEngine.Debug.Log("GetInput:" + Time.frameCount);
+           // UnityEngine.Debug.Log("GetInput:" + Time.frameCount);
 
-            //there is no  Time.frameCount in Editor (edit mode - editor scripts)
+            //there is no  Time.frameCount in Editor (Edit mode - Editor scripts)
             if(Application.isPlaying) 
             {
-                Update();//prevents multiply update in frame
-                //if(Application.isWebPlayer && !this.isReady) retr
+                   //prevents multiply update in frame
+                Update();
+               // if (!Update())
+               //     return 0;
+
+                
 
 
                 

@@ -597,7 +597,7 @@ namespace ws.winx.input
                 //If 
                 if ((_code = device.GetInput()) != 0)
                 {
-                    Debug.Log("Get Input Joy" + device.ID + " " + KeyCodeExtension.toEnumString(_code)+"frame:"+Time.frameCount);
+                   // Debug.Log("Get Input Joy" + device.ID + " " + KeyCodeExtension.toEnumString(_code)+"frame:"+Time.frameCount);
                     return processInput(_code, time);
                 }
             }
@@ -647,7 +647,7 @@ namespace ws.winx.input
 
                         _lastCode = action.code;
                         action.startTime = Time.time;
-                        Debug.Log("First Click" + Time.time + ":" + action.startTime + "<" + InputActionType.DOUBLE);
+                        Debug.Log("First Click" + Time.time + ":" + action.startTime + " going for " + InputActionType.DOUBLE);
                         return false;
                     }
                     else

@@ -58,38 +58,10 @@ namespace ws.winx.drivers
 
         public void Update(IDevice device)
         {
-            //when device is Ready we have new data from device so no REFRESH is NEEDED
-            //also when device is Ready we call for new READ
-            if (!device.isReady)////REFRESH WITH ALL DATA should move states from UP-> NONE or DOWN -> HOLD
-            {
-                HIDReport report=__hidInterface.Generics[device].lastReport;
-                if (report != null)
-                {
-                    UnityEngine.Debug.Log("REFRESH AT frame:" + Time.frameCount);
-                    
-                    
-                   // report.Status = 
-                    onRead(new HIDReport(report.index,(byte[])report.Data.Clone(),HIDReport.ReadStatus.Refresh));
-                    
-                }
-            }
-
-            else if (__hidInterface.Generics.ContainsKey(device))
-            {
-                // Debug.Log("ThustmasterDriver>>Update:" + device.isReady);
-
-                ((JoystickDevice)device).isReady = false;
-
-                // Debug.Log("ThustmasterDriver>>Update: Lock device" + device.isReady);
-                __hidInterface.Generics[device].Read(onRead);
-
-
-            }
             
-            
-               
-            
-            //throw new NotImplementedException();
+            if(__hidInterface.Generics.ContainsKey(device))
+            __hidInterface.Generics[device].Read(onRead);
+           
         }
 
 
@@ -127,7 +99,7 @@ namespace ws.winx.drivers
 
            // Debug.Log("ThustmasterDriver>>onRead:" + data);
 
-            if (report != null && (report.Status == HIDReport.ReadStatus.Success || report.Status==HIDReport.ReadStatus.Refresh) && report.Data[0] == 0x01)
+            if (report != null && (report.Status == HIDReport.ReadStatus.Success) && report.Data[0] == 0x01)
             {
 
 
@@ -182,7 +154,7 @@ namespace ws.winx.drivers
                         buttonInx++;
                     }
 
-                    UnityEngine.Debug.Log("but0:" + device.Buttons[0].value + " " + device.Buttons[0].buttonState+" frame:");
+                   // UnityEngine.Debug.Log("but0:" + device.Buttons[0].value + " " + device.Buttons[0].buttonState+" frame "+device.LastFrameNum+"phase:"+report.Status);
 
 
                     //HAT
@@ -246,8 +218,7 @@ namespace ws.winx.drivers
 
 
                     // UnityEngine.Debug.Log("Axis:" + device.Axis[0].value +","+ device.Axis[1].value +","+ device.Axis[2].value+"," + device.Axis[3].value);
-                    if(report.Status==HIDReport.ReadStatus.Success)//unlock Read only if this were fresh data not Refresh
-                    device.isReady = true;
+                 
                 }
 
 

@@ -87,18 +87,7 @@ namespace ws.winx.platform
                 }
 
 
-                public virtual HIDReport lastReport
-                {
-                    get
-                    {
-                        return lastReport;
-                    }
-                    internal set
-                    {
-                        lastReport = value;
-                    }
-
-                }
+          
 			
 
 				public virtual IHIDInterface hidInterface {
