@@ -532,6 +532,8 @@ namespace ws.winx.platform.windows
 
 
             Native.DeviceInfo deviceInfo = GetDeviceInfo(rawInputDeviceList.DeviceHandle);
+            UnityEngine.Debug.Log("PID:" + deviceInfo.HIDInfo.ProductID + " VID:" + deviceInfo.HIDInfo.VendorID);
+
             string devicePath = GetDevicePath(rawInputDeviceList.DeviceHandle);
 
             string name = ReadRegKey(Native.HKEY_CURRENT_USER, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + "VID_" + deviceInfo.HIDInfo.VendorID.ToString("X4") + "&PID_" + deviceInfo.HIDInfo.ProductID.ToString("X4"), Native.REGSTR_VAL_JOYOEMNAME);

@@ -18,6 +18,9 @@ namespace ws.winx.drivers
 {
     /// <summary>
     /// Implementation of WiiDriver
+    /// 
+  
+
     /// </summary>
     public class WiiDriver : IDriver, IDisposable
     {
@@ -32,8 +35,9 @@ namespace ws.winx.drivers
        
 
         // VID = Nintendo, PID = Wiimote
-        private const int VID = 0x057e;
-        private const int PID = 0x0306;
+        private const int VID =0x057e;
+        private const int PID =0x0306;
+        private const int PID_MOTION_PLUS_INSIDE = 0x0330;
 
         // sure, we could find this out the hard way using HID, but trust me, it's 22
         private const int REPORT_LENGTH = 22;
@@ -64,9 +68,10 @@ namespace ws.winx.drivers
         const int REGISTER_EXTENSION_TYPE = 0x4a400fa;
         const int REGISTER_EXTENSION_CALIBRATION = 0x4a40020;
         const int REGISTER_BALANCE_CALIBRATION = 0x4a40024;
-        const int REGISTER_MOTIONPLUS_DETECT = 0x4a600fa;
+        const int REGISTER_MOTIONPLUS_DETECT = 0x4a600fa;//0x(4)a600fa
         const int REGISTER_MOTIONPLUS_INIT = 0x4a600f0;
         const int REGISTER_MOTIONPLUS_ENABLE = 0x4a600fe;
+       
 
       
 
@@ -82,21 +87,96 @@ namespace ws.winx.drivers
         {
 
             HIDDevice hidDevice;
-
-
-            if (device.isReady)
+           WiimoteDevice wDevice=device as WiimoteDevice;
+            if(wDevice!=null)
+            if (!wDevice.isCalibrated)
             {
 
-                hidDevice = _hidInterface.Generics[device] as HIDDevice;
+               // _hidInterface.Read(device, onReadCalibration);
 
-                if (hidDevice != null)
-                {
-                    ((WiimoteDevice)device).isReady = false;
-                    hidDevice.Read(onRead);
-                }
+                // read the calibration info from the controller
+                // this appears to change the report type to 0x31
+                ReadCalibration(wDevice, REGISTER_CALIBRATION, 7);
+
+              //  _hidInterface.Read(device, onReadCalibration);
+             //   _hidInterface.Read(device, onRead);
+
+               //GetStatus(wDevice);
+
+               //_hidInterface.Read(device, onRead);
+
+
+               wDevice.isCalibrated = true;
+                //hidDevice = _hidInterface.Generics[device] as HIDDevice;
+
+                //if (hidDevice != null)
+                //{
+                //    ((WiimoteDevice)device).isReady = false;
+                //    hidDevice.Read(onRead);
+                //}
             }
 
+          
 
+
+        }
+
+
+        /// <summary>
+        /// handles calibration read information stored on Wiimote
+        /// </summary>
+        private void onReadCalibration(object data)
+        {
+            HIDReport report = data as HIDReport;
+
+            // if (report != null || report.Status != HIDReport.ReadStatus.Success || report.Data == null) return;
+            UnityEngine.Debug.Log(BitConverter.ToString(report.Data));
+
+            return;
+
+
+            WiimoteDevice device = _hidInterface.Devices[report.index] as WiimoteDevice;
+
+            byte[] buff = report.Data;
+
+            // AxisDetails[JoystickAxis.AxisX].
+            AxisDetails axisDetails;
+
+            axisDetails = device.Axis[JoystickAxis.AxisAccX] as AxisDetails;
+            axisDetails.min = buff[0];
+            axisDetails.max = buff[4];
+
+            axisDetails = device.Axis[JoystickAxis.AxisAccY] as AxisDetails;
+            axisDetails.min = buff[1];
+            axisDetails.max = buff[5];
+
+            axisDetails = device.Axis[JoystickAxis.AxisAccZ] as AxisDetails;
+            axisDetails.min = buff[2];
+            axisDetails.max = buff[6];
+
+            //00-00-60-00-16-80-80-7F-17-99-99-98
+            //mWiimoteState.AccelCalibrationInfo.X0 = buff[0];
+            //mWiimoteState.AccelCalibrationInfo.Y0 = buff[1];
+            //mWiimoteState.AccelCalibrationInfo.Z0 = buff[2];
+            //mWiimoteState.AccelCalibrationInfo.XG = buff[4];
+            //mWiimoteState.AccelCalibrationInfo.YG = buff[5];
+            //mWiimoteState.AccelCalibrationInfo.ZG = buff[6];
+
+            // device.isCalibrated = true;
+
+
+
+
+        }
+
+
+
+        public void onAnyRead(object data)
+        {
+            HIDReport report = data as HIDReport;
+
+            // if (report != null || report.Status != HIDReport.ReadStatus.Success || report.Data == null) return;
+            UnityEngine.Debug.Log("Any Read"+BitConverter.ToString(report.Data));
 
         }
 
@@ -106,7 +186,7 @@ namespace ws.winx.drivers
         {
 
 
-            if (hidDevice.VID == VID && hidDevice.PID == PID)
+            if ((hidDevice.VID == VID && hidDevice.PID == PID) || (hidDevice.VID == VID && hidDevice.PID == PID_MOTION_PLUS_INSIDE))
             {
                 _hidInterface = hidDevice.hidInterface;
 
@@ -209,12 +289,10 @@ namespace ws.winx.drivers
 
                 joystick.isReady = false;
 
-                // read the calibration info from the controller
-                // this appears to change the report type to 0x31
-                ReadCalibration(joystick, REGISTER_CALIBRATION, 7);
 
 
-
+                //((HIDDevice)hidDevice).InputReportByteLength = REPORT_LENGTH;
+               // ((HIDDevice)hidDevice).OutputReportByteLength = 7;
 
             
 
@@ -231,18 +309,41 @@ namespace ws.winx.drivers
 
         internal void ReadCalibration(WiimoteDevice device, int address, short size)
         {
+
+
+            HIDDevice hidDevice = _hidInterface.Generics[device];
+
+            hidDevice.InputReportByteLength = REPORT_LENGTH;
+             hidDevice.OutputReportByteLength =  REPORT_LENGTH;
+
+            //clean extension
+           // WriteMemory(device,REGISTER_EXTENSION_INIT2, 0x00);
+             // _hidInterface.Read(device, onReadCalibration);
+
+
+
+
+           
+
+             //request calibration
+            ReadMemory(device, address, size, (suc) => 
+            {
+               // _hidInterface.Read(device, onReadCalibration);
+                Debug.WriteLineIf(!suc, "Read Calibaration failed");
+                // force a status check to get the state of any extensions plugged in at startup
+               // GetStatus(device);
+                _hidInterface.Read(device, onAnyRead);
+            });
+
+
+           // _hidInterface.Read(device, onReadCalibration);
             //wait read after write
-           _hidInterface.Read(device,onReadCalibration);
-
-            //request calibration
-            ReadMemory(device, address, size, onCalibrationRequestStatus);
-
-
+           
         }
 
         protected void onCalibrationRequestStatus(bool success)
         {
-            
+            UnityEngine.Debug.Log("onCalibrationRequestStatus:" + success);
         }
 
 
@@ -1032,48 +1133,7 @@ namespace ws.winx.drivers
         //    return (byte)(device.Rumble ? 0x01 : 0x00);
         //}
 
-        /// <summary>
-        /// handles calibration read information stored on Wiimote
-        /// </summary>
-        private void onReadCalibration(object data)
-        {
-            HIDReport report = data as HIDReport;
-
-            if (report != null || report.Status != HIDReport.ReadStatus.Success || report.Data == null) return;
-
-            WiimoteDevice device = _hidInterface.Devices[report.index] as WiimoteDevice;
-
-            byte[] buff = report.Data;
-
-            // AxisDetails[JoystickAxis.AxisX].
-            AxisDetails axisDetails;
-
-            axisDetails = device.Axis[JoystickAxis.AxisAccX] as AxisDetails;
-            axisDetails.min = buff[0];
-            axisDetails.max = buff[4];
-
-            axisDetails = device.Axis[JoystickAxis.AxisAccY] as AxisDetails;
-            axisDetails.min = buff[1];
-            axisDetails.max = buff[5];
-
-            axisDetails = device.Axis[JoystickAxis.AxisAccZ] as AxisDetails;
-            axisDetails.min = buff[2];
-            axisDetails.max = buff[6];
-
-            //mWiimoteState.AccelCalibrationInfo.X0 = buff[0];
-            //mWiimoteState.AccelCalibrationInfo.Y0 = buff[1];
-            //mWiimoteState.AccelCalibrationInfo.Z0 = buff[2];
-            //mWiimoteState.AccelCalibrationInfo.XG = buff[4];
-            //mWiimoteState.AccelCalibrationInfo.YG = buff[5];
-            //mWiimoteState.AccelCalibrationInfo.ZG = buff[6];
-
-
-            // force a status check to get the state of any extensions plugged in at startup
-            GetStatus(device);
-
-
-        }
-
+     
         /// <summary>
         /// Set Wiimote reporting mode (if using an IR report type, IR sensitivity is set to WiiLevel3)
         /// </summary>
@@ -1202,15 +1262,21 @@ namespace ws.winx.drivers
         /// </summary>
         void GetStatus(WiimoteDevice device)
         {
-           
-            byte[] mBuff=new byte[REPORT_LENGTH];
+            HIDDevice hidDevice = _hidInterface.Generics[device];
+            hidDevice.InputReportByteLength = REPORT_LENGTH;
+            hidDevice.OutputReportByteLength = REPORT_LENGTH;
+
+            byte[] mBuff = new byte[REPORT_LENGTH];
 
             mBuff[0] = (byte)OutputReport.Status;
             mBuff[1] = (byte)device.RumbleBit;
             //mBuff[1] = GetRumbleBit();
 
-            _hidInterface.Read(device,onRead);
-           _hidInterface.Write(mBuff,device);
+
+            _hidInterface.Write(mBuff, device, (suc) => {
+                UnityEngine.Debug.Log("Status call:" + suc);
+               // _hidInterface.Read(device, onRead);
+            });
         }
 
         
@@ -1305,8 +1371,18 @@ namespace ws.winx.drivers
         void ReadMemory(WiimoteDevice device, int address, short size, HIDDevice.WriteCallback callback)
         {
 
+            //Output Report 0x17 reads memory:
+            //(52) 17 XX XX XX XX YY YY
+            //XX XX XX XX is big-endian formatted address
+            //YY YY is big-endian formatted size in bytes
+            //LSB of first byte is rumble flag and is not part of address, should
+            //be set to whatever state the rumble should be
+
             byte[] mBuff = new byte[REPORT_LENGTH];
 
+            
+
+            address = address & 0xffff;
             mBuff[0] = (byte)OutputReport.ReadMemory;
             mBuff[1] = (byte)(((address & 0xff000000) >> 24) | (uint)device.RumbleBit);
             mBuff[2] = (byte)((address & 0x00ff0000) >> 16);
@@ -1318,6 +1394,8 @@ namespace ws.winx.drivers
 
             _hidInterface.Write(mBuff,device, callback);
 
+
+           
 
         }
 

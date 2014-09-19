@@ -105,7 +105,7 @@ public class HIDDeviceWrapper {
 
 		
 		
-		//Log.d(TAG,"write "+HexDump.dumpHexString((byte[]) from)+" size"+((byte[]) from).length);
+		Log.d(TAG,"write "+HexDump.dumpHexString((byte[]) from)+" size"+((byte[]) from).length);
 		HIDDeviceWrapper.__executor.execute(new WriteRunnable(this).read(from).timeout(timeout));
 		//((Activity)AndroidHID.context).runOnUiThread(__writeRunnable.read(from).timeout(timeout));
 
@@ -117,7 +117,7 @@ public class HIDDeviceWrapper {
 		
 		
 		//!!! maybe build pool of WriteRunnable 
-		//Log.d(TAG,"write with listener:"+HexDump.dumpHexString((byte[]) from)+" size"+((byte[]) from).length);
+		Log.d(TAG,"write with listener:"+HexDump.dumpHexString((byte[]) from)+" size"+((byte[]) from).length);
 		HIDDeviceWrapper.__executor.execute(new WriteRunnable(this).read(from).timeout(timeout).addEventListener(listener));
 	    //((Activity)AndroidHID.context).runOnUiThread(__writeRunnable.read(from).timeout(timeout).addEventListener(listener));
 

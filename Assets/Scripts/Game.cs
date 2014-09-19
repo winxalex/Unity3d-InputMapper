@@ -69,6 +69,8 @@ namespace ws.winx
             //When you add them add specialized first then XInputDriver  then wide range supporting drivers UnityDriver
 #if (UNITY_STANDALONE_WIN || UNITY_ANDROID) 
             InputManager.AddDriver(new ThrustMasterDriver());
+            InputManager.AddDriver(new WiiDriver());
+
 			   // InputManager.AddDriver(new ws.winx.platform.windows.XInputDriver());
 #endif
 
@@ -352,9 +354,10 @@ namespace ws.winx
 
                  if (device == null) return;
              
+            //#if UNITY_ANDROID
              
             vSliderValue = GUI.HorizontalSlider(new Rect(25, 520, 400, 100), vSliderValue, 255.0F, 0.0F);
-           
+           // #endif
 
             if (vSliderValue != vSliderValuePrev)
                device.SetMotor(Convert.ToByte(vSliderValue),0xA7,onMotorSet);

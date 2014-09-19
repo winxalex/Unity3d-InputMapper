@@ -136,6 +136,7 @@ namespace ws.winx.devices
         // sure, we could find this out the hard way using HID, but trust me, it's 22
         private const int REPORT_LENGTH = 22;
 
+        public bool isCalibrated = false;
 
         public WiimoteDevice(int id,int pid,int vid, int axes, int buttons,int leds,int irs,IDriver driver)
             : base(id,pid,vid,axes,buttons,driver)

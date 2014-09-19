@@ -20,6 +20,7 @@ namespace ws.winx.platform.windows
         public const int DBT_DEVICEREMOVECOMPLETE = 0x8004; // device is gone      
         public const int WM_DEVICECHANGE = 0x0219; // device change event  
         public const int ERROR_SUCCESS = 0;
+        public const int ERROR_IO_PENDING = 0X3E5;
 
 
 
@@ -40,6 +41,7 @@ namespace ws.winx.platform.windows
         internal const uint WAIT_OBJECT_0 = 0;
         internal const uint WAIT_FAILED = 0xffffffff;
         internal const int WAIT_INFINITE = 0xffff;
+        internal const int WAIT_ABANDONED = 0x80;
 
 
 

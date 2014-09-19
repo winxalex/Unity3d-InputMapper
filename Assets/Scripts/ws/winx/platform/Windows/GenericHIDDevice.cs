@@ -13,6 +13,7 @@ using System.Threading;
 using System.Runtime.InteropServices;
 using ws.winx.devices;
 using System.Timers;
+using System.Diagnostics;
 namespace ws.winx.platform.windows
 {
     public enum DeviceMode
@@ -116,7 +117,8 @@ namespace ws.winx.platform.windows
 
         public void OpenDevice()
         {
-            OpenDevice(DeviceMode.NonOverlapped, DeviceMode.NonOverlapped);
+            OpenDevice(DeviceMode.Overlapped, DeviceMode.Overlapped);
+           // OpenDevice(DeviceMode.NonOverlapped, DeviceMode.NonOverlapped);
         }
 
         public void OpenDevice(DeviceMode readMode, DeviceMode writeMode)
@@ -268,33 +270,6 @@ namespace ws.winx.platform.windows
 
 
 
-
-       
-
-
-
-       
-
-      
-
-       
-
-       
-
-       
-
-
-       
-
-
-       
-
-
-      
-
-       
-
-
         #endregion
 
         #region private
@@ -360,6 +335,7 @@ namespace ws.winx.platform.windows
             {
                 
                 var security = new Native.SECURITY_ATTRIBUTES();
+               
                 var overlapped = new NativeOverlapped();
 
                 var overlapTimeout = timeout <= 0 ? Native.WAIT_INFINITE : timeout;
@@ -372,25 +348,42 @@ namespace ws.winx.platform.windows
                 overlapped.OffsetHigh = 0;
                 overlapped.EventHandle = Native.CreateEvent(ref security, Convert.ToInt32(false), Convert.ToInt32(true), "");
 
-                try
-                {
-                    Native.WriteFile(WriteHandle, buffer, (uint)buffer.Length, out bytesWritten, ref overlapped);
-                }
-                catch { return false; }
+                bool success;
 
-                var result = Native.WaitForSingleObject(overlapped.EventHandle, overlapTimeout);
+                
+                    success = Native.WriteFile(WriteHandle, buffer, (uint)buffer.Length, out bytesWritten, ref overlapped);
+                    UnityEngine.Debug.Log("WriteFile happend " + success + " " + bytesWritten);
 
-                switch (result)
+                    if (Marshal.GetLastWin32Error() > 0)
+                    {
+                        UnityEngine.Debug.LogWarning("Error during Write Data"+Marshal.GetLastWin32Error());
+                    }
+              
+               // UnityEngine.Debug.LogError(Marshal.GetLastWin32Error());
+
+
+                if (!success && Marshal.GetLastWin32Error() == Native.ERROR_IO_PENDING)
                 {
-                    case Native.WAIT_OBJECT_0:
-                        return true;
-                    case Native.WAIT_TIMEOUT:
-                        return false;
-                    case Native.WAIT_FAILED:
-                        return false;
-                    default:
-                        return false;
+                    var result = Native.WaitForSingleObject(overlapped.EventHandle, overlapTimeout);
+
+                    switch (result)
+                    {
+                        case Native.WAIT_OBJECT_0:
+
+                            // System.Threading.Overlapped.Unpack(overlapped);
+                            return true;
+                        case Native.WAIT_TIMEOUT:
+                            UnityEngine.Debug.Log("WriteData WAIT_TIMEOUT");
+                            return false;
+                        case Native.WAIT_FAILED:
+                            UnityEngine.Debug.Log("WriteData WAIT_FAILED");
+                            return false;
+                        default:
+                            return false;
+                    }
                 }
+
+                return success;
             }
             else
             {
@@ -400,10 +393,10 @@ namespace ws.winx.platform.windows
                     bool success;
                     success = Native.WriteFile(WriteHandle, buffer, (uint)buffer.Length, out bytesWritten, ref overlapped);
 
-                    if (!success)
-                    {
-                        Console.WriteLine(Marshal.GetLastWin32Error());
-                    }
+                    //if (!success)
+                    //{
+                    //    UnityEngine.Debug.LogError(Marshal.GetLastWin32Error());
+                    //}
 
                     return success;
 
@@ -416,6 +409,7 @@ namespace ws.winx.platform.windows
         {
             var buffer = new byte[] { };
             var status = HIDReport.ReadStatus.NoDataRead;
+            int error = 0;
 
             if (InputReportByteLength > 0)
             {
@@ -439,26 +433,59 @@ namespace ws.winx.platform.windows
 
                     try
                     {
-                        Native.ReadFile(ReadHandle, buffer, (uint)buffer.Length, out bytesRead, ref overlapped);
+                       var success=Native.ReadFile(ReadHandle, buffer, (uint)buffer.Length, out bytesRead, ref overlapped);
 
-                        var result = Native.WaitForSingleObject(overlapped.EventHandle, overlapTimeout);
+                       UnityEngine.Debug.Log("Read happend " + success + " " + bytesRead);
 
-                        switch (result)
-                        {
-                            case Native.WAIT_OBJECT_0: status = HIDReport.ReadStatus.Success; break;
-                            case Native.WAIT_TIMEOUT:
-                                status = HIDReport.ReadStatus.WaitTimedOut;
-                                buffer = new byte[] { };
-                                break;
-                            case Native.WAIT_FAILED:
-                                status = HIDReport.ReadStatus.WaitFail;
-                                buffer = new byte[] { };
-                                break;
-                            default:
-                                status = HIDReport.ReadStatus.NoDataRead;
-                                buffer = new byte[] { };
-                                break;
-                        }
+                        error=Marshal.GetLastWin32Error();
+
+                       if (error > 0)
+                       {
+                           UnityEngine.Debug.LogWarning("Error during Read Data" + error);
+                       }
+
+
+
+                       if (!success && (error == Native.ERROR_IO_PENDING || bytesRead < buffer.Length))
+                       {
+                           UnityEngine.Debug.LogWarning("Wait reading...");
+
+                           var result = Native.WaitForSingleObject(overlapped.EventHandle, overlapTimeout);
+
+                           switch (result)
+                           {
+                               case Native.WAIT_OBJECT_0: status = HIDReport.ReadStatus.Success; break;
+                               case Native.WAIT_TIMEOUT:
+                                   status = HIDReport.ReadStatus.WaitTimedOut;
+                                   UnityEngine.Debug.Log("ReadData_WAIT_TIMEOUT");
+                                   // buffer = new byte[] { };
+                                   break;
+                               case Native.WAIT_FAILED:
+                                   status = HIDReport.ReadStatus.WaitFail;
+                                   UnityEngine.Debug.Log("ReadData_WAIT_FAILED");
+                                   //  buffer = new byte[] { };
+                                   break;
+                                
+                               case Native.WAIT_ABANDONED:
+                                    status = HIDReport.ReadStatus.NoDataRead;
+                                    UnityEngine.Debug.Log("ReadData_WAIT_ABANDONED" + result);
+                                //   buffer = new byte[] { };
+                               break;
+
+                               default:
+
+                                
+                                   UnityEngine.Debug.Log("ReadData Default" + result);
+                                  
+                                   break;
+                           }
+                       }
+                       else
+                       {
+                           status = HIDReport.ReadStatus.Success;
+                       }
+
+                       
                     }
                     catch { status = HIDReport.ReadStatus.ReadError; }
                     finally { CloseDeviceIO(overlapped.EventHandle); }
@@ -489,7 +516,8 @@ namespace ws.winx.platform.windows
 
         private static IntPtr OpenDeviceIO(string devicePath, uint deviceAccess)
         {
-            return OpenDeviceIO(devicePath, DeviceMode.NonOverlapped, deviceAccess);
+            return OpenDeviceIO(devicePath, DeviceMode.Overlapped, deviceAccess);
+           // return OpenDeviceIO(devicePath, DeviceMode.NonOverlapped, deviceAccess);
         }
 
         private static IntPtr OpenDeviceIO(string devicePath, DeviceMode deviceMode, uint deviceAccess)
@@ -502,6 +530,12 @@ namespace ws.winx.platform.windows
             security.lpSecurityDescriptor = IntPtr.Zero;
             security.bInheritHandle = true;
             security.nLength = Marshal.SizeOf(security);
+
+
+            //Handle = CreateFile(didetail->DevicePath, GENERIC_READ|GENERIC_WRITE,
+												//	FILE_SHARE_READ,
+												//	NULL, OPEN_EXISTING,
+												//	FILE_FLAG_OVERLAPPED, NULL);
 
             return Native.CreateFile(devicePath, deviceAccess, Native.FILE_SHARE_READ | Native.FILE_SHARE_WRITE, ref security, Native.OPEN_EXISTING, flags, 0);
         }

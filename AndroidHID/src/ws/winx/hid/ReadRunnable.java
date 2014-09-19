@@ -56,12 +56,7 @@ public class ReadRunnable implements Runnable {
 	
 		 this._isReady=false;
 		 
-		 try {
-			HIDDeviceWrapper.getEndPointlock().acquire();
-		} catch (InterruptedException e) {
-			
-			  Log.e(TAG,"Lock error",e);
-		}
+	
 		
 		 ByteBuffer buffer = ByteBuffer.wrap(_data.Buffer);
 		 
@@ -94,11 +89,20 @@ public class ReadRunnable implements Runnable {
 	            if (_device.get_connection().requestWait() == request) {
 	            	
 	            //	 Log.d(TAG, uid+"Request succeded");
+	            	
+	            	 try {
+	    			HIDDeviceWrapper.getEndPointlock().acquire();
+	    		} catch (InterruptedException e) {
+	    			
+	    			  Log.e(TAG,"Lock error",e);
+	    		}
 	            	 
 	            	 if(_listener!=null)
 	            	 _listener.onRead(_data);
 	            	 
 	            	 request.close();
+	            	 
+	            	 HIDDeviceWrapper.getEndPointlock().release();
 	            } else {
 	              //  Log.e(TAG, uid+"RequestWait failed, exiting");
 	                //!!! don't request.close() close when failed
@@ -108,7 +112,7 @@ public class ReadRunnable implements Runnable {
 	            this._isReady=true;
 	            
 	            
-	            HIDDeviceWrapper.getEndPointlock().release();
+	          
 		
 	/*
 	 * 
