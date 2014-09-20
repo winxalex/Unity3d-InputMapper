@@ -47,8 +47,20 @@ namespace ws.winx.platform.windows
     {
 
 
-        private DeviceMode _deviceReadMode = DeviceMode.NonOverlapped;
-        private DeviceMode _deviceWriteMode = DeviceMode.NonOverlapped;
+        private DeviceMode _deviceReadMode = DeviceMode.Overlapped;
+
+        public DeviceMode DeviceReadMode
+        {
+            get { return _deviceReadMode; }
+            set { _deviceReadMode = value; }
+        }
+        private DeviceMode _deviceWriteMode = DeviceMode.Overlapped;
+
+        public DeviceMode DeviceWriteMode
+        {
+            get { return _deviceWriteMode; }
+            set { _deviceWriteMode = value; }
+        }
 
         protected delegate HIDReport ReadDelegate();
         private delegate bool WriteDelegate(byte[] data);
@@ -117,7 +129,7 @@ namespace ws.winx.platform.windows
 
         public void OpenDevice()
         {
-            OpenDevice(DeviceMode.Overlapped, DeviceMode.Overlapped);
+            OpenDevice(_deviceReadMode, _deviceWriteMode);
            // OpenDevice(DeviceMode.NonOverlapped, DeviceMode.NonOverlapped);
         }
 
@@ -125,8 +137,8 @@ namespace ws.winx.platform.windows
         {
             if (IsOpen) return;
 
-            _deviceReadMode = readMode;
-            _deviceWriteMode = writeMode;
+           // _deviceReadMode = readMode;
+          //  _deviceWriteMode = writeMode;
 
             try
             {
@@ -369,7 +381,7 @@ namespace ws.winx.platform.windows
                     switch (result)
                     {
                         case Native.WAIT_OBJECT_0:
-
+                          
                             // System.Threading.Overlapped.Unpack(overlapped);
                             return true;
                         case Native.WAIT_TIMEOUT:
@@ -467,13 +479,14 @@ namespace ws.winx.platform.windows
                                    break;
                                 
                                case Native.WAIT_ABANDONED:
-                                    status = HIDReport.ReadStatus.NoDataRead;
+                                   status = HIDReport.ReadStatus.Success;
+                                    
                                     UnityEngine.Debug.Log("ReadData_WAIT_ABANDONED" + result);
                                 //   buffer = new byte[] { };
                                break;
 
                                default:
-
+                                    status = HIDReport.ReadStatus.NoDataRead;
                                 
                                    UnityEngine.Debug.Log("ReadData Default" + result);
                                   

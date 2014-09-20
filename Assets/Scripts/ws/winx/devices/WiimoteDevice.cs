@@ -62,6 +62,89 @@ namespace ws.winx.devices
     };
 
 
+    /// <summary>
+    /// 
+    /// </summary>
+   public enum PassThruMode : byte
+    {
+        None = 0x00,
+        Nunchuck = 0x05,
+        ClassicController = 0x07,
+
+    }
+
+
+   public enum ExtensionType : byte
+   {
+       None = 0x00,
+       Nunchuck = 0x01,
+       ClassicController = 0x02,
+       ClassicControllerPro = 0x04,
+       Guitar = 0x08,
+       Drums = 0x10,
+       MotionPlus = 0x20,
+       BalancedBoard = 0x40,
+       TaikoDrums = 0x80
+   }
+
+   public enum ProcessingMode
+   {
+       AccCalibration=0,
+       MPlusCalibration,
+       Update
+   }
+
+
+
+   /// <summary>
+   /// The extension number of the currently plugged into the Wiimote
+   /// </summary>
+   public enum ExtensionNumber : long
+   {
+
+
+       /// <summary>
+       /// No extension
+       /// </summary>
+       None = 0x000000000000,
+       /// <summary>
+       /// Nunchuk extension
+       /// </summary>
+       Nunchuk = 0x0000a4200000,
+       /// <summary>
+       /// Classic Controller extension
+       /// </summary>
+       ClassicController = 0x0000a4200101,
+       /// <summary>
+       /// Guitar controller from Guitar Hero 3/WorldTour
+       /// </summary>
+       Guitar = 0x0000a4200103,
+       /// <summary>
+       /// Drum controller from Guitar Hero: World Tour
+       /// </summary>
+       Drums = 0x0100a4200103,
+       /// <summary>
+       /// Wii Fit Balance Board controller
+       /// </summary>
+       BalanceBoard = 0x0000a4200402,
+       /// <summary>
+       /// Taiko "TaTaCon" drum controller
+       /// </summary>
+       TaikoDrum = 0x0000a4200111,
+       /// <summary>
+       /// Wii MotionPlus extension
+       /// </summary>
+       MotionPlus = 0x0000a4200405,
+       //MotionPlusInside has 0x0100 A420 0405
+       //static const QWORD MOTION_PLUS		   = 0x050420A40000ULL;
+       //	static const QWORD MOTION_PLUS_DETECT  = 0x050020a60000ULL;
+       //	static const QWORD MOTION_PLUS_DETECT2 = 0x050420a60000ULL;
+       /// <summary>
+       /// Partially inserted extension.  This is an error condition.
+       /// </summary>
+       ParitallyInserted = 0xffffffffffff
+   };
+
 
 
 	class WiimoteDevice:JoystickDevice,IDisposable
@@ -72,8 +155,10 @@ namespace ws.winx.devices
         protected bool _rumble;
         protected WiiExtensionType _ExtensionType;
         protected bool _extensionDevice;
-        protected byte _battery;
+        protected float _battery;
         protected IRMode _irmode;
+
+        public byte Extensions;
         
         #region IRSensor
         public class IRSensor{
@@ -181,7 +266,7 @@ namespace ws.winx.devices
         }
 
 
-        public byte Battery
+        public float Battery
         {
             get
             {
