@@ -89,7 +89,11 @@ namespace ws.winx.devices
 
    public enum ProcessingMode
    {
-       AccCalibration=0,
+       None=0,
+       InProgress,
+       AccCalibration,
+       ExtCheck,
+       MPlusCheck,
        MPlusCalibration,
        Update
    }
