@@ -89,13 +89,22 @@ namespace ws.winx.devices
 
    public enum ProcessingMode
    {
-       None=0,
+       None = 0,
        InProgress,
        AccCalibration,
        ExtCheck,
        MPlusCheck,
        MPlusCalibration,
-       Update
+       Update,
+       MPlusInit
+   }
+
+
+   public enum MotionPlusStatus:byte
+   {
+       None=0x0,
+       Exist=0x1,
+       Enabled=0x2
    }
 
 
@@ -161,6 +170,29 @@ namespace ws.winx.devices
         protected bool _extensionDevice;
         protected float _battery;
         protected IRMode _irmode;
+
+        //Interleave mode for use of M+ and Extension toghter
+        public PassThruMode PASS_THRU_MODE = PassThruMode.None;
+
+
+        private ProcessingMode __processingMode = ProcessingMode.None;
+
+        public ProcessingMode processingMode
+        {
+            get { return processingMode; }
+            set { processingMode = value; }
+        }
+      
+
+        protected byte _MotionPlusStatus;
+
+        public byte MotionPlusStatus
+        {
+            get { return _MotionPlusStatus; }
+            internal set { _MotionPlusStatus = value; }
+        }
+
+        public int numMPlusChecks = 0;
 
         public byte Extensions;
         

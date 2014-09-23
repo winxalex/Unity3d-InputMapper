@@ -42,7 +42,7 @@ namespace ws.winx.drivers
         // sure, we could find this out the hard way using HID, but trust me, it's 22
         private const int REPORT_LENGTH = 22;
 
-        private ProcessingMode __processingMode=ProcessingMode.None;
+      
 
         // Wiimote output commands
         private enum OutputReport : byte
@@ -73,9 +73,7 @@ namespace ws.winx.drivers
         const int REGISTER_MODE = 0x4a600fe;//0x04a600fe
 
 
-        //Interleave mode for use of M+ and Extension toghter
-        protected PassThruMode PASS_THRU_MODE = PassThruMode.None;
-private  bool isMotionPlusDisabled;
+      
 
         /// <summary>
         /// Default constructor
@@ -94,12 +92,15 @@ private  bool isMotionPlusDisabled;
             //Add states
 
             if(wDevice!=null){
-            switch(__processingMode){
+
+          
+
+            switch(wDevice.processingMode){
                 case ProcessingMode.InProgress:
                     return;
-                break;
+                
                 case ProcessingMode.Update:
-                    __processingMode=ProcessingMode.InProgress;
+                    wDevice.processingMode=ProcessingMode.InProgress;
                     _hidInterface.Read(wDevice,onRead);
                         
                 break;
@@ -111,6 +112,18 @@ private  bool isMotionPlusDisabled;
                 case ProcessingMode.ExtCheck:
                  // force a status check to get the state of any extensions plugged in at startup
                    GetStatus(wDevice);
+                break;
+
+                case ProcessingMode.MPlusCheck:
+                    CheckMotionPlusCapabilities(wDevice);
+                break;
+
+                 case ProcessingMode.MPlusInit:
+                   InitializeMotionPlus(wDevice);
+                break;
+
+                 case ProcessingMode.MPlusCalibration:
+                  
                 break;
 
             }
@@ -132,7 +145,7 @@ private  bool isMotionPlusDisabled;
         /// <param name="size"></param>
         internal void ReadAccCalibration(WiimoteDevice device, int address, short size)
         {
-            __processingMode=ProcessingMode.InProgress;
+            device.processingMode=ProcessingMode.InProgress;
 
             HIDDevice hidDevice = _hidInterface.Generics[device];
 
@@ -202,7 +215,7 @@ private  bool isMotionPlusDisabled;
                 //mWiimoteState.AccelCalibrationInfo.YG = buff[5];
                 //mWiimoteState.AccelCalibrationInfo.ZG = buff[6];
 
-               __processingMode=ProcessingMode.ExtCheck;
+               device.processingMode=ProcessingMode.ExtCheck;
             }
 
 
@@ -235,19 +248,19 @@ private  bool isMotionPlusDisabled;
 
               
 
-                WiimoteDevice joystick;
+                WiimoteDevice device;
                 int inx = 0;
 
 
                 // create new Device
-                joystick = new WiimoteDevice(((IHIDInterface)_hidInterface).Devices.Count, hidDevice.PID, hidDevice.VID, 16, 12, 4, 4, this);
+                device = new WiimoteDevice(((IHIDInterface)_hidInterface).Devices.Count, hidDevice.PID, hidDevice.VID, 16, 12, 4, 4, this);
 
 
 
                 //inti button structure
                 for (; inx < 12; inx++)
                 {
-                    joystick.Buttons[inx] = new ButtonDetails();
+                    device.Buttons[inx] = new ButtonDetails();
                 }
 
                 AxisDetails axisDetails;
@@ -255,52 +268,52 @@ private  bool isMotionPlusDisabled;
 
                 //AccX
                 axisDetails = new AxisDetails();
-                joystick.Axis[JoystickAxis.AxisAccX] = axisDetails;
+                device.Axis[JoystickAxis.AxisAccX] = axisDetails;
 
                 //AccY
                 axisDetails = new AxisDetails();
-                joystick.Axis[JoystickAxis.AxisAccY] = axisDetails;
+                device.Axis[JoystickAxis.AxisAccY] = axisDetails;
 
                 //AccZ
                 axisDetails = new AxisDetails();
-                joystick.Axis[JoystickAxis.AxisAccZ] = axisDetails;
+                device.Axis[JoystickAxis.AxisAccZ] = axisDetails;
 
                 //AccR
                 axisDetails = new AxisDetails();
-                joystick.Axis[JoystickAxis.AxisAccR] = axisDetails;
+                device.Axis[JoystickAxis.AxisAccR] = axisDetails;
 
                 //AccU
                 axisDetails = new AxisDetails();
-                joystick.Axis[JoystickAxis.AxisAccU] = axisDetails;
+                device.Axis[JoystickAxis.AxisAccU] = axisDetails;
 
                 //AccV
                 axisDetails = new AxisDetails();
-                joystick.Axis[JoystickAxis.AxisAccV] = axisDetails;
+                device.Axis[JoystickAxis.AxisAccV] = axisDetails;
 
 
                 //LX
                 axisDetails = new AxisDetails();
                 //  axisDetails.max = 32767;
                 //  axisDetails.min = -32767;
-                joystick.Axis[JoystickAxis.AxisX] = axisDetails;
+                device.Axis[JoystickAxis.AxisX] = axisDetails;
 
                 //LY
                 axisDetails = new AxisDetails();
                 //    axisDetails.max = 32767;
                 //    axisDetails.min = -32767;
-                joystick.Axis[JoystickAxis.AxisY] = axisDetails;
+                device.Axis[JoystickAxis.AxisY] = axisDetails;
 
                 //RX
                 axisDetails = new AxisDetails();
                 //       axisDetails.max = 32767;
                 //        axisDetails.min = -32767;
-                joystick.Axis[JoystickAxis.AxisZ] = axisDetails;
+                device.Axis[JoystickAxis.AxisZ] = axisDetails;
 
                 //RY
                 axisDetails = new AxisDetails();
                 //      axisDetails.max = 32767;
                 //      axisDetails.min = -32767;
-                joystick.Axis[JoystickAxis.AxisR] = axisDetails;
+                device.Axis[JoystickAxis.AxisR] = axisDetails;
 
 
                 //TRIGGERS
@@ -308,28 +321,28 @@ private  bool isMotionPlusDisabled;
                 axisDetails.max = 255;
                 axisDetails.min = 0;
                 axisDetails.isTrigger = true;
-                joystick.Axis[JoystickAxis.AxisU] = axisDetails;
+                device.Axis[JoystickAxis.AxisU] = axisDetails;
 
 
                 axisDetails = new AxisDetails();
                 axisDetails.max = 255;
                 axisDetails.min = 0;
                 axisDetails.isTrigger = true;
-                joystick.Axis[JoystickAxis.AxisV] = axisDetails;
+                device.Axis[JoystickAxis.AxisV] = axisDetails;
 
                 //POV
                 axisDetails = new AxisDetails();
                 axisDetails.isHat = true;
-                joystick.Axis[JoystickAxis.AxisPovX] = axisDetails;
+                device.Axis[JoystickAxis.AxisPovX] = axisDetails;
                 axisDetails = new AxisDetails();
                 axisDetails.isHat = true;
-                joystick.Axis[JoystickAxis.AxisPovY] = axisDetails;
+                device.Axis[JoystickAxis.AxisPovY] = axisDetails;
 
 
 
 
 
-                joystick.isReady = false;
+                device.isReady = false;
 
 
 
@@ -337,9 +350,9 @@ private  bool isMotionPlusDisabled;
                // ((HIDDevice)hidDevice).OutputReportByteLength = 7;
 
             
-                __processingMode=ProcessingMode.AccCalibration;
+                device.processingMode=ProcessingMode.AccCalibration;
 
-                return joystick;
+                return device;
 
             }
 
@@ -403,12 +416,12 @@ private  bool isMotionPlusDisabled;
                     ParseButtons(device, buff);
                     ParseAccel(device, buff);
                     ParseIR(device, buff);
-                    ParseExtension(device, DecryptBuffer(buff), 16);
+                    ParseExtension(device, buff, 16);
                     break;
                 case InputReport.Status:
 
 
-                       if (!isStatusReady) break;;
+                       
 
                   
 
@@ -437,10 +450,8 @@ private  bool isMotionPlusDisabled;
                         if (extension)
                         {
                              
-                               long extensionNumber;
-
-
-                              
+                              // long extensionNumber;
+           
                               // buff = ReadData(REGISTER_EXTENSION_TYPE, 6);
                              //  extensionNumber = ((long)buff[0] << 40) | ((long)buff[1] << 32) | ((long)buff[2]) << 24 | ((long)buff[3]) << 16 | ((long)buff[4]) << 8 | buff[5];
 
@@ -449,15 +460,9 @@ private  bool isMotionPlusDisabled;
 
                       
                      }
-                    else if(!isMotionPlusDisabled)
+                    else if(device.MotionPlusStatus == (byte)MotionPlusStatus.None)
                     {
-                        if (CheckMotionPlusCapabilities(device))
-                        {
-                            
-                          
-                            //initalization would call GetStatus automatically
-                            InitializeMotionPlus(device);
-                        }
+                       device.processingMode=ProcessingMode.MPlusCheck;
                     }
                     
                     
@@ -530,11 +535,14 @@ private  bool isMotionPlusDisabled;
 		/// </summary>
 		public void InitializeMotionPlus(WiimoteDevice device)
 		{
+
+          
            
             if ((device.Extensions & (byte)ExtensionType.MotionPlus) == 0 )
             {
                 Debug.WriteLine("InitializeMotionPlus");
 
+                device.processingMode=ProcessingMode.InProgress;
                 // Initialize it:
                // WriteData(REGISTER_MOTIONPLUS_INIT, 0x55);
                 WriteMemory(device,REGISTER_MOTIONPLUS_INIT, 0x55);
@@ -550,46 +558,56 @@ private  bool isMotionPlusDisabled;
         /// <summary>
         /// 
         /// </summary>
-        public bool CheckMotionPlusCapabilities(WiimoteDevice device)
+        public void CheckMotionPlusCapabilities(WiimoteDevice device)
         {
-            if ((mWiimoteState.Extension & (byte)ExtensionType.MotionPlus)!=0x00) return true;
+            device.processingMode=ProcessingMode.InProgress;
 
-            Debug.WriteLine("Try:1 to MOTIONPLUS_DETECT");
-            BeginAsyncRead();
-            byte[] buff = ReadData(REGISTER_MOTIONPLUS_DETECT, 0x02);
 
-            if (buff[1] != 0x05)
-            {
-                Thread.Sleep(3000);
 
-                Debug.WriteLine("Try:2 to MOTIONPLUS_DETECT");
-                BeginAsyncRead();
-                buff = ReadData(REGISTER_MOTIONPLUS_DETECT, 0x02);
-           
+                  Debug.WriteLine("Try:"+device.numMPlusChecks+" to MOTIONPLUS_DETECT");
 
-                if (buff[1] != 0x05)
-                {
-                    Thread.Sleep(3000);
+               // ReadData(REGISTER_MOTIONPLUS_DETECT, 0x02);
+                ReadMemory(device,REGISTER_MOTIONPLUS_DETECT, 0x02,(suc)=>{
+                    _hidInterface.Read(device,onCheckMotionPlusCapabilities);
+                });
 
-                    Debug.WriteLine("Try:3 to MOTIONPLUS_DETECT");
-                    BeginAsyncRead();
-                    buff = ReadData(REGISTER_MOTIONPLUS_DETECT, 0x02);
-                }
-            }
 
-            Debug.WriteLine("Detected:" + (buff[1] == 0x05) + "buff:" + BitConverter.ToString(buff));
+            
 
-            return (buff[1] == 0x05);
+          
+        
         }
 
 
+
+
+        public void onCheckMotionPlusCapabilities(object data){
+            HIDReport report = data as HIDReport;
+            byte[] buff=report.Data;
+
+               WiimoteDevice device = _hidInterface.Devices[report.index] as WiimoteDevice;
+                
+            if(buff[1] == 0x05){
+                device.MotionPlusStatus|=(byte)MotionPlusStatus.Exist;
+                 device.processingMode=ProcessingMode.MPlusInit;
+            }else{
+                if(device.numMPlusChecks<4){
+                     device.numMPlusChecks++;
+                    device.processingMode=ProcessingMode.MPlusCheck;
+                 }else{
+                     device.processingMode=ProcessingMode.Update;
+                }
+                 
+            }
+
+        }
 
           /// <summary>
         /// 
         /// </summary>
         public void DisableMotionPlus(WiimoteDevice device)
         {
-            isMotionPlusDisabled = true;
+           
            
              //   WriteData(REGISTER_EXTENSION_INIT_1, 0x55);
             //    WriteData(REGISTER_EXTENSION_INIT_2, 0x00);
@@ -598,6 +616,9 @@ private  bool isMotionPlusDisabled;
             WriteMemory(device,REGISTER_EXTENSION_INIT2, 0x00);
 
                 device.Extensions &= (byte)0xDF;
+
+            //Status Disabled
+            device.MotionPlusStatus &=(byte) 0xD;//mask 0x1101
 
                 Debug.WriteLineIf(((device.Extensions & (byte)ExtensionType.MotionPlus) == 0), "MotionPlus disabled");
         }
@@ -645,7 +666,7 @@ private  bool isMotionPlusDisabled;
 					//mWiimoteState.ExtensionType = ExtensionNumber.None;
 					return;
 				case ExtensionNumber.Nunchuk:
-                    if(PASS_THRU_MODE==(byte)PassThruMode.None)
+                    if(device.PASS_THRU_MODE==(byte)PassThruMode.None)
                         device.Extensions = (byte)ExtensionType.Nunchuck;
                     else 
                         device.Extensions |= (byte)ExtensionType.Nunchuck;
@@ -655,7 +676,7 @@ private  bool isMotionPlusDisabled;
 
                     break;
 				case ExtensionNumber.ClassicController:
-                    if(PASS_THRU_MODE==(byte)PassThruMode.None)
+                    if(device.PASS_THRU_MODE==(byte)PassThruMode.None)
                           device.Extensions = (int)ExtensionType.ClassicController;
                       else
                          device.Extensions |= (int)ExtensionType.ClassicController;
@@ -674,12 +695,12 @@ private  bool isMotionPlusDisabled;
                      device.Extensions = (byte)ExtensionType.TaikoDrums;
                 break;
 				case ExtensionNumber.MotionPlus:
-                     if(PASS_THRU_MODE==(byte)PassThruMode.None)
+                     if(device.PASS_THRU_MODE==(byte)PassThruMode.None)
                          device.Extensions = (byte)ExtensionType.MotionPlus;
                     else
                          device.Extensions |= (byte)ExtensionType.MotionPlus;
 
-                     isMotionPlusDisabled = false;
+                  
                   
 					break;
 				default:
@@ -690,7 +711,7 @@ private  bool isMotionPlusDisabled;
 
 
 
-                           if (PASS_THRU_MODE!=PassThruMode.None)//NOT TESTED (PSEUDO)
+                           if (device.PASS_THRU_MODE!=PassThruMode.None)//NOT TESTED (PSEUDO)
                                 {
 
 
@@ -878,7 +899,7 @@ private  bool isMotionPlusDisabled;
 
             SetReportType(device,InputReport.IRExtensionAccel,true);
 
-            __processingMode=ProcessingMode.Update;
+            device.processingMode=ProcessingMode.Update;
 
         }
 
@@ -1122,30 +1143,100 @@ private  bool isMotionPlusDisabled;
             AxisDetails axisDetails;
 
 
-             if  ((device.Extension & (byte)ExtensionType.Nunchuck) !=0){
+             if  ((device.Extensions & (byte)ExtensionType.Nunchuck) !=0){
 			
-                    if(PASS_THRU_MODE == PassThruMode.Nunchuck){
+                    if(device.PASS_THRU_MODE == PassThruMode.Nunchuck){
                         if((buff[offset + 5] & 0x03)==0x00){
-           
-            switch (device.ExtensionType)
-            {
-                case WiiExtensionType.Nunchuk:
+                                //interleave mode
+                             //if (extension_data.size() >= 6 && !(extension_data[5] & 0x03))
+                    //{
+                    //    output.valid_data_flags |= dolphiimote_NUNCHUCK_VALID;
+
+                    //    output.nunchuck.stick_x = extension_data[0];
+                    //    output.nunchuck.stick_y = extension_data[1];
+                    //    output.nunchuck.x = (extension_data[2] << 1) | (extension_data[5] & 0x10) >> 4;
+                    //    output.nunchuck.y = (extension_data[3] << 1) | (extension_data[5] & 0x20) >> 5;
+                    //    output.nunchuck.z = ((extension_data[4] & ~0x1) << 1) | (extension_data[5] & 0xC0) >> 6;
+
+                    //    output.nunchuck.buttons = ~(extension_data[5] >> 2) & 0x3;
+                    //}
 
 
-                    axisDetails = device.Axis[JoystickAxis.AxisX] as AxisDetails;
 
-                    if (axisDetails.max > 0f)
-                    {
-                        axisDetails.value = ((float)buff[offset] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                        //mWiimoteState.NunchukState.RawJoystick.X = buff[offset];
+                        //mWiimoteState.NunchukState.RawJoystick.Y = buff[offset + 1];
+
+                            axisDetails = device.Axis[JoystickAxis.AxisX] as AxisDetails;
+
+                            if (axisDetails.max > 0f)
+                            {
+                                axisDetails.value = ((float)buff[offset] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                            }
+
+
+                            axisDetails = device.Axis[JoystickAxis.AxisY] as AxisDetails;
+
+                            if (axisDetails.max > 0f)
+                            {
+                                axisDetails.value = ((float)buff[offset + 1] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                            }
+
+
+                        //mWiimoteState.NunchukState.AccelState.RawValues6b.X = buff[offset + 2];
+                        //mWiimoteState.NunchukState.AccelState.RawValues6b.Y = buff[offset + 3];
+                        //mWiimoteState.NunchukState.AccelState.RawValues6b.Z = buff[offset + 4];
+
+
+                        //mWiimoteState.NunchukState.AccelState.RawValues8b.X = (buff[offset + 2]<<1) | (buff[offset + 5] & 0x10) >> 4;
+                        //mWiimoteState.NunchukState.AccelState.RawValues8b.Y = (buff[offset + 3] << 1)| (buff[offset + 5] & 0x30) >> 4;;
+                        //mWiimoteState.NunchukState.AccelState.RawValues8b.Z = ((buff[offset + 4]& ~0x1) << 1) | (buff[offset + 5] & 0xC0) >> 6;
+
+
+                            //Acceleration axes
+                            axisDetails = device.Axis[JoystickAxis.AxisAccR] as AxisDetails;
+
+                            if (axisDetails.max > 0f)
+                            {
+                                axisDetails.value = ((float)((buff[offset + 2] << 1) | (buff[offset + 5] & 0x10) >> 4) - axisDetails.min) / (axisDetails.max - axisDetails.min);
+                            }
+
+
+                            axisDetails = device.Axis[JoystickAxis.AxisAccU] as AxisDetails;
+
+                            if (axisDetails.max > 0f)
+                            {
+                                axisDetails.value = ((float)((buff[offset + 3] << 1)| (buff[offset + 5] & 0x30) >> 4) - axisDetails.min) / (axisDetails.max - axisDetails.min);
+                            }
+
+                            axisDetails = device.Axis[JoystickAxis.AxisAccV] as AxisDetails;
+
+                            if (axisDetails.max > 0f)
+                            {
+                                axisDetails.value = ((float)(((buff[offset + 4]& ~0x1) << 1) | (buff[offset + 5] & 0xC0) >> 6) - axisDetails.min) / (axisDetails.max - axisDetails.min);
+                            }
+
+
+
+
+                        }else {return;}
                     }
+          
 
 
-                    axisDetails = device.Axis[JoystickAxis.AxisY] as AxisDetails;
+                            axisDetails = device.Axis[JoystickAxis.AxisX] as AxisDetails;
 
-                    if (axisDetails.max > 0f)
-                    {
-                        axisDetails.value = ((float)buff[offset + 1] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
-                    }
+                            if (axisDetails.max > 0f)
+                            {
+                                axisDetails.value = ((float)buff[offset] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                            }
+
+
+                            axisDetails = device.Axis[JoystickAxis.AxisY] as AxisDetails;
+
+                            if (axisDetails.max > 0f)
+                            {
+                                axisDetails.value = ((float)buff[offset + 1] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                            }
 
 
                     //  mWiimoteState.NunchukState.RawJoystick.X = buff[offset];
@@ -1201,154 +1292,227 @@ private  bool isMotionPlusDisabled;
                     //if (mWiimoteState.NunchukState.CalibrationInfo.MaxY != 0x00)
                     //    mWiimoteState.NunchukState.Joystick.Y = (float)((float)mWiimoteState.NunchukState.RawJoystick.Y - mWiimoteState.NunchukState.CalibrationInfo.MidY) /
                     //                            ((float)mWiimoteState.NunchukState.CalibrationInfo.MaxY - mWiimoteState.NunchukState.CalibrationInfo.MinY);
+                 //mWiimoteState.NunchukState.RawJoystick.X = buff[offset];
+                 //       mWiimoteState.NunchukState.RawJoystick.Y = buff[offset + 1];
 
-                    break;
+                    
+                      
+                 //       mWiimoteState.NunchukState.AccelState.RawValues6b.X = buff[offset + 2];
+                 //       mWiimoteState.NunchukState.AccelState.RawValues6b.Y = buff[offset + 3];
+                 //       mWiimoteState.NunchukState.AccelState.RawValues6b.Z = buff[offset + 4];
 
-                case WiiExtensionType.ClassicController:
-
-
-                    //AXES
-
-
-                    //mWiimoteState.ClassicControllerState.RawJoystickL.X = (byte)(buff[offset] & 0x3f);
-                    //mWiimoteState.ClassicControllerState.RawJoystickL.Y = (byte)(buff[offset + 1] & 0x3f);
-                    // mWiimoteState.ClassicControllerState.RawJoystickR.X = (byte)((buff[offset + 2] >> 7) | (buff[offset + 1] & 0xc0) >> 5 | (buff[offset] & 0xc0) >> 3);
-                    // mWiimoteState.ClassicControllerState.RawJoystickR.Y = (byte)(buff[offset + 2] & 0x1f);
-
-
-
-                    axisDetails = device.Axis[JoystickAxis.AxisX] as AxisDetails;
-
-                    if (axisDetails.max > 0f)
-                    {
-                        axisDetails.value = ((float)(buff[offset] & 0x3f) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
-                    }
-
-                    axisDetails = device.Axis[JoystickAxis.AxisY] as AxisDetails;
-
-                    if (axisDetails.max > 0f)
-                    {
-                        axisDetails.value = ((float)(buff[offset + 1] & 0x3f) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
-                    }
-
-
-                    axisDetails = device.Axis[JoystickAxis.AxisZ] as AxisDetails;
-
-                    if (axisDetails.max > 0f)
-                    {
-                        axisDetails.value = ((float)((buff[offset + 2] >> 7) | (buff[offset + 1] & 0xc0) >> 5 | (buff[offset] & 0xc0) >> 3) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
-                    }
-
-                    axisDetails = device.Axis[JoystickAxis.AxisR] as AxisDetails;
-
-                    if (axisDetails.max > 0f)
-                    {
-                        axisDetails.value = ((float)(buff[offset + 2] & 0x1f) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
-                    }
+                 //        //    output.nunchuck.x = (extension_data[2] << 2) | (extension_data[5] & 0x0C) >> 2;
+                 //   //    output.nunchuck.y = (extension_data[3] << 2) | (extension_data[5] & 0x30) >> 4;
+                 //   //    output.nunchuck.z = (extension_data[4] << 2) | (extension_data[5] & 0xC0) >> 6;
 
 
 
-                    // mWiimoteState.ClassicControllerState.RawTriggerL = (byte)(((buff[offset + 2] & 0x60) >> 2) | (buff[offset + 3] >> 5));
-                    //  mWiimoteState.ClassicControllerState.RawTriggerR = (byte)(buff[offset + 3] & 0x1f);
+                 //        //10bit precision but calibration data is 8bit
+                 //        mWiimoteState.NunchukState.AccelState.RawValues8b.X = (buff[offset + 2]<<2) | (buff[offset + 5] & 0x0C) >> 2;
+                 //       mWiimoteState.NunchukState.AccelState.RawValues8b.Y = (buff[offset + 3] << 2)| (buff[offset+5] & 0x30) >> 4;;
+                 //       mWiimoteState.NunchukState.AccelState.RawValues8b.Z = (buff[offset + 4]<< 2)| (buff[offset + 5] & 0xC0) >> 6;
 
-                    //  mWiimoteState.ClassicControllerState.ButtonState.TriggerL = (buff[offset + 4] & 0x20) == 0;
-                    //  mWiimoteState.ClassicControllerState.ButtonState.TriggerR = (buff[offset + 4] & 0x02) == 0;
-
-
-                    axisDetails = device.Axis[JoystickAxis.AxisU] as AxisDetails;
-
-                    if (axisDetails.max > 0f)
-                    {
-                        axisDetails.value = ((float)(((buff[offset + 2] & 0x60) >> 2) | (buff[offset + 3] >> 5)) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
-                    }
-
-                    axisDetails = device.Axis[JoystickAxis.AxisV] as AxisDetails;
-
-                    if (axisDetails.max > 0f)
-                    {
-                        axisDetails.value = ((float)(buff[offset + 3] & 0x1f) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
-                    }
-
-                    //mWiimoteState.ClassicControllerState.ButtonState.Plus = (buff[offset + 4] & 0x04) == 0;
-                    //mWiimoteState.ClassicControllerState.ButtonState.Home = (buff[offset + 4] & 0x08) == 0;
-                    //mWiimoteState.ClassicControllerState.ButtonState.Minus = (buff[offset + 4] & 0x10) == 0;
-
-                    device.Buttons[4].value = (float)(buff[1] & 0x10);
-                    device.Buttons[3].value = (float)(buff[2] & 0x80);
-                    device.Buttons[2].value = (float)(buff[2] & 0x10);
+                 //       mWiimoteState.NunchukState.C = (buff[offset + 5] & 0x02) == 0;
+                 //       mWiimoteState.NunchukState.Z = (buff[offset + 5] & 0x01) == 0;
 
 
 
-                    //POV
-                    //mWiimoteState.ClassicControllerState.ButtonState.Down = (buff[offset + 4] & 0x40) == 0;
-                    //mWiimoteState.ClassicControllerState.ButtonState.Right = (buff[offset + 4] & 0x80) == 0;
-                    //mWiimoteState.ClassicControllerState.ButtonState.Up = (buff[offset + 5] & 0x01) == 0;
-                    //mWiimoteState.ClassicControllerState.ButtonState.Left = (buff[offset + 5] & 0x02) == 0;
-
-                    //POV
-                    axisDetails = device.Axis[JoystickAxis.AxisPovY] as AxisDetails;
-
-                    axisDetails.value = 0;
-
-                    if ((buff[offset + 5] & 0x01) == 0)
-                        axisDetails.value = 1f;
-                    else if ((buff[offset + 4] & 0x40) == 0)
-                        axisDetails.value = -1f;
-
-                    axisDetails = device.Axis[JoystickAxis.AxisPovX] as AxisDetails;
-                    axisDetails.value = 0;
-
-                    if ((buff[offset + 4] & 0x80) == 0)
-                        axisDetails.value = 1f;
-                    else if ((buff[offset + 5] & 0x02) == 0)
-                        axisDetails.value = -1f;
 
 
 
-                    //BUTTONS
+
+                   }
+
+             else if ((device.Extensions & (byte)ExtensionType.ClassicController) != 0)
+             {
+
+                 if (device.PASS_THRU_MODE == PassThruMode.ClassicController)
+                 {
+
+                     if ((buff[offset + 5] & 0x03) == 0)
+                     {
+                         //mWiimoteState.ClassicControllerState.RawJoystickL.X = (byte)(buff[offset] & 0x3E);
+                         //mWiimoteState.ClassicControllerState.RawJoystickL.Y = (byte)(buff[offset + 1] & 0x3E);
+
+                         //mWiimoteState.ClassicControllerState.RawJoystickR.X = (byte)((buff[offset] & 0xC0) >> 3) | ((buff[offset + 1] & 0xC0) >> 5) | ((buff[offset + 2] & 0xC0) >> 7);
+                         //mWiimoteState.ClassicControllerState.RawJoystickR.Y = (byte)(buff[offset + 2] & 0x1F);
+
+                         //mWiimoteState.ClassicControllerState.RawTriggerL = (byte)(((buff[offset + 2] & 0x60) >> 2) | ((buff[offset + 3] & 0xE0) >> 5));
+                         //mWiimoteState.ClassicControllerState.RawTriggerR = (byte)(buff[offset + 3] & 0x1f);
 
 
-                    device.Buttons[7].value = (float)(buff[offset + 5] & 0x04);
-                    device.Buttons[8].value = (float)(buff[offset + 5] & 0x08);
-                    device.Buttons[0].value = (float)(buff[offset + 5] & 0x10);
-                    device.Buttons[9].value = (float)(buff[offset + 5] & 0x20);
-                    device.Buttons[1].value = (float)(buff[offset + 5] & 0x40);
-                    device.Buttons[10].value = (float)(buff[offset + 5] & 0x80);
+                         ////TODO CHECK if buttons are the same as in normal mode
+                         //mWiimoteState.ClassicControllerState.ButtonState.TriggerR = (buff[offset + 4] & 0x02) == 0;
+                         //mWiimoteState.ClassicControllerState.ButtonState.Plus = (buff[offset + 4] & 0x04) == 0;
+                         //mWiimoteState.ClassicControllerState.ButtonState.Home = (buff[offset + 4] & 0x08) == 0;
+                         //mWiimoteState.ClassicControllerState.ButtonState.Minus = (buff[offset + 4] & 0x10) == 0;
+                         //mWiimoteState.ClassicControllerState.ButtonState.TriggerL = (buff[offset + 4] & 0x20) == 0;
+                         //mWiimoteState.ClassicControllerState.ButtonState.Down = (buff[offset + 4] & 0x40) == 0;
+                         //mWiimoteState.ClassicControllerState.ButtonState.Right = (buff[offset + 4] & 0x80) == 0;
+
+                         //mWiimoteState.ClassicControllerState.ButtonState.Up = (buff[offset + 5] & 0x01) == 0;
+                         //mWiimoteState.ClassicControllerState.ButtonState.Left = (buff[offset + 5] & 0x02) == 0;
+                         //mWiimoteState.ClassicControllerState.ButtonState.ZR = (buff[offset + 5] & 0x04) == 0;
+                         //mWiimoteState.ClassicControllerState.ButtonState.X = (buff[offset + 5] & 0x08) == 0;
+                         //mWiimoteState.ClassicControllerState.ButtonState.A = (buff[offset + 5] & 0x10) == 0;
+                         //mWiimoteState.ClassicControllerState.ButtonState.Y = (buff[offset + 5] & 0x20) == 0;
+                         //mWiimoteState.ClassicControllerState.ButtonState.B = (buff[offset + 5] & 0x40) == 0;
+                         //mWiimoteState.ClassicControllerState.ButtonState.ZL = (buff[offset + 5] & 0x80) == 0;
+
+                     }
+                     else
+                     {
+                         return;
+
+
+                     }
+                 }
+                 else
+                 {
+
+
+                     //AXES
+
+
+                     //mWiimoteState.ClassicControllerState.RawJoystickL.X = (byte)(buff[offset] & 0x3f);
+                     //mWiimoteState.ClassicControllerState.RawJoystickL.Y = (byte)(buff[offset + 1] & 0x3f);
+                     // mWiimoteState.ClassicControllerState.RawJoystickR.X = (byte)((buff[offset + 2] >> 7) | (buff[offset + 1] & 0xc0) >> 5 | (buff[offset] & 0xc0) >> 3);
+                     // mWiimoteState.ClassicControllerState.RawJoystickR.Y = (byte)(buff[offset + 2] & 0x1f);
 
 
 
-                    //mWiimoteState.ClassicControllerState.ButtonState.ZR = (buff[offset + 5] & 0x04) == 0;
-                    //mWiimoteState.ClassicControllerState.ButtonState.X = (buff[offset + 5] & 0x08) == 0;
-                    //mWiimoteState.ClassicControllerState.ButtonState.A = (buff[offset + 5] & 0x10) == 0;
-                    //mWiimoteState.ClassicControllerState.ButtonState.Y = (buff[offset + 5] & 0x20) == 0;
-                    //mWiimoteState.ClassicControllerState.ButtonState.B = (buff[offset + 5] & 0x40) == 0;
-                    //mWiimoteState.ClassicControllerState.ButtonState.ZL = (buff[offset + 5] & 0x80) == 0;
+                     axisDetails = device.Axis[JoystickAxis.AxisX] as AxisDetails;
 
-                    //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxXL != 0x00)
-                    //    mWiimoteState.ClassicControllerState.JoystickL.X = (float)((float)mWiimoteState.ClassicControllerState.RawJoystickL.X - mWiimoteState.ClassicControllerState.CalibrationInfo.MidXL) /
-                    //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxXL - mWiimoteState.ClassicControllerState.CalibrationInfo.MinXL);
+                     if (axisDetails.max > 0f)
+                     {
+                         axisDetails.value = ((float)(buff[offset] & 0x3f) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                     }
 
-                    //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxYL != 0x00)
-                    //    mWiimoteState.ClassicControllerState.JoystickL.Y = (float)((float)mWiimoteState.ClassicControllerState.RawJoystickL.Y - mWiimoteState.ClassicControllerState.CalibrationInfo.MidYL) /
-                    //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxYL - mWiimoteState.ClassicControllerState.CalibrationInfo.MinYL);
+                     axisDetails = device.Axis[JoystickAxis.AxisY] as AxisDetails;
 
-                    //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxXR != 0x00)
-                    //    mWiimoteState.ClassicControllerState.JoystickR.X = (float)((float)mWiimoteState.ClassicControllerState.RawJoystickR.X - mWiimoteState.ClassicControllerState.CalibrationInfo.MidXR) /
-                    //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxXR - mWiimoteState.ClassicControllerState.CalibrationInfo.MinXR);
+                     if (axisDetails.max > 0f)
+                     {
+                         axisDetails.value = ((float)(buff[offset + 1] & 0x3f) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                     }
 
-                    //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxYR != 0x00)
-                    //    mWiimoteState.ClassicControllerState.JoystickR.Y = (float)((float)mWiimoteState.ClassicControllerState.RawJoystickR.Y - mWiimoteState.ClassicControllerState.CalibrationInfo.MidYR) /
-                    //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxYR - mWiimoteState.ClassicControllerState.CalibrationInfo.MinYR);
 
-                    //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxTriggerL != 0x00)
-                    //    mWiimoteState.ClassicControllerState.TriggerL = (mWiimoteState.ClassicControllerState.RawTriggerL) /
-                    //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxTriggerL - mWiimoteState.ClassicControllerState.CalibrationInfo.MinTriggerL);
+                     axisDetails = device.Axis[JoystickAxis.AxisZ] as AxisDetails;
 
-                    //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxTriggerR != 0x00)
-                    //    mWiimoteState.ClassicControllerState.TriggerR = (mWiimoteState.ClassicControllerState.RawTriggerR) /
-                    //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxTriggerR - mWiimoteState.ClassicControllerState.CalibrationInfo.MinTriggerR);
-                    break;
+                     if (axisDetails.max > 0f)
+                     {
+                         axisDetails.value = ((float)((buff[offset + 2] >> 7) | (buff[offset + 1] & 0xc0) >> 5 | (buff[offset] & 0xc0) >> 3) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                     }
 
+                     axisDetails = device.Axis[JoystickAxis.AxisR] as AxisDetails;
+
+                     if (axisDetails.max > 0f)
+                     {
+                         axisDetails.value = ((float)(buff[offset + 2] & 0x1f) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                     }
+
+
+
+                     // mWiimoteState.ClassicControllerState.RawTriggerL = (byte)(((buff[offset + 2] & 0x60) >> 2) | (buff[offset + 3] >> 5));
+                     //  mWiimoteState.ClassicControllerState.RawTriggerR = (byte)(buff[offset + 3] & 0x1f);
+
+                     //  mWiimoteState.ClassicControllerState.ButtonState.TriggerL = (buff[offset + 4] & 0x20) == 0;
+                     //  mWiimoteState.ClassicControllerState.ButtonState.TriggerR = (buff[offset + 4] & 0x02) == 0;
+
+
+                     axisDetails = device.Axis[JoystickAxis.AxisU] as AxisDetails;
+
+                     if (axisDetails.max > 0f)
+                     {
+                         axisDetails.value = ((float)(((buff[offset + 2] & 0x60) >> 2) | (buff[offset + 3] >> 5)) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                     }
+
+                     axisDetails = device.Axis[JoystickAxis.AxisV] as AxisDetails;
+
+                     if (axisDetails.max > 0f)
+                     {
+                         axisDetails.value = ((float)(buff[offset + 3] & 0x1f) - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                     }
+
+                     //mWiimoteState.ClassicControllerState.ButtonState.Plus = (buff[offset + 4] & 0x04) == 0;
+                     //mWiimoteState.ClassicControllerState.ButtonState.Home = (buff[offset + 4] & 0x08) == 0;
+                     //mWiimoteState.ClassicControllerState.ButtonState.Minus = (buff[offset + 4] & 0x10) == 0;
+
+                     device.Buttons[4].value = (float)(buff[1] & 0x10);
+                     device.Buttons[3].value = (float)(buff[2] & 0x80);
+                     device.Buttons[2].value = (float)(buff[2] & 0x10);
+
+
+
+                     //POV
+                     //mWiimoteState.ClassicControllerState.ButtonState.Down = (buff[offset + 4] & 0x40) == 0;
+                     //mWiimoteState.ClassicControllerState.ButtonState.Right = (buff[offset + 4] & 0x80) == 0;
+                     //mWiimoteState.ClassicControllerState.ButtonState.Up = (buff[offset + 5] & 0x01) == 0;
+                     //mWiimoteState.ClassicControllerState.ButtonState.Left = (buff[offset + 5] & 0x02) == 0;
+
+                     //POV
+                     axisDetails = device.Axis[JoystickAxis.AxisPovY] as AxisDetails;
+
+                     axisDetails.value = 0;
+
+                     if ((buff[offset + 5] & 0x01) == 0)
+                         axisDetails.value = 1f;
+                     else if ((buff[offset + 4] & 0x40) == 0)
+                         axisDetails.value = -1f;
+
+                     axisDetails = device.Axis[JoystickAxis.AxisPovX] as AxisDetails;
+                     axisDetails.value = 0;
+
+                     if ((buff[offset + 4] & 0x80) == 0)
+                         axisDetails.value = 1f;
+                     else if ((buff[offset + 5] & 0x02) == 0)
+                         axisDetails.value = -1f;
+
+
+
+                     //BUTTONS
+
+
+                     device.Buttons[7].value = (float)(buff[offset + 5] & 0x04);
+                     device.Buttons[8].value = (float)(buff[offset + 5] & 0x08);
+                     device.Buttons[0].value = (float)(buff[offset + 5] & 0x10);
+                     device.Buttons[9].value = (float)(buff[offset + 5] & 0x20);
+                     device.Buttons[1].value = (float)(buff[offset + 5] & 0x40);
+                     device.Buttons[10].value = (float)(buff[offset + 5] & 0x80);
+
+
+
+                     //mWiimoteState.ClassicControllerState.ButtonState.ZR = (buff[offset + 5] & 0x04) == 0;
+                     //mWiimoteState.ClassicControllerState.ButtonState.X = (buff[offset + 5] & 0x08) == 0;
+                     //mWiimoteState.ClassicControllerState.ButtonState.A = (buff[offset + 5] & 0x10) == 0;
+                     //mWiimoteState.ClassicControllerState.ButtonState.Y = (buff[offset + 5] & 0x20) == 0;
+                     //mWiimoteState.ClassicControllerState.ButtonState.B = (buff[offset + 5] & 0x40) == 0;
+                     //mWiimoteState.ClassicControllerState.ButtonState.ZL = (buff[offset + 5] & 0x80) == 0;
+
+                     //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxXL != 0x00)
+                     //    mWiimoteState.ClassicControllerState.JoystickL.X = (float)((float)mWiimoteState.ClassicControllerState.RawJoystickL.X - mWiimoteState.ClassicControllerState.CalibrationInfo.MidXL) /
+                     //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxXL - mWiimoteState.ClassicControllerState.CalibrationInfo.MinXL);
+
+                     //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxYL != 0x00)
+                     //    mWiimoteState.ClassicControllerState.JoystickL.Y = (float)((float)mWiimoteState.ClassicControllerState.RawJoystickL.Y - mWiimoteState.ClassicControllerState.CalibrationInfo.MidYL) /
+                     //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxYL - mWiimoteState.ClassicControllerState.CalibrationInfo.MinYL);
+
+                     //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxXR != 0x00)
+                     //    mWiimoteState.ClassicControllerState.JoystickR.X = (float)((float)mWiimoteState.ClassicControllerState.RawJoystickR.X - mWiimoteState.ClassicControllerState.CalibrationInfo.MidXR) /
+                     //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxXR - mWiimoteState.ClassicControllerState.CalibrationInfo.MinXR);
+
+                     //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxYR != 0x00)
+                     //    mWiimoteState.ClassicControllerState.JoystickR.Y = (float)((float)mWiimoteState.ClassicControllerState.RawJoystickR.Y - mWiimoteState.ClassicControllerState.CalibrationInfo.MidYR) /
+                     //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxYR - mWiimoteState.ClassicControllerState.CalibrationInfo.MinYR);
+
+                     //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxTriggerL != 0x00)
+                     //    mWiimoteState.ClassicControllerState.TriggerL = (mWiimoteState.ClassicControllerState.RawTriggerL) /
+                     //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxTriggerL - mWiimoteState.ClassicControllerState.CalibrationInfo.MinTriggerL);
+
+                     //if (mWiimoteState.ClassicControllerState.CalibrationInfo.MaxTriggerR != 0x00)
+                     //    mWiimoteState.ClassicControllerState.TriggerR = (mWiimoteState.ClassicControllerState.RawTriggerR) /
+                     //    (float)(mWiimoteState.ClassicControllerState.CalibrationInfo.MaxTriggerR - mWiimoteState.ClassicControllerState.CalibrationInfo.MinTriggerR);
+
+                 }
 
             }
         }
@@ -1522,7 +1686,7 @@ private  bool isMotionPlusDisabled;
         /// </summary>
         void GetStatus(WiimoteDevice device)
         {
-            __processingMode=ProcessingMode.InProgress;
+            device.processingMode=ProcessingMode.InProgress;
 
             HIDDevice hidDevice = _hidInterface.Generics[device];
             hidDevice.InputReportByteLength = REPORT_LENGTH;
