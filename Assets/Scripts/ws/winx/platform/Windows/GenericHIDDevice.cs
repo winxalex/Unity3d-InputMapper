@@ -47,26 +47,17 @@ namespace ws.winx.platform.windows
     {
 
 
-        private DeviceMode _deviceReadMode = DeviceMode.Overlapped;
+      
 
-        public DeviceMode DeviceReadMode
-        {
-            get { return _deviceReadMode; }
-            set { _deviceReadMode = value; }
-        }
-        private DeviceMode _deviceWriteMode = DeviceMode.Overlapped;
-
-        public DeviceMode DeviceWriteMode
-        {
-            get { return _deviceWriteMode; }
-            set { _deviceWriteMode = value; }
-        }
-
-        protected delegate HIDReport ReadDelegate();
-        private delegate bool WriteDelegate(byte[] data);
+        protected delegate HIDReport ReadDelegate(int timeout);
+        private delegate bool WriteDelegate(byte[] data,int timeout);
         
         public IntPtr ReadHandle { get; private set; }
         public IntPtr WriteHandle { get; private set; }
+        public IntPtr ReadAsyncHandle { get; private set; }
+        public IntPtr WriteAsyncHandle { get; private set; }
+
+
         public bool IsOpen { get; private set; }
         volatile bool IsReadInProgress = false;
 
@@ -129,21 +120,17 @@ namespace ws.winx.platform.windows
 
         public void OpenDevice()
         {
-            OpenDevice(_deviceReadMode, _deviceWriteMode);
-           // OpenDevice(DeviceMode.NonOverlapped, DeviceMode.NonOverlapped);
-        }
-
-        public void OpenDevice(DeviceMode readMode, DeviceMode writeMode)
-        {
+        
             if (IsOpen) return;
 
-           // _deviceReadMode = readMode;
-          //  _deviceWriteMode = writeMode;
+      
 
             try
             {
-                ReadHandle = OpenDeviceIO(this.DevicePath, readMode, Native.GENERIC_READ);
-                WriteHandle = OpenDeviceIO(this.DevicePath, writeMode, Native.GENERIC_WRITE);
+                ReadHandle = OpenDeviceIO(this.DevicePath, DeviceMode.NonOverlapped, Native.GENERIC_READ);
+                WriteHandle = OpenDeviceIO(this.DevicePath, DeviceMode.NonOverlapped, Native.GENERIC_WRITE);
+                ReadAsyncHandle = OpenDeviceIO(this.DevicePath, DeviceMode.Overlapped, Native.GENERIC_READ);
+                WriteAsyncHandle = OpenDeviceIO(this.DevicePath, DeviceMode.Overlapped, Native.GENERIC_WRITE);
             }
             catch (Exception exception)
             {
@@ -162,6 +149,9 @@ namespace ws.winx.platform.windows
             CloseDeviceIO(ReadHandle);
             CloseDeviceIO(WriteHandle);
 
+            CloseDeviceIO(ReadAsyncHandle);
+            CloseDeviceIO(WriteAsyncHandle);
+
             UnityEngine.Debug.Log("Clossing device handles");
 
                 ReadHandle=IntPtr.Zero;
@@ -171,9 +161,14 @@ namespace ws.winx.platform.windows
             IsOpen = false;
         }
 
-        
+
 
         override public void Read(ReadCallback callback)
+        {
+            Read(callback, 0);
+        }
+
+        override public void Read(ReadCallback callback,int timeout)
         {
             if (IsReadInProgress)
             {
@@ -186,21 +181,12 @@ namespace ws.winx.platform.windows
             //TODO make this fields or use pool
             var readDelegate = new ReadDelegate(Read);
             var asyncState = new HidAsyncState(readDelegate, callback);
-             readDelegate.BeginInvoke(EndRead, asyncState);
+             readDelegate.BeginInvoke(timeout,EndRead, asyncState);
         }
 
-       
-  
-        //private void onReadTimeOut(object sender, ElapsedEventArgs args)
-        //{
-        //    UnityEngine.Debug.Log("Timeout");
-        //    // cal
-        //}
 
-        protected HIDReport Read()
-        {
-            return Read(0);
-        }
+      
+      
 
         protected HIDReport Read(int timeout)
         {
@@ -219,32 +205,27 @@ namespace ws.winx.platform.windows
            
         }
 
-        public override void Write(object data, HIDDevice.WriteCallback callback)
+        public override void Write(object data, HIDDevice.WriteCallback callback,int timeout)
         {
 
-            this.Write((byte[])data, callback);
+            var writeDelegate = new WriteDelegate(Write);
+            var asyncState = new HidAsyncState(writeDelegate, callback);
+            writeDelegate.BeginInvoke((byte[])data,timeout, EndWrite, asyncState);
 
+        }
+
+        public override void Write(object data, HIDDevice.WriteCallback callback)
+        {
+            this.Write((byte[])data,callback, 0);
         }
 
         public override void Write(object data)
         {
-
-            this.Write((byte[])data);
-
+            this.Write((byte[])data,0);
         }
        
 
-        protected void Write(byte[] data,WriteCallback callback)
-        {
-            var writeDelegate = new WriteDelegate(Write);
-            var asyncState = new HidAsyncState(writeDelegate, callback);
-            writeDelegate.BeginInvoke(data, EndWrite, asyncState);
-        }
-
-        protected bool Write(byte[] data)
-        {
-            return Write(data, 0);
-        }
+     
 
         protected bool Write(byte[] data, int timeout)
         {
@@ -264,14 +245,6 @@ namespace ws.winx.platform.windows
       
 
      
-
-       
-
-      
-
-     
-
-
 
         override public void Dispose()
         {
@@ -343,14 +316,15 @@ namespace ws.winx.platform.windows
 
             Array.Copy(data, 0, buffer, 0, Math.Min(data.Length, OutputReportByteLength));
 
-            if (_deviceWriteMode == DeviceMode.Overlapped)
+            if (timeout>0)
             {
                 
                 var security = new Native.SECURITY_ATTRIBUTES();
                
                 var overlapped = new NativeOverlapped();
 
-                var overlapTimeout = timeout <= 0 ? Native.WAIT_INFINITE : timeout;
+               // var overlapTimeout = timeout <= 0 ? Native.WAIT_INFINITE : timeout;
+                var overlapTimeout = timeout;
 
                 security.lpSecurityDescriptor = IntPtr.Zero;
                 security.bInheritHandle = true;
@@ -363,7 +337,7 @@ namespace ws.winx.platform.windows
                 bool success;
 
                 
-                    success = Native.WriteFile(WriteHandle, buffer, (uint)buffer.Length, out bytesWritten, ref overlapped);
+                    success = Native.WriteFile(WriteAsyncHandle, buffer, (uint)buffer.Length, out bytesWritten, ref overlapped);
                     UnityEngine.Debug.Log("WriteFile happend " + success + " " + bytesWritten);
 
                     if (Marshal.GetLastWin32Error() > 0)
@@ -378,11 +352,14 @@ namespace ws.winx.platform.windows
                 {
                     var result = Native.WaitForSingleObject(overlapped.EventHandle, overlapTimeout);
 
+                    //TODO clean overlapped
+                    // System.Threading.Overlapped.Unpack(overlapped);
+
                     switch (result)
                     {
                         case Native.WAIT_OBJECT_0:
                           
-                            // System.Threading.Overlapped.Unpack(overlapped);
+                           
                             return true;
                         case Native.WAIT_TIMEOUT:
                             UnityEngine.Debug.Log("WriteData WAIT_TIMEOUT");
@@ -430,7 +407,7 @@ namespace ws.winx.platform.windows
 
                 buffer = CreateInputBuffer();
 
-                if (_deviceReadMode == DeviceMode.Overlapped)
+                if (timeout>0)
                 {
                     var security = new Native.SECURITY_ATTRIBUTES();
                     var overlapped = new NativeOverlapped();
@@ -446,7 +423,7 @@ namespace ws.winx.platform.windows
 
                     try
                     {
-                       success=Native.ReadFile(ReadHandle, buffer, (uint)buffer.Length, out bytesRead, ref overlapped);
+                       success=Native.ReadFile(ReadAsyncHandle, buffer, (uint)buffer.Length, out bytesRead, ref overlapped);
 
                        UnityEngine.Debug.Log("Read happend " + success + " " + bytesRead);
 
@@ -510,7 +487,7 @@ namespace ws.winx.platform.windows
                     {
                         var overlapped = new NativeOverlapped();
 
-                        Native.ReadFile(ReadHandle, buffer, (uint)buffer.Length, out bytesRead, ref overlapped);
+                        success=Native.ReadFile(ReadHandle, buffer, (uint)buffer.Length, out bytesRead, ref overlapped);
                         status = HIDReport.ReadStatus.Success;
                     }
                     catch { status = HIDReport.ReadStatus.ReadError; }

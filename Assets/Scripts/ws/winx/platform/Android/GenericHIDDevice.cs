@@ -68,7 +68,7 @@ namespace ws.winx.platform.android
       
 
         //	public void read(byte[] into,IReadWriteListener listener, int timeout)
-        public override void Read(HIDDevice.ReadCallback callback)
+        public override void Read(HIDDevice.ReadCallback callback,int timeout)
         {
 
             if (IsReadInProgress)
@@ -115,10 +115,10 @@ namespace ws.winx.platform.android
         }
 
 
-        public override void Write(object data, HIDDevice.WriteCallback callback)
+        public override void Write(object data, HIDDevice.WriteCallback callback,int timeout)
         {
             _listener.WriteComplete = callback;
-            _device.Call("write", (byte[])data, _listener, 0);
+            _device.Call("write", (byte[])data, _listener, timeout);
         }
 
 

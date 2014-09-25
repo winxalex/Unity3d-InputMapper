@@ -67,9 +67,15 @@ namespace ws.winx.platform.windows
         #region IHIDInterface implementation
 
 
-        public void Read(IDevice device,HIDDevice.ReadCallback callback)
+        public void Read(IDevice device,HIDDevice.ReadCallback callback,int timeout=0xfffff)
         {
-            this.__Generics[device].Read(callback);
+            this.__Generics[device].Read(callback,timeout);
+
+        }
+
+        public void Read(IDevice device, HIDDevice.ReadCallback callback)
+        {
+            this.__Generics[device].Read(callback, 0);
 
         }
 
@@ -80,7 +86,12 @@ namespace ws.winx.platform.windows
 
         public void Write(object data, IDevice device, HIDDevice.WriteCallback callback)
         {
-            this.__Generics[device].Write(data,callback);
+            this.__Generics[device].Write(data, callback, 0);
+        }
+
+        public void Write(object data, IDevice device, HIDDevice.WriteCallback callback,int timeout=0xfffff)
+        {
+            this.__Generics[device].Write(data,callback,timeout);
         }
 
 

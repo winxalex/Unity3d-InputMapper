@@ -160,14 +160,19 @@ namespace ws.winx.platform.android
             get { return __Generics; }
         }
 
-        public void Read(devices.IDevice device, HIDDevice.ReadCallback callback)
+        public void Read(devices.IDevice device, HIDDevice.ReadCallback callback,int timeout=0xffff)
         {
-            this.__Generics[device].Read(callback);
+            this.__Generics[device].Read(callback,timeout);
         }
 
-        public void Write(object data, devices.IDevice device, HIDDevice.WriteCallback callback)
+        public void Read(devices.IDevice device, HIDDevice.ReadCallback callback)
         {
-            throw new NotImplementedException();
+            this.__Generics[device].Read(callback,0);
+        }
+
+        public void Write(object data, devices.IDevice device, HIDDevice.WriteCallback callback,int timeout=0xffff)
+        {
+            this.__Generics[device].Write(data,callback,timeout);
         }
 
         public void Write(object data, devices.IDevice device)
@@ -198,7 +203,7 @@ namespace ws.winx.platform.android
             List<IDevice> _iterationCacheList;
             bool _isEnumeratorDirty = true;
 
-            #endregion
+#endregion
 
 #region Constructors
 
@@ -210,11 +215,11 @@ namespace ws.winx.platform.android
                 JoystickDevices = new Dictionary<IntPtr, IDevice>();
             }
 
-            #endregion
+#endregion
 
 #region Public Members
 
-            #endregion
+#endregion
 
 #region IDeviceCollection implementation
 
@@ -311,12 +316,12 @@ namespace ws.winx.platform.android
                 get { return JoystickDevices.Count; }
             }
 
-            #endregion
+#endregion
 
      
 
         }
-        #endregion
+#endregion
     
 
         public void Dispose()
