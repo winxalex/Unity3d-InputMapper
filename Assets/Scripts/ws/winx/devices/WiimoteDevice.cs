@@ -159,8 +159,80 @@ namespace ws.winx.devices
    };
 
 
+    /// <summary>
+    /// 
+    /// </summary>
+   public struct MotionPlusCalibrationInfo
+   {
+       public Vector3 mMaxNoise;
+       public List<Vector3> mNoise;
+       public Vector3 mBias;
+       public Vector3 mMinNoise;
 
-	class WiimoteDevice:JoystickDevice,IDisposable
+
+       public bool mMotionPlusCalibrated;
+       public bool mMotionPlusCalibrating;
+
+       // New calibration
+       // Use of mNoise vector seems to accumulate error
+       // TODO: find out why, fix, and use mNoise instead
+       public int numCalibrationReadings;
+       public double pitchSum ;
+       public double yawSum ;
+       public double rollSum ;
+
+
+
+       public double mCalibrationTimeout;
+
+       public Vector3 mNoiseLevel;
+       public Vector3 mNoiseThreshold;
+       public float mLastTime;
+   }
+
+   /// <summary>
+   /// Current state of the MotionPlus controller
+   /// </summary>
+  
+   public class MotionPlus
+   {
+       /// <summary>
+       /// Calibration data for MontionPlus
+       /// </summary>
+
+       public MotionPlusCalibrationInfo CalibrationInfo;
+
+       /// <summary>
+       /// 
+       /// </summary>
+       public Vector3 RawValues;
+  
+       /// <summary>
+       /// Normalized speed data
+       /// <remarks>Values range between 0 - ?</remarks>
+       /// </summary>
+
+       public Vector3 Values;
+
+
+    
+
+       /// <summary>
+       /// Yaw/Pitch/Roll rotating "quickly" (no definition for "quickly" yet...)
+       /// </summary>
+       public bool YawFast = false;
+       public bool PitchFast=false;
+       public bool RollFast=false;
+
+
+     
+
+
+   }
+
+
+
+	public class WiimoteDevice:JoystickDevice,IDisposable
 	{
       
 
@@ -168,8 +240,16 @@ namespace ws.winx.devices
         protected bool _rumble;
         protected WiiExtensionType _ExtensionType;
         protected bool _extensionDevice;
+        protected bool _hasMotionPlus;
         protected float _battery;
         protected IRMode _irmode;
+
+
+        private const double NOISE_FILTER = 1.5;
+        private const double CALIB_TIME = 5000;//ms
+
+
+        
 
         //Interleave mode for use of M+ and Extension toghter
         public PassThruMode PASS_THRU_MODE = PassThruMode.None;
@@ -258,6 +338,15 @@ namespace ws.winx.devices
         private const int REPORT_LENGTH = 22;
 
         public bool isCalibrated = false;
+        private MotionPlus _motionPlus;
+
+        public MotionPlus motionPlus
+        {
+            get { return _motionPlus; }
+          
+        }
+
+       
 
         public WiimoteDevice(int id,int pid,int vid, int axes, int buttons,int leds,int irs,IDriver driver)
             : base(id,pid,vid,axes,buttons,driver)
@@ -269,7 +358,7 @@ namespace ws.winx.devices
                for(int i=0;i<irs;i++)
                    IR_SENSORS[i]=new IRSensor();
                
-
+            
 
             _LED = new bool[leds];
 
@@ -328,6 +417,21 @@ namespace ws.winx.devices
                 _extensionDevice = value;
 
              
+            }
+        }
+
+
+        public bool hasMotionPlus
+        {
+            get
+            {
+                return _hasMotionPlus;
+            }
+            set
+            {
+                _hasMotionPlus = value;
+
+                _motionPlus = new MotionPlus();
             }
         }
 
@@ -434,7 +538,118 @@ namespace ws.winx.devices
 //    }
            throw new NotImplementedException();
         }
-       
+
+
+
+         public void UpdateMPlusCalibration(double dt, Vector3 values)
+         {
+              if (!_motionPlus.CalibrationInfo.mMotionPlusCalibrating )
+              {
+                  InitMPlusCalibration(values.x, values.y, values.z);
+
+                  return;   
+              }
+                   
+
+
+
+
+             _motionPlus.CalibrationInfo.mMaxNoise.x = Math.Max(_motionPlus.CalibrationInfo.mMaxNoise.x, values.x);
+             _motionPlus.CalibrationInfo.mMaxNoise.y = Math.Max(_motionPlus.CalibrationInfo.mMaxNoise.y, values.y);
+             _motionPlus.CalibrationInfo.mMaxNoise.z = Math.Max(_motionPlus.CalibrationInfo.mMaxNoise.z, values.z);
+             _motionPlus.CalibrationInfo.mMinNoise.x = Math.Min(_motionPlus.CalibrationInfo.mMinNoise.x, values.x);
+             _motionPlus.CalibrationInfo.mMinNoise.y = Math.Min(_motionPlus.CalibrationInfo.mMinNoise.y, values.y);
+             _motionPlus.CalibrationInfo.mMinNoise.z = Math.Min(_motionPlus.CalibrationInfo.mMinNoise.z, values.z);
+
+
+
+             // Store the "reading" in mNoise
+             //mNoise.push_back(rates);
+             _motionPlus.CalibrationInfo.mNoise.Add(values);
+
+
+
+
+
+             _motionPlus.CalibrationInfo.mCalibrationTimeout -= dt;
+
+             if (_motionPlus.CalibrationInfo.mCalibrationTimeout <= 0)
+             {
+                 _motionPlus.CalibrationInfo.mMotionPlusCalibrated = true;
+             
+
+                 calculateMPlusCalibration();
+
+
+             }
+             else
+             {
+
+
+                 _motionPlus.CalibrationInfo.pitchSum += values.x;
+                 _motionPlus.CalibrationInfo.yawSum += values.z;
+                 _motionPlus.CalibrationInfo.rollSum += values.y;
+
+                 _motionPlus.CalibrationInfo.numCalibrationReadings++;
+             }
+
+         }
+
+
+         // calculate the bias and std of angulr speeds
+         // set mBias and mNoiseLevel
+         void calculateMPlusCalibration()
+         {
+             int n = _motionPlus.CalibrationInfo.mNoise.Count;
+             Vector3 sum = new Vector3();//vector3f(0,0,0);
+             Vector3 currentNoise;
+
+             for (int i = 0; i < n; i++)
+             {
+                 //sum += mNoise.at(i);
+                 currentNoise = _motionPlus.CalibrationInfo.mNoise[i];
+                 sum.x += currentNoise.x;
+                 sum.y += currentNoise.y;
+                 sum.z += currentNoise.z;
+
+             }
+
+
+
+
+             _motionPlus.CalibrationInfo.mBias.x = (float)_motionPlus.CalibrationInfo.pitchSum / _motionPlus.CalibrationInfo.numCalibrationReadings;
+             _motionPlus.CalibrationInfo.mBias.y = (float)_motionPlus.CalibrationInfo.rollSum / _motionPlus.CalibrationInfo.numCalibrationReadings;
+             _motionPlus.CalibrationInfo.mBias.z = (float)_motionPlus.CalibrationInfo.yawSum / _motionPlus.CalibrationInfo.numCalibrationReadings;
+      
+
+
+         }
+
+         void InitMPlusCalibration(float x, float y, float z)
+         {
+
+             _motionPlus.CalibrationInfo.mMotionPlusCalibrating = true;
+             _motionPlus.CalibrationInfo.mCalibrationTimeout = CALIB_TIME;
+             _motionPlus.CalibrationInfo.mLastTime = Time.time;
+
+             _motionPlus.CalibrationInfo.numCalibrationReadings = 0;
+             _motionPlus.CalibrationInfo.pitchSum = 0;
+             _motionPlus.CalibrationInfo.yawSum = 0;
+             _motionPlus.CalibrationInfo.rollSum = 0;
+
+             _motionPlus.CalibrationInfo.mMaxNoise = new Vector3();
+             _motionPlus.CalibrationInfo.mBias = new Vector3();
+             _motionPlus.CalibrationInfo.mMinNoise = new Vector3();
+
+
+
+             _motionPlus.CalibrationInfo.mMaxNoise.x = _motionPlus.CalibrationInfo.mBias.x = _motionPlus.CalibrationInfo.mMinNoise.x = x;
+             _motionPlus.CalibrationInfo.mMaxNoise.y = _motionPlus.CalibrationInfo.mBias.y = _motionPlus.CalibrationInfo.mMinNoise.y = y;
+             _motionPlus.CalibrationInfo.mMaxNoise.z = _motionPlus.CalibrationInfo.mBias.z = _motionPlus.CalibrationInfo.mMinNoise.z = z;
+
+             _motionPlus.CalibrationInfo.mNoise.Clear();
+
+         }
 
 
         public UnityEngine.Vector2 GetIRPoint(){

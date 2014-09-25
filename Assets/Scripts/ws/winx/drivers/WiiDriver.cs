@@ -12,6 +12,7 @@ using System.Threading;
 using ws.winx.devices;
 using System.Collections.Generic;
 using ws.winx.platform;
+using UnityEngine;
 
 
 namespace ws.winx.drivers
@@ -161,7 +162,7 @@ namespace ws.winx.drivers
             ReadMemory(device, address, size, (suc) =>
             {
                 // _hidInterface.Read(device, onReadCalibration);
-                Debug.WriteLineIf(!suc, "Read Calibaration failed");
+              // UnityEngine.Debug.Log("Read Calibaration failed");
                
                 _hidInterface.Read(device, onReadAccCalibration);
             });
@@ -223,6 +224,10 @@ namespace ws.winx.drivers
 
         }
 
+
+     
+      
+       
 
 
         public void onAnyRead(object data)
@@ -425,7 +430,7 @@ namespace ws.winx.drivers
 
                   
 
-					Debug.WriteLine("******** STATUS ********");
+					UnityEngine.Debug.Log("******** STATUS ********");
                     ParseButtons(device,buff);
 					//device.BatteryRaw = buff[6];
 					device.Battery = (((100.0f * 48.0f * (float)((int)buff[6] / 48.0f))) / 192.0f);
@@ -441,7 +446,7 @@ namespace ws.winx.drivers
 
 					// extension connected?
 					bool extension = (buff[3] & 0x02) != 0;
-					Debug.WriteLine("Extension, Old: " + (device.Extensions!=0x00) + ", New: " + extension);
+					UnityEngine.Debug.Log("Extension, Old: " + (device.Extensions!=0x00) + ", New: " + extension);
 
 
 
@@ -488,7 +493,7 @@ namespace ws.winx.drivers
 
                     //// extension connected?
                     //bool extension = (buff[3] & 0x02) != 0;
-                    ////Debug.WriteLine("Extension: " + extension);
+                    ////UnityEngine.Debug.Log("Extension: " + extension);
                     //UnityEngine.Debug.Log("Extension: " + extension);
 
 
@@ -540,7 +545,7 @@ namespace ws.winx.drivers
            
             if ((device.Extensions & (byte)ExtensionType.MotionPlus) == 0 )
             {
-                Debug.WriteLine("InitializeMotionPlus");
+                UnityEngine.Debug.Log("InitializeMotionPlus");
 
                 device.processingMode=ProcessingMode.InProgress;
                 // Initialize it:
@@ -564,7 +569,7 @@ namespace ws.winx.drivers
 
 
 
-                  Debug.WriteLine("Try:"+device.numMPlusChecks+" to MOTIONPLUS_DETECT");
+                  UnityEngine.Debug.Log("Try:"+device.numMPlusChecks+" to MOTIONPLUS_DETECT");
 
                // ReadData(REGISTER_MOTIONPLUS_DETECT, 0x02);
                 ReadMemory(device,REGISTER_MOTIONPLUS_DETECT, 0x02,(suc)=>{
@@ -620,7 +625,7 @@ namespace ws.winx.drivers
             //Status Disabled
             device.MotionPlusStatus &=(byte) 0xD;//mask 0x1101
 
-                Debug.WriteLineIf(((device.Extensions & (byte)ExtensionType.MotionPlus) == 0), "MotionPlus disabled");
+                UnityEngine.Debug.Log(((device.Extensions & (byte)ExtensionType.MotionPlus) == 0)+ "MotionPlus disabled");
         }
 
 
@@ -671,8 +676,8 @@ namespace ws.winx.drivers
                     else 
                         device.Extensions |= (byte)ExtensionType.Nunchuck;
 
-                  //  Debug.WriteLine(mWiimoteState.NunchukState.CalibrationInfo.MaxX + " " + mWiimoteState.NunchukState.CalibrationInfo.MidX + " " + mWiimoteState.NunchukState.CalibrationInfo.MinX);
-                 //   Debug.WriteLine(mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.X0 + " " + mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.XG);
+                  //  UnityEngine.Debug.Log(mWiimoteState.NunchukState.CalibrationInfo.MaxX + " " + mWiimoteState.NunchukState.CalibrationInfo.MidX + " " + mWiimoteState.NunchukState.CalibrationInfo.MinX);
+                 //   UnityEngine.Debug.Log(mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.X0 + " " + mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.XG);
 
                     break;
 				case ExtensionNumber.ClassicController:
@@ -707,7 +712,7 @@ namespace ws.winx.drivers
 					throw new Exception("Unknown extension controller found: " + type.ToString("x"));
 			}
 
-            Debug.WriteLine("InitExtension " + (ExtensionNumber)type);
+            UnityEngine.Debug.Log("InitExtension " + (ExtensionNumber)type);
 
 
 
@@ -1515,6 +1520,86 @@ namespace ws.winx.drivers
                  }
 
             }
+             else
+                 if ((device.Extensions & (byte)ExtensionType.MotionPlus) != 0)
+                 {
+            
+
+                     //fast
+                     // (N-8192)/16384 * 3.3V * (1 deg/s)/.0005V * (Pi radians)/(180 deg)
+
+                     //slow
+                     // (N-8192)/16384 * 3.3V * (1 deg/s)/.002V * (Pi radians)/(180 deg)
+
+                     const float slowFactor = 500 / 8192f;//deg/unit  0.05f;//   500/8192f;//deg/unit
+                     const float fastFactor = 2000 / 8192f;//deg/unit 0.25f;// 2000/8192f ;//deg/unit
+                     // (value - offest) *gain;
+                     //  short yaw   = ((unsigned short)buff[offset+3] & 0xFC)<<6 |
+                     //               (unsigned short)buff[offset+0];
+                    
+                     device.motionPlus.YawFast= ((buff[offset + 3] & 0x02) >> 1) == 0;
+                     device.motionPlus.PitchFast = ((buff[offset + 3] & 0x01) >> 0) == 0;
+                     device.motionPlus.RollFast = ((buff[offset + 4] & 0x02) >> 1) == 0;
+
+
+
+                     device.motionPlus.RawValues.z = (buff[offset + 0] | (buff[offset + 3] & 0xfc) << 6);//YAW
+                    device.motionPlus.RawValues.y = (buff[offset + 1] | (buff[offset + 4] & 0xfc) << 6);//ROLL
+                     device.motionPlus.RawValues.x = (buff[offset + 2] | (buff[offset + 5] & 0xfc) << 6);//PITCH
+
+
+
+
+
+                     //mask should be 0xfc(1111 1100) not fa 
+                     // mWiimoteState.MotionPlusState.RawValues.X = (buff[offset + 0] | (buff[offset + 3] & 0xfa) << 6);
+                     //  mWiimoteState.MotionPlusState.RawValues.Y = (buff[offset + 1] | (buff[offset + 4] & 0xfa) << 6);
+                     //  mWiimoteState.MotionPlusState.RawValues.Z = (buff[offset + 2] | (buff[offset + 5] & 0xfa) << 6);
+                     
+
+                     if (device.motionPlus.CalibrationInfo.mMotionPlusCalibrating)
+                     {
+
+                              device.UpdateMPlusCalibration(Time.time,  device.motionPlus.RawValues);
+                  
+                     }
+                   
+
+
+
+                    //alex winx deg/s
+                     device.motionPlus.Values.x = device.motionPlus.PitchFast ? (device.motionPlus.RawValues.x - (int)device.motionPlus.CalibrationInfo.mBias.x) * fastFactor : (device.motionPlus.RawValues.x - (int)device.motionPlus.CalibrationInfo.mBias.x) * slowFactor;
+                     device.motionPlus.Values.y = device.motionPlus.RollFast ? (device.motionPlus.RawValues.y - (int)device.motionPlus.CalibrationInfo.mBias.y) * fastFactor : (device.motionPlus.RawValues.y - (int)device.motionPlus.CalibrationInfo.mBias.y) * slowFactor;
+                     device.motionPlus.Values.z = device.motionPlus.YawFast ? (device.motionPlus.RawValues.z - (int)device.motionPlus.CalibrationInfo.mBias.z) * fastFactor : (device.motionPlus.RawValues.z - (int)device.motionPlus.CalibrationInfo.mBias.z) * slowFactor;
+
+
+
+                
+
+
+
+                     if ((buff[offset + 4] & 0x01) == 1)
+                     {
+                        
+
+                         if (device.PASS_THRU_MODE == PassThruMode.None)
+                         {
+
+                             DisableMotionPlus(device); //would trigger status
+
+
+                         }
+
+                         GetStatus(device);
+
+                        
+                     }
+
+                     //Debug.WriteLineIf((buff[offset + 4] & 0x01)==1,"Extension is connected in continuation of Motion");
+
+                 }
+
+
         }
 
         /// <summary>

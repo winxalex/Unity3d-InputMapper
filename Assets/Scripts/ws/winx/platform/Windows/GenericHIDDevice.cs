@@ -422,6 +422,7 @@ namespace ws.winx.platform.windows
             var buffer = new byte[] { };
             var status = HIDReport.ReadStatus.NoDataRead;
             int error = 0;
+            var success = false;
 
             if (InputReportByteLength > 0)
             {
@@ -445,7 +446,7 @@ namespace ws.winx.platform.windows
 
                     try
                     {
-                       var success=Native.ReadFile(ReadHandle, buffer, (uint)buffer.Length, out bytesRead, ref overlapped);
+                       success=Native.ReadFile(ReadHandle, buffer, (uint)buffer.Length, out bytesRead, ref overlapped);
 
                        UnityEngine.Debug.Log("Read happend " + success + " " + bytesRead);
 
