@@ -67,7 +67,7 @@ namespace ws.winx.devices
     /// </summary>
    public enum PassThruMode : byte
     {
-        None = 0x00,
+        Noone = 0x04,
         Nunchuck = 0x05,
         ClassicController = 0x07,
 
@@ -90,6 +90,7 @@ namespace ws.winx.devices
    public enum ProcessingMode
    {
        None = 0,
+       ClearExtension,
        InProgress,
        AccCalibration,
        ExtCheck,
@@ -100,12 +101,7 @@ namespace ws.winx.devices
    }
 
 
-   public enum MotionPlusStatus:byte
-   {
-       None=0x0,
-       Exist=0x1,
-       Enabled=0x2
-   }
+  
 
 
 
@@ -159,88 +155,97 @@ namespace ws.winx.devices
    };
 
 
-    /// <summary>
-    /// 
-    /// </summary>
-   public struct MotionPlusCalibrationInfo
-   {
-       public Vector3 mMaxNoise;
-       public List<Vector3> mNoise;
-       public Vector3 mBias;
-       public Vector3 mMinNoise;
-
-
-       public bool mMotionPlusCalibrated;
-       public bool mMotionPlusCalibrating;
-
-       // New calibration
-       // Use of mNoise vector seems to accumulate error
-       // TODO: find out why, fix, and use mNoise instead
-       public int numCalibrationReadings;
-       public double pitchSum ;
-       public double yawSum ;
-       public double rollSum ;
-
-
-
-       public double mCalibrationTimeout;
-
-       public Vector3 mNoiseLevel;
-       public Vector3 mNoiseThreshold;
-       public float mLastTime;
-   }
-
-   /// <summary>
-   /// Current state of the MotionPlus controller
-   /// </summary>
-  
-   public class MotionPlus
-   {
-       /// <summary>
-       /// Calibration data for MontionPlus
-       /// </summary>
-
-       public MotionPlusCalibrationInfo CalibrationInfo;
-
-       /// <summary>
-       /// 
-       /// </summary>
-       public Vector3 RawValues;
-  
-       /// <summary>
-       /// Normalized speed data
-       /// <remarks>Values range between 0 - ?</remarks>
-       /// </summary>
-
-       public Vector3 Values;
-
-
-    
-
-       /// <summary>
-       /// Yaw/Pitch/Roll rotating "quickly" (no definition for "quickly" yet...)
-       /// </summary>
-       public bool YawFast = false;
-       public bool PitchFast=false;
-       public bool RollFast=false;
-
-
-     
-
-
-   }
+   
 
 
 
 	public class WiimoteDevice:JoystickDevice,IDisposable
 	{
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public struct MotionPlusCalibrationInfo
+        {
+            public Vector3 mMaxNoise;
+            public List<Vector3> mNoise;
+            public Vector3 mBias;
+            public Vector3 mMinNoise;
+
+
+            public bool mMotionPlusCalibrated;
+            public bool mMotionPlusCalibrating;
+
+            // New calibration
+            // Use of mNoise vector seems to accumulate error
+            // TODO: find out why, fix, and use mNoise instead
+            public int numCalibrationReadings;
+            public double pitchSum;
+            public double yawSum;
+            public double rollSum;
+
+
+
+            public double mCalibrationTimeout;
+
+            public Vector3 mNoiseLevel;
+            public Vector3 mNoiseThreshold;
+            public float mLastTime;
+        }
+
+        /// <summary>
+        /// Current state of the MotionPlus controller
+        /// </summary>
+
+        public class MotionPlus
+        {
+            /// <summary>
+            /// Calibration data for MontionPlus
+            /// </summary>
+
+            public MotionPlusCalibrationInfo CalibrationInfo;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public Vector3 RawValues;
+
+            /// <summary>
+            /// Normalized speed data
+            /// <remarks>Values range between 0 - ?</remarks>
+            /// </summary>
+
+            public Vector3 Values;
+
+
+            public bool Enabled = false;
+
+            /// <summary>
+            /// Yaw/Pitch/Roll rotating "quickly" (no definition for "quickly" yet...)
+            /// </summary>
+            public bool YawFast = false;
+            public bool PitchFast = false;
+            public bool RollFast = false;
+
+
+
+
+
+        }
       
 
         protected uint _rumbleBit;
         protected bool _rumble;
         protected WiiExtensionType _ExtensionType;
-        protected bool _extensionDevice;
-        protected bool _hasMotionPlus;
+
+        private bool _hasMotionPlus;
+
+        protected bool HasMotionPlus
+        {
+            get { return _hasMotionPlus; }
+            set { _hasMotionPlus = value; }
+        }
         protected float _battery;
         protected IRMode _irmode;
 
@@ -252,25 +257,18 @@ namespace ws.winx.devices
         
 
         //Interleave mode for use of M+ and Extension toghter
-        public PassThruMode PASS_THRU_MODE = PassThruMode.None;
+        public PassThruMode mode = PassThruMode.Noone;
 
 
         private ProcessingMode __processingMode = ProcessingMode.None;
 
         public ProcessingMode processingMode
         {
-            get { return processingMode; }
-            set { processingMode = value; }
+            get { return __processingMode; }
+            set { __processingMode = value; }
         }
       
-
-        protected byte _MotionPlusStatus;
-
-        public byte MotionPlusStatus
-        {
-            get { return _MotionPlusStatus; }
-            internal set { _MotionPlusStatus = value; }
-        }
+       
 
         public int numMPlusChecks = 0;
 
@@ -410,30 +408,13 @@ namespace ws.winx.devices
         {
             get
             {
-                return _extensionDevice;
+                return Extensions == 0x0;
             }
-            set
-            {
-                _extensionDevice = value;
-
-             
-            }
+           
         }
 
 
-        public bool hasMotionPlus
-        {
-            get
-            {
-                return _hasMotionPlus;
-            }
-            set
-            {
-                _hasMotionPlus = value;
-
-                _motionPlus = new MotionPlus();
-            }
-        }
+    
 
         public bool Rumble
         {
@@ -540,6 +521,11 @@ namespace ws.winx.devices
         }
 
 
+         internal void InitMotionPlus()
+         {
+             _motionPlus = new MotionPlus();
+
+         }
 
          public void UpdateMPlusCalibration(double dt, Vector3 values)
          {
@@ -627,6 +613,7 @@ namespace ws.winx.devices
 
          void InitMPlusCalibration(float x, float y, float z)
          {
+             _motionPlus.CalibrationInfo = new MotionPlusCalibrationInfo();
 
              _motionPlus.CalibrationInfo.mMotionPlusCalibrating = true;
              _motionPlus.CalibrationInfo.mCalibrationTimeout = CALIB_TIME;
@@ -713,5 +700,7 @@ return _irPoint;
         {
             Disconnect();
         }
+
+      
     }
 }

@@ -21,6 +21,8 @@ namespace ws.winx.platform
 			IDeviceCollection Devices{get;}
             Dictionary<IDevice, HIDDevice> Generics{get;}
             void Read(IDevice device,HIDDevice.ReadCallback callback);
+            void Read(IDevice device, HIDDevice.ReadCallback callback,int timeout);
+            void Write(object data, IDevice device, HIDDevice.WriteCallback callback, int timeout);
             void Write(object data, IDevice device,HIDDevice.WriteCallback callback);
             void Write(object data, IDevice device);
 			void Update();
