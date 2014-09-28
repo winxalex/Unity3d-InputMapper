@@ -161,7 +161,7 @@ namespace ws.winx.platform.windows
             IsOpen = false;
         }
 
-
+      
 
         override public void Read(ReadCallback callback)
         {
@@ -172,8 +172,8 @@ namespace ws.winx.platform.windows
         {
             if (IsReadInProgress)
             {
-               //callback.BeginInvoke(__lastHIDReport, EndReadCallback, callback);
-               // callback.Invoke(__lastHIDReport);
+                callback.BeginInvoke(__lastHIDReport, EndReadCallback, callback);
+                // callback.Invoke(__lastHIDReport);
                 return;
             }
 
@@ -220,9 +220,23 @@ namespace ws.winx.platform.windows
             this.Write((byte[])data,callback, 0);
         }
 
+        /// <summary>
+        /// Syncro write timeout
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="timeout"></param>
+        public override void Write(object data,int timeout)
+        {
+            this.WriteData((byte[])data, timeout);
+        }
+
+        /// <summary>
+        /// Syncro write
+        /// </summary>
+        /// <param name="data"></param>
         public override void Write(object data)
         {
-            this.Write((byte[])data,0);
+            this.WriteData((byte[])data,0);
         }
        
 
@@ -411,15 +425,17 @@ namespace ws.winx.platform.windows
                     bool success;
                     success = Native.WriteFile(WriteHandle, buffer, (uint)buffer.Length, out bytesWritten, ref overlapped);
 
-                    //if (!success)
-                    //{
-                    //    UnityEngine.Debug.LogError(Marshal.GetLastWin32Error());
-                    //}
+                    if (!success)
+                    {
+                        UnityEngine.Debug.LogWarning(Marshal.GetLastWin32Error());
+                    }
 
                     return success;
 
                 }
-                catch { return false; }
+                catch(Exception ex) {
+                    UnityEngine.Debug.LogException(ex);
+                    return false; }
             }
         }
 

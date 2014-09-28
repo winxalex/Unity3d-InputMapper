@@ -547,6 +547,8 @@ namespace ws.winx.devices
          {
              if (!_motionPlus.CalibrationInfo.mMotionPlusCalibrating)
              {
+
+                 UnityEngine.Debug.Log("InitMPlusCalibration"); 
                  InitMPlusCalibration(values.x, values.y, values.z);
 
 
@@ -562,9 +564,9 @@ namespace ws.winx.devices
              }
 
 
-          
 
 
+             UnityEngine.Debug.Log(_motionPlus.CalibrationInfo.watch.ElapsedMilliseconds);
 
 
 
@@ -609,6 +611,8 @@ namespace ws.winx.devices
 
              _motionPlus.CalibrationInfo.mMotionPlusCalibrating = false;
              _motionPlus.CalibrationInfo.mMotionPlusCalibrated = true;
+
+             UnityEngine.Debug.Log("Motion Plus Calibrated"); 
 
          }
 

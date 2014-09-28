@@ -111,11 +111,11 @@ namespace ws.winx.drivers
 
 
                     //test
-                    wDevice.InitMotionPlus();
-                    wDevice.Extensions = (byte)ExtensionType.MotionPlus;
+                    //wDevice.InitMotionPlus();
+                   // wDevice.Extensions = (byte)ExtensionType.MotionPlus;
 
                    // _hidInterface.Read(device, onRead, 0xffff);
-                        _hidInterface.Read(wDevice, onRead);
+                       
                         //Start settup sequence
                         ClearExtension(wDevice);
 
@@ -126,7 +126,7 @@ namespace ws.winx.drivers
 
                         //_hidInterface.Read(wDevice, onRead);//, 0xffff);
                         
-                        ReadAccCalibration(wDevice);
+                       
 
 
                        //, 0xffff);
@@ -194,15 +194,23 @@ namespace ws.winx.drivers
             device.processingMode = ProcessingMode.ClearExtension;
 
             UnityEngine.Debug.Log("ClearExtension");
+             _hidInterface.Read(device, onRead);
+            WriteMemory(device, REGISTER_EXTENSION_INIT1, 0x55);
+           
+            //WriteMemory(device, REGISTER_EXTENSION_INIT2, 0x00);
 
-            WriteMemory(device, REGISTER_EXTENSION_INIT2, 0x00);
+         
 
-            //WriteMemory(device, REGISTER_EXTENSION_INIT2, 0x00, (suc) =>
-            //   {
-                 
+           // ReadAccCalibration(device);
 
-                  
-            //   });
+            WriteMemory(device, REGISTER_EXTENSION_INIT2, 0x00, (suc) =>
+               {
+                  // _hidInterface.Read(device, onRead);
+
+                   ReadAccCalibration(device);
+
+
+               });
         }
 
 
@@ -318,8 +326,11 @@ namespace ws.winx.drivers
 
             WiimoteDevice device = _hidInterface.Devices[(data as HIDReport).index] as WiimoteDevice;
 
+          
+          //  _hidInterface.Read(device, onRead, 0xffff);
             _hidInterface.Read(device, onRead);
-           // _hidInterface.Read(device, onRead, 0xffff);
+
+            UnityEngine.Debug.Log("loop");
         }
 
         public IDevice ResolveDevice(IHIDDevice hidDevice)
@@ -513,11 +524,14 @@ namespace ws.winx.drivers
                             ParseButtons(device, buff);
                             ParseAccel(device, buff);
                             ParseIR(device, buff);
-                           
+                           ParseExtension(device, buff, 16);
                         }
-
-                     
-                        ParseExtension(device, buff, 16);
+                        UnityEngine.Debug.Log("shit");
+                        if (device.motionPlus != null && device.motionPlus.Enabled && !device.motionPlus.CalibrationInfo.mMotionPlusCalibrated)
+                        {
+                            CalibrateMotionPlus(device, buff, 16);
+                        }
+                        
                         break;
                     case InputReport.Status:
 
@@ -633,6 +647,28 @@ namespace ws.winx.drivers
                 
             }
           
+        }
+
+        private void CalibrateMotionPlus(WiimoteDevice device, byte[] buff, int offset)
+        {
+
+            device.motionPlus.RawValues.z = (buff[offset + 0] | (buff[offset + 3] & 0xfc) << 6);//YAW
+            device.motionPlus.RawValues.y = (buff[offset + 1] | (buff[offset + 4] & 0xfc) << 6);//ROLL
+            device.motionPlus.RawValues.x = (buff[offset + 2] | (buff[offset + 5] & 0xfc) << 6);//PITCH
+
+
+
+            if (!device.motionPlus.CalibrationInfo.mMotionPlusCalibrated)
+            {
+
+                device.UpdateMPlusCalibration(device.motionPlus.RawValues);
+
+                return;
+            }
+
+            device.isReady = true;
+
+            UnityEngine.Debug.Log("M+ calibrated => read");
         }
 
 
@@ -869,7 +905,7 @@ namespace ws.winx.drivers
                     else
                          device.Extensions |= (byte)ExtensionType.MotionPlus;
 
-                  
+                    
                   
 					break;
 				default:
@@ -1042,6 +1078,14 @@ namespace ws.winx.drivers
 
                     device.isReady = true;
                     break;
+
+
+
+                case ExtensionNumber.MotionPlus:
+                    //Not known to me
+                    device.motionPlus.Enabled = true;
+
+                 break;
 
             }
 
@@ -1733,15 +1777,7 @@ namespace ws.winx.drivers
                      //  mWiimoteState.MotionPlusState.RawValues.Z = (buff[offset + 2] | (buff[offset + 5] & 0xfa) << 6);
                      
 
-                     if (!device.motionPlus.CalibrationInfo.mMotionPlusCalibrated)
-                     {
-
-                              device.UpdateMPlusCalibration(device.motionPlus.RawValues);
-
-                              return;
-                     }
-
-                     device.isReady = true;
+              
 
 
                     //alex winx deg/s
@@ -1854,6 +1890,8 @@ namespace ws.winx.drivers
                     break;
             }
 
+
+            UnityEngine.Debug.Log("SyncType");
 
             byte[] mBuff = new byte[REPORT_LENGTH];
 
@@ -2016,19 +2054,62 @@ namespace ws.winx.drivers
         {
             device.irMode = mode;
 
+            UnityEngine.Debug.Log("Sync1");
+
             byte[] mBuff = new byte[REPORT_LENGTH];
             mBuff[0] = (byte)OutputReport.IR;
             mBuff[1] = (byte)(0x04 | device.RumbleBit);
             _hidInterface.Write(mBuff, device);
 
-            mBuff = new byte[27];
+            UnityEngine.Debug.Log("Sync2");
+            Array.Clear(mBuff, 0, mBuff.Length);
+            mBuff = new byte[REPORT_LENGTH];
             mBuff[0] = (byte)OutputReport.IR2;
             mBuff[1] = (byte)(0x04 | device.RumbleBit);
             _hidInterface.Write(mBuff, device);
 
+
+            UnityEngine.Debug.Log("Sync3");
             WriteMemory(device, REGISTER_IR, 0x08);
 
-            switch (irSensitivity)
+            UnityEngine.Debug.Log("Sync2x");
+            setSensitivity(device,irSensitivity);
+
+            UnityEngine.Debug.Log("Sync4");
+            WriteMemory(device, REGISTER_IR_MODE, (byte)mode);
+
+            UnityEngine.Debug.Log("Sync5");
+            WriteMemory(device, REGISTER_IR, 0x08);
+
+            //_hidInterface.Write(mBuff, device, (s1) =>
+            //{
+            //     mBuff = new byte[27];
+            //     mBuff[0] = (byte)OutputReport.IR2;
+            //     mBuff[1] = (byte)(0x04 | device.RumbleBit);
+            //     _hidInterface.Write(mBuff, device,(s2)=>{
+            //         WriteMemory(device, REGISTER_IR, 0x08, (s3) =>
+            //         {
+
+            //             setSensitivity(device, irSensitivity);
+            //         });
+            //     });
+            //});
+
+                
+
+          
+
+         
+
+       
+        }
+
+
+
+        void setSensitivity(WiimoteDevice device, IRSensitivity irSensitivity)
+        {
+
+             switch (irSensitivity)
             {
                 case IRSensitivity.WiiLevel1:
                     WriteMemory(device, REGISTER_IR_SENSITIVITY_1, 9, new byte[] { 0x02, 0x00, 0x00, 0x71, 0x01, 0x00, 0x64, 0x00, 0xfe });
@@ -2051,14 +2132,22 @@ namespace ws.winx.drivers
                     WriteMemory(device, REGISTER_IR_SENSITIVITY_2, 2, new byte[] { 0x1, 0x03 });
                     break;
                 case IRSensitivity.Maximum:
+
+                    UnityEngine.Debug.Log("Sync2x1");
                     WriteMemory(device, REGISTER_IR_SENSITIVITY_1, 9, new byte[] { 0x02, 0x00, 0x00, 0x71, 0x01, 0x00, 0x90, 0x00, 0x41 });
+                    UnityEngine.Debug.Log("Sync2x2");
                     WriteMemory(device, REGISTER_IR_SENSITIVITY_2, 2, new byte[] { 0x40, 0x00 });
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("irSensitivity");
             }
-            WriteMemory(device, REGISTER_IR_MODE, (byte)mode);
-            WriteMemory(device, REGISTER_IR, 0x08);
+
+
+
+
+          
+
+
         }
 
         /// <summary>
@@ -2072,13 +2161,16 @@ namespace ws.winx.drivers
             mBuff[0] = (byte)OutputReport.IR;
             mBuff[1] = (byte)device.RumbleBit;
 
-            _hidInterface.Write(mBuff, device);
+            _hidInterface.Write(mBuff, device, (suc) => {
+                 mBuff = new byte[27];
+                mBuff[0] = (byte)OutputReport.IR2;
+                mBuff[1] = (byte)device.RumbleBit;
+                _hidInterface.Write(mBuff, device);
+            });
 
-            mBuff = new byte[27];
-            mBuff[0] = (byte)OutputReport.IR2;
-            mBuff[1] = (byte)device.RumbleBit;
+           
 
-            _hidInterface.Write(mBuff, device);
+            
             
         }
 

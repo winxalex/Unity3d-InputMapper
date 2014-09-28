@@ -183,6 +183,12 @@ namespace ws.winx.platform
                     throw new NotImplementedException();
                 }
 
+
+                public virtual void Write(object data, int timeout)
+                {
+                    throw new NotImplementedException();
+                }
+
                 public virtual void Write(object data)
                 {
                     throw new NotImplementedException();
