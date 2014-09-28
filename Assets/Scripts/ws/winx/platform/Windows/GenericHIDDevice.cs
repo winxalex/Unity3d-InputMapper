@@ -172,7 +172,8 @@ namespace ws.winx.platform.windows
         {
             if (IsReadInProgress)
             {
-                callback.Invoke(__lastHIDReport);
+               //callback.BeginInvoke(__lastHIDReport, EndReadCallback, callback);
+               // callback.Invoke(__lastHIDReport);
                 return;
             }
 
@@ -266,21 +267,49 @@ namespace ws.winx.platform.windows
             var callerDelegate = (ReadDelegate)hidAsyncState.CallerDelegate;
             var callbackDelegate = (ReadCallback)hidAsyncState.CallbackDelegate;
             var data = callerDelegate.EndInvoke(ar);
-           
-            if ((callbackDelegate != null)) callbackDelegate.Invoke(data);
+
+
+            if ((callbackDelegate != null)) callbackDelegate.BeginInvoke(data, EndReadCallback, callbackDelegate);
+
+            //if ((callbackDelegate != null)) callbackDelegate.Invoke(data);
+
             IsReadInProgress = false;
         }
 
+
+        protected void EndReadCallback(IAsyncResult ar)
+        {
+            // Because you passed your original delegate in the asyncState parameter
+            // of the Begin call, you can get it back here to complete the call.
+            ReadCallback dlgt = (ReadCallback)ar.AsyncState;
+
+            // Complete the call.
+            dlgt.EndInvoke(ar);
+        }
+
        
-        private static void EndWrite(IAsyncResult ar)
+        private void EndWrite(IAsyncResult ar)
         {
             var hidAsyncState = (HidAsyncState)ar.AsyncState;
             var callerDelegate = (WriteDelegate)hidAsyncState.CallerDelegate;
             var callbackDelegate = (WriteCallback)hidAsyncState.CallbackDelegate;
             var result = callerDelegate.EndInvoke(ar);
 
-            if ((callbackDelegate != null)) callbackDelegate.Invoke(result);
+            if ((callbackDelegate != null)) callbackDelegate.BeginInvoke(result, EndWriteCallback, callbackDelegate);
+            //if ((callbackDelegate != null)) callbackDelegate.Invoke(result);
         }
+
+
+        protected void EndWriteCallback(IAsyncResult ar)
+        {
+            // Because you passed your original delegate in the asyncState parameter
+            // of the Begin call, you can get it back here to complete the call.
+            WriteCallback dlgt = (WriteCallback)ar.AsyncState;
+          
+            // Complete the call.
+            dlgt.EndInvoke(ar);
+        }
+            
 
        
 
@@ -411,7 +440,7 @@ namespace ws.winx.platform.windows
                 {
                     var security = new Native.SECURITY_ATTRIBUTES();
                     var overlapped = new NativeOverlapped();
-                    var overlapTimeout = timeout <= 0 ? Native.WAIT_INFINITE : timeout;
+                    var overlapTimeout =  timeout;
 
                     security.lpSecurityDescriptor = IntPtr.Zero;
                     security.bInheritHandle = true;

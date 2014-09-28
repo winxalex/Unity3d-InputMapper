@@ -58,7 +58,7 @@ namespace ws.winx.drivers
         };
 
         // wiimote registers
-        const int REGISTER_CALIBRATION = 0x0016;
+        const int REGISTER_ACC_CALIBRATION = 0x0016;
         const int REGISTER_IR = 0x4b00030;
         const int REGISTER_IR_SENSITIVITY_1 = 0x4b00000;
         const int REGISTER_IR_SENSITIVITY_2 = 0x4b0001a;
@@ -78,7 +78,12 @@ namespace ws.winx.drivers
         const int REGISTER_MODE = 0x04a600fe;//0x04a600fe
 
     
+        // The following delegate 
+        delegate void OnReadCallbackDelgate(WiimoteDevice device,byte[] buff);
 
+        delegate void StandardCallbackDelgate(WiimoteDevice device);
+
+        
       
 
         /// <summary>
@@ -86,6 +91,7 @@ namespace ws.winx.drivers
         /// </summary>
         public WiiDriver()
         {
+            
         }
 
 
@@ -99,20 +105,32 @@ namespace ws.winx.drivers
 
             if(wDevice!=null){
 
-                if (wDevice.isReady)
+                if (wDevice.isReady && !wDevice.isAccCalibrated)
                 {
                     wDevice.isReady = false;
 
-                    if (!wDevice.isCalibrated)
-                    {
+
+                    //test
+                    wDevice.InitMotionPlus();
+                    wDevice.Extensions = (byte)ExtensionType.MotionPlus;
+
+                   // _hidInterface.Read(device, onRead, 0xffff);
+                        _hidInterface.Read(wDevice, onRead);
                         //Start settup sequence
-                        //ClearExtension(wDevice);
-                        CheckMotionPlusCapabilities(wDevice);
-                    }
-                    else
-                    {
-                        _hidInterface.Read(device, onRead);
-                    }
+                        ClearExtension(wDevice);
+
+                       // _hidInterface.Read(device, onRead, 0xffff);
+                        
+
+                        
+
+                        //_hidInterface.Read(wDevice, onRead);//, 0xffff);
+                        
+                        ReadAccCalibration(wDevice);
+
+
+                       //, 0xffff);
+                  
                 }
 
               
@@ -175,13 +193,16 @@ namespace ws.winx.drivers
         {
             device.processingMode = ProcessingMode.ClearExtension;
 
-            WriteMemory(device, REGISTER_EXTENSION_INIT2, 0x00, (suc) =>
-               {
-                   _hidInterface.Read(device, onRead);
+            UnityEngine.Debug.Log("ClearExtension");
 
-                   //device.processingMode = ProcessingMode.InProgress;
+            WriteMemory(device, REGISTER_EXTENSION_INIT2, 0x00);
+
+            //WriteMemory(device, REGISTER_EXTENSION_INIT2, 0x00, (suc) =>
+            //   {
+                 
+
                   
-               });
+            //   });
         }
 
 
@@ -194,16 +215,21 @@ namespace ws.winx.drivers
         /// <param name="device"></param>
         /// <param name="address"></param>
         /// <param name="size"></param>
-        internal void ReadAccCalibration(WiimoteDevice device, int address, short size)
+        internal void ReadAccCalibration(WiimoteDevice device)
         {
+            UnityEngine.Debug.Log("ReadAccCalibration");
 
-            device.processingMode = ProcessingMode.AccCalibration;
+
+            //device.processingMode = ProcessingMode.AccCalibration;
           
             //request calibration
-            ReadMemory(device, address, size,(suc)=>{
-                _hidInterface.Read(device,onRead);
+            ReadMemory(device, REGISTER_ACC_CALIBRATION, 7);
 
-            });
+
+            //ReadMemory(device, REGISTER_ACC_CALIBRATION, 7, (suc)=>{
+            //   // _hidInterface.Read(device,onRead);
+            //    _hidInterface.Read(device, onReadAccCalibration);
+            //});
            
 
         }
@@ -213,7 +239,23 @@ namespace ws.winx.drivers
         /// handles calibration read information stored on Wiimote
         /// </summary>
         private void onReadAccCalibration(WiimoteDevice device,byte[] buff)
+       // private void onReadAccCalibration(object data)
         {
+            UnityEngine.Debug.Log("onReadAccCalibration");
+           // HIDReport report = data as HIDReport;
+           // WiimoteDevice device = _hidInterface.Devices[report.index] as WiimoteDevice;
+
+            //ParseButtons(device, report.Data);
+
+            //if (((InputReport)report.Data[0]) != InputReport.ReadData)
+            //{
+            //     onRead(data);
+            //     _hidInterface.Read(device, onReadAccCalibration);
+            //     return;
+            //}
+
+            //byte[] buff = ParseReadData(REGISTER_ACC_CALIBRATION, report.Data);
+
                 // AxisDetails[JoystickAxis.AxisX].
                 AxisDetails axisDetails;
 
@@ -237,14 +279,27 @@ namespace ws.winx.drivers
                 //mWiimoteState.AccelCalibrationInfo.YG = buff[5];
                 //mWiimoteState.AccelCalibrationInfo.ZG = buff[6];
 
+
+                device.isAccCalibrated = true;
+
+
+               // StandardCallbackDelgate sd = new StandardCallbackDelgate(GetStatus);
+
+               // sd.BeginInvoke(device, EndInvoker, sd);
                 GetStatus(device);
-         
+          
+                //GetStatus
 
         }
 
 
-     
-      
+
+        internal void EndInvoker(IAsyncResult ar)
+        {
+            StandardCallbackDelgate sd = (StandardCallbackDelgate)ar.AsyncState;
+            sd.EndInvoke(ar);
+
+        }
        
 
 
@@ -259,7 +314,12 @@ namespace ws.winx.drivers
 
         public void onRead(object data) { 
             
-            ParseInputReport(data as HIDReport); 
+            ParseInputReport(data as HIDReport);
+
+            WiimoteDevice device = _hidInterface.Devices[(data as HIDReport).index] as WiimoteDevice;
+
+            _hidInterface.Read(device, onRead);
+           // _hidInterface.Read(device, onRead, 0xffff);
         }
 
         public IDevice ResolveDevice(IHIDDevice hidDevice)
@@ -420,6 +480,8 @@ namespace ws.winx.drivers
 
                 int address = buff[4] << 8 | buff[5];
 
+               
+
                 switch (type)
                 {
                     case InputReport.Buttons:
@@ -427,11 +489,11 @@ namespace ws.winx.drivers
                         break;
                     case InputReport.ButtonsAccel:
                         ParseButtons(device, buff);
-                        ParseAccel(device, buff);
+                        if (device.isAccCalibrated) ParseAccel(device, buff);
                         break;
                     case InputReport.ButtonsIRAccel:
                         ParseButtons(device, buff);
-                        ParseAccel(device, buff);
+                        if (device.isAccCalibrated) ParseAccel(device, buff);
                         ParseIR(device, buff);
                         break;
                     case InputReport.ButtonsExtension:
@@ -440,13 +502,21 @@ namespace ws.winx.drivers
                         break;
                     case InputReport.ButtonsExtensionAccel:
                         ParseButtons(device, buff);
-                        ParseAccel(device, buff);
-                        ParseExtension(device, buff, 6);
+
+                        if (device.isAccCalibrated) ParseAccel(device, buff);
+                            ParseExtension(device, buff, 6);
+                        
                         break;
                     case InputReport.ButtonsIRExtensionAccel:
-                        ParseButtons(device, buff);
-                        ParseAccel(device, buff);
-                        ParseIR(device, buff);
+                        if (device.isReady)
+                        {
+                            ParseButtons(device, buff);
+                            ParseAccel(device, buff);
+                            ParseIR(device, buff);
+                           
+                        }
+
+                     
                         ParseExtension(device, buff, 16);
                         break;
                     case InputReport.Status:
@@ -497,77 +567,31 @@ namespace ws.winx.drivers
                             CheckMotionPlusCapabilities(device);
                         }
 
-
-
-
-
-
-                        //ParseButtons(device, buff);
-                        //device.Battery = buff[6];
-
-                        //// get the real LED values in case the values from SetLEDs() somehow becomes out of sync, which really shouldn't be possible
-
-
-                        //device.LED[0] = (buff[3] & 0x10) != 0;
-                        //device.LED[1] = (buff[3] & 0x20) != 0;
-                        //device.LED[2] = (buff[3] & 0x40) != 0;
-                        //device.LED[3] = (buff[3] & 0x80) != 0;
-
-                        ////mWiimoteState.LEDState.LED1 = (buff[3] & 0x10) != 0;
-                        ////mWiimoteState.LEDState.LED2 = (buff[3] & 0x20) != 0;
-                        ////mWiimoteState.LEDState.LED3 = (buff[3] & 0x40) != 0;
-                        ////mWiimoteState.LEDState.LED4 = (buff[3] & 0x80) != 0;
-
-                        //// extension connected?
-                        //bool extension = (buff[3] & 0x02) != 0;
-                        ////UnityEngine.Debug.Log("Extension: " + extension);
-                        //UnityEngine.Debug.Log("Extension: " + extension);
-
-
-                        ////if (mWiimoteState.Extension != extension)
-                        //if (device.hasExtensionDevice != extension)
-                        //{
-                        //    device.hasExtensionDevice = extension;
-
-                        //    if (extension)
-                        //    {
-                        //        device.isReady = false;
-                        //        InitializeExtension(device);
-
-                        //    }
-                        //    else
-                        //    {
-                        //        device.ExtensionType = WiiExtensionType.None;
-
-                        //    }
-
-                        //    //  if (WiimoteExtensionChanged != null)
-                        //    //     WiimoteExtensionChanged(this, new WiimoteExtensionChangedEventArgs(mWiimoteState.ExtensionType, mWiimoteState.Extension));
-                        //}
-
+                      
                         break;
 
                     case InputReport.ReadData:
                         ParseButtons(device, buff);
                         byte[] result = ParseReadData(address, buff);
 
-                        if (address == (REGISTER_CALIBRATION & 0xffff))
+                        if (address == (REGISTER_ACC_CALIBRATION & 0xffff))
                         {
+                            
                             onReadAccCalibration(device, result);
+                          
                         }else if(address ==(REGISTER_MODE & 0xffff)){
                             onCheckMotionPlusCapabilities(device,result);
                         }
                         else if(address ==(REGISTER_EXTENSION_TYPE & 0xffff)){
                             onReadExtension(device,result);
+                        }else if(address == (REGISTER_EXTENSION_CALIBRATION & 0xffff)){
+                           onExtensionCalibration(device, result);
                         }
 
                         break;
                     case InputReport.OutputReportAck:
-
-                        //if (device.processingMode == ProcessingMode.ClearExtension)
-                        //{
-                        //    ReadAccCalibration(device, REGISTER_CALIBRATION, 7);
-                        //}
+                        UnityEngine.Debug.Log("Write command ACK");
+                       
                         //if (address == (REGISTER_EXTENSION_INIT2 & 0xffff) && !device.isCalibrated)
                         //{
                         //    ReadAccCalibration(device, REGISTER_CALIBRATION, 7);
@@ -581,7 +605,7 @@ namespace ws.winx.drivers
                         //}
                         //Debug.WriteLine(type.ToString() + "  DATA:" + BitConverter.ToString(buff));
                         //					Debug.WriteLine("ack: " + buff[0] + " " +  buff[1] + " " +buff[2] + " " +buff[3] + " " +buff[4]);
-
+                       // _hidInterface.Read(device, onRead, 0xffff);
                    break;
 
 
@@ -605,7 +629,7 @@ namespace ws.winx.drivers
             }
             else
             {
-                UnityEngine.Debug.LogError(report.Status);
+                UnityEngine.Debug.LogWarning("ParseInputReport:"+report.Status);
                 
             }
           
@@ -630,11 +654,17 @@ namespace ws.winx.drivers
 
                 device.InitMotionPlus();
 
+                //WriteMemory(device, REGISTER_MOTIONPLUS_INIT, 0x55);
+              
+
+                //RegisterMode(device, PassThruMode.Noone);
+
+
                // WriteData(REGISTER_MOTIONPLUS_INIT, 0x55);
                 WriteMemory(device, REGISTER_MOTIONPLUS_INIT, 0x55, (suc) =>
                 {
 
-                    RegisterMode(device, device.mode);
+                    RegisterMode(device, PassThruMode.Noone);
                 }
 
                     );
@@ -654,20 +684,23 @@ namespace ws.winx.drivers
         internal void RegisterMode(WiimoteDevice device, PassThruMode mode)
         {
             //WriteData(REGISTER_MOTIONPLUS_INIT, 0x04);//0xa600fe
-            WriteMemory(device, REGISTER_MODE, (byte)mode, (suc) =>
 
-                {
-                    _hidInterface.Read(device, onRead);
+            WriteMemory(device, REGISTER_MODE, (byte)mode);
 
-                }
+            //WriteMemory(device, REGISTER_MODE, (byte)mode, (suc) =>
 
-                );
+            //    {
+            //        _hidInterface.Read(device, onRead);
+
+            //    }
+
+            //    );
         }
         
         /// <summary>
         /// 
         /// </summary>
-        public void CheckMotionPlusCapabilities(WiimoteDevice device)
+        internal void CheckMotionPlusCapabilities(WiimoteDevice device)
         {
             //device.processingMode=ProcessingMode.InProgress;
 
@@ -679,12 +712,13 @@ namespace ws.winx.drivers
                // ReadData(REGISTER_MOTIONPLUS_DETECT, 0x02);
 
                  // ReadMemory(device, REGISTER_MOTIONPLUS_DETECT, 0x06, (suc) =>
-                 ReadMemory(device, REGISTER_MODE, 0x02, (suc) =>
-                  {
-                     // _hidInterface.Read(device, onCheckMotionPlusCapabilities);
-                     // _hidInterface.Read(device, onAnyRead);
-                      _hidInterface.Read(device, onRead);
-                });
+                  ReadMemory(device, REGISTER_MODE, 0x02);
+                // ReadMemory(device, REGISTER_MODE, 0x02, (suc) =>
+                //  {
+                //      _hidInterface.Read(device, onCheckMotionPlusCapabilities);
+                //     // _hidInterface.Read(device, onAnyRead);
+                //     // _hidInterface.Read(device, onRead);
+                //});
 
 
             
@@ -695,11 +729,14 @@ namespace ws.winx.drivers
 
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="device"></param>
+        /// <param name="buff"></param>
         public void onCheckMotionPlusCapabilities(WiimoteDevice device,byte[] buff)
         {
-
-          
+            UnityEngine.Debug.Log("onCheckMotionPlusCapabilities");
                 
             if(buff[1] == 0x05){
                 
@@ -710,13 +747,17 @@ namespace ws.winx.drivers
                 if(device.numMPlusChecks<4){
                      device.numMPlusChecks++;
 
-                     Thread.Sleep(3000);
+                     Thread.Sleep(1000);
                     //device.processingMode=ProcessingMode.MPlusCheck;
 
                      CheckMotionPlusCapabilities(device);
                  }else{
                     // device.processingMode=ProcessingMode.Update;
-                    // device.isReady = true;
+                     device.isReady = true;
+
+                    
+
+                     SetReportType(device, InputReport.ButtonsIRExtensionAccel, true);
                 }
                  
             }
@@ -751,12 +792,14 @@ namespace ws.winx.drivers
        
 
        private void ReadExtension(WiimoteDevice device){
+           UnityEngine.Debug.Log("ReadExtension");
 
+           ReadMemory(device, REGISTER_EXTENSION_TYPE, 6);
+          //ReadMemory(device,REGISTER_EXTENSION_TYPE, 6,(suc)=>{
 
-          ReadMemory(device,REGISTER_EXTENSION_TYPE, 6,(suc)=>{
-
-                 _hidInterface.Read(device,onRead);
-          });
+          //       //_hidInterface.Read(device,onRead);
+          //    _hidInterface.Read(device, onReadExtension);
+          //});
 
         
        }
@@ -764,15 +807,17 @@ namespace ws.winx.drivers
         /// <summary>
         /// Handles setting up an extension when plugged in
         /// </summary>
-        private void onReadExtension( WiimoteDevice device, byte[] buff)
+        private void onReadExtension(WiimoteDevice device, byte[] buff)
         {
-           
 
+            UnityEngine.Debug.Log("onReadExtension");
+            
             long type = ((long)buff[0] << 40) | ((long)buff[1] << 32) | ((long)buff[2]) << 24 | ((long)buff[3]) << 16 | ((long)buff[4]) << 8 | buff[5];
 
 
              if(type != (long)ExtensionNumber.Guitar && type!=(long)ExtensionNumber.Drums)
             type=type & 0x0000ffffffff;
+
 
             switch((ExtensionNumber)type)
 			{
@@ -782,27 +827,26 @@ namespace ws.winx.drivers
 					//mWiimoteState.ExtensionType = ExtensionNumber.None;
 					return;
 				case ExtensionNumber.Nunchuk:
-                    if (device.mode == PassThruMode.Noone)
+                    if (device.Mode == PassThruMode.Noone)
                         device.Extensions = (byte)ExtensionType.Nunchuck;
                     else
                     {
                         device.Extensions |= (byte)ExtensionType.Nunchuck;
-                        RegisterMode(device, PassThruMode.Nunchuck);
-                        
+                      
                     }
                   //  UnityEngine.Debug.Log(mWiimoteState.NunchukState.CalibrationInfo.MaxX + " " + mWiimoteState.NunchukState.CalibrationInfo.MidX + " " + mWiimoteState.NunchukState.CalibrationInfo.MinX);
                  //   UnityEngine.Debug.Log(mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.X0 + " " + mWiimoteState.NunchukState.CalibrationInfo.AccelCalibration.XG);
 
                     break;
 				case ExtensionNumber.ClassicController:
-                    if (device.mode == PassThruMode.Noone)
+                    if (device.Mode == PassThruMode.Noone)
                     {
                         device.Extensions = (int)ExtensionType.ClassicController;
                     }
                     else
                     {
                         device.Extensions |= (int)ExtensionType.ClassicController;
-                        RegisterMode(device, PassThruMode.ClassicController);
+                       // RegisterMode(device, PassThruMode.ClassicController);
                        
                     }
 
@@ -820,7 +864,7 @@ namespace ws.winx.drivers
                      device.Extensions = (byte)ExtensionType.TaikoDrums;
                 break;
 				case ExtensionNumber.MotionPlus:
-                     if(device.mode==PassThruMode.Noone)
+                     if(device.Mode==PassThruMode.Noone)
                          device.Extensions = (byte)ExtensionType.MotionPlus;
                     else
                          device.Extensions |= (byte)ExtensionType.MotionPlus;
@@ -832,10 +876,10 @@ namespace ws.winx.drivers
 					throw new Exception("Unknown extension controller found: " + type.ToString("x"));
 			}
 
-            UnityEngine.Debug.Log("InitExtension " + (ExtensionNumber)type);
+            UnityEngine.Debug.Log("Extension registered [" + (ExtensionNumber)type+"]");
 
 
-
+            device.ExtensionForCalibration = (ExtensionNumber)type;
 
 
 
@@ -843,33 +887,30 @@ namespace ws.winx.drivers
         
             
          
-              ReadExtensionCalibaration(device,type);
+              ReadExtensionCalibaration(device);
            
 
           
         }
 
 
-        protected void ReadExtensionCalibaration(WiimoteDevice device,long type){
-              WriteMemory(device, REGISTER_EXTENSION_CALIBRATION, 16,(suc)=>{
-                //_hidInterface.Read(device, (dt)=>{ onExtensionCalibration(dt,type); }
-                  _hidInterface.Read(device,onRead);
-              }
-                    );
-          
+        protected void ReadExtensionCalibaration(WiimoteDevice device){
+
+            UnityEngine.Debug.Log("ReadExtensionCalibaration");
+
+            ReadMemory(device, REGISTER_EXTENSION_CALIBRATION, 32);
+                    
         }
 
 
-        protected void onExtensionCalibration(object data,long type)
+        protected void onExtensionCalibration(WiimoteDevice device,byte[] buff)
         {
-            HIDReport report = data as HIDReport;
-            WiimoteDevice device = _hidInterface.Devices[report.index] as WiimoteDevice;
-            //byte[] buff=DecryptBuffer(report.Data);
-            byte[] buff=ParseReadData(REGISTER_EXTENSION_CALIBRATION,report.Data);
+
+            UnityEngine.Debug.Log("onExtensionCalibration");
                 
             AxisDetails axisDetails;
 
-            switch((ExtensionNumber)type)
+            switch(device.ExtensionForCalibration)
 			{
 				
 				case ExtensionNumber.Nunchuk:
@@ -937,7 +978,7 @@ namespace ws.winx.drivers
 
 
 
-
+                    device.isReady = true;
 
                     break;
                 case ExtensionNumber.ClassicController:
@@ -999,30 +1040,21 @@ namespace ws.winx.drivers
                     axisDetails.max = (byte)(buff[15] >> 3);
                     axisDetails.min = (byte)(buff[13] >> 3);
 
-
+                    device.isReady = true;
                     break;
 
             }
 
 
+            device.ExtensionForCalibration = 0;
+
             SetReportType(device,InputReport.ButtonsIRExtensionAccel,true);
 
-            device.processingMode=ProcessingMode.Update;
+           // device.processingMode=ProcessingMode.Update;
 
         }
 
-        /// <summary>
-        /// Decrypts data sent from the extension to the Wiimote
-        /// </summary>
-        /// <param name="buff">Data buffer</param>
-        /// <returns>Byte array containing decoded data</returns>
-        private byte[] DecryptBuffer(byte[] buff)
-        {
-            for (int i = 0; i < buff.Length; i++)
-                buff[i] = (byte)(((buff[i] ^ 0x17) + 0x17) & 0xff);
-
-            return buff;
-        }
+    
 
         /// <summary>
         /// Parses a standard button report into the ButtonState struct
@@ -1076,6 +1108,8 @@ namespace ws.winx.drivers
 
 
         }
+
+      
 
 
         /// <summary>
@@ -1160,7 +1194,7 @@ namespace ws.winx.drivers
 
 
 
-            switch (device.Mode)
+            switch (device.irMode)
             {
                 case IRMode.Basic:
 
@@ -1292,7 +1326,7 @@ namespace ws.winx.drivers
 
              if  ((device.Extensions & (byte)ExtensionType.Nunchuck) !=0){
 			
-                    if(device.mode == PassThruMode.Nunchuck){
+                    if(device.Mode == PassThruMode.Nunchuck){
                         if((buff[offset + 5] & 0x03)==0x00){
                                 //interleave mode
                              //if (extension_data.size() >= 6 && !(extension_data[5] & 0x03))
@@ -1473,7 +1507,7 @@ namespace ws.winx.drivers
              else if ((device.Extensions & (byte)ExtensionType.ClassicController) != 0)
              {
 
-                 if (device.mode == PassThruMode.ClassicController)
+                 if (device.Mode == PassThruMode.ClassicController)
                  {
 
                      if ((buff[offset + 5] & 0x03) == 0)
@@ -1699,14 +1733,15 @@ namespace ws.winx.drivers
                      //  mWiimoteState.MotionPlusState.RawValues.Z = (buff[offset + 2] | (buff[offset + 5] & 0xfa) << 6);
                      
 
-                     if (device.motionPlus.CalibrationInfo.mMotionPlusCalibrating)
+                     if (!device.motionPlus.CalibrationInfo.mMotionPlusCalibrated)
                      {
 
-                              device.UpdateMPlusCalibration(Time.time,  device.motionPlus.RawValues);
-                  
-                     }
-                   
+                              device.UpdateMPlusCalibration(device.motionPlus.RawValues);
 
+                              return;
+                     }
+
+                     device.isReady = true;
 
 
                     //alex winx deg/s
@@ -1719,12 +1754,12 @@ namespace ws.winx.drivers
                 
 
 
-
+                     //test
                      if ((buff[offset + 4] & 0x01) == 1)
                      {
                         
 
-                         if (device.mode == PassThruMode.Noone)
+                         if (device.Mode == PassThruMode.Noone)
                          {
 
                              DisableMotionPlus(device); //would trigger status
@@ -1732,7 +1767,7 @@ namespace ws.winx.drivers
 
                          }
 
-                         GetStatus(device);
+                        // GetStatus(device);
 
                         
                      }
@@ -1750,6 +1785,9 @@ namespace ws.winx.drivers
         /// <param name="buff">Data buffer</param>
         private byte[] ParseReadData(int address,byte[] buff)
         {
+
+           
+
             if ((buff[3] & 0x08) != 0)
                 UnityEngine.Debug.LogError("Error reading data from Wiimote: Bytes do not exist.");
 
@@ -1827,6 +1865,37 @@ namespace ws.winx.drivers
             _hidInterface.Write(mBuff, device);
         }
 
+
+        public void SetReportType2(WiimoteDevice device,InputReport type, bool continuous)
+        {
+            byte[] mBuff = new byte[REPORT_LENGTH];
+
+            mBuff[0] = (byte)OutputReport.Type;
+            // mBuff[1] = (byte)((continuous ? 0x04 : 0x00) | (byte)(mWiimoteState.Rumble ? 0x01 : 0x00));
+            mBuff[1] = (byte)((continuous ? (uint)0x04 : (uint)0x00) | (uint)device.RumbleBit);
+            mBuff[2] =(byte)type;
+
+            _hidInterface.Write(mBuff, device, (suc) => { 
+                _hidInterface.Read(device,onRead); });
+        }
+
+
+        internal void SetMode(WiimoteDevice device ,PassThruMode mode)
+        {
+            if (mode == PassThruMode.Noone)
+            {
+               //TODO
+            }else if(mode == PassThruMode.ClassicController)
+            {
+                //TODO
+            }
+            else if (mode == PassThruMode.Nunchuck)
+            {
+                //TODO
+            }
+        }
+        
+
         /// <summary>
         /// Set the LEDs on the Wiimote
         /// </summary>
@@ -1834,7 +1903,7 @@ namespace ws.winx.drivers
         /// <param name="led2">LED 2</param>
         /// <param name="led3">LED 3</param>
         /// <param name="led4">LED 4</param>
-        void SetLEDs(WiimoteDevice device, bool led1, bool led2, bool led3, bool led4)
+        internal void SetLEDs(WiimoteDevice device, bool led1, bool led2, bool led3, bool led4)
         {
             device.LED[0] = led1;
             device.LED[1] = led2;
@@ -1862,7 +1931,7 @@ namespace ws.winx.drivers
         /// Set the LEDs on the Wiimote
         /// </summary>
         /// <param name="leds">The value to be lit up in base2 on the Wiimote</param>
-        void SetLEDs(WiimoteDevice device, int leds)
+        internal void SetLEDs(WiimoteDevice device, int leds)
         {
 
 
@@ -1897,7 +1966,7 @@ namespace ws.winx.drivers
         /// Toggle rumble
         /// </summary>
         /// <param name="on">On or off</param>
-        void SetRumble(WiimoteDevice device, bool on)
+        internal void SetRumble(WiimoteDevice device, bool on)
         {
             device.Rumble = on;
 
@@ -1913,7 +1982,8 @@ namespace ws.winx.drivers
         /// </summary>
         void GetStatus(WiimoteDevice device)
         {
-            device.processingMode=ProcessingMode.InProgress;
+
+            UnityEngine.Debug.Log("GetStatus");
 
             HIDDevice hidDevice = _hidInterface.Generics[device];
             hidDevice.InputReportByteLength = REPORT_LENGTH;
@@ -1925,11 +1995,12 @@ namespace ws.winx.drivers
             mBuff[1] = (byte)device.RumbleBit;
             //mBuff[1] = GetRumbleBit();
 
+            _hidInterface.Write(mBuff, device);
 
-            _hidInterface.Write(mBuff, device, (suc) => {
-                UnityEngine.Debug.Log("Status call:" + suc);
-                _hidInterface.Read(device, onRead);
-            });
+            //_hidInterface.Write(mBuff, device, (suc) => {
+            //    UnityEngine.Debug.Log("Status call:" + suc);
+            //    _hidInterface.Read(device, onRead);
+            //});
         }
 
         
@@ -1943,7 +2014,7 @@ namespace ws.winx.drivers
         /// <param name="irSensitivity">IR sensitivity</param>
         void EnableIR(WiimoteDevice device, IRMode mode, IRSensitivity irSensitivity)
         {
-            device.Mode = mode;
+            device.irMode = mode;
 
             byte[] mBuff = new byte[REPORT_LENGTH];
             mBuff[0] = (byte)OutputReport.IR;
@@ -1995,7 +2066,7 @@ namespace ws.winx.drivers
         /// </summary>
         void DisableIR(WiimoteDevice device)
         {
-            device.Mode = IRMode.Off;
+            device.irMode = IRMode.Off;
 
             byte[] mBuff=new byte[27];
             mBuff[0] = (byte)OutputReport.IR;

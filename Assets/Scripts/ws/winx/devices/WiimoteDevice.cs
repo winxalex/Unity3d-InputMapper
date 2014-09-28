@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using ws.winx.platform;
+using ws.winx.drivers;
+using System.Diagnostics;
 
 
 
@@ -166,7 +168,7 @@ namespace ws.winx.devices
         /// <summary>
         /// 
         /// </summary>
-        public struct MotionPlusCalibrationInfo
+        public class MotionPlusCalibrationInfo
         {
             public Vector3 mMaxNoise;
             public List<Vector3> mNoise;
@@ -188,10 +190,12 @@ namespace ws.winx.devices
 
 
             public double mCalibrationTimeout;
+            public Stopwatch watch;
+            
 
             public Vector3 mNoiseLevel;
             public Vector3 mNoiseThreshold;
-            public float mLastTime;
+          
         }
 
         /// <summary>
@@ -239,12 +243,12 @@ namespace ws.winx.devices
         protected bool _rumble;
         protected WiiExtensionType _ExtensionType;
 
-        private bool _hasMotionPlus;
+      
 
         protected bool HasMotionPlus
         {
-            get { return _hasMotionPlus; }
-            set { _hasMotionPlus = value; }
+            get { return _motionPlus != null; }
+            
         }
         protected float _battery;
         protected IRMode _irmode;
@@ -257,7 +261,15 @@ namespace ws.winx.devices
         
 
         //Interleave mode for use of M+ and Extension toghter
-        public PassThruMode mode = PassThruMode.Noone;
+        private PassThruMode _mode = PassThruMode.Noone;
+
+        public PassThruMode Mode
+        {
+            get { return _mode; }
+            set { _mode = value;
+            ((WiiDriver)driver).SetMode(this,value);
+            }
+        }
 
 
         private ProcessingMode __processingMode = ProcessingMode.None;
@@ -335,8 +347,12 @@ namespace ws.winx.devices
         // sure, we could find this out the hard way using HID, but trust me, it's 22
         private const int REPORT_LENGTH = 22;
 
-        public bool isCalibrated = false;
-        private MotionPlus _motionPlus;
+        public bool isAccCalibrated = false;
+
+
+
+        protected MotionPlus _motionPlus;
+        internal ExtensionNumber ExtensionForCalibration;
 
         public MotionPlus motionPlus
         {
@@ -344,7 +360,7 @@ namespace ws.winx.devices
           
         }
 
-       
+      
 
         public WiimoteDevice(int id,int pid,int vid, int axes, int buttons,int leds,int irs,IDriver driver)
             : base(id,pid,vid,axes,buttons,driver)
@@ -355,9 +371,9 @@ namespace ws.winx.devices
                   
                for(int i=0;i<irs;i++)
                    IR_SENSORS[i]=new IRSensor();
-               
-            
 
+
+              
             _LED = new bool[leds];
 
         }
@@ -367,7 +383,7 @@ namespace ws.winx.devices
 
 
 
-        public IRMode Mode
+        public IRMode irMode
         {
             get { return _irmode; }
             set { _irmode = value; }
@@ -524,44 +540,39 @@ namespace ws.winx.devices
          internal void InitMotionPlus()
          {
              _motionPlus = new MotionPlus();
-
+             _motionPlus.CalibrationInfo = new MotionPlusCalibrationInfo();
          }
 
-         public void UpdateMPlusCalibration(double dt, Vector3 values)
+         public void UpdateMPlusCalibration(Vector3 values)
          {
-              if (!_motionPlus.CalibrationInfo.mMotionPlusCalibrating )
-              {
-                  InitMPlusCalibration(values.x, values.y, values.z);
-
-                  return;   
-              }
-                   
-
-
-
-
-             _motionPlus.CalibrationInfo.mMaxNoise.x = Math.Max(_motionPlus.CalibrationInfo.mMaxNoise.x, values.x);
-             _motionPlus.CalibrationInfo.mMaxNoise.y = Math.Max(_motionPlus.CalibrationInfo.mMaxNoise.y, values.y);
-             _motionPlus.CalibrationInfo.mMaxNoise.z = Math.Max(_motionPlus.CalibrationInfo.mMaxNoise.z, values.z);
-             _motionPlus.CalibrationInfo.mMinNoise.x = Math.Min(_motionPlus.CalibrationInfo.mMinNoise.x, values.x);
-             _motionPlus.CalibrationInfo.mMinNoise.y = Math.Min(_motionPlus.CalibrationInfo.mMinNoise.y, values.y);
-             _motionPlus.CalibrationInfo.mMinNoise.z = Math.Min(_motionPlus.CalibrationInfo.mMinNoise.z, values.z);
-
-
-
-             // Store the "reading" in mNoise
-             //mNoise.push_back(rates);
-             _motionPlus.CalibrationInfo.mNoise.Add(values);
-
-
-
-
-
-             _motionPlus.CalibrationInfo.mCalibrationTimeout -= dt;
-
-             if (_motionPlus.CalibrationInfo.mCalibrationTimeout <= 0)
+             if (!_motionPlus.CalibrationInfo.mMotionPlusCalibrating)
              {
-                 _motionPlus.CalibrationInfo.mMotionPlusCalibrated = true;
+                 InitMPlusCalibration(values.x, values.y, values.z);
+
+
+             }
+             else
+             {
+                 _motionPlus.CalibrationInfo.mMaxNoise.x = Math.Max(_motionPlus.CalibrationInfo.mMaxNoise.x, values.x);
+                 _motionPlus.CalibrationInfo.mMaxNoise.y = Math.Max(_motionPlus.CalibrationInfo.mMaxNoise.y, values.y);
+                 _motionPlus.CalibrationInfo.mMaxNoise.z = Math.Max(_motionPlus.CalibrationInfo.mMaxNoise.z, values.z);
+                 _motionPlus.CalibrationInfo.mMinNoise.x = Math.Min(_motionPlus.CalibrationInfo.mMinNoise.x, values.x);
+                 _motionPlus.CalibrationInfo.mMinNoise.y = Math.Min(_motionPlus.CalibrationInfo.mMinNoise.y, values.y);
+                 _motionPlus.CalibrationInfo.mMinNoise.z = Math.Min(_motionPlus.CalibrationInfo.mMinNoise.z, values.z);
+             }
+
+
+          
+
+
+
+
+
+
+             if (_motionPlus.CalibrationInfo.mCalibrationTimeout <= _motionPlus.CalibrationInfo.watch.ElapsedMilliseconds)
+             {
+
+                
              
 
                  calculateMPlusCalibration();
@@ -576,7 +587,11 @@ namespace ws.winx.devices
                  _motionPlus.CalibrationInfo.yawSum += values.z;
                  _motionPlus.CalibrationInfo.rollSum += values.y;
 
-                 _motionPlus.CalibrationInfo.numCalibrationReadings++;
+                 // Store the "reading" in mNoise
+                 //mNoise.push_back(rates);
+                 _motionPlus.CalibrationInfo.mNoise.Add(values);
+
+               
              }
 
          }
@@ -587,37 +602,26 @@ namespace ws.winx.devices
          void calculateMPlusCalibration()
          {
              int n = _motionPlus.CalibrationInfo.mNoise.Count;
-             Vector3 sum = new Vector3();//vector3f(0,0,0);
-             Vector3 currentNoise;
+            
+             _motionPlus.CalibrationInfo.mBias.x = (float)_motionPlus.CalibrationInfo.pitchSum / n;
+             _motionPlus.CalibrationInfo.mBias.y = (float)_motionPlus.CalibrationInfo.rollSum / n;
+             _motionPlus.CalibrationInfo.mBias.z = (float)_motionPlus.CalibrationInfo.yawSum / n;
 
-             for (int i = 0; i < n; i++)
-             {
-                 //sum += mNoise.at(i);
-                 currentNoise = _motionPlus.CalibrationInfo.mNoise[i];
-                 sum.x += currentNoise.x;
-                 sum.y += currentNoise.y;
-                 sum.z += currentNoise.z;
-
-             }
-
-
-
-
-             _motionPlus.CalibrationInfo.mBias.x = (float)_motionPlus.CalibrationInfo.pitchSum / _motionPlus.CalibrationInfo.numCalibrationReadings;
-             _motionPlus.CalibrationInfo.mBias.y = (float)_motionPlus.CalibrationInfo.rollSum / _motionPlus.CalibrationInfo.numCalibrationReadings;
-             _motionPlus.CalibrationInfo.mBias.z = (float)_motionPlus.CalibrationInfo.yawSum / _motionPlus.CalibrationInfo.numCalibrationReadings;
-      
-
+             _motionPlus.CalibrationInfo.mMotionPlusCalibrating = false;
+             _motionPlus.CalibrationInfo.mMotionPlusCalibrated = true;
 
          }
 
          void InitMPlusCalibration(float x, float y, float z)
          {
-             _motionPlus.CalibrationInfo = new MotionPlusCalibrationInfo();
+             _motionPlus.CalibrationInfo.watch = new Stopwatch();
+             _motionPlus.CalibrationInfo.watch.Start();
+             _motionPlus.CalibrationInfo.mNoise = new List<Vector3>();
+           
 
              _motionPlus.CalibrationInfo.mMotionPlusCalibrating = true;
              _motionPlus.CalibrationInfo.mCalibrationTimeout = CALIB_TIME;
-             _motionPlus.CalibrationInfo.mLastTime = Time.time;
+             
 
              _motionPlus.CalibrationInfo.numCalibrationReadings = 0;
              _motionPlus.CalibrationInfo.pitchSum = 0;
@@ -634,7 +638,7 @@ namespace ws.winx.devices
              _motionPlus.CalibrationInfo.mMaxNoise.y = _motionPlus.CalibrationInfo.mBias.y = _motionPlus.CalibrationInfo.mMinNoise.y = y;
              _motionPlus.CalibrationInfo.mMaxNoise.z = _motionPlus.CalibrationInfo.mBias.z = _motionPlus.CalibrationInfo.mMinNoise.z = z;
 
-             _motionPlus.CalibrationInfo.mNoise.Clear();
+            
 
          }
 
@@ -643,7 +647,7 @@ namespace ws.winx.devices
 
 
 
-            switch (this.Mode)
+            switch (this.irMode)
             {
                 case IRMode.Basic:
                     if (this.IR_SENSORS[0].Found && this.IR_SENSORS[1].Found)
