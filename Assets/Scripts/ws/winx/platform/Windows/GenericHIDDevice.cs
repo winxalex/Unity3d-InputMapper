@@ -427,7 +427,7 @@ namespace ws.winx.platform.windows
 
                     if (!success)
                     {
-                        UnityEngine.Debug.LogWarning(Marshal.GetLastWin32Error());
+                        UnityEngine.Debug.LogWarning(Marshal.GetLastWin32Error().ToString());
                     }
 
                     return success;

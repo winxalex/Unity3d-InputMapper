@@ -6,6 +6,7 @@ using UnityEngine;
 using ws.winx.platform;
 using ws.winx.drivers;
 using System.Diagnostics;
+using ws.winx.input;
 
 
 
@@ -360,6 +361,14 @@ namespace ws.winx.devices
           
         }
 
+
+        protected byte _DataReportType;
+
+        public byte DataReportType
+        {
+            get { return _DataReportType; }
+            internal set { _DataReportType = value; }
+        }
       
 
         public WiimoteDevice(int id,int pid,int vid, int axes, int buttons,int leds,int irs,IDriver driver)
@@ -390,19 +399,7 @@ namespace ws.winx.devices
         }
 
 
-        public WiiExtensionType ExtensionType
-        {
-            get
-            {
-                return _ExtensionType;
-            }
-            set
-            {
-                _ExtensionType = value;
-
-               
-            }
-        }
+    
 
 
         public float Battery
@@ -455,87 +452,6 @@ namespace ws.winx.devices
         }
 
 
-         public float GetExtensionYaw(){
-
-           throw new NotImplementedException();
-        }
-
-         public float GetExtensionRaw(){
-
-           throw new NotImplementedException();
-        }
-
-        public float GetYaw(){
-           throw new NotImplementedException();
-        }
-
-         public float GetPitch(){
-
-           throw new NotImplementedException();
-        }
-         public float GetRoll(){
-             
-//              bool wiimote::EstimateOrientationFrom (wiimote_state::acceleration &accel)
-//    {
-//    // Orientation estimate from acceleration data (shared between wiimote and nunchuk)
-//    //  return true if the orientation was updated
-
-//    //  assume the controller is stationary if the acceleration vector is near
-//    //  1g for several updates (this may not always be correct)
-//    float length_sq = square(accel.X) + square(accel.Y) + square(accel.Z);
-
-//    // TODO: as I'm comparing _squared_ length, I really need different
-//    //		  min/max epsilons...
-//    #define DOT(x1,y1,z1, x2,y2,z2)	((x1*x2) + (y1*y2) + (z1*z2))
-
-//    static const float epsilon = 0.2f;
-//    if((length_sq >= (1.f-epsilon)) && (length_sq <= (1.f+epsilon)))
-//        {
-//        if(++WiimoteNearGUpdates < 2)
-//            return false;
-
-//        // wiimote seems to be stationary:  normalize the current acceleration
-//        //  (ie. the assumed gravity vector)
-//        float inv_len = 1.f / sqrt(length_sq);
-//        float x = accel.X * inv_len;
-//        float y = accel.Y * inv_len;
-//        float z = accel.Z * inv_len;
-
-//        // copy the values
-//        accel.Orientation.X = x;
-//        accel.Orientation.Y = y;
-//        accel.Orientation.Z = z;
-
-//        // and extract pitch & roll from them:
-//        // (may not be optimal)
-//        float pitch = -asin(y)    * 57.2957795f;
-////		float roll  =  asin(x)    * 57.2957795f;
-//        float roll  =  atan2(x,z) * 57.2957795f;
-//        if(z < 0) {
-//            pitch = (y < 0)?  180 - pitch : -180 - pitch;
-//            roll  = (x < 0)? -180 - roll  :  180 - roll;
-//            }
-
-//        accel.Orientation.Pitch = pitch;
-//        accel.Orientation.Roll  = roll;
-
-//        // show that we just updated orientation
-//        accel.Orientation.UpdateAge = 0;
-//#ifdef BEEP_ON_ORIENTATION_ESTIMATE
-//        Beep(2000, 1);
-//#endif
-//        return true; // updated
-//        }
-
-//    // not updated this time:
-//    WiimoteNearGUpdates	= 0;
-//    // age the last orientation update
-//    accel.Orientation.UpdateAge++;
-//    return false;
-//    }
-           throw new NotImplementedException();
-        }
-
 
          internal void InitMotionPlus()
          {
@@ -543,7 +459,7 @@ namespace ws.winx.devices
              _motionPlus.CalibrationInfo = new MotionPlusCalibrationInfo();
          }
 
-         public void UpdateMPlusCalibration(Vector3 values)
+         internal void UpdateMPlusCalibration(Vector3 values)
          {
              if (!_motionPlus.CalibrationInfo.mMotionPlusCalibrating)
              {
@@ -566,7 +482,7 @@ namespace ws.winx.devices
 
 
 
-             UnityEngine.Debug.Log(_motionPlus.CalibrationInfo.watch.ElapsedMilliseconds);
+            // UnityEngine.Debug.Log(_motionPlus.CalibrationInfo.watch.ElapsedMilliseconds);
 
 
 
@@ -599,9 +515,176 @@ namespace ws.winx.devices
          }
 
 
+        
+         /// <summary>
+		/// Gets the input.
+        /// IMPORTANT: If button or axis is already "DOWN" returns 0
+        /// GetInput is called in "edit mode" (when mapping in UI) and anykeydown for devices
+        /// during combos process
+		/// </summary>
+		/// <returns>The input.</returns>
+		 public override int GetInput(){
+           // UnityEngine.Debug.Log("GetInput:" + Time.frameCount);
+
+            //there is no  Time.frameCount in Editor (Edit mode - Editor scripts)
+            if(Application.isPlaying) 
+            {
+                   //prevents multiply update in frame
+                Update();
+               // if (!Update())
+               //     return 0;
+
+                
+
+
+                
+            }
+            else  
+                driver.Update(this);
+            
+
+          
+					int num_axes = 7;//Acceleration Axis not need digital input
+						
+					int axis = 0;
+					float joyValue=0f;
+					float joyValueMax = 0f;
+					
+					IAxisDetails axisDetails;
+
+
+
+
+                    /////////////////////////////////   HANDLE AXIS in DIGITAL MANNER //////////////////////////////
+
+                    int dominantAxisInx = -1;
+
+                    while (axis < num_axes)
+                    {
+
+                        if (axis < num_axes && (axisDetails = Axis[axis]) != null)
+                        {
+
+                            axisDetails = Axis[axis];
+                            joyValue = axisDetails.value;
+
+                            joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
+
+                            if (axisDetails.buttonState == JoystickButtonState.Down)
+                                if (joyValueMax < joyValue)
+                                {
+                                    joyValueMax = joyValue;
+                                    // dominantAxis = JoystickAxis.AxisV;
+                                    dominantAxisInx = axis;
+                                }
+
+
+
+                        }
+
+                        axis++;
+                    }
+
+
+                    // UnityEngine.Debug.Log(dominantAxisInx);
+                    if (dominantAxisInx > -1)
+                    {
+                        //if (dominantAxis != JoystickAxis.None) {
+
+                        //UnityEngine.Debug.Log("Count" + Axis.Count);
+                        // UnityEngine.Debug.Log("dominantAxis "+dominantAxis+" state"+Axis[dominantAxis].buttonState);
+
+                        //stick.AxisAsButtons [dominantAxis] != JoystickButtonState.Hold;
+
+                        // index 6 and 7 are reserved for Pov Axes
+                        if (dominantAxisInx == 6) //(int)JoystickAxis.AxisPovX
+                        {
+                            if (Axis[dominantAxisInx].value > 0)
+                                return KeyCodeExtension.toCode((Joysticks)ID, dominantAxisInx, JoystickPovPosition.Right);
+                            else
+                                return KeyCodeExtension.toCode((Joysticks)ID, dominantAxisInx, JoystickPovPosition.Left);
+                        }
+
+                        //if (Axis[JoystickAxis.AxisPovX].buttonState == JoystickButtonState.Down)
+                        //{
+
+                        if (dominantAxisInx == 7)//(int)JoystickAxis.AxisPovY
+                        {
+
+                            if (Axis[dominantAxisInx].value > 0)
+                                return KeyCodeExtension.toCode((Joysticks)ID, dominantAxisInx, JoystickPovPosition.Forward);
+                            else
+                                return KeyCodeExtension.toCode((Joysticks)ID, dominantAxisInx, JoystickPovPosition.Backward);
+                        }
+
+                        if (Axis[dominantAxisInx].value > 0)
+                            return KeyCodeExtension.toCode((Joysticks)ID, dominantAxisInx, (int)JoystickPosition.Positive);
+                        else
+                            return KeyCodeExtension.toCode((Joysticks)ID, dominantAxisInx, (int)JoystickPosition.Negative);
+
+
+
+                    }
+					
+					
+					
+					
+					
+					
+						// A discrete POV returns specific values for left, right, etc.
+						// A continuous POV returns an integer indicating an angle in degrees * 100, e.g. 18000 == 180.00 degrees.
+						// The vast majority of joysticks have discrete POVs, so we'll treat all of them as discrete for simplicity.
+						//					           0(Forward)
+						//						         |
+						//							     |
+						//				 (Left)27000----- ----9000(Right)
+						//						         |
+						//							     |
+						//							   18000(Backward)
+						
+						
+						
+					/////TODO make possible any axes to be POV (add isHatFirstAxis)
+                        // Axis [JoystickAxis.AxisPovX].isHat
+
+
+                    ///////////////////////////////////   HANDLE BUTTONS  //////////////////////////////
+
+					
+					int button = 0;
+                    int numButtons = Buttons.Count;
+                    ////DEBUG
+                    //if (this is WiimoteDevice)
+                    //{
+                    //    UnityEngine.Debug.Log("GetInput took state:" + button_collection[button].buttonState);
+                    //    if (button_collection[button].buttonState == JoystickButtonState.Down)
+                    //        return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.None, button);
+                    //}
+
+
+
+                    while (button < numButtons)
+                    {
+
+                   
+
+                        if (Buttons[button].buttonState == JoystickButtonState.Down)
+                            return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.None, button);
+
+                        // UnityEngine.Debug.Log("AfterbuttonState " + button_collection[0]);
+
+                        button++;
+
+                    }//while buttons
+		
+			return 0;
+
+
+		}
+
          // calculate the bias and std of angulr speeds
          // set mBias and mNoiseLevel
-         void calculateMPlusCalibration()
+         internal void calculateMPlusCalibration()
          {
              int n = _motionPlus.CalibrationInfo.mNoise.Count;
             
@@ -616,7 +699,7 @@ namespace ws.winx.devices
 
          }
 
-         void InitMPlusCalibration(float x, float y, float z)
+         internal void InitMPlusCalibration(float x, float y, float z)
          {
              _motionPlus.CalibrationInfo.watch = new Stopwatch();
              _motionPlus.CalibrationInfo.watch.Start();

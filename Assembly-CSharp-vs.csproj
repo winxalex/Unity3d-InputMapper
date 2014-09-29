@@ -101,6 +101,7 @@
      <Compile Include="Assets\Scripts\ws\winx\platform\Windows\WinMMDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\unity\Loader.cs" />
      <Compile Include="Assets\Scripts\ws\winx\unity\Tags.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\utils\ComplementaryFilter.cs" />
      <Compile Include="Assets\Scripts\ws\winx\utils\Extensions.cs" />
      <None Include="Assets\StreamingAssets\InputSettings.xml" />
      <None Include="Assets\Pluggins\Android\AndroidManifest.xml" />

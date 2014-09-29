@@ -98,7 +98,7 @@ namespace ws.winx.drivers
         public void Update(IDevice device)
         {
 
-            HIDDevice hidDevice;
+           
            WiimoteDevice wDevice=device as WiimoteDevice;
 
             //Add states
@@ -115,16 +115,19 @@ namespace ws.winx.drivers
                    // wDevice.Extensions = (byte)ExtensionType.MotionPlus;
 
                    // _hidInterface.Read(device, onRead, 0xffff);
-                       
+
+                    ReadMemory(wDevice, REGISTER_MOTIONPLUS_INIT, 1);
+                    ReadMemory(wDevice, REGISTER_EXTENSION_INIT1, 1);
+                    ReadMemory(wDevice, REGISTER_EXTENSION_INIT2, 1);  
                         //Start settup sequence
                         ClearExtension(wDevice);
 
-                       // _hidInterface.Read(device, onRead, 0xffff);
+                       //_hidInterface.Read(device, onRead, 0xffff);
+
+                    //ReadAccCalibration(wDevice);
                         
 
-                        
-
-                        //_hidInterface.Read(wDevice, onRead);//, 0xffff);
+                        _hidInterface.Read(wDevice, onRead);//, 0xffff);
                         
                        
 
@@ -133,54 +136,12 @@ namespace ws.winx.drivers
                   
                 }
 
-              
-
-                
-          
-
-            //switch(wDevice.processingMode){
-            //    case ProcessingMode.InProgress:
-            //        return;
-                
-            //    case ProcessingMode.Update:
-            //        wDevice.processingMode=ProcessingMode.InProgress;
-            //        _hidInterface.Read(wDevice,onRead);
-                        
-            //    break;
-
-            //    case ProcessingMode.AccCalibration:
-            //        ReadAccCalibration(wDevice, REGISTER_CALIBRATION, 7);
-            //    WriteMemory(wDevice, REGISTER_EXTENSION_INIT2, 0x00, (suc) =>
-            //    {
-                    
-            //    }
-
-
-            //        );
-                       
-            //    break;
-
-            //    case ProcessingMode.ExtCheck:
-            //     // force a status check to get the state of any extensions plugged in at startup
-            //       GetStatus(wDevice);
-            //    break;
-
-            //    case ProcessingMode.MPlusCheck:
-            //        CheckMotionPlusCapabilities(wDevice);
-            //    break;
-
-            //     case ProcessingMode.MPlusInit:
-            //       InitializeMotionPlus(wDevice);
-            //    break;
-
-            //     case ProcessingMode.MPlusCalibration:
-                  
-            //    break;
-
-            //}
-            
+                if(wDevice.isReady)
+                _hidInterface.Read(wDevice, onRead);
            
             }
+
+          
 
           
 
@@ -294,7 +255,7 @@ namespace ws.winx.drivers
                // StandardCallbackDelgate sd = new StandardCallbackDelgate(GetStatus);
 
                // sd.BeginInvoke(device, EndInvoker, sd);
-                GetStatus(device);
+               GetStatus(device);
           
                 //GetStatus
 
@@ -328,9 +289,11 @@ namespace ws.winx.drivers
 
           
           //  _hidInterface.Read(device, onRead, 0xffff);
+
+            if(!device.isReady)
             _hidInterface.Read(device, onRead);
 
-            UnityEngine.Debug.Log("loop");
+           // UnityEngine.Debug.Log("loop");
         }
 
         public IDevice ResolveDevice(IHIDDevice hidDevice)
@@ -496,22 +459,32 @@ namespace ws.winx.drivers
                 switch (type)
                 {
                     case InputReport.Buttons:
+                        device.DataReportType = (byte)type;
+
                         ParseButtons(device, buff);
                         break;
                     case InputReport.ButtonsAccel:
+                        device.DataReportType = (byte)type;
+
                         ParseButtons(device, buff);
                         if (device.isAccCalibrated) ParseAccel(device, buff);
                         break;
                     case InputReport.ButtonsIRAccel:
+                        device.DataReportType = (byte)type;
+
                         ParseButtons(device, buff);
                         if (device.isAccCalibrated) ParseAccel(device, buff);
                         ParseIR(device, buff);
                         break;
                     case InputReport.ButtonsExtension:
+                        device.DataReportType = (byte)type;
+
                         ParseButtons(device, buff);
                         ParseExtension(device, buff, 4);
                         break;
                     case InputReport.ButtonsExtensionAccel:
+                        device.DataReportType = (byte)type;
+
                         ParseButtons(device, buff);
 
                         if (device.isAccCalibrated) ParseAccel(device, buff);
@@ -519,6 +492,8 @@ namespace ws.winx.drivers
                         
                         break;
                     case InputReport.ButtonsIRExtensionAccel:
+                        device.DataReportType = (byte)type;
+
                         if (device.isReady)
                         {
                             ParseButtons(device, buff);
@@ -526,7 +501,7 @@ namespace ws.winx.drivers
                             ParseIR(device, buff);
                            ParseExtension(device, buff, 16);
                         }
-                        UnityEngine.Debug.Log("shit");
+                      //  UnityEngine.Debug.Log("shit");
                         if (device.motionPlus != null && device.motionPlus.Enabled && !device.motionPlus.CalibrationInfo.mMotionPlusCalibrated)
                         {
                             CalibrateMotionPlus(device, buff, 16);
@@ -578,7 +553,7 @@ namespace ws.winx.drivers
                         else if (device.motionPlus == null)
                         {
                             //device.processingMode = ProcessingMode.MPlusCheck;
-                            CheckMotionPlusCapabilities(device);
+                            //CheckMotionPlusCapabilities(device);
                         }
 
                       
@@ -600,6 +575,18 @@ namespace ws.winx.drivers
                             onReadExtension(device,result);
                         }else if(address == (REGISTER_EXTENSION_CALIBRATION & 0xffff)){
                            onExtensionCalibration(device, result);
+                        }
+                        else if (address == (REGISTER_MOTIONPLUS_INIT & 0xffff))
+                        {
+                            UnityEngine.Debug.Log("Motion REGISTER_MOTIONPLUS_INIT flag" + result[0]);
+                        }
+                        else if (address == (REGISTER_EXTENSION_INIT1 & 0xffff))
+                        {
+                            UnityEngine.Debug.Log("Motion REGISTER_EXTENSION_INIT1 flag" + result[0]);
+                        }
+                        else if (address == (REGISTER_EXTENSION_INIT2 & 0xffff))
+                        {
+                            UnityEngine.Debug.Log("Motion REGISTER_EXTENSION_INIT2 flag" + result[0]);
                         }
 
                         break;
@@ -663,12 +650,16 @@ namespace ws.winx.drivers
 
                 device.UpdateMPlusCalibration(device.motionPlus.RawValues);
 
+                if(device.motionPlus.CalibrationInfo.mMotionPlusCalibrated)
+                    device.isReady = true;
+
+
                 return;
             }
 
-            device.isReady = true;
+          
 
-            UnityEngine.Debug.Log("M+ calibrated => read");
+         
         }
 
 
@@ -792,7 +783,7 @@ namespace ws.winx.drivers
                      device.isReady = true;
 
                     
-
+                    if(device.DataReportType!=(byte)InputReport.ButtonsIRExtensionAccel)
                      SetReportType(device, InputReport.ButtonsIRExtensionAccel, true);
                 }
                  
@@ -854,6 +845,7 @@ namespace ws.winx.drivers
              if(type != (long)ExtensionNumber.Guitar && type!=(long)ExtensionNumber.Drums)
             type=type & 0x0000ffffffff;
 
+             short numCalibrationBytes = 16;
 
             switch((ExtensionNumber)type)
 			{
@@ -905,8 +897,9 @@ namespace ws.winx.drivers
                     else
                          device.Extensions |= (byte)ExtensionType.MotionPlus;
 
-                    
-                  
+
+                     numCalibrationBytes = 32;
+
 					break;
 				default:
 					throw new Exception("Unknown extension controller found: " + type.ToString("x"));
@@ -920,21 +913,22 @@ namespace ws.winx.drivers
 
 
 
-        
-            
-         
-              ReadExtensionCalibaration(device);
+
+
+
+            ReadExtensionCalibaration(device, numCalibrationBytes);
            
 
           
         }
 
 
-        protected void ReadExtensionCalibaration(WiimoteDevice device){
+        protected void ReadExtensionCalibaration(WiimoteDevice device, short numCalibrationBytes)
+        {
 
             UnityEngine.Debug.Log("ReadExtensionCalibaration");
 
-            ReadMemory(device, REGISTER_EXTENSION_CALIBRATION, 32);
+            ReadMemory(device, REGISTER_EXTENSION_CALIBRATION, numCalibrationBytes);
                     
         }
 
@@ -1106,6 +1100,8 @@ namespace ws.winx.drivers
         /// <param name="buff">Data buffer</param>
         private void ParseButtons(WiimoteDevice device, byte[] buff)
         {
+            //TODO Remove Debug
+            return;
 
             //mWiimoteState.ButtonState.A = (buff[2] & 0x08) != 0;
             //mWiimoteState.ButtonState.B = (buff[2] & 0x04) != 0;
@@ -1115,13 +1111,13 @@ namespace ws.winx.drivers
             //mWiimoteState.ButtonState.One = (buff[2] & 0x02) != 0;
             //mWiimoteState.ButtonState.Two = (buff[2] & 0x01) != 0;
 
-            device.Buttons[0].value = (float)(buff[2] & 0x08);
-            device.Buttons[1].value = (float)(buff[2] & 0x04);
-            device.Buttons[2].value = (float)(buff[2] & 0x10);
-            device.Buttons[3].value = (float)(buff[2] & 0x80);
-            device.Buttons[4].value = (float)(buff[1] & 0x10);
-            device.Buttons[5].value = (float)(buff[2] & 0x02);
-            device.Buttons[6].value = (float)(buff[2] & 0x01);
+            device.Buttons[0].value = (buff[2] & 0x08) == 0 ? 0f : 1f;
+            device.Buttons[1].value = (buff[2] & 0x04) == 0 ? 0f : 1f;
+            device.Buttons[2].value = (buff[2] & 0x10) == 0 ? 0f : 1f;
+            device.Buttons[3].value = (buff[2] & 0x80) == 0 ? 0f : 1f;
+            device.Buttons[4].value = (buff[1] & 0x10) == 0 ? 0f : 1f;
+            device.Buttons[5].value = (buff[2] & 0x02) == 0 ? 0f : 1f;
+            device.Buttons[6].value = (buff[2] & 0x01) == 0 ? 0f : 1f;
 
             //mWiimoteState.ButtonState.Up = (buff[1] & 0x08) != 0;
             //mWiimoteState.ButtonState.Down = (buff[1] & 0x04) != 0;
@@ -1201,6 +1197,8 @@ namespace ws.winx.drivers
         private void ParseAccel(WiimoteDevice device, byte[] buff)
         {
             AxisDetails axisDetails;
+            
+
             axisDetails = device.Axis[JoystickAxis.AxisAccX] as AxisDetails;
             axisDetails.value = (float)buff[3] - axisDetails.min / (axisDetails.max - axisDetails.min);
 
@@ -1366,11 +1364,14 @@ namespace ws.winx.drivers
         private void ParseExtension(WiimoteDevice device, byte[] buff, int offset)
         {
             AxisDetails axisDetails;
-
+float value;
 
              if  ((device.Extensions & (byte)ExtensionType.Nunchuck) !=0){
 			
                     if(device.Mode == PassThruMode.Nunchuck){
+
+                        UnityEngine.Debug.LogError("Not tested");
+
                         if((buff[offset + 5] & 0x03)==0x00){
                                 //interleave mode
                              //if (extension_data.size() >= 6 && !(extension_data[5] & 0x03))
@@ -1393,9 +1394,13 @@ namespace ws.winx.drivers
 
                             axisDetails = device.Axis[JoystickAxis.AxisX] as AxisDetails;
 
+                            
+
                             if (axisDetails.max > 0f)
                             {
-                                axisDetails.value = ((float)buff[offset] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                                value=((float)buff[offset] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+
+                                axisDetails.value = value < 0.15 && value > -0.15 ? 0f : value;
                             }
 
 
@@ -1452,7 +1457,9 @@ namespace ws.winx.drivers
 
                             if (axisDetails.max > 0f)
                             {
-                                axisDetails.value = ((float)buff[offset] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                                value = ((float)buff[offset] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+
+                                axisDetails.value = value < 0.15 && value > -0.15 ? 0f : value;
                             }
 
 
@@ -1460,7 +1467,8 @@ namespace ws.winx.drivers
 
                             if (axisDetails.max > 0f)
                             {
-                                axisDetails.value = ((float)buff[offset + 1] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                                value = ((float)buff[offset + 1] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                                axisDetails.value = value < 0.15 && value > -0.15 ? 0f : value;                               
                             }
 
 
@@ -1496,8 +1504,12 @@ namespace ws.winx.drivers
                     //mWiimoteState.NunchukState.AccelState.RawValues.Y = buff[offset + 3];
                     //mWiimoteState.NunchukState.AccelState.RawValues.Z = buff[offset + 4];
 
-                    device.Buttons[7].value = (float)(buff[offset + 5] & 0x02);
-                    device.Buttons[8].value = (float)((buff[offset + 5] & 0x01));
+                    device.Buttons[7].value = (buff[offset + 5] & 0x02)==0 ? 1f: 0f;
+                    device.Buttons[8].value = (buff[offset + 5] & 0x01)==0 ? 1f: 0f;
+
+                  //  UnityEngine.Debug.Log("Button7 value=" + device.Buttons[0].value + " " + device.Buttons[0].buttonState);
+
+                   // UnityEngine.Debug.Log("Button7 "+buff[offset + 5]+" masked:"+(buff[offset + 5] & 0x02)+" value=" + device.Buttons[7].value);
 
                     // mWiimoteState.NunchukState.C = (buff[offset + 5] & 0x02) == 0;
                     // mWiimoteState.NunchukState.Z = (buff[offset + 5] & 0x01) == 0;
@@ -1550,7 +1562,7 @@ namespace ws.winx.drivers
 
              else if ((device.Extensions & (byte)ExtensionType.ClassicController) != 0)
              {
-
+                 UnityEngine.Debug.LogError("Not tested");
                  if (device.Mode == PassThruMode.ClassicController)
                  {
 
@@ -1662,9 +1674,9 @@ namespace ws.winx.drivers
                      //mWiimoteState.ClassicControllerState.ButtonState.Home = (buff[offset + 4] & 0x08) == 0;
                      //mWiimoteState.ClassicControllerState.ButtonState.Minus = (buff[offset + 4] & 0x10) == 0;
 
-                     device.Buttons[4].value = (float)(buff[1] & 0x10);
-                     device.Buttons[3].value = (float)(buff[2] & 0x80);
-                     device.Buttons[2].value = (float)(buff[2] & 0x10);
+                     device.Buttons[4].value = (buff[offset + 4] & 0x04) == 0 ? 1f : 0f;
+                     device.Buttons[3].value = (buff[offset + 4] & 0x08) == 0 ? 1f : 0f;
+                     device.Buttons[2].value = (buff[offset + 4] & 0x10) == 0 ? 1f : 0f;
 
 
 
@@ -1697,12 +1709,12 @@ namespace ws.winx.drivers
                      //BUTTONS
 
 
-                     device.Buttons[7].value = (float)(buff[offset + 5] & 0x04);
-                     device.Buttons[8].value = (float)(buff[offset + 5] & 0x08);
-                     device.Buttons[0].value = (float)(buff[offset + 5] & 0x10);
-                     device.Buttons[9].value = (float)(buff[offset + 5] & 0x20);
-                     device.Buttons[1].value = (float)(buff[offset + 5] & 0x40);
-                     device.Buttons[10].value = (float)(buff[offset + 5] & 0x80);
+                     device.Buttons[7].value = (buff[offset + 5] & 0x04) == 0 ? 1f : 0f;
+                     device.Buttons[8].value = (buff[offset + 5] & 0x08) == 0 ? 1f : 0f;
+                     device.Buttons[0].value = (buff[offset + 5] & 0x10) == 0 ? 1f : 0f;
+                     device.Buttons[9].value = (buff[offset + 5] & 0x20) == 0 ? 1f : 0f;
+                     device.Buttons[1].value = (buff[offset + 5] & 0x40) == 0 ? 1f : 0f;
+                     device.Buttons[10].value = (buff[offset + 5] & 0x80) == 0 ? 1f : 0f;
 
 
 
@@ -1787,14 +1799,26 @@ namespace ws.winx.drivers
 
 
 
-                
+                     if (device.motionPlus.Values.z < 0.5 && device.motionPlus.Values.z > -0.5)
+                         device.motionPlus.Values.z = 0;
+
+
+                     if (device.motionPlus.Values.x < 0.5 && device.motionPlus.Values.x > -0.5)
+                         device.motionPlus.Values.x = 0;
+
+
+
+                     if (device.motionPlus.Values.y < 0.5 && device.motionPlus.Values.y > -0.5)
+                         device.motionPlus.Values.y = 0;
 
 
                      //test
-                     if ((buff[offset + 4] & 0x01) == 1)
+                     if ((buff[offset + 4] & 0x01) == 1 && device.isReady)
                      {
-                        
+                         device.isReady = false;
 
+                         UnityEngine.Debug.Log("Device is attached in continuation of M+");
+                       
                          if (device.Mode == PassThruMode.Noone)
                          {
 
@@ -1803,7 +1827,7 @@ namespace ws.winx.drivers
 
                          }
 
-                        // GetStatus(device);
+                         GetStatus(device);
 
                         
                      }
@@ -2625,7 +2649,7 @@ namespace ws.winx.drivers
 
                     _value = value;
 
-
+                   // UnityEngine.Debug.Log("_buttonState:" + _buttonState);
 
                 }//set
             }
