@@ -544,7 +544,7 @@ namespace ws.winx.devices
             
 
           
-					int num_axes = 7;//Acceleration Axis not need digital input
+					int num_axes = 8;//Acceleration Axis not need digital input
 						
 					int axis = 0;
 					float joyValue=0f;

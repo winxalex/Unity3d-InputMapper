@@ -116,9 +116,11 @@ namespace ws.winx.drivers
 
                    // _hidInterface.Read(device, onRead, 0xffff);
 
-                    ReadMemory(wDevice, REGISTER_MOTIONPLUS_INIT, 1);
-                    ReadMemory(wDevice, REGISTER_EXTENSION_INIT1, 1);
-                    ReadMemory(wDevice, REGISTER_EXTENSION_INIT2, 1);  
+                    //ReadMemory(wDevice, REGISTER_MOTIONPLUS_INIT, 1);
+                    //ReadMemory(wDevice, REGISTER_EXTENSION_INIT1, 1);
+                    //ReadMemory(wDevice, REGISTER_EXTENSION_INIT2, 1); 
+
+                    _hidInterface.Read(wDevice, onRead);
                         //Start settup sequence
                         ClearExtension(wDevice);
 
@@ -127,7 +129,7 @@ namespace ws.winx.drivers
                     //ReadAccCalibration(wDevice);
                         
 
-                        _hidInterface.Read(wDevice, onRead);//, 0xffff);
+                        //, 0xffff);
                         
                        
 
@@ -155,7 +157,7 @@ namespace ws.winx.drivers
             device.processingMode = ProcessingMode.ClearExtension;
 
             UnityEngine.Debug.Log("ClearExtension");
-             _hidInterface.Read(device, onRead);
+            
             WriteMemory(device, REGISTER_EXTENSION_INIT1, 0x55);
            
             //WriteMemory(device, REGISTER_EXTENSION_INIT2, 0x00);
@@ -553,7 +555,7 @@ namespace ws.winx.drivers
                         else if (device.motionPlus == null)
                         {
                             //device.processingMode = ProcessingMode.MPlusCheck;
-                            //CheckMotionPlusCapabilities(device);
+                            CheckMotionPlusCapabilities(device);
                         }
 
                       
@@ -845,6 +847,11 @@ namespace ws.winx.drivers
              if(type != (long)ExtensionNumber.Guitar && type!=(long)ExtensionNumber.Drums)
             type=type & 0x0000ffffffff;
 
+             if (((byte)device.Extensions & type) != 0)
+             {
+                 UnityEngine.Debug.Log("Double package. Extesnion already registered");
+             }
+
              short numCalibrationBytes = 16;
 
             switch((ExtensionNumber)type)
@@ -1100,8 +1107,7 @@ namespace ws.winx.drivers
         /// <param name="buff">Data buffer</param>
         private void ParseButtons(WiimoteDevice device, byte[] buff)
         {
-            //TODO Remove Debug
-            return;
+          
 
             //mWiimoteState.ButtonState.A = (buff[2] & 0x08) != 0;
             //mWiimoteState.ButtonState.B = (buff[2] & 0x04) != 0;
