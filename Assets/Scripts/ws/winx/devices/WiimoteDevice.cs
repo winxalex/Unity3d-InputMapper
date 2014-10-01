@@ -175,7 +175,8 @@ namespace ws.winx.devices
             public List<Vector3> mNoise;
             public Vector3 mBias;
             public Vector3 mMinNoise;
-
+            public float slowFactor = 500 / 8192f;//deg/unit  0.05f;//   500/8192f;//deg/unit
+            public float fastFactor = 2000 / 8192f;//deg/unit 0.25f;// 2000/8192f ;//deg/unit
 
             public bool mMotionPlusCalibrated;
             public bool mMotionPlusCalibrating;

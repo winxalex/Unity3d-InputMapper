@@ -652,8 +652,12 @@ namespace ws.winx.drivers
 
                 device.UpdateMPlusCalibration(device.motionPlus.RawValues);
 
-                if(device.motionPlus.CalibrationInfo.mMotionPlusCalibrated)
+                if (device.motionPlus.CalibrationInfo.mMotionPlusCalibrated)
+                {
                     device.isReady = true;
+
+                    UnityEngine.Debug.Log("BIAS:" + device.motionPlus.CalibrationInfo.mBias.x + " " + device.motionPlus.CalibrationInfo.mBias.y + " " + device.motionPlus.CalibrationInfo.mBias.z);
+                }
 
 
                 return;
@@ -1206,19 +1210,24 @@ namespace ws.winx.drivers
             
 
             axisDetails = device.Axis[JoystickAxis.AxisAccX] as AxisDetails;
-            axisDetails.value = (float)buff[3] - axisDetails.min / (axisDetails.max - axisDetails.min);
+            axisDetails.value = (float)(buff[3] - axisDetails.min) / (axisDetails.max - axisDetails.min);
 
 
             axisDetails = device.Axis[JoystickAxis.AxisAccY] as AxisDetails;
-            axisDetails.value = (float)buff[4] - axisDetails.min / (axisDetails.max - axisDetails.min);
+            axisDetails.value = (float)(buff[4] - axisDetails.min) / (axisDetails.max - axisDetails.min);
 
             axisDetails = device.Axis[JoystickAxis.AxisAccZ] as AxisDetails;
-            axisDetails.value = (float)buff[5] - axisDetails.min / (axisDetails.max - axisDetails.min);
+            axisDetails.value = (float)(buff[5] - axisDetails.min) / (axisDetails.max - axisDetails.min);
 
-
+           // UnityEngine.Debug.Log("AccX:" + device.Axis[JoystickAxis.AxisAccX].value + " AccY:" + device.Axis[JoystickAxis.AxisAccY].value + " AccZ:" + device.Axis[JoystickAxis.AxisAccZ].value);
+           
             //mWiimoteState.AccelState.RawValues.X = buff[3];
             //mWiimoteState.AccelState.RawValues.Y = buff[4];
             //mWiimoteState.AccelState.RawValues.Z = buff[5];
+
+            //mWiimoteState.AccelState.RawValues8b.X = (buff[3] << 2) | (buff[0] >> 5 & 0x3);// 
+            //mWiimoteState.AccelState.RawValues8b.Y = (buff[4] << 2) | (buff[1] >> 4 & 0x2);//
+            //mWiimoteState.AccelState.RawValues8b.Z = (buff[5] << 2) | (buff[1] >> 5 & 0x2);//
 
             //mWiimoteState.AccelState.Values.X = (float)((float)mWiimoteState.AccelState.RawValues.X - mWiimoteState.AccelCalibrationInfo.X0) /
             //                                ((float)mWiimoteState.AccelCalibrationInfo.XG - mWiimoteState.AccelCalibrationInfo.X0);
@@ -1404,7 +1413,7 @@ float value;
 
                             if (axisDetails.max > 0f)
                             {
-                                value=((float)buff[offset] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                                value=(float)(buff[offset] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
 
                                 axisDetails.value = value < 0.15 && value > -0.15 ? 0f : value;
                             }
@@ -1414,7 +1423,7 @@ float value;
 
                             if (axisDetails.max > 0f)
                             {
-                                axisDetails.value = ((float)buff[offset + 1] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                                axisDetails.value = (float)(buff[offset + 1] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
                             }
 
 
@@ -1463,7 +1472,7 @@ float value;
 
                             if (axisDetails.max > 0f)
                             {
-                                value = ((float)buff[offset] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                                value = (float)(buff[offset] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
 
                                 axisDetails.value = value < 0.15 && value > -0.15 ? 0f : value;
                             }
@@ -1473,7 +1482,7 @@ float value;
 
                             if (axisDetails.max > 0f)
                             {
-                                value = ((float)buff[offset + 1] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
+                                value = (float)(buff[offset + 1] - axisDetails.mid) / (axisDetails.max - axisDetails.min);
                                 axisDetails.value = value < 0.15 && value > -0.15 ? 0f : value;                               
                             }
 
@@ -1487,7 +1496,7 @@ float value;
 
                     if (axisDetails.max > 0f)
                     {
-                        axisDetails.value = ((float)buff[offset + 2] - axisDetails.min) / (axisDetails.max - axisDetails.min);
+                        axisDetails.value = (float)(buff[offset + 2] - axisDetails.min) / (axisDetails.max - axisDetails.min);
                     }
 
 
@@ -1495,14 +1504,14 @@ float value;
 
                     if (axisDetails.max > 0f)
                     {
-                        axisDetails.value = ((float)buff[offset + 3] - axisDetails.min) / (axisDetails.max - axisDetails.min);
+                        axisDetails.value = (float)(buff[offset + 3] - axisDetails.min) / (axisDetails.max - axisDetails.min);
                     }
 
                     axisDetails = device.Axis[JoystickAxis.AxisAccV] as AxisDetails;
 
                     if (axisDetails.max > 0f)
                     {
-                        axisDetails.value = ((float)buff[offset + 4] - axisDetails.min) / (axisDetails.max - axisDetails.min);
+                        axisDetails.value = (float)(buff[offset + 4] - axisDetails.min) / (axisDetails.max - axisDetails.min);
                     }
 
 
@@ -1769,8 +1778,7 @@ float value;
                      //slow
                      // (N-8192)/16384 * 3.3V * (1 deg/s)/.002V * (Pi radians)/(180 deg)
 
-                     const float slowFactor = 500 / 8192f;//deg/unit  0.05f;//   500/8192f;//deg/unit
-                     const float fastFactor = 2000 / 8192f;//deg/unit 0.25f;// 2000/8192f ;//deg/unit
+                  
                      // (value - offest) *gain;
                      //  short yaw   = ((unsigned short)buff[offset+3] & 0xFC)<<6 |
                      //               (unsigned short)buff[offset+0];
@@ -1793,9 +1801,11 @@ float value;
                      // mWiimoteState.MotionPlusState.RawValues.X = (buff[offset + 0] | (buff[offset + 3] & 0xfa) << 6);
                      //  mWiimoteState.MotionPlusState.RawValues.Y = (buff[offset + 1] | (buff[offset + 4] & 0xfa) << 6);
                      //  mWiimoteState.MotionPlusState.RawValues.Z = (buff[offset + 2] | (buff[offset + 5] & 0xfa) << 6);
-                     
 
-              
+
+
+                     float fastFactor = device.motionPlus.CalibrationInfo.fastFactor;
+                     float slowFactor = device.motionPlus.CalibrationInfo.slowFactor;
 
 
                     //alex winx deg/s

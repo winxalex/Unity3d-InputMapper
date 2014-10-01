@@ -15,6 +15,7 @@ using ws.winx.gui;
 using ws.winx.unity;
 using System.Timers;
 using ws.winx.drivers;
+using ws.winx.utils;
 
 
 namespace ws.winx
@@ -32,29 +33,39 @@ namespace ws.winx
         //		static int waveState = Animator.StringToHash("Layer2.Wave");
 
 
-      
-        
-       
+
+
+
         //bool isConnected = usbI.Connect();
         //Debug.Log(isConnected);
         //USBHIDDRIVER.USB
         //bool isConnected = usbI.Connect();
-   
 
 
-        Animator animator=null;
-		bool _settingsLoaded=false;
+
+        Animator animator = null;
+        bool _settingsLoaded = false;
         private float vSliderValue;
         private ThrustmasterRGTFFDDevice device;
         private byte forceX;
         private Timer timer;
         private float vSliderValuePrev;
         IEnumerator runEffectEnumerator;
+        ComplementaryFilter complementaryFuzer;
+        float lastTime = -1f;
+        public static double RAD_TO_DEG = 180 / Math.PI;
+        public static double DEG_TO_RAD = Math.PI / 180;
+        GameObject wiimote;
+        Vector3 Angles;
 
 
         // Use this for initialization
         void Start()
         {
+            complementaryFuzer = new ComplementaryFilter();
+            wiimote = GameObject.Find("wiimote");
+            Angles = new Vector3();
+
             animator = GameObject.FindObjectOfType<Animator>();
 
             vSliderValuePrev = vSliderValue = 128f;
@@ -63,42 +74,43 @@ namespace ws.winx
             timer.Elapsed += new ElapsedEventHandler(onTimerElapsed);
 
             UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
-           
+
 
             //supporting devices with custom drivers
             //When you add them add specialized first then XInputDriver  then wide range supporting drivers UnityDriver
-#if (UNITY_STANDALONE_WIN || UNITY_ANDROID) 
+#if (UNITY_STANDALONE_WIN || UNITY_ANDROID)
             InputManager.AddDriver(new ThrustMasterDriver());
             InputManager.AddDriver(new WiiDriver());
 
-			   // InputManager.AddDriver(new ws.winx.platform.windows.XInputDriver());
+            // InputManager.AddDriver(new ws.winx.platform.windows.XInputDriver());
 #endif
 
             // !!!Postive аxes mapping only currently(need to find way to distinct postive from negative axis)
-      
-// if(Application.isPlaying)
-     //     InputManager.AddDriver(new UnityDriver());
+
+            // if(Application.isPlaying)
+            //     InputManager.AddDriver(new UnityDriver());
 
 
             //if you want to load some states from .xml and add custom manually first load settings xml
             //!!!Application.streamingAssetPath gives "Raw" folder in web player
-        
+
 #if (UNITY_STANDALONE || UNITY_EDITOR ) && !UNITY_WEBPLAYER && !UNITY_ANDROID
-			//UnityEngine.Debug.Log("Standalone");
-                  
-			
-			if(ui!=null && ui.settingsXML==null){//settingsXML would trigger internal loading mechanism (only for testing)
-
-                 InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));
+            //UnityEngine.Debug.Log("Standalone");
 
 
-            
-				ui.StateInputCombinations=InputManager.Settings.stateInputs;
-			}
-            
-            
+            if (ui != null && ui.settingsXML == null)
+            {//settingsXML would trigger internal loading mechanism (only for testing)
+
+                InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));
+
+
+
+                ui.StateInputCombinations = InputManager.Settings.stateInputs;
+            }
+
+
             manuallyAddStateAndHandlers();
-			
+
 #endif
 
 #if UNITY_ANDROID
@@ -252,11 +264,11 @@ namespace ws.winx
             //			InputManager.MapStateToInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
             //			InputManager.MapStateToInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
 
-        
+
 
             ////easiest way to map state to combination (ex.of single W and C click)
-            if(!InputManager.HasInputState("ManualAddedSTATE"))
-            InputManager.MapStateToInput("ManualAddedSTATE", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
+            if (!InputManager.HasInputState("ManualAddedSTATE"))
+                InputManager.MapStateToInput("ManualAddedSTATE", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
 
             UnityEngine.Debug.Log("Log:" + InputManager.Log());
 
@@ -278,13 +290,13 @@ namespace ws.winx
         void Update()
         {
 
-			//Use is mapping states so no quering keys during gameplay
-			if (InputManager.EditMode ||  !_settingsLoaded) return ;
+            //Use is mapping states so no quering keys during gameplay
+            if (InputManager.EditMode || !_settingsLoaded) return;
 
 
             //Input.GetInput allows combos (combined input actions)
             if (InputManager.GetInputDown((int)States.Wave))// || InputManager.GetInput((int)States.Wave,true))
-           // if (InputManager.GetInput((int)States.Wave,false))
+            // if (InputManager.GetInput((int)States.Wave,false))
             {
                 Debug.Log("Wave Down");
                 animator.Play((int)States.Wave);
@@ -298,7 +310,46 @@ namespace ws.winx
             }
 
 
-           
+            #region Testing Fuzer
+            //Demo of use of M+ and Acc data from Wiimote
+            //you will use ofcourse some sofisticate algo based on Kalman or Magdwick filter to process data
+
+
+            //take all devices of type WiimoteDevice
+            List<WiimoteDevice> wiimoteDevices = InputManager.GetJoysticks<WiimoteDevice>();
+
+            if (wiimoteDevices.Count > 0)
+            {
+                WiimoteDevice device = wiimoteDevices[0];
+
+                if (device.isReady)
+                {
+                    if (device.motionPlus != null)
+                    {
+                        if (lastTime < 0f)
+                        {
+                            lastTime = Time.time;
+                        }
+
+                        complementaryFuzer.Update(device.Axis[JoystickAxis.AxisAccX].value, device.Axis[JoystickAxis.AxisAccY].value, device.Axis[JoystickAxis.AxisAccZ].value, device.motionPlus.Values.x * DEG_TO_RAD, device.motionPlus.Values.y * DEG_TO_RAD, device.motionPlus.Values.z * DEG_TO_RAD, Time.time - lastTime);
+                        lastTime = Time.time;
+
+
+
+                        Angles.x = (float)(complementaryFuzer.Angles.x * RAD_TO_DEG);
+                        Angles.y = (float)(complementaryFuzer.Angles.z * RAD_TO_DEG);
+                        Angles.z = (float)(complementaryFuzer.Angles.y * RAD_TO_DEG);
+
+                        // UnityEngine.Debug.Log(Angles.z);
+                        UnityEngine.Debug.Log(Angles.x + " " + Angles.y + " " + Angles.z);
+
+                        wiimote.transform.rotation = Quaternion.Euler(Angles);
+                    }
+                }
+            }
+
+            #endregion
+
 
             //if (InputManager.GetInput((int)States.MyCustomState, false))
             //{
@@ -349,38 +400,40 @@ namespace ws.winx
         void OnGUI()
         {
             //don't take device here in the loop this is just for demo
-            if(InputManager.hidInterface.Devices.ContainsKey(0))
-            device = InputManager.hidInterface.Devices[0] as ThrustmasterRGTFFDDevice;
+            if (InputManager.hidInterface.Devices.ContainsKey(0))
+                device = InputManager.hidInterface.Devices[0] as ThrustmasterRGTFFDDevice;
 
-                 if (device == null) return;
-             
+            if (device == null) return;
+
             //#if UNITY_ANDROID
-             
+
             vSliderValue = GUI.HorizontalSlider(new Rect(25, 520, 400, 100), vSliderValue, 255.0F, 0.0F);
-           // #endif
+            // #endif
 
             if (vSliderValue != vSliderValuePrev)
-               device.SetMotor(Convert.ToByte(vSliderValue),0xA7,onMotorSet);
+                device.SetMotor(Convert.ToByte(vSliderValue), 0xA7, onMotorSet);
 
-            vSliderValuePrev=vSliderValue;
-           
+            vSliderValuePrev = vSliderValue;
 
 
-            if(GUI.Button(new Rect(25, 590, 100, 130),"Stop Motor")){
+
+            if (GUI.Button(new Rect(25, 590, 100, 130), "Stop Motor"))
+            {
                 //timer.Stop();
                 StopCoroutine(runEffectEnumerator);
                 device.StopMotor(onMotorStop);
-                 vSliderValue = 128;
+                vSliderValue = 128;
             }
 
-            if(GUI.Button( new Rect(150, 590, 100, 130),"Rumble")){
-               // timer.Stop();
-               // this.InvokeRepeating("runEffect",1,
+            if (GUI.Button(new Rect(150, 590, 100, 130), "Rumble"))
+            {
+                // timer.Stop();
+                // this.InvokeRepeating("runEffect",1,
                 runEffectEnumerator = runEffect();
 
                 device.StopMotor(onMotorStop);
 
-                 StartCoroutine(runEffectEnumerator);
+                StartCoroutine(runEffectEnumerator);
                 // timer.Start();
             }
         }
@@ -406,14 +459,15 @@ namespace ws.winx
                 yield return new WaitForSeconds(0.5f);
             }
 
-           // yield break;
-                 
+            // yield break;
+
         }
 
-        void onTimerElapsed( object sender,ElapsedEventArgs args){
-            forceX+=0xA7;
-            device.SetMotor(forceX, forceX,onMotorSet);
-          }
+        void onTimerElapsed(object sender, ElapsedEventArgs args)
+        {
+            forceX += 0xA7;
+            device.SetMotor(forceX, forceX, onMotorSet);
+        }
 
 
 
