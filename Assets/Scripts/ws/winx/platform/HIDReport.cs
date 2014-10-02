@@ -17,7 +17,8 @@ namespace ws.winx.platform
                 NoDataRead = 3,
                 ReadError = 4,
                 NotConnected = 5,
-                Refresh = 6
+                Refresh = 6,
+                Resent
             }
 
             public HIDReport()

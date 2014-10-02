@@ -172,6 +172,8 @@ namespace ws.winx.platform.windows
         {
             if (IsReadInProgress)
             {
+              //  UnityEngine.Debug.Log("Clone paket");
+                __lastHIDReport.Status = HIDReport.ReadStatus.Resent;
                 callback.BeginInvoke(__lastHIDReport, EndReadCallback, callback);
                 // callback.Invoke(__lastHIDReport);
                 return;

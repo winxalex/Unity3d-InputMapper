@@ -324,7 +324,7 @@ namespace ws.winx
 
                 if (device.isReady)
                 {
-                    if (device.motionPlus != null)
+                    if (device.motionPlus != null && device.motionPlus.Enabled)
                     {
                         if (lastTime < 0f)
                         {
@@ -341,7 +341,7 @@ namespace ws.winx
                         Angles.z = (float)(complementaryFuzer.Angles.y * RAD_TO_DEG);
 
                         // UnityEngine.Debug.Log(Angles.z);
-                        UnityEngine.Debug.Log(Angles.x + " " + Angles.y + " " + Angles.z);
+                       // UnityEngine.Debug.Log(Angles.x + " " + Angles.y + " " + Angles.z);
 
                         wiimote.transform.rotation = Quaternion.Euler(Angles);
                     }

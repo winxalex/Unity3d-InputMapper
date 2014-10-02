@@ -233,6 +233,7 @@ namespace ws.winx.devices
             public bool YawFast = false;
             public bool PitchFast = false;
             public bool RollFast = false;
+            public bool DisableStatusEvent=false;
 
 
 
@@ -370,6 +371,9 @@ namespace ws.winx.devices
             get { return _DataReportType; }
             internal set { _DataReportType = value; }
         }
+
+
+        internal bool isInProccesingExtension = false;
       
 
         public WiimoteDevice(int id,int pid,int vid, int axes, int buttons,int leds,int irs,IDriver driver)
@@ -456,8 +460,12 @@ namespace ws.winx.devices
 
          internal void InitMotionPlus()
          {
-             _motionPlus = new MotionPlus();
-             _motionPlus.CalibrationInfo = new MotionPlusCalibrationInfo();
+             if (_motionPlus == null)
+             {
+                 _motionPlus = new MotionPlus();
+                 _motionPlus.CalibrationInfo = new MotionPlusCalibrationInfo();
+             }
+             
          }
 
          internal void UpdateMPlusCalibration(Vector3 values)
@@ -730,8 +738,29 @@ namespace ws.winx.devices
 
          }
 
+        /// <summary>
+        /// Set the LEDs on the Wiimote
+        /// </summary>
+        /// <param name="inx">led index(0 to 3)</param>
+         public void SetLEDs(int inx)
+         {
+             if (inx < 0 || inx > 3) return;
 
-        public UnityEngine.Vector2 GetIRPoint(){
+             ((WiiDriver)driver).SetLEDs(this, 1 << inx);
+         }
+
+
+         /// <summary>
+         /// Toggle rumble
+         /// </summary>
+         /// <param name="on">On or off</param>
+         internal void SetRumble(bool on)
+         {
+             ((WiiDriver)driver).SetRumble(this,on);
+         }
+
+
+        public Vector2 GetIRPoint(){
 
 
 
@@ -793,6 +822,60 @@ return _irPoint;
             Disconnect();
         }
 
-      
+
+
+        internal void Reset()
+        {
+            int num_axes = Axis.Count;//Acceleration Axis not need digital input
+
+            int axis = 0;
+          
+
+            IAxisDetails axisDetails;
+
+
+
+
+            /////////////////////////////////   RESET AXIS  //////////////////////////////
+
+
+            while (axis < num_axes)
+            {
+
+                if (axis < num_axes && (axisDetails = Axis[axis]) != null)
+                {
+
+                    axisDetails = Axis[axis];
+                    axisDetails.value = 0f;
+                    
+                }
+
+                axis++;
+            }
+
+
+          
+
+
+
+            ///////////////////////////////////   RESET BUTTONS  //////////////////////////////
+
+
+            int button = 0;
+            int numButtons = Buttons.Count;
+       
+
+
+            while (button < numButtons)
+            {
+
+
+
+                Buttons[button].value = 0f;
+
+                button++;
+
+            }//while buttons
+        }
     }
 }
