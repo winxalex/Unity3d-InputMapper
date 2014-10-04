@@ -20,10 +20,10 @@ namespace ws.winx.drivers
     public class XInputDriver : IDriver
     {
 
-        XInputState state;
+      
 //        IHIDInterface _hidInterface;
         int _lastFrameNum = -1;
-        IntPtr xInputStatePtr;
+    
 
         private const float XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE = 0.239f;//7849;
         private const float XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE = 0.265f;//8689
@@ -39,19 +39,17 @@ namespace ws.winx.drivers
         }
 
 
-        /// <summary>
-        /// 
-        /// Need Direct X to be install
-        /// Dependent of XInputInterface.dll wrapper calls of (xinput1_3.dll)
-        /// </summary>
+       /// <summary>
+       /// 
+       /// </summary>
         public XInputDriver()
         {
-            xInputStatePtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(XInputState)));
+           
 
         }
 
         int[] XPAD_DEVICE = new int[] {
-                 0x0A5C, 0x4503, /*My XBOX test Xbox 360 Wireless Receiver */(int)XTYPE.XBOX,
+                 0x045e, 0x02A1, /*My XBOX test Xbox 360 Wireless Receiver */(int)XTYPE.XBOX360W,
  	             0x045e, 0x0202, /* "Microsoft X-Box pad v1 (US)",0*/  (int)XTYPE.XBOX ,
 	             0x045e, 0x0289, /* "Microsoft X-Box pad v2 (US)", 0*/ (int)XTYPE.XBOX ,
  	             0x045e, 0x0285,  /*"Microsoft X-Box pad (Japan)", 0*/ (int)XTYPE.XBOX ,
@@ -112,6 +110,7 @@ namespace ws.winx.drivers
                  
  	            
  };
+        private IHIDInterface _hidInterface;
 
 
 
@@ -121,10 +120,11 @@ namespace ws.winx.drivers
 
         #region IJoystickDriver implementation
 
-        public void Update(IDevice joystick)
+        public void Update(IDevice device)
         //public void Update (IDevice<ws.winx.devices.IAxisDetails, ws.winx.devices.IButtonDetails, ws.winx.devices.IDeviceExtension> joystick)
         {
-            GamePad gamePad;
+          
+
 
             //don't update in same frame twice
             if (_lastFrameNum == Time.frameCount)
@@ -132,69 +132,131 @@ namespace ws.winx.drivers
             else _lastFrameNum = Time.frameCount;
 
 
-
-
-            if (UnsafeNativeMethods.XInputGamePadGetState((uint)joystick.ID, xInputStatePtr) == 0)
+            if (device.isReady)
             {
-                state = (XInputState)Marshal.PtrToStructure(xInputStatePtr, typeof(XInputState));
-                gamePad = state.Gamepad;
+                ((JoystickDevice)device).isReady = false;
+                _hidInterface.Read(device, onRead);
+            }
+
+        
+           
+
+
+        }
+
+
+        void onRead(object data)
+        {
+            HIDReport report = data as HIDReport;
+             IDevice device = _hidInterface.Devices[report.index];
+          
+
+            UnityEngine.Debug.Log(BitConverter.ToString(report.Data));
+            if(report.Status==HIDReport.ReadStatus.Success){
+              
+                byte[] buff = report.Data;
+
+            //C3-85-47-7B-2A-76-6D-7A-00-80-00-80-00-8E
+
+        
+
+            //controlTransfer(0x21, 0x09, 0x0240, 0, __outputBuffer, __outputBuffer.length, 0) > -1;
+
+            //pad are last three bytes  (demo left click)
+            //    82-81-47-7B-2A-76-6D-7A-00-80-00-9C-00-8E
+            //    82-81-47-7B-2A-76-6D-7A-00-80-00-80-10-D0
+            //    82-81-47-7B-2A-76-6D-7A-00-80-00-9C-80-E6
+            //    82-81-47-7B-2A-76-6D-7A-00-80-00-80-00-8E
 
 
 
-                //////////////////////////////////// BUTTONS ////////////////////////////////////////
-                joystick.Buttons[0].value = (float)(gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_START);
-                joystick.Buttons[1].value = (float)(gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_BACK);
-                joystick.Buttons[2].value = (float)(gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_LEFT_THUMB);
-                joystick.Buttons[3].value = (float)(gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_RIGHT_THUMB);
-                joystick.Buttons[4].value = (float)(gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_LEFT_SHOULDER);
-                joystick.Buttons[5].value = (float)(gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_RIGHT_SHOULDER);
-                joystick.Buttons[6].value = (float)(gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_A);
-                joystick.Buttons[7].value = (float)(gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_B);
-                joystick.Buttons[8].value = (float)(gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_X);
-                joystick.Buttons[9].value = (float)(gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_Y);
+
+
+            ///////////////////////////////////// BUTTONS ////////////////////////////////////////
+                device.Buttons[0].value = (buff[11] & 0x80) != 0 ? 1f : 0f;//Start
+                device.Buttons[1].value =  (buff[11] & 0x40) != 0 ? 1f : 0f;//Back
+                device.Buttons[2].value = (buff[11] & 0x10) != 0 ? 1f : 0f;//LThumb
+                device.Buttons[3].value = (buff[11] & 0x20) != 0 ? 1f : 0f;//RThumb
+                //device.Buttons[4].value = (float)(gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_LEFT_SHOULDER);
+                //device.Buttons[5].value = (float)(gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_RIGHT_SHOULDER);
 
 
 
-                //////////////////////////////  POV ////////////////////////////////////////
-                float x = 0, y = 0;
+            ////byte 10 
 
-                if ((gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_DPAD_UP) != 0) y = 1;
-                else if ((gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_DPAD_DOWN) != 0) y = -1;
-
-                if ((gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_DPAD_LEFT) != 0) x = -1;
-                else if ((gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_DPAD_RIGHT) != 0) x = 1;
-
-                joystick.Axis[JoystickAxis.AxisPovX].value = x;
-                joystick.Axis[JoystickAxis.AxisPovY].value = y;
+            device.Buttons[6].value = (buff[11] & 0x01) != 0 ? 1f : 0f;//A
+            device.Buttons[7].value = (buff[11] & 0x02) != 0 ? 1f : 0f;//B
+            device.Buttons[8].value = (buff[11] & 0x04) != 0 ? 1f : 0f;//X
+            device.Buttons[9].value = (buff[11] & 0x08) != 0 ? 1f : 0f;//Y
 
 
+            // 80   1000 0000 -neutral
+            // 84   1000 0100       Y+
+            // 9C   1001 1100        X-
+            // AO   1010 0000 LT
+            // 8C   1000 1100  X+
+            // 94   1001 0100  Y-
+             //88  1000 1000
+            // 90   1001 0000  RB
+            // 98   1001 1000 LB
+            // 88    1000 1000 RT
 
 
-                ////////////////////////// AXIS //////////////////////////////////
-                IAxisDetails axisDetails;
 
-                axisDetails = joystick.Axis[JoystickAxis.AxisX];
-                axisDetails.value = NormalizeAxis((float)gamePad.sThumbLX, axisDetails.min, axisDetails.max);
+            ////byte 11,12,13
 
+            //    //////////////////////////////  POV ////////////////////////////////////////
+            //    float x = 0, y = 0;
 
-                axisDetails = joystick.Axis[JoystickAxis.AxisY];
-                axisDetails.value = NormalizeAxis((float)gamePad.sThumbLY, axisDetails.min, axisDetails.max);
+            //    if ((gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_DPAD_UP) != 0) y = 1;
+            //    else if ((gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_DPAD_DOWN) != 0) y = -1;
 
+            //    if ((gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_DPAD_LEFT) != 0) x = -1;
+            //    else if ((gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_DPAD_RIGHT) != 0) x = 1;
 
-                axisDetails = joystick.Axis[JoystickAxis.AxisZ];
-                axisDetails.value = NormalizeAxis((float)gamePad.sThumbRX, axisDetails.min, axisDetails.max);
-
-
-                axisDetails = joystick.Axis[JoystickAxis.AxisR];
-                axisDetails.value = NormalizeAxis((float)gamePad.sThumbRY, axisDetails.min, axisDetails.max);
-
-                axisDetails = joystick.Axis[JoystickAxis.AxisU];
-                axisDetails.value = NormalizeAxis((float)gamePad.bLeftTrigger, axisDetails.min, axisDetails.max);
-
-                axisDetails = joystick.Axis[JoystickAxis.AxisV];
-                axisDetails.value = NormalizeAxis((float)gamePad.bRightTrigger, axisDetails.min, axisDetails.max);
+            //    device.Axis[JoystickAxis.AxisPovX].value = x;
+            //    device.Axis[JoystickAxis.AxisPovY].value = y;
 
 
+
+
+            //    ////////////////////////// AXIS //////////////////////////////////
+
+            ////0-3 bytes left joystick
+            ////4-8 bytes right joystick
+            IAxisDetails axisDetails;
+            float value;
+           
+
+            value=(buff[1] | (buff[2] << 8));
+            UnityEngine.Debug.Log("valueX=" + value);
+            axisDetails = device.Axis[JoystickAxis.AxisX];
+            axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max);
+            UnityEngine.Debug.Log("valueX=" + axisDetails.value);
+
+            value = axisDetails.max-(buff[3] | (buff[4] << 8));
+            UnityEngine.Debug.Log("valueY=" + value);
+            axisDetails = device.Axis[JoystickAxis.AxisY];
+            axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max);
+            UnityEngine.Debug.Log("valueY=" + axisDetails.value);
+
+
+            value = (buff[5] | (buff[6] << 8));
+            axisDetails = device.Axis[JoystickAxis.AxisZ];
+            axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max);
+
+            value = axisDetails.max-(buff[7] | (buff[8] << 8));
+            axisDetails = device.Axis[JoystickAxis.AxisR];
+            axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max);
+
+
+
+                //byte 9,10 (triggerL 80-FF  and triggerR 80 -00)
+            //axisDetails = device.Axis[JoystickAxis.AxisU];
+            //axisDetails.value = NormalizeAxis((float)gamePad.bLeftTrigger, axisDetails.min, axisDetails.max);
+
+            //axisDetails = device.Axis[JoystickAxis.AxisV];
+            //axisDetails.value = NormalizeAxis((float)gamePad.bRightTrigger, axisDetails.min, axisDetails.max);
 
             }
 
@@ -203,16 +265,26 @@ namespace ws.winx.drivers
 
 
 
-        }
 
-        public IDevice ResolveDevice(IHIDDevice info)
+
+
+
+         //  // SetLed((XInputDevice)device, 0x1);
+         //   SetMotor((XInputDevice)device, 0xff, 0xff);
+
+            ((JoystickDevice)device).isReady = true;
+         ////   device.Write(new byte[] { 0x00, 0x01, 0x0f, 0xc0, 0x00, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00 });
+
+          }
+
+        public IDevice ResolveDevice(IHIDDevice hidDevice)
         //public IDevice<IAxisDetails, IButtonDetails, IDeviceExtension> ResolveDevice(IHIDDeviceInfo info)
         {
             int type = -1;
             int len = XPAD_DEVICE.Length;
             for (int i = 0; i < len; i += 3)
             {
-                if (info.VID == XPAD_DEVICE[i] && info.PID == XPAD_DEVICE[i + 1])
+                if (hidDevice.VID == XPAD_DEVICE[i] && hidDevice.PID == XPAD_DEVICE[i + 1])
                 {
                     type = XPAD_DEVICE[i + 2];
                     break;
@@ -221,19 +293,20 @@ namespace ws.winx.drivers
 
             if (type < 0) return null;
 
-            XInputDevice joystick;
+            XInputDevice device;
             int inx = 0;
 
-           // _hidInterface = info.hidInterface;
+           _hidInterface = hidDevice.hidInterface;
+           
 
 
-            joystick = new XInputDevice(info.index, info.PID, info.VID, 8, 10, this, type);
+            device = new XInputDevice(hidDevice.index, hidDevice.PID, hidDevice.VID, 8, 10, this, type);
 
 
             //inti button structure
             for (; inx < 10; inx++)
             {
-                joystick.Buttons[inx] = new ButtonDetails();
+                device.Buttons[inx] = new ButtonDetails();
             }
 
 
@@ -242,50 +315,53 @@ namespace ws.winx.drivers
 
             //LX
             axisDetails = new AxisDetails();
-            axisDetails.max = 32767;
-            axisDetails.min = -32767;
-            joystick.Axis[JoystickAxis.AxisX] = axisDetails;
+            axisDetails.max = 65535;
+            axisDetails.min = 0;
+            device.Axis[JoystickAxis.AxisX] = axisDetails;
 
             //LY
             axisDetails = new AxisDetails();
-            axisDetails.max = 32767;
-            axisDetails.min = -32767;
-            joystick.Axis[JoystickAxis.AxisY] = axisDetails;
+            axisDetails.max = 65535;
+            axisDetails.min = 0;
+            device.Axis[JoystickAxis.AxisY] = axisDetails;
 
             //RX
             axisDetails = new AxisDetails();
-            axisDetails.max = 32767;
-            axisDetails.min = -32767;
-            joystick.Axis[JoystickAxis.AxisZ] = axisDetails;
+            axisDetails.max = 65535;
+            axisDetails.min = 0;
+            device.Axis[JoystickAxis.AxisZ] = axisDetails;
 
             //RY
             axisDetails = new AxisDetails();
-            axisDetails.max = 32767;
-            axisDetails.min = -32767;
-            joystick.Axis[JoystickAxis.AxisR] = axisDetails;
+            axisDetails.max = 65535;
+            axisDetails.min = 0;
+            device.Axis[JoystickAxis.AxisR] = axisDetails;
 
 
             //TRIGGERS
             axisDetails = new AxisDetails();
             axisDetails.max = 255;
             axisDetails.min = 0;
-            joystick.Axis[JoystickAxis.AxisU] = axisDetails;
+            device.Axis[JoystickAxis.AxisU] = axisDetails;
 
             axisDetails = new AxisDetails();
             axisDetails.max = 255;
             axisDetails.min = 0;
-            joystick.Axis[JoystickAxis.AxisV] = axisDetails;
+            device.Axis[JoystickAxis.AxisV] = axisDetails;
 
             //POV
             axisDetails = new AxisDetails();
             axisDetails.isHat = true;
-            joystick.Axis[JoystickAxis.AxisPovX] = axisDetails;
+            device.Axis[JoystickAxis.AxisPovX] = axisDetails;
             axisDetails = new AxisDetails();
             axisDetails.isHat = true;
-            joystick.Axis[JoystickAxis.AxisPovY] = axisDetails;
+            device.Axis[JoystickAxis.AxisPovY] = axisDetails;
 
+            ((HIDDevice)hidDevice).InputReportByteLength = 15;
+            ((HIDDevice)hidDevice).OutputReportByteLength = 12;
 
-            return joystick;
+           
+            return device;
             //return (IDevice<AxisDetails, ButtonDetails, XInputExtension>)joystick;
         }
         #endregion
@@ -325,83 +401,39 @@ namespace ws.winx.drivers
         }
 
 
-        internal struct Vibration
+      
+
+
+
+
+  
+
+
+      
+
+        internal void SetLed(XInputDevice device, byte mode)
         {
-            public ushort LeftMotorSpeed;
-            public ushort RightMotorSpeed;
-            public Vibration(ushort left, ushort right)
-            {
-                this.LeftMotorSpeed = left;
-                this.RightMotorSpeed = right;
-            }
-        }
+            //0103xx
 
-
-
-
-
-        public struct GamePad
-        {
-            public ushort dwButtons;
-            public byte bLeftTrigger;
-            public byte bRightTrigger;
-            public short sThumbLX;
-            public short sThumbLY;
-            public short sThumbRX;
-            public short sThumbRY;
-        }
-
-
-        public enum ButtonsFlags : ushort
-        {
-            XINPUT_GAMEPAD_DPAD_UP = 0x00000001,
-            XINPUT_GAMEPAD_DPAD_DOWN = 0x00000002,
-            XINPUT_GAMEPAD_DPAD_LEFT = 0x00000004,
-            XINPUT_GAMEPAD_DPAD_RIGHT = 0x00000008,
-            XINPUT_GAMEPAD_START = 0x00000010,
-            XINPUT_GAMEPAD_BACK = 0x00000020,
-            XINPUT_GAMEPAD_LEFT_THUMB = 0x00000040,
-            XINPUT_GAMEPAD_RIGHT_THUMB = 0x00000080,
-            XINPUT_GAMEPAD_LEFT_SHOULDER = 0x0100,
-            XINPUT_GAMEPAD_RIGHT_SHOULDER = 0x0200,
-            XINPUT_GAMEPAD_A = 0x1000,
-            XINPUT_GAMEPAD_B = 0x2000,
-            XINPUT_GAMEPAD_X = 0x4000,
-            XINPUT_GAMEPAD_Y = 0x8000
-        }
-
-
-
-
-
-        public struct XInputState
-        {
-            public uint dwPacketNumber;
-            public GamePad Gamepad;
-
+            _hidInterface.Write(new byte[]{0x1, 0x3, mode},device);
+            //_hidInterface.Write(new byte[] { 0x00, 0x01, 0x0f, 0xc0, 0x00, leftMotor, rightMotor, 0x00, 0x00, 0x00, 0x00, 0x00 }, device, onSetMotor);
 
         }
 
-
-
-        internal void SetMotor(XInputDevice device, float leftMotor, float rightMotor)
+        internal void SetMotor(XInputDevice device, byte leftMotor, byte rightMotor)
         {
-            UnsafeNativeMethods.XInputGamePadSetState((uint)device.ID, leftMotor, rightMotor);
+
+
+            _hidInterface.Write(new byte[] { 0x00, 0x01, 0x0f, 0xc0, 0x00, leftMotor, rightMotor, 0x00, 0x00, 0x00, 0x00, 0x00 }, device,onSetMotor);
+  
         }
 
-
-
-        static class UnsafeNativeMethods
+        internal void onSetMotor(bool suc)
         {
-            internal const string DLLName = "XInputInterface";
-
-            [DllImport(DLLName)]
-            public static extern uint XInputGamePadGetState(uint playerIndex, IntPtr state);
-            [DllImport(DLLName)]
-            public static extern void XInputGamePadSetState(uint playerIndex, float leftMotor, float rightMotor);
-
+            UnityEngine.Debug.Log("Motor was "+(suc? "not set." :"set."));
         }
 
+     
 
 
         #region ButtonDetails

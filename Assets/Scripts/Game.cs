@@ -80,7 +80,9 @@ namespace ws.winx
             //When you add them add specialized first then XInputDriver  then wide range supporting drivers UnityDriver
 #if (UNITY_STANDALONE_WIN || UNITY_ANDROID)
             InputManager.AddDriver(new ThrustMasterDriver());
-            InputManager.AddDriver(new WiiDriver());
+          //  InputManager.AddDriver(new WiiDriver());
+            InputManager.AddDriver(new XInputDriver());
+
 
             // InputManager.AddDriver(new ws.winx.platform.windows.XInputDriver());
 #endif

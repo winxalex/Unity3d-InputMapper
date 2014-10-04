@@ -90,19 +90,7 @@ namespace ws.winx.devices
        TaikoDrums = 0x80
    }
 
-   public enum ProcessingMode
-   {
-       None = 0,
-       ClearExtension,
-       InProgress,
-       AccCalibration,
-       ExtCheck,
-       MPlusCheck,
-       MPlusCalibration,
-       Update,
-       MPlusInit
-   }
-
+ 
 
   
 
@@ -275,13 +263,6 @@ namespace ws.winx.devices
         }
 
 
-        private ProcessingMode __processingMode = ProcessingMode.None;
-
-        public ProcessingMode processingMode
-        {
-            get { return __processingMode; }
-            set { __processingMode = value; }
-        }
       
        
 
@@ -376,6 +357,18 @@ namespace ws.winx.devices
         internal bool isInProccesingExtension = false;
       
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="pid"></param>
+        /// <param name="vid"></param>
+        /// <param name="axes"></param>
+        /// <param name="buttons"></param>
+        /// <param name="leds"></param>
+        /// <param name="irs"></param>
+        /// <param name="driver"></param>
         public WiimoteDevice(int id,int pid,int vid, int axes, int buttons,int leds,int irs,IDriver driver)
             : base(id,pid,vid,axes,buttons,driver)
         {
@@ -426,7 +419,7 @@ namespace ws.winx.devices
         {
             get
             {
-                return Extensions == 0x0;
+                return Extensions != 0x0;
             }
            
         }
@@ -448,6 +441,8 @@ namespace ws.winx.devices
             }
         }
 
+
+       
         internal uint RumbleBit
         {
             get
@@ -457,7 +452,9 @@ namespace ws.winx.devices
         }
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
          internal void InitMotionPlus()
          {
              if (_motionPlus == null)
@@ -468,12 +465,17 @@ namespace ws.winx.devices
              
          }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="values"></param>
          internal void UpdateMPlusCalibration(Vector3 values)
          {
              if (!_motionPlus.CalibrationInfo.mMotionPlusCalibrating)
              {
 
-                 UnityEngine.Debug.Log("InitMPlusCalibration"); 
+                 UnityEngine.Debug.Log("M+ Calibrating..."); 
                  InitMPlusCalibration(values.x, values.y, values.z);
 
 
@@ -708,6 +710,13 @@ namespace ws.winx.devices
 
          }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
          internal void InitMPlusCalibration(float x, float y, float z)
          {
              _motionPlus.CalibrationInfo.watch = new Stopwatch();
@@ -760,6 +769,11 @@ namespace ws.winx.devices
          }
 
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public Vector2 GetIRPoint(){
 
 

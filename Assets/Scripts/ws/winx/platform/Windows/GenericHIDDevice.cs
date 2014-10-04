@@ -93,8 +93,10 @@ namespace ws.winx.platform.windows
         {
             try
             {
-                var hidHandle = OpenDeviceIO(this.DevicePath,Native.ACCESS_NONE);
+                //TODO find way to check if real device is connected cos it can be inside HID list but actually not connected
 
+                var hidHandle = OpenDeviceIO(this.DevicePath,Native.ACCESS_NONE);
+              
                 CloseDeviceIO(hidHandle);
 
                 __lastHIDReport = new HIDReport(this.index, CreateInputBuffer(),HIDReport.ReadStatus.Success);
@@ -535,7 +537,18 @@ namespace ws.winx.platform.windows
                         var overlapped = new NativeOverlapped();
 
                         success=Native.ReadFile(ReadHandle, buffer, (uint)buffer.Length, out bytesRead, ref overlapped);
+
+                        error = Marshal.GetLastWin32Error();
+
                         status = HIDReport.ReadStatus.Success;
+
+                        if (error > 0)
+                        {
+                            status = HIDReport.ReadStatus.ReadError;
+                            UnityEngine.Debug.LogWarning("Error during Read Data" + error);
+                        }
+
+                       
                     }
                     catch { status = HIDReport.ReadStatus.ReadError; }
                 }
@@ -554,8 +567,8 @@ namespace ws.winx.platform.windows
 
         private static IntPtr OpenDeviceIO(string devicePath, uint deviceAccess)
         {
-            return OpenDeviceIO(devicePath, DeviceMode.Overlapped, deviceAccess);
-           // return OpenDeviceIO(devicePath, DeviceMode.NonOverlapped, deviceAccess);
+           // return OpenDeviceIO(devicePath, DeviceMode.Overlapped, deviceAccess);
+            return OpenDeviceIO(devicePath, DeviceMode.NonOverlapped, deviceAccess);
         }
 
         private static IntPtr OpenDeviceIO(string devicePath, DeviceMode deviceMode, uint deviceAccess)
