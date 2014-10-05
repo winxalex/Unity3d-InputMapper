@@ -449,7 +449,7 @@ namespace ws.winx.drivers
                            ParseExtension(device, buff, 16);
                         }
                        
-                        if (device.motionPlus != null && device.motionPlus.Enabled && !device.motionPlus.CalibrationInfo.mMotionPlusCalibrated)
+                        if (device.motionPlus != null && device.motionPlus.Enabled && !device.motionPlus.CalibrationInfo.MotionPlusCalibrated)
                         {
                             CalibrateMotionPlus(device, buff, 16);
                         }
@@ -599,12 +599,12 @@ namespace ws.winx.drivers
 
 
 
-            if (!device.motionPlus.CalibrationInfo.mMotionPlusCalibrated)
+            if (!device.motionPlus.CalibrationInfo.MotionPlusCalibrated)
             {
 
                 device.UpdateMPlusCalibration(device.motionPlus.RawValues);
 
-                if (device.motionPlus.CalibrationInfo.mMotionPlusCalibrated)
+                if (device.motionPlus.CalibrationInfo.MotionPlusCalibrated)
                 {
                     device.isReady = true;
                     device.isInProccesingExtension = false;
@@ -850,7 +850,7 @@ namespace ws.winx.drivers
                     else
                          device.Extensions |= (byte)ExtensionType.MotionPlus;
 
-                     if (device.motionPlus != null && device.motionPlus.CalibrationInfo.mMotionPlusCalibrated)
+                     if (device.motionPlus != null && device.motionPlus.CalibrationInfo.MotionPlusCalibrated)
                      {
                          UnityEngine.Debug.Log("M+ already calibrated");
                          device.motionPlus.Enabled = true;

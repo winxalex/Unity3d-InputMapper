@@ -20,15 +20,9 @@ namespace ws.winx.drivers
     public class XInputDriver : IDriver
     {
 
-      
-//        IHIDInterface _hidInterface;
-        int _lastFrameNum = -1;
-    
+ 
 
-        private const float XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE = 0.239f;//7849;
-        private const float XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE = 0.265f;//8689
-        private const float XINPUT_GAMEPAD_TRIGGER_THRESHOLD = 0.117f;// 30;
-        private const float ERROR_SUCCESS = 0;
+       
 
 
         public enum XTYPE : int
@@ -126,17 +120,20 @@ namespace ws.winx.drivers
           
 
 
-            //don't update in same frame twice
-            if (_lastFrameNum == Time.frameCount)
-                return;
-            else _lastFrameNum = Time.frameCount;
+            ////don't update in same frame twice
+            //if (_lastFrameNum == Time.frameCount)
+            //    return;
+            //else _lastFrameNum = Time.frameCount;
+ //UnityEngine.Debug.Log("Update");
+            _hidInterface.Read(device, onRead);
 
+           
 
-            if (device.isReady)
-            {
-                ((JoystickDevice)device).isReady = false;
-                _hidInterface.Read(device, onRead);
-            }
+            //if (device.isReady)
+            //{
+            //    ((JoystickDevice)device).isReady = false;
+            //    _hidInterface.Read(device, onRead);
+            //}
 
         
            
@@ -147,12 +144,15 @@ namespace ws.winx.drivers
 
         void onRead(object data)
         {
+
+
             HIDReport report = data as HIDReport;
              IDevice device = _hidInterface.Devices[report.index];
           
 
-            UnityEngine.Debug.Log(BitConverter.ToString(report.Data));
-            if(report.Status==HIDReport.ReadStatus.Success){
+           // UnityEngine.Debug.Log(BitConverter.ToString(report.Data));
+
+            if(report.Status==HIDReport.ReadStatus.Success || report.Status==HIDReport.ReadStatus.Resent){
               
                 byte[] buff = report.Data;
 
@@ -171,53 +171,83 @@ namespace ws.winx.drivers
 
 
 
-
+             ////byte 11
             ///////////////////////////////////// BUTTONS ////////////////////////////////////////
                 device.Buttons[0].value = (buff[11] & 0x80) != 0 ? 1f : 0f;//Start
                 device.Buttons[1].value =  (buff[11] & 0x40) != 0 ? 1f : 0f;//Back
-                device.Buttons[2].value = (buff[11] & 0x10) != 0 ? 1f : 0f;//LThumb
-                device.Buttons[3].value = (buff[11] & 0x20) != 0 ? 1f : 0f;//RThumb
-                //device.Buttons[4].value = (float)(gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_LEFT_SHOULDER);
-                //device.Buttons[5].value = (float)(gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_RIGHT_SHOULDER);
+                device.Buttons[2].value = (buff[11] & 0x10) != 0 ? 1f : 0f;//LEFT_SHOULDER
+                device.Buttons[3].value = (buff[11] & 0x20) != 0 ? 1f : 0f;//RIGHT_SHOULDER
+                device.Buttons[4].value = (buff[11] & 0x01) != 0 ? 1f : 0f;//A
+                device.Buttons[5].value = (buff[11] & 0x02) != 0 ? 1f : 0f;//B
+                device.Buttons[6].value = (buff[11] & 0x04) != 0 ? 1f : 0f;//X
+                device.Buttons[7].value = (buff[11] & 0x08) != 0 ? 1f : 0f;//Y
+
+          
+
+           
+
+
+           
+                
 
 
 
-            ////byte 10 
+            ////byte 12
 
-            device.Buttons[6].value = (buff[11] & 0x01) != 0 ? 1f : 0f;//A
-            device.Buttons[7].value = (buff[11] & 0x02) != 0 ? 1f : 0f;//B
-            device.Buttons[8].value = (buff[11] & 0x04) != 0 ? 1f : 0f;//X
-            device.Buttons[9].value = (buff[11] & 0x08) != 0 ? 1f : 0f;//Y
+                // 80   1000 0000 -neutral
 
+                // AO   1010 0000 LT(-,+)
+                // 84   1000 0100  Y+
+                // 88   1000 1000 RT(+,+)
+                // 8C   1000 1100  X+
 
-            // 80   1000 0000 -neutral
-            // 84   1000 0100       Y+
-            // 9C   1001 1100        X-
-            // AO   1010 0000 LT
-            // 8C   1000 1100  X+
-            // 94   1001 0100  Y-
-             //88  1000 1000
-            // 90   1001 0000  RB
-            // 98   1001 1000 LB
-            // 88    1000 1000 RT
+                // 90   1001 0000  RB(+,-)
+                // 94   1001 0100  Y-
+                // 98   1001 1000  LB(-,-)
+                // 9C   1001 1100  X-
 
-
-
-            ////byte 11,12,13
 
             //    //////////////////////////////  POV ////////////////////////////////////////
-            //    float x = 0, y = 0;
+                float x = 0, y = 0;
+                int sign = 1;
 
-            //    if ((gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_DPAD_UP) != 0) y = 1;
-            //    else if ((gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_DPAD_DOWN) != 0) y = -1;
+                if(buff[12] != 0x80){
+                    if ((buff[12] >> 4) == 9)
+                    {
+                        sign = -1;
+                        
+                    }
+                   
 
-            //    if ((gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_DPAD_LEFT) != 0) x = -1;
-            //    else if ((gamePad.dwButtons & (ushort)ButtonsFlags.XINPUT_GAMEPAD_DPAD_RIGHT) != 0) x = 1;
 
-            //    device.Axis[JoystickAxis.AxisPovX].value = x;
-            //    device.Axis[JoystickAxis.AxisPovY].value = y;
+                    switch (buff[12] & 0x0C)
+                    {
+                        case 0x0:
+                            x = sign * (-1);
+                            y=sign * 1;
+                            break;
 
+                        case 0x4:
+                            y = sign * 1;
+                            break;
 
+                        case 0x8:
+                            x = sign * 1;
+                            y=sign * 1;
+                            break;
+
+                        case 0xC:
+                              x = sign * 1;
+                          
+                            break;
+                    }
+                }
+               
+
+                device.Axis[JoystickAxis.AxisPovX].value = x;
+                device.Axis[JoystickAxis.AxisPovY].value = y;
+
+           // UnityEngine.Debug.Log("x=" + x+" y="+y);
 
 
             //    ////////////////////////// AXIS //////////////////////////////////
@@ -229,44 +259,54 @@ namespace ws.winx.drivers
            
 
             value=(buff[1] | (buff[2] << 8));
-            UnityEngine.Debug.Log("valueX=" + value);
+           // UnityEngine.Debug.Log("raw valueX=" + value);
             axisDetails = device.Axis[JoystickAxis.AxisX];
-            axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max);
-            UnityEngine.Debug.Log("valueX=" + axisDetails.value);
+            axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max, 0.1f);
+          //  UnityEngine.Debug.Log("valueX=" + axisDetails.value);
 
             value = axisDetails.max-(buff[3] | (buff[4] << 8));
-            UnityEngine.Debug.Log("valueY=" + value);
+         //   UnityEngine.Debug.Log("valueY=" + value);
             axisDetails = device.Axis[JoystickAxis.AxisY];
-            axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max);
-            UnityEngine.Debug.Log("valueY=" + axisDetails.value);
+            axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max, 0.1f);
+          
 
 
             value = (buff[5] | (buff[6] << 8));
             axisDetails = device.Axis[JoystickAxis.AxisZ];
-            axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max);
+            axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max, 0.1f);
+          //  UnityEngine.Debug.Log("valueZ=" + axisDetails.value);
 
             value = axisDetails.max-(buff[7] | (buff[8] << 8));
             axisDetails = device.Axis[JoystickAxis.AxisR];
-            axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max);
+            axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max,0.1f);
+         //   UnityEngine.Debug.Log("valueR=" + axisDetails.value);
 
 
+             //byte 9,10??? (triggerL 80->FF  and triggerR 80->00)
+            value=buff[10];
 
-                //byte 9,10 (triggerL 80-FF  and triggerR 80 -00)
-            //axisDetails = device.Axis[JoystickAxis.AxisU];
-            //axisDetails.value = NormalizeAxis((float)gamePad.bLeftTrigger, axisDetails.min, axisDetails.max);
+            axisDetails = device.Axis[JoystickAxis.AxisU];
+            if(value>128){
 
-            //axisDetails = device.Axis[JoystickAxis.AxisV];
-            //axisDetails.value = NormalizeAxis((float)gamePad.bRightTrigger, axisDetails.min, axisDetails.max);
+                axisDetails.value =1 - NormalizeTrigger(value-128, axisDetails.min, axisDetails.max,0.05f);
+            }else axisDetails.value=0f;
+
+         //   UnityEngine.Debug.Log("LTigger=" + axisDetails.value);
+
+
+            axisDetails = device.Axis[JoystickAxis.AxisV];
+
+            if (value < 128)
+            {
+                axisDetails.value = NormalizeTrigger((float)value, axisDetails.min, axisDetails.max, 0.05f);
+            }
+            else axisDetails.value = 0f;
+
+          //  UnityEngine.Debug.Log("RTigger=" + axisDetails.value);
+
+
 
             }
-
-
-
-
-
-
-
-
 
 
          //  // SetLed((XInputDevice)device, 0x1);
@@ -340,14 +380,15 @@ namespace ws.winx.drivers
 
             //TRIGGERS
             axisDetails = new AxisDetails();
-            axisDetails.max = 255;
+            axisDetails.max = 128;
             axisDetails.min = 0;
             device.Axis[JoystickAxis.AxisU] = axisDetails;
 
             axisDetails = new AxisDetails();
-            axisDetails.max = 255;
+            axisDetails.max = 128;
             axisDetails.min = 0;
             device.Axis[JoystickAxis.AxisV] = axisDetails;
+
 
             //POV
             axisDetails = new AxisDetails();
@@ -377,7 +418,7 @@ namespace ws.winx.drivers
         /// <returns></returns>
         public float NormalizeTrigger(float pos, int min, int max, float dreadZone = 0.001f)
         {
-            float value =1- pos / (max - min);
+            float value =1-pos / (max - min);
             if (value < dreadZone && value > -dreadZone)
                 return 0;
 
@@ -385,6 +426,16 @@ namespace ws.winx.drivers
 
         }
 
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <param name="dreadZone"></param>
+        /// <returns></returns>
         private float NormalizeAxis(float pos, int min, int max, float dreadZone = 0.001f)
         {
             //UnityEngine.Debug.Log(Min[axis]+" Max:"+Max[axis]);
@@ -407,19 +458,29 @@ namespace ws.winx.drivers
 
 
   
-
+        ///!!! Sorry I couldn't found yet SetMotor and SetMotor
 
       
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="device"></param>
+        /// <param name="mode"></param>
         internal void SetLed(XInputDevice device, byte mode)
         {
-            //0103xx
+           
 
             _hidInterface.Write(new byte[]{0x1, 0x3, mode},device);
-            //_hidInterface.Write(new byte[] { 0x00, 0x01, 0x0f, 0xc0, 0x00, leftMotor, rightMotor, 0x00, 0x00, 0x00, 0x00, 0x00 }, device, onSetMotor);
-
+        
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="device"></param>
+        /// <param name="leftMotor"></param>
+        /// <param name="rightMotor"></param>
         internal void SetMotor(XInputDevice device, byte leftMotor, byte rightMotor)
         {
 

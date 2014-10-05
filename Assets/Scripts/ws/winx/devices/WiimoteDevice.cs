@@ -166,8 +166,8 @@ namespace ws.winx.devices
             public float slowFactor = 500 / 8192f;//deg/unit  0.05f;//   500/8192f;//deg/unit
             public float fastFactor = 2000 / 8192f;//deg/unit 0.25f;// 2000/8192f ;//deg/unit
 
-            public bool mMotionPlusCalibrated;
-            public bool mMotionPlusCalibrating;
+            public bool MotionPlusCalibrated;
+            public bool MotionPlusCalibrating;
 
             // New calibration
             // Use of mNoise vector seems to accumulate error
@@ -179,12 +179,12 @@ namespace ws.winx.devices
 
 
 
-            public double mCalibrationTimeout;
+            public double CalibrationTimeout;
             public Stopwatch watch;
             
 
-            public Vector3 mNoiseLevel;
-            public Vector3 mNoiseThreshold;
+            public Vector3 NoiseLevel;
+            public Vector3 NoiseThreshold;
           
         }
 
@@ -472,7 +472,7 @@ namespace ws.winx.devices
         /// <param name="values"></param>
          internal void UpdateMPlusCalibration(Vector3 values)
          {
-             if (!_motionPlus.CalibrationInfo.mMotionPlusCalibrating)
+             if (!_motionPlus.CalibrationInfo.MotionPlusCalibrating)
              {
 
                  UnityEngine.Debug.Log("M+ Calibrating..."); 
@@ -498,7 +498,7 @@ namespace ws.winx.devices
 
 
 
-             if (_motionPlus.CalibrationInfo.mCalibrationTimeout <= _motionPlus.CalibrationInfo.watch.ElapsedMilliseconds)
+             if (_motionPlus.CalibrationInfo.CalibrationTimeout <= _motionPlus.CalibrationInfo.watch.ElapsedMilliseconds)
              {
 
                 
@@ -540,15 +540,9 @@ namespace ws.winx.devices
             //there is no  Time.frameCount in Editor (Edit mode - Editor scripts)
             if(Application.isPlaying) 
             {
-                   //prevents multiply update in frame
+                //prevents multiply update in frame
                 Update();
-               // if (!Update())
-               //     return 0;
-
-                
-
-
-                
+                              
             }
             else  
                 driver.Update(this);
@@ -703,8 +697,8 @@ namespace ws.winx.devices
              _motionPlus.CalibrationInfo.mBias.y = (float)_motionPlus.CalibrationInfo.rollSum / n;
              _motionPlus.CalibrationInfo.mBias.z = (float)_motionPlus.CalibrationInfo.yawSum / n;
 
-             _motionPlus.CalibrationInfo.mMotionPlusCalibrating = false;
-             _motionPlus.CalibrationInfo.mMotionPlusCalibrated = true;
+             _motionPlus.CalibrationInfo.MotionPlusCalibrating = false;
+             _motionPlus.CalibrationInfo.MotionPlusCalibrated = true;
 
              UnityEngine.Debug.Log("Motion Plus Calibrated"); 
 
@@ -724,8 +718,8 @@ namespace ws.winx.devices
              _motionPlus.CalibrationInfo.mNoise = new List<Vector3>();
            
 
-             _motionPlus.CalibrationInfo.mMotionPlusCalibrating = true;
-             _motionPlus.CalibrationInfo.mCalibrationTimeout = CALIB_TIME;
+             _motionPlus.CalibrationInfo.MotionPlusCalibrating = true;
+             _motionPlus.CalibrationInfo.CalibrationTimeout = CALIB_TIME;
              
 
              _motionPlus.CalibrationInfo.numCalibrationReadings = 0;
