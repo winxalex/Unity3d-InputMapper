@@ -87,6 +87,7 @@
      <Compile Include="Assets\Scripts\ws\winx\platform\IHIDDevice.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\IHIDInterface.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\OSX\CoreFoundation.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\OSX\GenericHIDDevice.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\OSX\OSXDriver.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\OSX\OSXHIDInterface.cs" />
      <Compile Include="Assets\Scripts\ws\winx\platform\Web\GamePadJSON.cs" />
@@ -105,9 +106,6 @@
      <Compile Include="Assets\Scripts\ws\winx\utils\Extensions.cs" />
      <None Include="Assets\StreamingAssets\InputSettings.xml" />
      <None Include="Assets\Pluggins\Android\AndroidManifest.xml" />
- <Reference Include="nunit.framework">
- <HintPath>E:/Projects/InputManager/Unity3d-InputMapper/Assets/Pluggins/nunit.framework.dll</HintPath>
- </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
