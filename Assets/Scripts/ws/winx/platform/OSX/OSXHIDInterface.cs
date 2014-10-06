@@ -58,11 +58,11 @@ namespace ws.winx.platform.osx
         bool disposed;
 
 
-        private List<IJoystickDriver> __drivers = new List<IJoystickDriver>();
+        private List<IDriver> __drivers = new List<IDriver>();
 
 
 
-        private IJoystickDriver __defaultJoystickDriver;
+        private IDriver __defaultJoystickDriver;
 
         JoystickDevicesCollection _joysticks;
 
@@ -71,7 +71,42 @@ namespace ws.winx.platform.osx
         #endregion
 
 #region IHIDInterface implementation
-        public IJoystickDriver defaultDriver
+
+
+
+		public void Read (IDevice device, HIDDevice.ReadCallback callback)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void Read (IDevice device, HIDDevice.ReadCallback callback, int timeout)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void Write (object data, IDevice device, HIDDevice.WriteCallback callback, int timeout)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void Write (object data, IDevice device, HIDDevice.WriteCallback callback)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void Write (object data, IDevice device)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public Dictionary<IDevice, HIDDevice> Generics {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
+
+
+        public IDriver defaultDriver
         {
             get { if (__defaultJoystickDriver == null) { __defaultJoystickDriver = new OSXDriver(); } return __defaultJoystickDriver; }
             set { __defaultJoystickDriver = value; }
@@ -102,7 +137,7 @@ namespace ws.winx.platform.osx
 
 #region Contsructor
 
-        public OSXHIDInterface(List<IJoystickDriver> drivers)
+        public OSXHIDInterface(List<IDriver> drivers)
         {
             __drivers = drivers;
 
@@ -196,7 +231,7 @@ namespace ws.winx.platform.osx
                 //loop thru drivers and attach the driver to device if compatible
                 foreach (var driver in __drivers)
                 {
-                    if ((joyDevice = driver.ResolveDevice(new HIDDeviceInfo(_joysticks.Count,vendor_id.ToInt32(), product_id.ToInt32(), device, this, ""))) != null)
+                    if ((joyDevice = driver.ResolveDevice(new GenericHIDDevice(_joysticks.Count,vendor_id.ToInt32(), product_id.ToInt32(), device, this, ""))) != null)
                     {
                         _joysticks[device] = joyDevice;
                         joyDevice.Name=description;
@@ -208,7 +243,7 @@ namespace ws.winx.platform.osx
                 if (joyDevice == null)
                 {//set default driver as resolver if no custom driver match device
 
-                    joyDevice = defaultDriver.ResolveDevice(new HIDDeviceInfo(_joysticks.Count,vendor_id.ToInt32(), product_id.ToInt32(), device, this, ""));//always return true
+					joyDevice = defaultDriver.ResolveDevice(new GenericHIDDevice(_joysticks.Count,vendor_id.ToInt32(), product_id.ToInt32(), device, this, ""));//always return true
 					joyDevice.Name=description;
 
 					if (joyDevice != null)

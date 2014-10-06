@@ -39,7 +39,7 @@ namespace ws.winx.platform.osx
 
 
 
-	sealed class OSXDriver: IJoystickDriver
+	sealed class OSXDriver:IDriver
 		{
 
 #region Fields
@@ -242,9 +242,10 @@ namespace ws.winx.platform.osx
             throw new Exception("OSX Default driver is meant to auto update on callback");
 		}
 
-		public IDevice ResolveDevice(IHIDDeviceInfo info)
+		public IDevice ResolveDevice (IHIDDevice info)
 		//public IDevice<IAxisDetails,IButtonDetails,IDeviceExtension> ResolveDevice(IHIDDeviceInfo info)
 		{
+
 			_hidInterface=info.hidInterface;
 
 			// The device is not normally available in the InputValueCallback (HandleDeviceValueReceived), so we include
@@ -261,7 +262,7 @@ namespace ws.winx.platform.osx
 
 
 		//public IDevice<IAxisDetails,IButtonDetails,IDeviceExtension> CreateDevice(IHIDDeviceInfo info){
-		public IDevice CreateDevice(IHIDDeviceInfo info){
+		public IDevice CreateDevice(IHIDDevice info){
 
 			IntPtr device=info.deviceHandle;
 			//JoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension> joystick;
