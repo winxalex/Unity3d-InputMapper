@@ -58,7 +58,7 @@ namespace ws.winx.input
                         
 
 					 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
-						__hidInterface=new ws.winx.platform.osx.OSXHIDInterface(__drivers);
+						//__hidInterface=new ws.winx.platform.osx.OSXHIDInterface(__drivers);
                      #endif
 
 

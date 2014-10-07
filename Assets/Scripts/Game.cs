@@ -100,22 +100,25 @@ namespace ws.winx
             //UnityEngine.Debug.Log("Standalone");
 
 
-            if (ui != null && ui.settingsXML == null)
-            {//settingsXML would trigger internal loading mechanism (only for testing)
-
-                InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));
-
-
-
-                ui.StateInputCombinations = InputManager.Settings.stateInputs;
-            }
-
-
-            manuallyAddStateAndHandlers();
+//            if (ui != null && ui.settingsXML == null)
+//            {//settingsXML would trigger internal loading mechanism (only for testing)
+//
+//                InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));
+//
+//
+//
+//                ui.StateInputCombinations = InputManager.Settings.stateInputs;
+//            }
+//
+//
+//            manuallyAddStateAndHandlers();
 
 #endif
 
+			#region Load InputSettings.xml Android
 #if UNITY_ANDROID
+
+
             Loader request = new Loader();
 
 
@@ -165,6 +168,7 @@ namespace ws.winx
 
             
 #endif
+			#endregion
 
 #if(UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE && !UNITY_ANDROID
             Loader request = new Loader();
@@ -183,7 +187,7 @@ namespace ws.winx
 
 
 
-
+			ws.winx.platform.osx.OSXHIDInterface a = new ws.winx.platform.osx.OSXHIDInterface (new List<IDriver>());
 
 
 
@@ -258,6 +262,7 @@ namespace ws.winx
         {
 
 
+
             //   UnityEngine.Debug.Log(InputManager.Log());
 
             //		adding input-states pairs manually
@@ -285,12 +290,17 @@ namespace ws.winx
             ev.DOWN += new EventHandler(onDown);//this wouldn't fire for combo inputs(single only)
 
             _settingsLoaded = true;
+
+
+
         }
 
 
         // Update is called once per frame
         void Update()
         {
+		
+			return;
 
             //Use is mapping states so no quering keys during gameplay
             if (InputManager.EditMode || !_settingsLoaded) return;
@@ -401,6 +411,8 @@ namespace ws.winx
 
         void OnGUI()
         {
+			return;
+
             //don't take device here in the loop this is just for demo
             if (InputManager.hidInterface.Devices.ContainsKey(0))
                 device = InputManager.hidInterface.Devices[0] as ThrustmasterRGTFFDDevice;

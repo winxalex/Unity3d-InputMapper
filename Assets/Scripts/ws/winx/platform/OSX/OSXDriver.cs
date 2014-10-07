@@ -16,7 +16,7 @@ using ws.winx.devices;
 namespace ws.winx.platform.osx
 {
 
-	using Carbon;
+
 	using CFAllocatorRef = System.IntPtr;
 	using CFDictionaryRef = System.IntPtr;
 	using CFArrayRef = System.IntPtr;
@@ -31,10 +31,9 @@ namespace ws.winx.platform.osx
 	using IOHIDValueRef = System.IntPtr;
 	using IOOptionBits = System.IntPtr;
 	using IOReturn = System.IntPtr;
-	using NativeMethods=OSXHIDInterface.NativeMethods;
-	using IOHIDElementType=OSXHIDInterface.IOHIDElementType;
-	using HIDUsageGD=OSXHIDInterface.HIDUsageGD;
-	using HIDPage=OSXHIDInterface.HIDPage;
+
+	using IOHIDElementType=Native.IOHIDElementType;
+
 
 
 
@@ -44,9 +43,9 @@ namespace ws.winx.platform.osx
 
 #region Fields
 
-		readonly CFRunLoop RunLoop = CF.CFRunLoopGetMain();
-		readonly CFString InputLoopMode = CF.RunLoopModeDefault;
-		NativeMethods.IOHIDValueCallback HandleDeviceValueReceived;
+		readonly CFRunLoop RunLoop = Native.CFRunLoopGetMain();
+		readonly CFString InputLoopMode = Native.RunLoopModeDefault;
+		Native.IOHIDValueCallback HandleDeviceValueReceived;
 		IHIDInterface _hidInterface;
 		
 	
@@ -80,23 +79,23 @@ namespace ws.winx.platform.osx
 		/// <param name="valRef">Value reference.</param>
 		void DeviceValueReceived(IntPtr context, IOReturn res, IntPtr sender, IOHIDValueRef valRef)
 		{
-			IOHIDElementRef element = NativeMethods.IOHIDValueGetElement(valRef);
-			uint uid=NativeMethods.IOHIDElementGetCookie(element);
-			int value;
-			OSXHIDInterface.IOHIDElementType  type = NativeMethods.IOHIDElementGetType(element);
+			IOHIDElementRef element = Native.IOHIDValueGetElement(valRef);
+			uint uid=Native.IOHIDElementGetCookie(element);
+			long value;
+			Native.IOHIDElementType  type = Native.IOHIDElementGetType(element);
 
 			IDevice stick=_hidInterface.Devices[context];
 
-			if (NativeMethods.IOHIDValueGetLength(valRef) > 4) {
+			if (Native.IOHIDValueGetLength(valRef) > 4) {
 				// Workaround for a strange crash that occurs with PS3 controller; was getting lengths of 39 (!)
 				return;
 			}
 
-			value=NativeMethods.IOHIDValueGetIntegerValue(valRef);
+			value=Native.IOHIDValueGetIntegerValue(valRef);
 
 			//AXIS
-			if(type==OSXHIDInterface.IOHIDElementType.kIOHIDElementTypeInput_Misc
-			   || type==OSXHIDInterface.IOHIDElementType.kIOHIDElementTypeInput_Axis)
+			if(type==Native.IOHIDElementType.kIOHIDElementTypeInput_Misc
+			   || type==Native.IOHIDElementType.kIOHIDElementTypeInput_Axis)
 			{
 				int numAxes=stick.Axis.Count;
 				AxisDetails axisDetails;
@@ -113,7 +112,7 @@ namespace ws.winx.platform.osx
 					if ( axisDetails.uid== uid) {
 						//check hatch
 						//Check if POV element.
-						if((NativeMethods.IOHIDElementGetUsage(element) & (uint)OSXHIDInterface.HIDUsageGD.Hatswitch)!=0)
+						if((Native.IOHIDElementGetUsage(element) & (uint)Native.HIDUsageGD.Hatswitch)!=0)
 						{
 									//Workaround for POV hat switches that do not have null states.
 									if(!axisDetails.isNullable)
@@ -156,7 +155,7 @@ namespace ws.winx.platform.osx
 				}//end for
 
 			//BUTTONS
-			}else if(type==OSXHIDInterface.IOHIDElementType.kIOHIDElementTypeInput_Button){
+			}else if(type==Native.IOHIDElementType.kIOHIDElementTypeInput_Button){
 
 				int numButtons=stick.Buttons.Count;
 
@@ -200,7 +199,7 @@ namespace ws.winx.platform.osx
 		/// <param name="range">Range.</param>
 		/// <param name="outX">Out x.</param>
 		/// <param name="outY">Out y.</param>
-		 void hatValueToXY(int value, int range,out int outX,out int outY) {
+		 void hatValueToXY(long value, int range,out int outX,out int outY) {
 
 				outX = outY = 0;
 				int rangeHalf=range>>1;
@@ -250,10 +249,10 @@ namespace ws.winx.platform.osx
 
 			// The device is not normally available in the InputValueCallback (HandleDeviceValueReceived), so we include
 			// the device identifier as the context variable, so we can identify it and figure out the device later.
-			OSXHIDInterface.NativeMethods.IOHIDDeviceRegisterInputValueCallback(info.deviceHandle,HandleDeviceValueReceived, info.deviceHandle);
+			Native.IOHIDDeviceRegisterInputValueCallback(info.deviceHandle,HandleDeviceValueReceived, info.deviceHandle);
 
 
-			OSXHIDInterface.NativeMethods.IOHIDDeviceScheduleWithRunLoop(info.deviceHandle, RunLoop, InputLoopMode);
+			Native.IOHIDDeviceScheduleWithRunLoop(info.deviceHandle, RunLoop, InputLoopMode);
 
 			return CreateDevice(info);
 		}
@@ -270,20 +269,21 @@ namespace ws.winx.platform.osx
 			int axisIndex=0;
 			int buttonIndex=0;
 
-			CFArray elements=new CFArray();
+			Native.CFArray elements=new Native.CFArray();
 			IOHIDElementRef element;
 			IOHIDElementType type;
 
 			//copy all matched 
-			elements.Ref=NativeMethods.IOHIDDeviceCopyMatchingElements(device, IntPtr.Zero,IOOptionBits.Zero );
+			elements.typeRef=Native.IOHIDDeviceCopyMatchingElements(device, IntPtr.Zero,IOOptionBits.Zero );
 			
 			int numButtons=0;
 			int numAxis=0;
-			int numElements=elements.Count;
+			int numElements=elements.Length;
 			
 							for (int elementIndex = 0; elementIndex < numElements; elementIndex++){
-								element = (IOHIDElementRef) elements[elementIndex];
-								type = NativeMethods.IOHIDElementGetType(element);
+								//element = (IOHIDElementRef) elements[elementIndex];
+								element = (IOHIDElementRef) elements.GetValue(elementIndex);
+								type = Native.IOHIDElementGetType(element);
 			
 			
 								// All of the axis elements I've ever detected have been kIOHIDElementTypeInput_Misc. kIOHIDElementTypeInput_Axis is only included for good faith...
@@ -302,9 +302,10 @@ namespace ws.winx.platform.osx
 			
 			AxisDetails axisDetails;
 
-			for (int elementIndex = 0; elementIndex < elements.Count; elementIndex++){
+
+			for (int elementIndex = 0; elementIndex < numElements; elementIndex++){
 				element = (IOHIDElementRef) elements[elementIndex];
-				type = NativeMethods.IOHIDElementGetType(element);
+				type = Native.IOHIDElementGetType(element);
 				
 				
 
@@ -315,20 +316,20 @@ namespace ws.winx.platform.osx
 					
 					
 					axisDetails=new AxisDetails();
-					axisDetails.uid=NativeMethods.IOHIDElementGetCookie(element);
-					axisDetails.min=NativeMethods.IOHIDElementGetLogicalMin(element);
-					axisDetails.max=NativeMethods.IOHIDElementGetLogicalMax(element);
-					axisDetails.isNullable=NativeMethods.IOHIDElementHasNullState(element);
+					axisDetails.uid=Native.IOHIDElementGetCookie(element);
+					axisDetails.min=(int)Native.IOHIDElementGetLogicalMin(element);
+					axisDetails.max=(int)Native.IOHIDElementGetLogicalMax(element);
+					axisDetails.isNullable=Native.IOHIDElementHasNullState(element);
 					axisDetails.isHat=false;
 					
 					
-					if(NativeMethods.IOHIDElementGetUsage(element)==(uint)HIDUsageGD.Hatswitch){
-						
+					if(Native.IOHIDElementGetUsage(element)==(uint)Native.HIDUsageGD.Hatswitch){
+
 						
 						axisDetails.isHat=true;
 						
 						//if prevous axis was Hat =>X next is Y
-						if(NativeMethods.IOHIDElementGetUsage((IOHIDElementRef) elements[elementIndex-1])==(uint)HIDUsageGD.Hatswitch){
+						if(Native.IOHIDElementGetUsage((IOHIDElementRef) elements[elementIndex-1])==(uint)Native.HIDUsageGD.Hatswitch){
 							
 							
 							joystick.Axis[JoystickAxis.AxisPovY]=axisDetails;
@@ -351,7 +352,7 @@ namespace ws.winx.platform.osx
 					
 				} else if (type == IOHIDElementType.kIOHIDElementTypeInput_Button) {
 					
-					joystick.Buttons[buttonIndex]=new ButtonDetails(NativeMethods.IOHIDElementGetCookie(element));  
+					joystick.Buttons[buttonIndex]=new ButtonDetails(Native.IOHIDElementGetCookie(element));  
 					buttonIndex++;
 					
 				}

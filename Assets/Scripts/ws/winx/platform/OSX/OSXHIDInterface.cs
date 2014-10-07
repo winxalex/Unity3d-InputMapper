@@ -18,24 +18,25 @@ using System.Linq;
 namespace ws.winx.platform.osx
 {
 
-    using Carbon;
-    using CFAllocatorRef = System.IntPtr;
-    using CFDictionaryRef = System.IntPtr;
-    using CFArrayRef = System.IntPtr;
-    using CFIndex = System.Int32;
-    using CFRunLoop = System.IntPtr;
-    using CFString = System.IntPtr;
-    using CFStringRef = System.IntPtr; // Here used interchangeably with the CFString
-    using CFTypeRef = System.IntPtr;
-    using IOHIDDeviceRef = System.IntPtr;
-    using IOHIDElementRef = System.IntPtr;
-    using IOHIDManagerRef = System.IntPtr;
-    using IOHIDValueRef = System.IntPtr;
-    using IOOptionBits = System.IntPtr;
-    using IOReturn = System.IntPtr;
-    using CFNumberRef = System.IntPtr;
-    using IOHIDElementCookie = System.UInt32;
-    using UnityEngine; /*System.UIntPtr*/
+   
+
+    using UnityEngine; 
+	using CFAllocatorRef=System.IntPtr;
+	using CFDictionaryRef=System.IntPtr;
+	using CFStringRef=System.IntPtr;
+	using CFNumberRef=System.IntPtr;
+	using CFArrayCallBacks=System.IntPtr;
+	using CFArrayRef = System.IntPtr;
+	using CFTypeRef = System.IntPtr;
+	using IOHIDDeviceRef = System.IntPtr;
+	using IOHIDElementRef = System.IntPtr;
+	using IOHIDManagerRef = System.IntPtr;
+	using IOHIDValueRef = System.IntPtr;
+	using IOOptionBits = System.IntPtr;
+	using IOReturn = System.IntPtr;
+	using IOHIDElementCookie = System.UInt32;
+	using CFTypeID=System.UInt64;
+	using CFIndex =System.Int64;
 
 
 
@@ -47,13 +48,13 @@ namespace ws.winx.platform.osx
         readonly IOHIDManagerRef hidmanager;
 
 
-        readonly CFRunLoop RunLoop = CF.CFRunLoopGetMain();
-        readonly CFString InputLoopMode = CF.RunLoopModeDefault;
-        readonly CFArray DeviceTypes;
+        readonly IntPtr RunLoop = Native.CFRunLoopGetMain();
+		readonly IntPtr InputLoopMode = Native.RunLoopModeDefault;
+        readonly Native.CFArray DeviceTypes;
 
-        NativeMethods.IOHIDDeviceCallback HandleDeviceAdded;
-        NativeMethods.IOHIDDeviceCallback HandleDeviceRemoved;
-        NativeMethods.IOHIDValueCallback HandleDeviceValueReceived;
+        Native.IOHIDDeviceCallback HandleDeviceAdded;
+        Native.IOHIDDeviceCallback HandleDeviceRemoved;
+        Native.IOHIDValueCallback HandleDeviceValueReceived;
 
         bool disposed;
 
@@ -146,60 +147,233 @@ namespace ws.winx.platform.osx
             HandleDeviceRemoved = DeviceRemoved;
           
             CFDictionaryRef[] dictionaries;
-            CFStringRef[] keys;
+           
 
 
+		
 
-            keys = new CFStringRef[2];
+            
             dictionaries = new CFDictionaryRef[3];
-
-            keys[0] = NativeMethods.IOHIDDeviceUsagePageKey;
-            keys[1] = NativeMethods.IOHIDDeviceUsageKey;
 
             //create 3 search patterns by Joystick,GamePad and MulitAxisController
 
+			// base.typeRef = CFLibrary.CFDictionaryCreate(IntPtr.Zero,keyz,values,keys.Length,ref kcall,ref vcall); 
 
-            dictionaries[0] = CF.CFDictionaryCreate(IntPtr.Zero, keys, new IntPtr[] { new IntPtr((int)HIDPage.GenericDesktop), new IntPtr((int)HIDUsageGD.Joystick) }, 2, IntPtr.Zero, IntPtr.Zero);
-            dictionaries[1] = CF.CFDictionaryCreate(IntPtr.Zero, keys, new IntPtr[] { new IntPtr((int)HIDPage.GenericDesktop), new IntPtr((int)HIDUsageGD.GamePad) }, 2, IntPtr.Zero, IntPtr.Zero);
-            dictionaries[2] = CF.CFDictionaryCreate(IntPtr.Zero, keys, new IntPtr[] { new IntPtr((int)HIDPage.GenericDesktop), new IntPtr((int)HIDUsageGD.MultiAxisController) }, 2, IntPtr.Zero, IntPtr.Zero);
+			IntPtr ptr;
 
 
-            DeviceTypes.Ref = CF.CFArrayCreate(IntPtr.Zero, dictionaries, 3, IntPtr.Zero);
+			dictionaries[0] = CreateDeviceMatchingDictionary((uint)Native.HIDPage.GenericDesktop,(uint)Native.HIDUsageGD.Joystick);
+			
+			
+			
+			dictionaries[1] = CreateDeviceMatchingDictionary((uint)Native.HIDPage.GenericDesktop,(uint)Native.HIDUsageGD.GamePad);
+
+			dictionaries[2] = CreateDeviceMatchingDictionary((uint)Native.HIDPage.GenericDesktop,(uint)Native.HIDUsageGD.MultiAxisController);
+
+
+
+			Native.CFDictionary dict;
+			dict= new Native.CFDictionary (dictionaries [0]);
+
+			Native.CFType a = dict.GetValue (Native.IOHIDDeviceUsagePageKey);
+
+
+			IntPtr buffer = Marshal.AllocCoTaskMem(Native.CFNumberGetByteSize(a.typeRef));
+
+			Native.CFNumberType typeOfNumber = Native.CFNumberGetType (a.typeRef);
+			bool scs = Native.CFNumberGetValue(a.typeRef, typeOfNumber, buffer);
+
+			//int type = a.GetTypeID ();
+			string st = a.ToString ();
+
+			//Native.CFNumberGetValue(a.typeRef,type , buffer);
+
+			int real = buffer.ToInt32 ();
+
+			return;
+			Native.CFNumber value;
+			dict= new Native.CFDictionary (dictionaries [1]);
+
+			value=dict.GetValue (new Native.CFString(Native.IOHIDDeviceUsagePageKey)) as Native.CFNumber;
+			dict= new Native.CFDictionary (dictionaries [2]) ;
+
+			value=dict.GetValue (Native.IOHIDDeviceUsageKey) as Native.CFNumber;
+
+
+			
+			Native.CFArray array = new Native.CFArray (dictionaries);
+			dict = array.GetValue (2) as Native.CFDictionary;
+			value = dict.GetValue (Native.IOHIDDeviceUsagePageKey) as Native.CFNumber;;
+
+            DeviceTypes.typeRef = Native.CFArrayCreate(IntPtr.Zero, dictionaries, 3, IntPtr.Zero);
 
             //create Hid manager	
-            hidmanager = NativeMethods.IOHIDManagerCreate(IntPtr.Zero, IntPtr.Zero);
+            hidmanager = Native.IOHIDManagerCreate(IntPtr.Zero, IntPtr.Zero);
 
-            //Register add/remove device handlers
-            RegisterHIDCallbacks(hidmanager);
+			if (hidmanager != IntPtr.Zero) {	
 
-            _joysticks = new JoystickDevicesCollection();
+				_joysticks = new JoystickDevicesCollection();
+
+				//Register add/remove device handlers
+				RegisterHIDCallbacks(hidmanager);
+				
+			
+			}else
+				UnityEngine.Debug.LogError("Creating of OSX HIDManager failed");         
+
+
+
 
 
 
         }
         #endregion
 
+
+
+
+
 #region Private Members
 
+		static CFDictionaryRef /*CFMutableDictionaryRef*/ CreateDeviceMatchingDictionary(uint inUsagePage, uint inUsage)
+		{
+				IntPtr pageCFNumberRef=(new Native.CFNumber((int)inUsagePage)).typeRef;
+				IntPtr usageCFNumberRef=(new Native.CFNumber((int)inUsage)).typeRef;
+				CFStringRef[] keys;
+				keys = new IntPtr[2];
+			keys[0] = Native.CFSTR (Native.IOHIDDeviceUsagePageKey);//new Native.CFString(Native.IOHIDDeviceUsagePageKey);
+			keys[1] = Native.CFSTR (Native.IOHIDDeviceUsageKey);//new Native.CFString(Native.IOHIDDeviceUsageKey);
 
+			Native.CFDictionary dict = new Native.CFDictionary (keys, new IntPtr[] { 
+				pageCFNumberRef,usageCFNumberRef});
+			
+			return dict.typeRef;
 
-        // Registers callbacks for device addition and removal. These callbacks
-        // are called when we run the loop in CheckDevicesMode
-        void RegisterHIDCallbacks(IOHIDManagerRef hidmanager)
-        {
-            NativeMethods.IOHIDManagerRegisterDeviceMatchingCallback(
+			
+			// create a dictionary to add usage page/usages to
+			//NativeMethod
+//			CFMutableDictionaryRef result = CFDictionaryCreateMutable(
+//				kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+//			Native..CFDictionary result=new ComRegisterFunctionAttribute.
+//
+//
+//			if (result) {
+//				if (inUsagePage) {
+//					// Add key for device type to refine the matching dictionary.
+//
+//
+//					CFNumberRef pageCFNumberRef = CFNumberCreate(
+//						kCFAllocatorDefault, kCFNumberIntType, &inUsagePage);
+//					if (pageCFNumberRef) {
+//						CFDictionarySetValue(result,
+//						                     CFSTR(kIOHIDDeviceUsagePageKey), pageCFNumberRef);
+//						CFRelease(pageCFNumberRef);
+//						
+//						// note: the usage is only valid if the usage page is also defined
+//						if (inUsage) {
+//							CFNumberRef usageCFNumberRef = CFNumberCreate(
+//								kCFAllocatorDefault, kCFNumberIntType, &inUsage);
+//							if (usageCFNumberRef) {
+//								CFDictionarySetValue(result,
+//								                     CFSTR(kIOHIDDeviceUsageKey), usageCFNumberRef);
+//								CFRelease(usageCFNumberRef);
+//							} else {
+//								fprintf(stderr, "%s: CFNumberCreate(usage) failed.", __PRETTY_FUNCTION__);
+//							}
+//						}
+//					} else {
+//						fprintf(stderr, "%s: CFNumberCreate(usage page) failed.", __PRETTY_FUNCTION__);
+//					}
+//				}
+//			} else {
+//				fprintf(stderr, "%s: CFDictionaryCreateMutable failed.", __PRETTY_FUNCTION__);
+//			}
+//			return result;
+		}   // hu_CreateDeviceMatchingDictionary
+//		
+//		// Create a matching dictionary
+//		CFDictionaryRef matchingCFDictRef =
+//			hu_CreateDeviceMatchingDictionary(kHIDPage_GenericDesktop, kHIDUsage_GD_Keyboard);
+//		if (matchingCFDictRef) {
+//			// set the HID device matching dictionary
+//			IOHIDManagerSetDeviceMatching(managerRef, matchingCFDictRef);
+//		} else {
+//			fprintf(stderr, "%s: hu_CreateDeviceMatchingDictionary failed.", __PRETTY_FUNCTION__);
+//		}
+//		
+//		// create an array of matching dictionaries
+//		CFArrayRef matchingCFArrayRef = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
+//		if (matchingCFArrayRef) {
+//			// create a device matching dictionary for joysticks
+//			CFDictionaryRef matchingCFDictRef =
+//				hu_CreateDeviceMatchingDictionary(kHIDPage_GenericDesktop, kHIDUsage_GD_Joystick);
+//			if (matchingCFDictRef) {
+//				// add it to the matching array
+//				CFArrayAppendValue(matchingCFArrayRef, matchingCFDictRef);
+//				CFRelease(matchingCFDictRef); // and release it
+//			} else {
+//				fprintf(stderr, "%s: hu_CreateDeviceMatchingDictionary(joystick) failed.", __PRETTY_FUNCTION__);
+//			}
+//			
+//			// create a device matching dictionary for game pads
+//			matchingCFDictRef = hu_CreateDeviceMatchingDictionary(kHIDPage_GenericDesktop, kHIDUsage_GD_GamePad);
+//			if (matchingCFDictRef) {
+//				// add it to the matching array
+//				CFArrayAppendValue(matchingCFArrayRef, matchingCFDictRef);
+//				CFRelease(matchingCFDictRef); // and release it
+//			} else {
+//				fprintf(stderr, "%s: hu_CreateDeviceMatchingDictionary(game pad) failed.", __PRETTY_FUNCTION__);
+//			}
+//		} else {
+//			fprintf(stderr, "%s: CFArrayCreateMutable failed.", __PRETTY_FUNCTION__);
+//		}
+//		
+//		-- EITHER --
+//			
+//			// create a dictionary for the kIOHIDDeviceUsagePairsKey entry
+//			matchingCFDictRef = CFDictionaryCreateMutable(
+//				kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+//		
+//		// add the matching array to it
+//		CFDictionarySetValue(matchingCFDictRef, CFSTR(kIOHIDDeviceUsagePairsKey), matchingCFArrayRef);
+//		// release the matching array
+//		CFRelease(matchingCFArrayRef);
+//		
+//		// set the HID device matching dictionary
+//		IOHIDManagerSetDeviceMatching(managerRef, matchingCFDictRef);
+//		
+//		// and then release it
+//		CFRelease(matchingCFDictRef);
+//		
+//		-- OR --
+//			
+//			// set the HID device matching array
+//			IOHIDManagerSetDeviceMatchingMultiple(managerRef, matchingCFArrayRef);
+//		
+//		// and then release it
+//		CFRelease(matchingCFArrayRef);
+		
+		// Registers callbacks for device addition and removal. These callbacks
+		// are called when we run the loop in CheckDevicesMode
+		void RegisterHIDCallbacks(IOHIDManagerRef hidmanager)
+		{
+			try{
+				Native.IOHIDManagerRegisterDeviceMatchingCallback(
                 hidmanager, HandleDeviceAdded, IntPtr.Zero);
-            NativeMethods.IOHIDManagerRegisterDeviceRemovalCallback(
+            Native.IOHIDManagerRegisterDeviceRemovalCallback(
                 hidmanager, HandleDeviceRemoved, IntPtr.Zero);
-            NativeMethods.IOHIDManagerScheduleWithRunLoop(hidmanager,
+            Native.IOHIDManagerScheduleWithRunLoop(hidmanager,
                                                           RunLoop, InputLoopMode);
 
-            //NativeMethods.IOHIDManagerSetDeviceMatching(hidmanager, DeviceTypes.Ref);
-            NativeMethods.IOHIDManagerSetDeviceMatchingMultiple(hidmanager, DeviceTypes.Ref);
-            NativeMethods.IOHIDManagerOpen(hidmanager, IOOptionBits.Zero);
+            //Native.IOHIDManagerSetDeviceMatching(hidmanager, DeviceTypes.Ref);
+            Native.IOHIDManagerSetDeviceMatchingMultiple(hidmanager, DeviceTypes.typeRef);
+            Native.IOHIDManagerOpen(hidmanager, IntPtr.Zero);
 
-            CF.CFRunLoopRunInMode(InputLoopMode, 0.0, true);
-            //OpenTK.Platform.MacOS.Carbon.CF.CFRunLoopRunInMode(InputLoopMode, 0.0, true);
+            Native.CFRunLoopRunInMode(InputLoopMode, 0.0, true);
+			}catch(Exception ex){
+				UnityEngine.Debug.LogException(ex);
+						}
+            //OpenTK.Platform.MacOS.Carbon.Native.CFRunLoopRunInMode(InputLoopMode, 0.0, true);
         }
 
 
@@ -212,14 +386,14 @@ namespace ws.winx.platform.osx
         /// <param name="device">Device.</param>
         void DeviceAdded(IntPtr context, IOReturn res, IntPtr sender, IOHIDDeviceRef device)
         {
-            if (NativeMethods.IOHIDDeviceOpen(device, IOOptionBits.Zero) == IOReturn.Zero
+            if (Native.IOHIDDeviceOpen(device, IntPtr.Zero) == IOReturn.Zero
 
                && !Devices.ContainsKey(device))
             {
 
-                IntPtr vendor_id = NativeMethods.IOHIDDeviceGetProperty(device, NativeMethods.IOHIDVendorIDKey);
-                IntPtr product_id = NativeMethods.IOHIDDeviceGetProperty(device, NativeMethods.IOHIDProductIDKey);
-                string description = NativeMethods.IOHIDDeviceGetProperty(device, NativeMethods.IOHIDProductKey).ToString();
+                IntPtr vendor_id = Native.IOHIDDeviceGetProperty(device, Native.CFSTR(Native.IOHIDVendorIDKey));
+				IntPtr product_id = Native.IOHIDDeviceGetProperty(device, Native.CFSTR(Native.IOHIDProductIDKey));
+				string description = Native.IOHIDDeviceGetProperty(device, Native.CFSTR(Native.IOHIDProductKey)).ToString();
 
 
 
@@ -274,9 +448,9 @@ namespace ws.winx.platform.osx
         /// <param name="device">Device.</param>
         void DeviceRemoved(IntPtr context, IOReturn res, IntPtr sender, IOHIDDeviceRef device)
         {
-            if (NativeMethods.IOHIDDeviceConformsTo(device, HIDPage.GenericDesktop, (int)HIDUsageGD.Joystick)
-                 || NativeMethods.IOHIDDeviceConformsTo(device, HIDPage.GenericDesktop, (int)HIDUsageGD.GamePad)
-                 || NativeMethods.IOHIDDeviceConformsTo(device, HIDPage.GenericDesktop, (int)HIDUsageGD.MultiAxisController)
+            if (Native.IOHIDDeviceConformsTo(device, Native.HIDPage.GenericDesktop, Native.HIDUsageGD.Joystick)
+                 || Native.IOHIDDeviceConformsTo(device, Native.HIDPage.GenericDesktop, Native.HIDUsageGD.GamePad)
+                 || Native.IOHIDDeviceConformsTo(device, Native.HIDPage.GenericDesktop, Native.HIDUsageGD.MultiAxisController)
              && Devices.ContainsKey(device))
             {
                 UnityEngine.Debug.Log(String.Format("Joystick device {0:x} disconnected, sender is {1:x}", device, sender));
@@ -285,9 +459,9 @@ namespace ws.winx.platform.osx
             }
 
 
-
-            NativeMethods.IOHIDDeviceRegisterInputValueCallback(device, IntPtr.Zero, IntPtr.Zero);
-            NativeMethods.IOHIDDeviceUnscheduleWithRunLoop(device, RunLoop, InputLoopMode);
+		    
+           // Native.IOHIDDeviceRegisterInputValueCallback(device, IntPtr.Zero, IntPtr.Zero);
+           // Native.IOHIDDeviceUnscheduleWithRunLoop(device, RunLoop, InputLoopMode);
         }
 
 
@@ -298,213 +472,7 @@ namespace ws.winx.platform.osx
 
 
 
-#region NativeMethods
 
-        internal class NativeMethods
-        {
-            const string hid = "/System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit";
-
-            public static readonly CFString IOHIDVendorIDKey = CF.CFSTR("VendorID");
-            public static readonly CFString IOHIDVendorIDSourceKey = CF.CFSTR("VendorIDSource");
-            public static readonly CFString IOHIDProductIDKey = CF.CFSTR("ProductID");
-            public static readonly CFString IOHIDVersionNumberKey = CF.CFSTR("VersionNumber");
-            public static readonly CFString IOHIDManufacturerKey = CF.CFSTR("Manufacturer");
-            public static readonly CFString IOHIDProductKey = CF.CFSTR("Product");
-            public static readonly CFString IOHIDDeviceUsageKey = CF.CFSTR("DeviceUsage");
-            public static readonly CFString IOHIDDeviceUsagePageKey = CF.CFSTR("DeviceUsagePage");
-            public static readonly CFString IOHIDDeviceUsagePairsKey = CF.CFSTR("DeviceUsagePairs");
-
-            [DllImport(hid)]
-            public static extern IOHIDManagerRef IOHIDManagerCreate(
-                CFAllocatorRef allocator, IOOptionBits options);
-
-            // This routine will be called when a new (matching) device is connected.
-            [DllImport(hid)]
-            public static extern void IOHIDManagerRegisterDeviceMatchingCallback(
-                IOHIDManagerRef inIOHIDManagerRef,
-                IOHIDDeviceCallback inIOHIDDeviceCallback,
-                IntPtr inContext);
-
-            [DllImport(hid)]
-            public static extern void IOHIDManagerRegisterDeviceMatchingCallback(
-                IOHIDManagerRef inIOHIDManagerRef,
-                IntPtr inIOHIDDeviceCallback,
-                IntPtr inContext);
-
-            // This routine will be called when a (matching) device is disconnected.
-            [DllImport(hid)]
-            public static extern void IOHIDManagerRegisterDeviceRemovalCallback(
-                IOHIDManagerRef inIOHIDManagerRef,
-                IOHIDDeviceCallback inIOHIDDeviceCallback,
-                IntPtr inContext);
-
-            [DllImport(hid)]
-            public static extern void IOHIDManagerRegisterDeviceRemovalCallback(
-                IOHIDManagerRef inIOHIDManagerRef,
-                IntPtr inIOHIDDeviceCallback,
-                IntPtr inContext);
-
-            [DllImport(hid)]
-            public static extern void IOHIDManagerScheduleWithRunLoop(
-                IOHIDManagerRef inIOHIDManagerRef,
-                CFRunLoop inCFRunLoop,
-                CFString inCFRunLoopMode);
-
-            [DllImport(hid)]
-            public static extern void IOHIDManagerSetDeviceMatching(
-                IOHIDManagerRef manager,
-                CFDictionaryRef matching);
-
-
-            [DllImport(hid)]
-            public static extern void IOHIDManagerSetDeviceMatchingMultiple(
-                IOHIDManagerRef manager,
-                CFArrayRef multiple);
-
-            [DllImport(hid)]
-            public static extern CFArrayRef IOHIDDeviceCopyMatchingElements(
-            IOHIDDeviceRef device,
-            CFDictionaryRef matching,
-            IOOptionBits options);
-
-            [DllImport(hid)]
-            public static extern uint IOHIDElementGetUsage(
-                IOHIDElementRef element);
-
-
-            [DllImport(hid)]
-            public static extern IOReturn IOHIDManagerOpen(
-                IOHIDManagerRef manager,
-                IOOptionBits options);
-
-            [DllImport(hid)]
-            public static extern IOReturn IOHIDDeviceOpen(
-                IOHIDDeviceRef manager,
-                IOOptionBits opts);
-
-            [DllImport(hid)]
-            public static extern CFTypeRef IOHIDDeviceGetProperty(
-                IOHIDDeviceRef device,
-                CFStringRef key);
-
-
-            [DllImport(hid)]
-            public static extern IOHIDElementType IOHIDElementGetType(
-                IOHIDElementRef element);
-
-            [DllImport(hid)]
-            public static extern bool IOHIDDeviceConformsTo(
-                IOHIDDeviceRef inIOHIDDeviceRef,  // IOHIDDeviceRef for the HID device
-                HIDPage inUsagePage,      // the usage page to test conformance with
-                int inUsage);         // the usage to test conformance with
-
-            [DllImport(hid)]
-            public static extern void IOHIDDeviceRegisterInputValueCallback(
-                IOHIDDeviceRef device,
-                IOHIDValueCallback callback,
-                IntPtr context);
-
-            [DllImport(hid)]
-            public static extern void IOHIDDeviceRegisterInputValueCallback(
-                IOHIDDeviceRef device,
-                IntPtr callback,
-                IntPtr context);
-
-            [DllImport(hid)]
-            public static extern void IOHIDDeviceScheduleWithRunLoop(
-                IOHIDDeviceRef device,
-                CFRunLoop inCFRunLoop,
-                CFString inCFRunLoopMode);
-
-
-            [DllImport(hid)]
-            public static extern bool IOHIDElementHasNullState(
-                IOHIDElementRef element);
-
-            [DllImport(hid)]
-            public static extern void IOHIDDeviceUnscheduleWithRunLoop(
-                IOHIDDeviceRef device,
-                CFRunLoop inCFRunLoop,
-                CFString inCFRunLoopMode);
-
-            [DllImport(hid)]
-            public static extern uint /*IOHIDElementCookie*/ IOHIDElementGetCookie(
-                IOHIDElementRef element);
-
-            [DllImport(hid)]
-            public static extern IOHIDElementRef IOHIDValueGetElement(IOHIDValueRef @value);
-
-            [DllImport(hid)]
-            public static extern CFIndex IOHIDValueGetIntegerValue(IOHIDValueRef @value);
-
-            [DllImport(hid)]
-            public static extern double IOHIDValueGetScaledValue(
-                IOHIDValueRef @value,
-                IOHIDValueScaleType type);
-
-
-            [DllImport(hid)]
-            public static extern HIDPage IOHIDElementGetUsagePage(IOHIDElementRef elem);
-
-            [DllImport(hid)]
-            public static extern CFIndex IOHIDElementGetLogicalMin(IOHIDElementRef element);
-
-            [DllImport(hid)]
-            public static extern CFIndex IOHIDElementGetLogicalMax(IOHIDElementRef element);
-
-
-            [DllImport(hid)]
-            public static extern CFIndex IOHIDValueGetLength(IOHIDValueRef value);
-
-
-
-            public delegate void IOHIDDeviceCallback(IntPtr ctx, IOReturn res, IntPtr sender, IOHIDDeviceRef device);
-            public delegate void IOHIDValueCallback(IntPtr ctx, IOReturn res, IntPtr sender, IOHIDValueRef val);
-
-
-
-
-
-        }
-
-        internal enum IOHIDValueScaleType
-        {
-            Physical, // [device min, device max]
-            Calibrated // [-1, +1]
-        }
-
-        internal enum HIDPage
-        {
-            GenericDesktop = 0x01,
-
-        }
-
-        // Generic desktop usage
-        internal enum HIDUsageGD
-        {
-
-            Joystick = 0x04, /* Application Collection */
-            GamePad = 0x05, /* Application Collection */
-            MultiAxisController = 0x08, /* Application Collection */
-            Hatswitch = 0x39, /* Dynamic Value */
-
-        }
-
-        internal enum IOHIDElementType
-        {
-            kIOHIDElementTypeInput_Misc = 1,
-            kIOHIDElementTypeInput_Button = 2,
-            kIOHIDElementTypeInput_Axis = 3,
-            kIOHIDElementTypeInput_ScanCodes = 4,
-            kIOHIDElementTypeOutput = 129,
-            kIOHIDElementTypeFeature = 257,
-            kIOHIDElementTypeCollection = 513
-        };
-
-
-
-
-        #endregion
 
 #region IntPtrEqualityComparer
         // Simple equality comparer to allow IntPtrs as keys in dictionaries
