@@ -48,7 +48,7 @@ namespace ws.winx.platform.osx
 	using IOOptionBits = System.IntPtr;
 	using IOReturn = System.IntPtr;
 	using IOHIDElementCookie = System.UInt32;
-	using CFTypeID=System.UInt64;
+	using CFTypeID=System.Int32;//System.UInt64;
 	using CFIndex =System.Int64;
 
    
@@ -120,8 +120,7 @@ namespace ws.winx.platform.osx
 
 
 
-		[DllImport(coreFoundationLibrary)]
-		internal static extern CFTypeID CFDataGetTypeID ();
+	
 
 		[DllImport(coreFoundationLibrary)]
 		internal static extern CFTypeID CFStringGetTypeID ();
@@ -148,6 +147,9 @@ namespace ws.winx.platform.osx
 		
 		[DllImport(coreFoundationLibrary)]
 		public static   extern IntPtr CFDataCreate(IntPtr theAllocator, IntPtr bytes, int bytelength);
+
+		[DllImport(coreFoundationLibrary)]
+		internal static extern CFTypeID CFDataGetTypeID ();
 		#endregion
 		#region CFDictionary Func
 
@@ -469,7 +471,7 @@ namespace ws.winx.platform.osx
 			{
 				GenericDesktop = 0x01,
 				
-		};
+		}
 			
 			// Generic desktop usage
 			internal enum HIDUsageGD
@@ -480,7 +482,7 @@ namespace ws.winx.platform.osx
 				MultiAxisController = 0x08, /* Application Collection */
 				Hatswitch = 0x39, /* Dynamic Value */
 				
-		};
+		}
 			
 			internal enum IOHIDElementType
 			{
@@ -491,20 +493,22 @@ namespace ws.winx.platform.osx
 				kIOHIDElementTypeOutput = 129,
 				kIOHIDElementTypeFeature = 257,
 				kIOHIDElementTypeCollection = 513
-			};
+			}
 		
 
-		#region CFType
+		#region CFType Class
 		public class CFType
 		{
-			internal ulong _CFArray = Native.CFArrayGetTypeID ();// 18;
-			internal  ulong _CFBoolean = Native.CFBooleanGetTypeID ();  // 21;
-			internal  ulong _CFData = Native.CFDataGetTypeID ();// 19; 
-			internal  ulong _CFNumber = Native.CFNumberGetTypeID ();// 22;
-			internal  ulong _CFDictionary = Native.CFDictionaryGetTypeID ();//17;
-			internal  ulong _CFString = Native.CFStringGetTypeID ();    //7;
+			internal CFTypeID _CFArray = Native.CFArrayGetTypeID ();// 18;
+			internal  CFTypeID _CFBoolean = Native.CFBooleanGetTypeID ();  // 21;
+			internal  CFTypeID _CFData = Native.CFDataGetTypeID ();// 19; 
+			internal  CFTypeID _CFNumber = Native.CFNumberGetTypeID ();// 22;
+			internal  CFTypeID _CFDictionary = Native.CFDictionaryGetTypeID ();//17;
+			internal  CFTypeID _CFString = Native.CFStringGetTypeID ();    //7;
+
 			
 			internal IntPtr typeRef;
+			internal object value;
 			
 			public CFType() { }
 			
@@ -514,7 +518,7 @@ namespace ws.winx.platform.osx
 			/// Returns the unique identifier of an opaque type to which a CoreFoundation object belongs
 			/// </summary>
 			/// <returns></returns>
-			public ulong GetTypeID()
+			public CFTypeID GetTypeID()
 			{
 				//return CFGetTypeID(typeRef);
 				return CFGetTypeID(typeRef);
@@ -526,90 +530,36 @@ namespace ws.winx.platform.osx
 			public string GetDescription()
 			{
 				return new CFString(CFCopyDescription(typeRef)).ToString();
-			}       
+			} 
+
+
+			internal CFType Factory(IntPtr value){
+				CFTypeID type = CFGetTypeID (value);
+
+				if (type == _CFString)                               
+										return new CFString (value);         
+				else if(type==_CFDictionary)  
+					return new CFDictionary(value);
+				else if(type==_CFArray)
+					return new CFArray(value);
+				        else if(type== _CFData)
+					return new CFData(value);
+				        else if(type==_CFBoolean)
+					return new CFBoolean(value);
+				        else if(type==_CFNumber)
+					return new CFNumber(value);                
+
+
+				return IntPtr.Zero;
+			}
 			
-			private string CFString()
-			{
-				if (typeRef == IntPtr.Zero)
-					return null;
-				
-				string str;
-				int length = CFStringGetLength(typeRef);        
-				IntPtr u = CFStringGetCharactersPtr(typeRef);
-				IntPtr buffer = IntPtr.Zero;
-				if (u == IntPtr.Zero)
-				{
-					CFRange range = new CFRange(0, length);
-					buffer = Marshal.AllocCoTaskMem(length * 2);
-					CFStringGetCharacters(typeRef, range, buffer);
-					u = buffer;
-				}
-				unsafe
-				{
-					str = new string((char*)u, 0, length);
-				}
-				if (buffer != IntPtr.Zero)
-					Marshal.FreeCoTaskMem(buffer);
-				return str;
-			}       
-			private string CFNumber()
-			{
-				IntPtr buffer = Marshal.AllocCoTaskMem(CFNumberGetByteSize(typeRef));
-				bool scs = CFNumberGetValue(typeRef, CFNumberGetType(typeRef), buffer);
-				if (scs != true)
-				{
-					return string.Empty;
-				}
-				int type = (int)CFNumberGetType(typeRef);
-				switch (type)
-				{
-				case 1:
-					return Marshal.ReadInt16(buffer).ToString();
-				case 2:
-					return Marshal.ReadInt16(buffer).ToString();
-				case 3:
-					return Marshal.ReadInt32(buffer).ToString();
-				case 4:
-					return Marshal.ReadInt64(buffer).ToString();
-				default:
-					return Enum.GetName(typeof(CFNumberType), type) + " is not supported yet!";
-				}
-			}
-			private string CFBoolean()
-			{
-				return CFBooleanGetValue(typeRef).ToString();
-			}
-			private string CFData()
-			{
-				CFData typeArray = new CFData(typeRef);
-				return Convert.ToBase64String(typeArray.ToByteArray());
-			}
-			private string CFPropertyList()
-			{
-				return Encoding.UTF8.GetString(new CFData(CFPropertyListCreateXMLData(IntPtr.Zero, typeRef)).ToByteArray());
-			}
+	
+
 			public override string ToString()
 			{
-				ulong typeID = CFGetTypeID (typeRef);
-
-				if(typeID==_CFString)                              
-					return CFString();                
-				else if(typeID==_CFDictionary) 
-					return  CFPropertyList();
-				else if(typeID==_CFArray)
-					return CFPropertyList();
-				else if(typeID==_CFData) 
-					return CFData();
-				else if(typeID==_CFBoolean) 
-					return CFBoolean();
-				else if(typeID==_CFNumber) 
-					return CFNumber();                
-
-
-				UnityEngine.Debug.LogWarning ("TypeID:" + typeID+" not found!.");
-
-				return null;
+				return String.Empty;
 			}
+
 			public static implicit operator IntPtr(CFType value)
 			{
 				return value.typeRef;
@@ -747,20 +697,16 @@ namespace ws.winx.platform.osx
 					return new CFType(CFArrayGetValueAtIndex(typeRef, index));
 				}
 			}
-			
-			/// <summary>
-			/// Retrieves a value at a given index
-			/// </summary>
-			/// <param name="index"></param>
-			/// <returns></returns>
-			public CFType GetValue(int index)
-			{            
-				if (index >= this.Length)
-					return new CFType(IntPtr.Zero);
-				
-				return new CFType(CFArrayGetValueAtIndex(typeRef, index));
-				
+
+
+			public override string ToString ()
+			{
+
+				return Encoding.UTF8.GetString(new CFData(CFPropertyListCreateXMLData(IntPtr.Zero, typeRef)).ToByteArray());
+
 			}
+			
+
 		}
 		#endregion
 
@@ -771,13 +717,29 @@ namespace ws.winx.platform.osx
 			public CFBoolean(IntPtr Number)
 				: base(Number)
 			{
-			}       
+			}  
+
+			public bool ToBoolean(){
+				if (base.value == null) {
+										base.value = CFBooleanGetValue (this.typeRef);
+								}
+
+
+					return (bool)base.value;
+			}
+
+			public override string ToString ()
+			{
+					return this.ToBoolean().ToString();
+			}
 		}
 		#endregion
 
 		#region CFData
 		public class CFData :  CFType 
 		{      
+			protected byte[] _value;
+
 			public CFData(){}
 			public CFData(IntPtr Data)
 				: base(Data)
@@ -812,12 +774,23 @@ namespace ws.winx.platform.osx
 			/// </summary>
 			/// <returns></returns>
 			unsafe public byte[] ToByteArray()
-			{            
+			{       
+				if(_value==null){
 				int len = Length();
 				byte[] buffer = new byte[len];
 				fixed (byte* bufPtr = buffer)
 					CFDataGetBytes(typeRef, new CFRange(0, len), (IntPtr)bufPtr);
-				return buffer;            
+					return _value=buffer; 
+				}else 
+					return _value;
+
+			}
+
+	
+
+			public override string ToString ()
+			{
+				return Convert.ToBase64String(this.ToByteArray());
 			}
 			
 			public static implicit operator CFData(IntPtr value)
@@ -857,6 +830,37 @@ namespace ws.winx.platform.osx
 			{
 				return CFGetTypeID(typeRef) == _CFString;
 			}
+
+			public override string ToString ()
+			{
+				if(base.value==null){
+
+				if (typeRef == IntPtr.Zero)
+					return null;
+				
+				string str;
+				int length = CFStringGetLength(typeRef);        
+				IntPtr u = CFStringGetCharactersPtr(typeRef);
+				IntPtr buffer = IntPtr.Zero;
+				if (u == IntPtr.Zero)
+				{
+					CFRange range = new CFRange(0, length);
+					buffer = Marshal.AllocCoTaskMem(length * 2);
+					CFStringGetCharacters(typeRef, range, buffer);
+					u = buffer;
+				}
+				unsafe
+				{
+					str = new string((char*)u, 0, length);
+				}
+				if (buffer != IntPtr.Zero)
+					Marshal.FreeCoTaskMem(buffer);
+					base.value=str;
+					return base.value as String;
+				}else 
+					return base.value as String;
+			}
+
 			public static implicit operator CFString(IntPtr value)
 			{
 				return new CFString(value);
@@ -897,25 +901,25 @@ namespace ws.winx.platform.osx
 				base.typeRef = CFDictionaryCreate(IntPtr.Zero,keys,values,keys.Length,ref kcall,ref vcall);            
 			}
 			
-			/// <summary>
-			/// Returns the value associated with a given key.
-			/// </summary>
-			/// <param name="value"></param>
-			/// <returns></returns>
-			public CFType GetValue(string value)
+
+
+
+			public CFType this[string value]
 			{
-				try
-				{
-					//return new CFType(CFDictionaryGetValue(base.typeRef, new CFString(value)));
-					return new CFType(CFDictionaryGetValue(base.typeRef, CFSTR(value)));
-				}
-				catch (Exception ex)
-				{
-					UnityEngine.Debug.LogException(ex);
-					return new CFType(IntPtr.Zero);
-				}
+				get{
+										try {
+
+												
+												//return new CFType(CFDictionaryGetValue(base.typeRef, new CFString(value)));
+												return base.Factory(CFDictionaryGetValue (base.typeRef, CFSTR (value)));
+										} catch (Exception ex) {
+												UnityEngine.Debug.LogException (ex);
+												return new CFType (IntPtr.Zero);
+										}
+				   }
 				
 			}
+
 			/// <summary>
 			/// Returns the number of key-value pairs in a dictionary
 			/// </summary>
@@ -993,10 +997,54 @@ namespace ws.winx.platform.osx
 			}
 			unsafe public CFNumber(int Number) 
 			{
+
 				//new IntPtr(Number);
 				int* pNumber=&Number;
 				base.typeRef = CFNumberCreate(IntPtr.Zero, CFNumberType.kCFNumberIntType, pNumber);
-			}       
+			} 
+
+
+			public object ToInteger()
+			{
+				if (base.value == null) {
+
+
+
+					IntPtr buffer = Marshal.AllocCoTaskMem(CFNumberGetByteSize(typeRef));
+					bool scs = CFNumberGetValue(typeRef, CFNumberGetType(typeRef), buffer);
+					if (scs != true)
+					{
+						UnityEngine.Debug.LogError("CFNumber IntPtr to Integer failed.");
+					}
+
+					CFNumberType type = CFNumberGetType(typeRef);
+					
+					switch (type)
+					{
+					case Native.CFNumberType.kCFNumberSInt8Type:
+						return (base.value=Marshal.ReadInt16(buffer));
+					case Native.CFNumberType.kCFNumberSInt16Type:
+						return (base.value=Marshal.ReadInt16(buffer));
+					case Native.CFNumberType.kCFNumberSInt32Type:
+						return (base.value=Marshal.ReadInt32(buffer));
+					case Native.CFNumberType.kCFNumberSInt64Type:
+						return (base.value=Marshal.ReadInt64(buffer));
+					default:
+						UnityEngine.Debug.LogError("CFNumber value not recognize type of "+((Native.CFNumberType)type).ToString());
+						break;
+					}
+
+
+				}
+
+				return base.value;
+
+			}
+
+			public override string ToString ()
+			{
+				return string.Format ("[CFNumber]");
+			}
 			   
 			
 		}

@@ -175,35 +175,21 @@ namespace ws.winx.platform.osx
 			Native.CFDictionary dict;
 			dict= new Native.CFDictionary (dictionaries [0]);
 
-			Native.CFType a = dict.GetValue (Native.IOHIDDeviceUsagePageKey);
+			Native.CFType a = dict[Native.IOHIDDeviceUsagePageKey];
 
 
-			IntPtr buffer = Marshal.AllocCoTaskMem(Native.CFNumberGetByteSize(a.typeRef));
+			int type=a.GetTypeID ();
+			Native.CFNumber value=a as Native.CFNumber;
 
-			Native.CFNumberType typeOfNumber = Native.CFNumberGetType (a.typeRef);
-			bool scs = Native.CFNumberGetValue(a.typeRef, typeOfNumber, buffer);
-
-			//int type = a.GetTypeID ();
-			string st = a.ToString ();
-
-			//Native.CFNumberGetValue(a.typeRef,type , buffer);
-
-			int real = buffer.ToInt32 ();
+			int real = (int)value.ToInteger ();
 
 			return;
-			Native.CFNumber value;
-			dict= new Native.CFDictionary (dictionaries [1]);
-
-			value=dict.GetValue (new Native.CFString(Native.IOHIDDeviceUsagePageKey)) as Native.CFNumber;
-			dict= new Native.CFDictionary (dictionaries [2]) ;
-
-			value=dict.GetValue (Native.IOHIDDeviceUsageKey) as Native.CFNumber;
 
 
 			
 			Native.CFArray array = new Native.CFArray (dictionaries);
-			dict = array.GetValue (2) as Native.CFDictionary;
-			value = dict.GetValue (Native.IOHIDDeviceUsagePageKey) as Native.CFNumber;;
+			dict = array[2] as Native.CFDictionary;
+			 value = dict[Native.IOHIDDeviceUsagePageKey] as Native.CFNumber;
 
             DeviceTypes.typeRef = Native.CFArrayCreate(IntPtr.Zero, dictionaries, 3, IntPtr.Zero);
 

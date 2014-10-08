@@ -282,7 +282,7 @@ namespace ws.winx.platform.osx
 			
 							for (int elementIndex = 0; elementIndex < numElements; elementIndex++){
 								//element = (IOHIDElementRef) elements[elementIndex];
-								element = (IOHIDElementRef) elements.GetValue(elementIndex);
+								element = (IOHIDElementRef) elements[elementIndex];
 								type = Native.IOHIDElementGetType(element);
 			
 			
