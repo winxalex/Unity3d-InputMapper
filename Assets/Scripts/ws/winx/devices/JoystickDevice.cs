@@ -532,6 +532,7 @@ namespace ws.winx.devices
                     //        return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.None, button);
                     //}
 
+			UnityEngine.Debug.Log("GetInput from J"+this.ID+" took state:" + button_collection[0].buttonState);
 
 
                     while (button < _numButtons)

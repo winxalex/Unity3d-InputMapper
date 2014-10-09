@@ -641,7 +641,7 @@ namespace ws.winx.platform.windows
                         }
 
                     }
-                }
+                }//set
             }
             #endregion
             #endregion

@@ -100,18 +100,18 @@ namespace ws.winx
             //UnityEngine.Debug.Log("Standalone");
 
 
-//            if (ui != null && ui.settingsXML == null)
-//            {//settingsXML would trigger internal loading mechanism (only for testing)
-//
-//                InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));
-//
-//
-//
-//                ui.StateInputCombinations = InputManager.Settings.stateInputs;
-//            }
-//
-//
-//            manuallyAddStateAndHandlers();
+            if (ui != null && ui.settingsXML == null)
+            {//settingsXML would trigger internal loading mechanism (only for testing)
+
+                InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));
+
+
+
+                ui.StateInputCombinations = InputManager.Settings.stateInputs;
+            }
+
+
+            manuallyAddStateAndHandlers();
 
 #endif
 
@@ -186,8 +186,8 @@ namespace ws.winx
 
 
 
-
-			ws.winx.platform.osx.OSXHIDInterface a = new ws.winx.platform.osx.OSXHIDInterface (new List<IDriver>());
+			//test only
+			//ws.winx.platform.osx.OSXHIDInterface a = new ws.winx.platform.osx.OSXHIDInterface (new List<IDriver>());
 
 
 
@@ -300,7 +300,7 @@ namespace ws.winx
         void Update()
         {
 		
-			return;
+
 
             //Use is mapping states so no quering keys during gameplay
             if (InputManager.EditMode || !_settingsLoaded) return;
@@ -411,7 +411,7 @@ namespace ws.winx
 
         void OnGUI()
         {
-			return;
+
 
             //don't take device here in the loop this is just for demo
             if (InputManager.hidInterface.Devices.ContainsKey(0))

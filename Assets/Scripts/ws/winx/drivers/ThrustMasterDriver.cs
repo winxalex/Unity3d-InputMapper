@@ -373,8 +373,6 @@ namespace ws.winx.drivers
 
                 //  UnityEngine.Debug.Log("Value:" + _value);
 
-                //if pressed==TRUE
-                //TODO check the code with triggers
                 if (value > 0)
                 {
                     if (_buttonState == JoystickButtonState.None

@@ -18,7 +18,7 @@ namespace ws.winx.platform
 		/// </summary>
 		/// <returns>returns JoystickDevice if driver is for this device or null</returns>
 		/// <param name="info">Info.</param>
-         IDevice ResolveDevice (IHIDDevice info);
+         IDevice ResolveDevice (IHIDDevice hidDevice);
 		//IDevice<IAxisDetails,IButtonDetails,IDeviceExtension> ResolveDevice (IHIDDeviceInfo info);
 		//JoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension> ResolveDevice (IHIDDeviceInfo info);
          void Update(IDevice device);

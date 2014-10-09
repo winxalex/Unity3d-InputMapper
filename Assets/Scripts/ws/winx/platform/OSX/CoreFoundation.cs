@@ -64,7 +64,8 @@ namespace ws.winx.platform.osx
 		const string coreFoundationLibrary = "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation";
 
 
-
+		public static readonly String IOHIDLocationIDKey="LocationID";
+		public static readonly String IOHIDTransportKey="Transport";
 		public static readonly String IOHIDVendorIDKey = "VendorID";
 		public static readonly String IOHIDVendorIDSourceKey = "VendorIDSource";
 		public static readonly String IOHIDProductIDKey = "ProductID";

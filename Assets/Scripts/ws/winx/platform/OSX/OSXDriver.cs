@@ -47,7 +47,7 @@ namespace ws.winx.platform.osx
 #region Fields
 
 
-		IHIDInterface _hidInterface;
+
 		
 	
 		
@@ -99,6 +99,8 @@ namespace ws.winx.platform.osx
 			if (!device.isReady)
 								return;
 
+			((JoystickDevice)device).isReady = false;
+
 
 //			if (Native.IOHIDValueGetLength(valRef) > 4) {
 //				// Workaround for a strange crash that occurs with PS3 controller; was getting lengths of 39 (!)
@@ -124,9 +126,12 @@ namespace ws.winx.platform.osx
 					axisDetails=device.Axis[axisIndex] as AxisDetails;
 
 					if (axisDetails!=null && axisDetails.uid== uid) {
+
+
+
 						//check hatch
 						//Check if POV element.
-						if((Native.IOHIDElementGetUsage(element) & (uint)Native.HIDUsageGD.Hatswitch)!=0)
+						if((Native.IOHIDElementGetUsage(element) == (uint)Native.HIDUsageGD.Hatswitch))
 						{
 									//Workaround for POV hat switches that do not have null states.
 									if(!axisDetails.isNullable)
@@ -134,16 +139,16 @@ namespace ws.winx.platform.osx
 										value = value < axisDetails.min ? axisDetails.max - axisDetails.min + 1 : value - 1;
 									}
 
-							//todo change them to float
-							int outX;
-							int outY;
+							//Todo change them to float
+							float outX;
+							float outY;
 
 							hatValueToXY(value,(axisDetails.max - axisDetails.min)+1,out outX,out outY);
 
 							device.Axis[JoystickAxis.AxisPovX].value=outX;
 							device.Axis[JoystickAxis.AxisPovY].value=outY;
 
-									
+							//UnityEngine.Debug.Log("POVX:"+device.Axis[JoystickAxis.AxisPovX].value+" POVY:"+device.Axis[JoystickAxis.AxisPovY].value);	
 						
 						}else{
 							//Sanity check.
@@ -158,6 +163,8 @@ namespace ws.winx.platform.osx
 
 							//Calculate the -1 to 1 float from the min and max possible values.
 							axisDetails.value=(value - axisDetails.min) / (float)(axisDetails.max - axisDetails.min) * 2.0f - 1.0f;
+
+							//UnityEngine.Debug.Log("AxisValue:"+axisDetails.value);
 
 						}
 
@@ -178,7 +185,7 @@ namespace ws.winx.platform.osx
 
 						device.Buttons[buttonIndex].value=value;
 
-
+						UnityEngine.Debug.Log("Button "+buttonIndex+" value:"+value+" State:"+device.Buttons[buttonIndex].buttonState);
 						
 						return;
 					}
@@ -213,24 +220,24 @@ namespace ws.winx.platform.osx
 		/// <param name="range">Range.</param>
 		/// <param name="outX">Out x.</param>
 		/// <param name="outY">Out y.</param>
-		 void hatValueToXY(long value, int range,out int outX,out int outY) {
+		 void hatValueToXY(long value, int range,out float outX,out float outY) {
 
-				outX = outY = 0;
+				outX = outY = 0f;
 				int rangeHalf=range>>1;
 				int rangeQuat=range>>2;
 				
 				if (value > 0 && value < rangeHalf) {
-					outX = 1;
+					outX = 1f;
 					
 				} else if (value > rangeHalf) {
-					outX = -1;					
+					outX = -1f;					
 				} 
 				
 				if (value > rangeQuat * 3 || value < rangeQuat) {
-					outY = 1;
+					outY = 1f;
 					
 				} else if (value > rangeQuat && value < rangeQuat * 3) {
-					outY = -1;					
+					outY = -1f;					
 				} 
 
 		}
@@ -255,7 +262,8 @@ namespace ws.winx.platform.osx
          public void Update(IDevice joystick)
 	
 		{
-            throw new Exception("OSX Default driver is meant to auto update on callback");
+			((JoystickDevice)joystick).isReady = true;
+            //throw new Exception("OSX Default driver is meant to auto update on callback");
 		}
 
 		/// <summary>
@@ -267,25 +275,11 @@ namespace ws.winx.platform.osx
 		public IDevice ResolveDevice (IHIDDevice hidDevice)
 		
 		{
-
-			_hidInterface=hidDevice.hidInterface;
-
-
-			return CreateDevice(hidDevice);
-		}
+	
 
 
+			IntPtr device=hidDevice.deviceHandle;
 
-
-	/// <summary>
-	/// Creates the device.
-	/// </summary>
-	/// <returns>The device.</returns>
-	/// <param name="info">Info.</param>
-		public IDevice CreateDevice(IHIDDevice info){
-
-			IntPtr device=info.deviceHandle;
-			//JoystickDevice<IAxisDetails,IButtonDetails,IDeviceExtension> joystick;
 			JoystickDevice joystick;
 			int axisIndex=0;
 			int buttonIndex=0;
@@ -334,7 +328,7 @@ namespace ws.winx.platform.osx
 			if (numPov > 0)
 								numAxis = Math.Max (8, numAxis);
 
-			joystick=new JoystickDevice(info.index,info.PID,info.PID,numAxis,numButtons,this);
+			joystick=new JoystickDevice(hidDevice.index,hidDevice.PID,hidDevice.VID,numAxis,numButtons,this);
 			joystick.numPOV = numPov;
 
 			
@@ -411,7 +405,7 @@ namespace ws.winx.platform.osx
 
 
 
-
+			joystick.isReady = false;
 
 						joystick.Extension=new OSXDefaultExtension();
 //			JoystickDevice<AxisDetails,ButtonDetails,OSXDefaultExtension> joystick;
@@ -468,41 +462,53 @@ namespace ws.winx.platform.osx
 				}
 				set{
 
-					_value=value;
+					_value = value;
+					
+					//  UnityEngine.Debug.Log("Value:" + _value);
+					
 					//if pressed==TRUE
 					//TODO check the code with triggers
-					if (value>0) {
-						if (_buttonState == JoystickButtonState.None 
-						    || _buttonState == JoystickButtonState.Up) {
+					if (value > 0)
+					{
+						if (_buttonState == JoystickButtonState.None
+						    || _buttonState == JoystickButtonState.Up)
+						{
 							
-								_buttonState = JoystickButtonState.Down;
+							_buttonState = JoystickButtonState.Down;
 							
 							
 							
-						} else {
+						}
+						else
+						{
 							//if (buttonState == JoystickButtonState.Down)
-							 _buttonState = JoystickButtonState.Hold;
+							_buttonState = JoystickButtonState.Hold;
 							
 						}
 						
 						
-					} else { //
+					}
+					else
+					{ //
 						if (_buttonState == JoystickButtonState.Down
-						    || _buttonState == JoystickButtonState.Hold) {
+						    || _buttonState == JoystickButtonState.Hold)
+						{
 							_buttonState = JoystickButtonState.Up;
-						} else {//if(buttonState==JoystickButtonState.Up){
-							_buttonState = JoystickButtonState.None; 
+						}
+						else
+						{//if(buttonState==JoystickButtonState.Up){
+							_buttonState = JoystickButtonState.None;
 						}
 						
 					}
-				}
+				}//set
 			}
-            #endregion
-            #endregion
-
-#region Constructor
+			#endregion
+			#endregion
+			
+			#region Constructor
 			public ButtonDetails(uint uid=0){this.uid=uid; }
-            #endregion
+			#endregion
 			
 			
 			
@@ -511,12 +517,12 @@ namespace ws.winx.platform.osx
 			
 		}
 		
-        #endregion
+		#endregion
 		
-#region AxisDetails
+		#region AxisDetails
 		public sealed class AxisDetails:IAxisDetails{
-
-#region Fields
+			
+			#region Fields
 			float _value;
 			uint _uid;
 			int _min;
@@ -524,19 +530,19 @@ namespace ws.winx.platform.osx
 			JoystickButtonState _buttonState;
 			bool _isNullable;
 			bool _isHat;
-
-#region IAxisDetails implementation
-
-
-
-			public bool isTrigger {
-				get {
-					throw new NotImplementedException ();
+			
+			#region IAxisDetails implementation
+				
+				
+				
+				public bool isTrigger {
+					get {
+						throw new NotImplementedException ();
+					}
+					set {
+						throw new NotImplementedException ();
+					}
 				}
-				set {
-					throw new NotImplementedException ();
-				}
-			}
 
 
 
@@ -606,9 +612,12 @@ namespace ws.winx.platform.osx
 				get{ return _value;}
 				set{ 
 					
-					if (value == 0) {
+					
+					if (value == 0)
+					{
 						if (_buttonState == JoystickButtonState.Down
-						    || _buttonState == JoystickButtonState.Hold){
+						    || _buttonState == JoystickButtonState.Hold)
+						{
 							
 							//axis float value isn't yet update so it have value before getting 0
 							if (_value > 0)//0 come after positive values
@@ -616,51 +625,70 @@ namespace ws.winx.platform.osx
 							else
 								_buttonState = JoystickButtonState.NegToUp;
 							
-						}else {//if(buttonState==JoystickButtonState.Up){
-							_buttonState = JoystickButtonState.None; 
+						}
+						else
+						{//if(buttonState==JoystickButtonState.Up){
+							_buttonState = JoystickButtonState.None;
 						}
 						
 						
-					} else { 
-						if (_buttonState == JoystickButtonState.None 
-						    || _buttonState == JoystickButtonState.Up) {
+					}
+					else
+						//!!! value can jump from >0 to <0 without go to 0(might go to "Down" directly for triggers axis)
+					{
+						if (_value > 0 && value < 0)
+						{
+							_buttonState = JoystickButtonState.PosToUp;
+						}
+						else if (_value < 0 && value > 0)
+						{
+							_buttonState = JoystickButtonState.NegToUp;
+						}
+						else if (_buttonState == JoystickButtonState.None
+						         || _buttonState == JoystickButtonState.PosToUp || _buttonState == JoystickButtonState.NegToUp)
+						{
 							
 							_buttonState = JoystickButtonState.Down;
 							
-						} else {
+						}
+						else
+						{
 							_buttonState = JoystickButtonState.Hold;
 						}
 						
 						
 					}
 					
-					_value=value;
+					
+					
+					
+					_value = value;
 					
 					
 					
 				}//set
 			}
-
-            #endregion
+			
+			#endregion
 			
 		}
 		
-        #endregion
-
-
-
-
-
-
-
+		#endregion
+		
+		
+		
+		
+		
+		
+		
 		public sealed class OSXDefaultExtension:IDeviceExtension{
 		}
-
-
-
-
-		}
+		
+		
+		
+		
+	}
 }
 
-        #endregion
+#endregion
 #endif
