@@ -45,8 +45,8 @@ namespace ws.winx.platform.osx
 	using IOHIDElementRef = System.IntPtr;
 	using IOHIDManagerRef = System.IntPtr;
 	using IOHIDValueRef = System.IntPtr;
-	using IOOptionBits = System.IntPtr;
-	using IOReturn = System.IntPtr;
+	using IOOptionBits = System.Int32;//System.UInt32;
+	//using IOReturn = //System.IntPtr;
 	using IOHIDElementCookie = System.UInt32;
 	using CFTypeID=System.Int32;//System.UInt64;
 	using CFIndex =System.Int64;
@@ -280,6 +280,9 @@ namespace ws.winx.platform.osx
 		[DllImport(coreFoundationLibrary)]
 		public static  extern void CFWriteStreamClose(IntPtr stream);
 		#endregion
+
+		[DllImport(coreFoundationLibrary)]
+		internal static extern void CFRelease (CFTypeRef cf);
 		
 		[DllImport(hid)]
 		public static extern IOHIDManagerRef IOHIDManagerCreate(
@@ -315,7 +318,7 @@ namespace ws.winx.platform.osx
 		public static extern void IOHIDManagerScheduleWithRunLoop(
 			IOHIDManagerRef inIOHIDManagerRef,
 			CFRunLoop inCFRunLoop,
-			CFString inCFRunLoopMode);
+			CFStringRef inCFRunLoopMode);
 		
 		[DllImport(hid)]
 		public static extern void IOHIDManagerSetDeviceMatching(
@@ -381,7 +384,7 @@ namespace ws.winx.platform.osx
 		public static extern void IOHIDDeviceScheduleWithRunLoop(
 			IOHIDDeviceRef device,
 			CFRunLoop inCFRunLoop,
-			CFString inCFRunLoopMode);
+			CFStringRef inCFRunLoopMode);
 		
 		
 		[DllImport(hid)]
@@ -395,7 +398,7 @@ namespace ws.winx.platform.osx
 			CFString inCFRunLoopMode);
 		
 		[DllImport(hid)]
-		public static extern uint /*IOHIDElementCookie*/ IOHIDElementGetCookie(
+		public static extern IOHIDElementCookie IOHIDElementGetCookie(
 			IOHIDElementRef element);
 		
 		[DllImport(hid)]
@@ -412,7 +415,16 @@ namespace ws.winx.platform.osx
 		
 		[DllImport(hid)]
 		public static extern HIDPage IOHIDElementGetUsagePage(IOHIDElementRef elem);
+
 		
+		[DllImport(hid)]
+		public static extern CFTypeID IOHIDElementGetTypeID();
+
+
+		[DllImport(hid)]
+		public static extern CFIndex IOHIDElementGetPhysicalMax(IOHIDElementRef element);
+
+
 		[DllImport(hid)]
 		public static extern CFIndex IOHIDElementGetLogicalMin(IOHIDElementRef element);
 		
@@ -429,6 +441,12 @@ namespace ws.winx.platform.osx
 		
 		public delegate void IOHIDDeviceCallback(IntPtr ctx, IOReturn res, IntPtr sender, IOHIDDeviceRef device);
 		public delegate void IOHIDValueCallback(IntPtr ctx, IOReturn res, IntPtr sender, IOHIDValueRef val);
+
+
+		internal enum IOReturn{
+			kIOReturnSuccess =0,//        KERN_SUCCESS            // OK
+
+		}
 		
 			internal enum CFNumberType
 			{
@@ -458,6 +476,20 @@ namespace ws.winx.platform.osx
 				TimedOut = 3,
 				HandledSource = 4
 			}
+
+				/*!
+		  @typedef IOHIDOptionsType
+		  @abstract Options for opening a device via IOHIDLib.
+		  @constant kIOHIDOptionsTypeNone Default option.
+		  @constant kIOHIDOptionsTypeSeizeDevice Used to open exclusive
+		    communication with the device.  This will prevent the system
+		    and other clients from receiving events from the device.
+		*/
+		internal enum IOHIDOptionsType:uint{
+			kIOHIDOptionsTypeNone	 = 0x00,
+			kIOHIDOptionsTypeSeizeDevice = 0x01
+		}
+
 			
 			public static readonly IntPtr RunLoopModeDefault = CFSTR("kCFRunLoopDefaultMode");
 		
@@ -537,7 +569,7 @@ namespace ws.winx.platform.osx
 				CFTypeID type = CFGetTypeID (value);
 
 				if (type == _CFString)                               
-										return new CFString (value);         
+					return new CFString (value);         
 				else if(type==_CFDictionary)  
 					return new CFDictionary(value);
 				else if(type==_CFArray)
@@ -550,7 +582,7 @@ namespace ws.winx.platform.osx
 					return new CFNumber(value);                
 
 
-				return IntPtr.Zero;
+				return new CFType(value);
 			}
 			
 	
@@ -694,7 +726,7 @@ namespace ws.winx.platform.osx
 					if (index >= this.Length)
 						return new CFType(IntPtr.Zero);
 					
-					return new CFType(CFArrayGetValueAtIndex(typeRef, index));
+					return base.Factory(CFArrayGetValueAtIndex(typeRef, index));
 				}
 			}
 

@@ -7,6 +7,9 @@
 //     the code is regenerated.
 // </auto-generated>
 //------------------------------------------------------------------------------
+using System.Runtime.InteropServices;
+
+
 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
 using System;
 using ws.winx.devices;
@@ -30,7 +33,7 @@ namespace ws.winx.platform.osx
 	using IOHIDManagerRef = System.IntPtr;
 	using IOHIDValueRef = System.IntPtr;
 	using IOOptionBits = System.IntPtr;
-	using IOReturn = System.IntPtr;
+	using IOReturn =Native.IOReturn;// System.IntPtr;
 
 	using IOHIDElementType=Native.IOHIDElementType;
 
@@ -43,9 +46,7 @@ namespace ws.winx.platform.osx
 
 #region Fields
 
-		readonly CFRunLoop RunLoop = Native.CFRunLoopGetMain();
-		readonly CFString InputLoopMode = Native.RunLoopModeDefault;
-		Native.IOHIDValueCallback HandleDeviceValueReceived;
+
 		IHIDInterface _hidInterface;
 		
 	
@@ -59,7 +60,7 @@ namespace ws.winx.platform.osx
         public OSXDriver()
 				{
 				
-					HandleDeviceValueReceived = DeviceValueReceived;
+					
 
 				}
         #endregion
@@ -77,19 +78,32 @@ namespace ws.winx.platform.osx
 		/// <param name="res">Res.</param>
 		/// <param name="sender">Sender.</param>
 		/// <param name="valRef">Value reference.</param>
-		void DeviceValueReceived(IntPtr context, IOReturn res, IntPtr sender, IOHIDValueRef valRef)
+		internal void DeviceValueReceived(IntPtr context, IOReturn res, IntPtr sender, IOHIDValueRef valRef)
 		{
 			IOHIDElementRef element = Native.IOHIDValueGetElement(valRef);
 			uint uid=Native.IOHIDElementGetCookie(element);
 			long value;
 			Native.IOHIDElementType  type = Native.IOHIDElementGetType(element);
+			IDevice device;
+			try{
+			GCHandle gch = GCHandle.FromIntPtr(context);
+			 device=(IDevice) gch.Target;
 
-			IDevice stick=_hidInterface.Devices[context];
-
-			if (Native.IOHIDValueGetLength(valRef) > 4) {
-				// Workaround for a strange crash that occurs with PS3 controller; was getting lengths of 39 (!)
-				return;
 			}
+			catch(Exception e){
+				UnityEngine.Debug.LogException(e);
+				return;
+		}
+
+
+			if (!device.isReady)
+								return;
+
+
+//			if (Native.IOHIDValueGetLength(valRef) > 4) {
+//				// Workaround for a strange crash that occurs with PS3 controller; was getting lengths of 39 (!)
+//				return;
+//			}
 
 			value=Native.IOHIDValueGetIntegerValue(valRef);
 
@@ -97,7 +111,7 @@ namespace ws.winx.platform.osx
 			if(type==Native.IOHIDElementType.kIOHIDElementTypeInput_Misc
 			   || type==Native.IOHIDElementType.kIOHIDElementTypeInput_Axis)
 			{
-				int numAxes=stick.Axis.Count;
+				int numAxes=device.Axis.Count;
 				AxisDetails axisDetails;
 
 
@@ -107,9 +121,9 @@ namespace ws.winx.platform.osx
 
 				for (int axisIndex = 0; axisIndex < numAxes; axisIndex++) {
 
-					axisDetails=stick.Axis[axisIndex] as AxisDetails;
+					axisDetails=device.Axis[axisIndex] as AxisDetails;
 
-					if ( axisDetails.uid== uid) {
+					if (axisDetails!=null && axisDetails.uid== uid) {
 						//check hatch
 						//Check if POV element.
 						if((Native.IOHIDElementGetUsage(element) & (uint)Native.HIDUsageGD.Hatswitch)!=0)
@@ -120,14 +134,14 @@ namespace ws.winx.platform.osx
 										value = value < axisDetails.min ? axisDetails.max - axisDetails.min + 1 : value - 1;
 									}
 
-
+							//todo change them to float
 							int outX;
 							int outY;
 
-							hatValueToXY(value,axisDetails.max - axisDetails.min,out outX,out outY);
+							hatValueToXY(value,(axisDetails.max - axisDetails.min)+1,out outX,out outY);
 
-							stick.Axis[JoystickAxis.AxisPovX].value=outX;
-							stick.Axis[JoystickAxis.AxisPovY].value=outY;
+							device.Axis[JoystickAxis.AxisPovX].value=outX;
+							device.Axis[JoystickAxis.AxisPovY].value=outY;
 
 									
 						
@@ -157,12 +171,12 @@ namespace ws.winx.platform.osx
 			//BUTTONS
 			}else if(type==Native.IOHIDElementType.kIOHIDElementTypeInput_Button){
 
-				int numButtons=stick.Buttons.Count;
+				int numButtons=device.Buttons.Count;
 
 				for (int buttonIndex = 0; buttonIndex < numButtons; buttonIndex++) {
-					if ( stick.Buttons[buttonIndex].uid== uid) {
+					if ( device.Buttons[buttonIndex].uid== uid) {
 
-						stick.Buttons[buttonIndex].value=value;
+						device.Buttons[buttonIndex].value=value;
 
 
 						
@@ -177,7 +191,7 @@ namespace ws.winx.platform.osx
 
 //					   0                 
 //					   |
-//				4______|______1
+//				3______|______1
 //					   |
 //					   |
 //					   2
@@ -208,7 +222,7 @@ namespace ws.winx.platform.osx
 				if (value > 0 && value < rangeHalf) {
 					outX = 1;
 					
-				} else if (value > range / 2) {
+				} else if (value > rangeHalf) {
 					outX = -1;					
 				} 
 				
@@ -216,7 +230,7 @@ namespace ws.winx.platform.osx
 					outY = 1;
 					
 				} else if (value > rangeQuat && value < rangeQuat * 3) {
-					outY = 1;					
+					outY = -1;					
 				} 
 
 		}
@@ -234,33 +248,40 @@ namespace ws.winx.platform.osx
 
 
 #region IJoystickDriver implementation
-
+		/// <summary>
+		/// Update the specified joystick.
+		/// </summary>
+		/// <param name="joystick">Joystick.</param>
          public void Update(IDevice joystick)
-		//public void Update (IDevice<IAxisDetails, IButtonDetails, IDeviceExtension> joystick)
+	
 		{
             throw new Exception("OSX Default driver is meant to auto update on callback");
 		}
 
-		public IDevice ResolveDevice (IHIDDevice info)
-		//public IDevice<IAxisDetails,IButtonDetails,IDeviceExtension> ResolveDevice(IHIDDeviceInfo info)
+		/// <summary>
+		/// Resolves the device.
+		/// </summary>
+		/// <returns>returns JoystickDevice if driver is for this device or null</returns>
+		/// <param name="info">Info.</param>
+		/// <param name="hidDevice">Hid device.</param>
+		public IDevice ResolveDevice (IHIDDevice hidDevice)
+		
 		{
 
-			_hidInterface=info.hidInterface;
-
-			// The device is not normally available in the InputValueCallback (HandleDeviceValueReceived), so we include
-			// the device identifier as the context variable, so we can identify it and figure out the device later.
-			Native.IOHIDDeviceRegisterInputValueCallback(info.deviceHandle,HandleDeviceValueReceived, info.deviceHandle);
+			_hidInterface=hidDevice.hidInterface;
 
 
-			Native.IOHIDDeviceScheduleWithRunLoop(info.deviceHandle, RunLoop, InputLoopMode);
-
-			return CreateDevice(info);
+			return CreateDevice(hidDevice);
 		}
 
 
 
 
-		//public IDevice<IAxisDetails,IButtonDetails,IDeviceExtension> CreateDevice(IHIDDeviceInfo info){
+	/// <summary>
+	/// Creates the device.
+	/// </summary>
+	/// <returns>The device.</returns>
+	/// <param name="info">Info.</param>
 		public IDevice CreateDevice(IHIDDevice info){
 
 			IntPtr device=info.deviceHandle;
@@ -274,15 +295,20 @@ namespace ws.winx.platform.osx
 			IOHIDElementType type;
 
 			//copy all matched 
-			elements.typeRef=Native.IOHIDDeviceCopyMatchingElements(device, IntPtr.Zero,IOOptionBits.Zero );
+			elements.typeRef=Native.IOHIDDeviceCopyMatchingElements(device, IntPtr.Zero,(int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone );
 			
 			int numButtons=0;
 			int numAxis=0;
+
 			int numElements=elements.Length;
+			int HIDElementType=Native.IOHIDElementGetTypeID();
+			int numPov = 0;
+
 			
 							for (int elementIndex = 0; elementIndex < numElements; elementIndex++){
-								//element = (IOHIDElementRef) elements[elementIndex];
-								element = (IOHIDElementRef) elements[elementIndex];
+									element =  elements[elementIndex].typeRef;
+				if(element!=IntPtr.Zero && Native.CFGetTypeID(element) == HIDElementType){
+								
 								type = Native.IOHIDElementGetType(element);
 			
 			
@@ -290,21 +316,35 @@ namespace ws.winx.platform.osx
 								if (type == IOHIDElementType.kIOHIDElementTypeInput_Misc ||
 								    type == IOHIDElementType.kIOHIDElementTypeInput_Axis) {
 									numAxis++;
-									
+						            
+									if(Native.IOHIDElementGetUsage(element)==(uint)Native.HIDUsageGD.Hatswitch){
+							numPov++;
+						}
+
+						          
+							
 								} else if (type == IOHIDElementType.kIOHIDElementTypeInput_Button) {
 									numButtons++;
 								}
+				}
 			
 						}
 
 
+			if (numPov > 0)
+								numAxis = Math.Max (8, numAxis);
+
 			joystick=new JoystickDevice(info.index,info.PID,info.PID,numAxis,numButtons,this);
+			joystick.numPOV = numPov;
+
 			
 			AxisDetails axisDetails;
 
 
 			for (int elementIndex = 0; elementIndex < numElements; elementIndex++){
-				element = (IOHIDElementRef) elements[elementIndex];
+				element = elements[elementIndex].typeRef;
+
+				if(element!=IntPtr.Zero && Native.CFGetTypeID(element) == HIDElementType){
 				type = Native.IOHIDElementGetType(element);
 				
 				
@@ -315,12 +355,14 @@ namespace ws.winx.platform.osx
 				    type == IOHIDElementType.kIOHIDElementTypeInput_Axis) {
 					
 					
+
 					axisDetails=new AxisDetails();
+
 					axisDetails.uid=Native.IOHIDElementGetCookie(element);
 					axisDetails.min=(int)Native.IOHIDElementGetLogicalMin(element);
 					axisDetails.max=(int)Native.IOHIDElementGetLogicalMax(element);
 					axisDetails.isNullable=Native.IOHIDElementHasNullState(element);
-					axisDetails.isHat=false;
+					
 					
 					
 					if(Native.IOHIDElementGetUsage(element)==(uint)Native.HIDUsageGD.Hatswitch){
@@ -328,16 +370,19 @@ namespace ws.winx.platform.osx
 						
 						axisDetails.isHat=true;
 						
-						//if prevous axis was Hat =>X next is Y
-						if(Native.IOHIDElementGetUsage((IOHIDElementRef) elements[elementIndex-1])==(uint)Native.HIDUsageGD.Hatswitch){
-							
-							
+
 							joystick.Axis[JoystickAxis.AxisPovY]=axisDetails;
-							joystick.numPOV++;
+						
 							
-						}else{
+							axisDetails=new AxisDetails();
+							
+							axisDetails.uid=Native.IOHIDElementGetCookie(element);
+							axisDetails.min=(int)Native.IOHIDElementGetLogicalMin(element);
+							axisDetails.max=(int)Native.IOHIDElementGetLogicalMax(element);
+							axisDetails.isNullable=Native.IOHIDElementHasNullState(element);
+							axisDetails.isHat=true;
 							joystick.Axis[JoystickAxis.AxisPovX]=axisDetails;
-						}
+						
 						
 						
 					}else{
@@ -351,10 +396,11 @@ namespace ws.winx.platform.osx
 					
 					
 				} else if (type == IOHIDElementType.kIOHIDElementTypeInput_Button) {
-					
-					joystick.Buttons[buttonIndex]=new ButtonDetails(Native.IOHIDElementGetCookie(element));  
+						//
+						joystick.Buttons[buttonIndex]=new ButtonDetails(Native.IOHIDElementGetCookie(element));  
 					buttonIndex++;
 					
+				}
 				}
 				
 			}
@@ -472,7 +518,7 @@ namespace ws.winx.platform.osx
 
 #region Fields
 			float _value;
-			int _uid;
+			uint _uid;
 			int _min;
 			int _max;
 			JoystickButtonState _buttonState;
@@ -543,10 +589,10 @@ namespace ws.winx.platform.osx
 
 			public uint uid {
 				get {
-					throw new NotImplementedException ();
+					return _uid;
 				}
-				set {
-					throw new NotImplementedException ();
+				 set {
+					_uid=value;
 				}
 			}
 

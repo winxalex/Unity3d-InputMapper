@@ -14,7 +14,8 @@ namespace ws.winx.platform.osx
 {
 		public class GenericHIDDevice:HIDDevice
 		{
-				public GenericHIDDevice (int index, int VID, int PID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath, string name = ""):base(index,VID,PID,deviceHandle,hidInterface,devicePath,name)
+				public GenericHIDDevice (int index, int VID, int PID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath, 
+		        string name = ""):base(index,VID,PID,deviceHandle,hidInterface,devicePath,name)
 				{
 						
 				}

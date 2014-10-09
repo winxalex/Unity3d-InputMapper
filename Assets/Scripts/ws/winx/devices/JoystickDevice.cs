@@ -55,9 +55,7 @@ namespace ws.winx.devices
 						if (buttons < 0)
 								throw new ArgumentOutOfRangeException ("buttons");
 
-			        if(axes<8 && numPOV>0){
-						throw new Exception("POV X and POV Y are 7th and 8th Axis default driver so min axes is 8");
-					}
+			        
 			     
 
 						_numAxis=axes;
@@ -125,7 +123,7 @@ namespace ws.winx.devices
 			get {
 				return _PID;
 			}
-			set {
+			internal set {
 				_PID=value;
 			}
 		}
@@ -134,7 +132,7 @@ namespace ws.winx.devices
 			get {
 				return _VID;
 			}
-			set {
+			internal set {
 				_VID=value;
 			}
 		}
@@ -146,7 +144,7 @@ namespace ws.winx.devices
         /// </summary>
 		public int ID {
 			get { return _ID; }
-			set { _ID = value; }
+			internal set { _ID = value; }
 		}
 
 

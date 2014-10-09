@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+	<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+	<ProductVersion>10.0.20506</ProductVersion>
+	<SchemaVersion>2.0</SchemaVersion>
+	<ProjectGuid>{D8B6FE4F-E672-218E-AF73-65577BBA85F3}</ProjectGuid>
+	<OutputType>Library</OutputType>
+	<AppDesignerFolder>Properties</AppDesignerFolder>
+	<RootNamespace></RootNamespace>
+	<AssemblyName>Assembly-CSharp</AssemblyName>
+	<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+	<FileAlignment>512</FileAlignment>
+	<BaseDirectory>Assets</BaseDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+	<DebugSymbols>true</DebugSymbols>
+	<DebugType>full</DebugType>
+	<Optimize>false</Optimize>
+	<OutputPath>Temp\bin\Debug\</OutputPath>
+	<DefineConstants>DEBUG;TRACE;UNITY_4_5_4;UNITY_4_5;UNITY_STANDALONE_OSX;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_UNITYEVENTS;ENABLE_NEW_HIERARCHY ;ENABLE_AUDIO_FMOD;UNITY_STANDALONE;ENABLE_MONO;ENABLE_TERRAIN;ENABLE_SUBSTANCE;ENABLE_GENERICS;INCLUDE_WP8SUPPORT;ENABLE_MOVIES;ENABLE_WWW;ENABLE_IMAGEEFFECTS;INCLUDE_WP_BLUE_SUPPORT;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;RENDER_SOFTWARE_CURSOR;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_GAMECENTER;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_DUCK_TYPING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_OSX</DefineConstants>
+	<ErrorReport>prompt</ErrorReport>
+	<WarningLevel>4</WarningLevel>
+	<NoWarn>0169</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+	<DebugType>pdbonly</DebugType>
+	<Optimize>true</Optimize>
+	<OutputPath>Temp\bin\Release\</OutputPath>
+	<DefineConstants>TRACE</DefineConstants>
+	<ErrorReport>prompt</ErrorReport>
+	<WarningLevel>4</WarningLevel>
+	<NoWarn>0169</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+	<Reference Include="System" />
+    <Reference Include="System.XML" />
+	<Reference Include="System.Core" />
+	<Reference Include="System.Xml.Linq" />
+	<Reference Include="UnityEngine">
+	  <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</HintPath>
+	</Reference>
+	<Reference Include="UnityEditor">
+	  <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll</HintPath>
+	</Reference>
+  </ItemGroup>
+  <ItemGroup>
+     <Compile Include="Assets\Scripts\Game.cs" />
+     <Compile Include="Assets\Scripts\TestDude.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\data\FlexibleDictionary.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\devices\IAxisDetails.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\devices\IButtonDetails.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\devices\IDevice.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\devices\IDeviceDetails.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\devices\IDeviceExtension.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\devices\JoystickDevice.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\devices\ThrustmasterRGTFFDDevice.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\devices\WiimoteDevice.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\devices\XInputDevice.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\drivers\ThrustMasterDriver.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\drivers\UnityDriver.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\drivers\WiiDriver.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\drivers\XInputDriver.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\examples\MyCodeExtension.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\examples\MyJoystickDevice.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\gui\UserInterfaceWindow.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\input\InputAction.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\input\InputActionType.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\input\InputCombination.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\input\InputEvent.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\input\InputEventDispatcherBehaviour.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\input\InputEx.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\input\InputManager.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\input\InputState.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\input\KeyCodeExtension.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\input\states\States.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Android\AndroidHIDBehaviour.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Android\AndroidHIDInterface.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Android\AndroidHIDListenerProxy.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Android\GenericHIDDevice.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Android\ReadWriteListenerProxy.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\HIDDevice.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\HIDReport.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\IDeviceCollection.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\IDriver.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\IHIDDevice.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\IHIDInterface.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\OSX\CoreFoundation.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\OSX\GenericHIDDevice.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\OSX\OSXDriver.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\OSX\OSXHIDInterface.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Web\GamePadJSON.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Web\GenericHIDDevice.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Web\WebDriver.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Web\WebHIDBehaviour.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Web\WebHIDInterface.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Web\WebHIDReport.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Windows\GenericHIDDevice.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Windows\Native.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Windows\WinHIDInterface.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\platform\Windows\WinMMDriver.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\unity\Loader.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\unity\Tags.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\utils\ComplementaryFilter.cs" />
+     <Compile Include="Assets\Scripts\ws\winx\utils\Extensions.cs" />
+     <None Include="Assets\StreamingAssets\InputSettings.xml" />
+     <None Include="Assets\Pluggins\Android\AndroidManifest.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+	   Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  
+</Project>
