@@ -18,7 +18,7 @@ namespace ws.winx.devices
 	{
 		int VID{get;}
 		int PID{get;}
-		int ID{get;}
+		int Index{get;}
         int numPOV { get; set; }
         bool isReady { get; }
 		IDriver driver{get;} 

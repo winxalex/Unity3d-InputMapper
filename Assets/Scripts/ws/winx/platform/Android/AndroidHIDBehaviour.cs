@@ -63,6 +63,7 @@ namespace ws.winx.platform.android
             var activity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity");
             UnityEngine.Debug.Log("AndroidHIDBehaviour >>>> Acitivty:" + activity);
             
+			//call Android Native Pluggin written in JAVA
             droidHID = new AndroidJavaClass("ws.winx.hid.AndroidHID");
             droidHID.CallStatic("Init", activity, listener);
 

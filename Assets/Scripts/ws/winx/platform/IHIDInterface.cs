@@ -16,15 +16,15 @@ namespace ws.winx.platform
 {
 		public interface IHIDInterface:IDisposable
 		{
-            
+			event EventHandler<DeviceEventArgs<int>> DeviceDisconnectEvent;
+			event EventHandler<DeviceEventArgs<IDevice>> DeviceConnectEvent;
 			IDriver defaultDriver{get;set;}
-			IDeviceCollection Devices{get;}
-            Dictionary<IDevice, HIDDevice> Generics{get;}
-            void Read(IDevice device,HIDDevice.ReadCallback callback);
-            void Read(IDevice device, HIDDevice.ReadCallback callback,int timeout);
-            void Write(object data, IDevice device, HIDDevice.WriteCallback callback, int timeout);
-            void Write(object data, IDevice device,HIDDevice.WriteCallback callback);
-            void Write(object data, IDevice device);
+            Dictionary<int, HIDDevice> Generics{get;}
+            void Read(int pid,HIDDevice.ReadCallback callback);
+            void Read(int pid, HIDDevice.ReadCallback callback,int timeout);
+            void Write(object data, int device, HIDDevice.WriteCallback callback, int timeout);
+            void Write(object data, int device,HIDDevice.WriteCallback callback);
+            void Write(object data, int device);
 			void Update();
 		    
 

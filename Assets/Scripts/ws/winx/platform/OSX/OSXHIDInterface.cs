@@ -66,11 +66,14 @@ namespace ws.winx.platform.osx
         private IDriver __defaultJoystickDriver;
 		private GCHandle DeviceGCHandle;
 
-        JoystickDevicesCollection _joysticks;
-		private Dictionary<IDevice, HIDDevice> __Generics;
+      
+		private Dictionary<int, HIDDevice> __Generics;
 		
 		
+		public event EventHandler<DeviceEventArgs<int>> DeviceDisconnectEvent;
 		
+		public event EventHandler<DeviceEventArgs<IDevice>> DeviceConnectEvent;
+
 
 
         #endregion
@@ -79,32 +82,40 @@ namespace ws.winx.platform.osx
 
 
 
-		public void Read (IDevice device, HIDDevice.ReadCallback callback)
+
+		public void Read (int pid, HIDDevice.ReadCallback callback)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public void Read (IDevice device, HIDDevice.ReadCallback callback, int timeout)
+		public void Read (int pid, HIDDevice.ReadCallback callback, int timeout)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public void Write (object data, IDevice device, HIDDevice.WriteCallback callback, int timeout)
+		public void Write (object data, int device, HIDDevice.WriteCallback callback, int timeout)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public void Write (object data, IDevice device, HIDDevice.WriteCallback callback)
+		public void Write (object data, int device, HIDDevice.WriteCallback callback)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public void Write (object data, IDevice device)
+		public void Write (object data, int device)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public Dictionary<IDevice, HIDDevice> Generics {
+
+
+
+
+
+
+
+		public Dictionary<int, HIDDevice> Generics {
 			get {
 				return __Generics;
 			}
@@ -121,12 +132,7 @@ namespace ws.winx.platform.osx
 
 
 
-        public IDeviceCollection Devices
-        {
-
-            get { return _joysticks; }
-
-        }
+      
 
 
 
@@ -187,8 +193,8 @@ namespace ws.winx.platform.osx
 
 			if (hidmanager != IntPtr.Zero) {	
 
-				_joysticks = new JoystickDevicesCollection();
-				__Generics = new Dictionary<IDevice, HIDDevice>();
+
+				__Generics = new Dictionary<int, HIDDevice>();
 					
 				//Register add/remove device handlers
 				RegisterHIDCallbacks(hidmanager);
@@ -275,13 +281,14 @@ namespace ws.winx.platform.osx
         {
 			IOReturn success = Native.IOHIDDeviceOpen (device, (int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone);
 
-			if (success==IOReturn.kIOReturnSuccess &&
-               !Devices.ContainsKey(device))
+			if (success==IOReturn.kIOReturnSuccess)
             {
+				int product_id = (int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(device, Native.CFSTR(Native.IOHIDProductIDKey)))).ToInteger();
+
+				if(Generics.ContainsKey(product_id)) return;
 
 				int vendor_id =(int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(device, Native.CFSTR(Native.IOHIDVendorIDKey)))).ToInteger();
 
-				int product_id = (int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(device, Native.CFSTR(Native.IOHIDProductIDKey)))).ToInteger();
 				string description = (new Native.CFString(Native.IOHIDDeviceGetProperty(device, Native.CFSTR(Native.IOHIDProductKey)))).ToString();
 
 				int location=(int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(device, Native.CFSTR(Native.IOHIDLocationIDKey)))).ToInteger();
@@ -292,7 +299,7 @@ namespace ws.winx.platform.osx
 					
 				
 
-				
+				GenericHIDDevice hidDevice;
 				IDevice joyDevice = null;
                // IDevice<IAxisDetails, IButtonDetails, IDeviceExtension> joyDevice = null;
 
@@ -301,10 +308,17 @@ namespace ws.winx.platform.osx
 				if (__drivers != null)
 					foreach (var driver in __drivers)
                 {
-                    if ((joyDevice = driver.ResolveDevice(new GenericHIDDevice(_joysticks.Count,vendor_id, product_id, device, this,path,description))) != null)
-                    {
-                        _joysticks[device] = joyDevice;
-                       
+
+					hidDevice=new GenericHIDDevice(__Generics.Count,vendor_id, product_id, device, this,path,description);
+
+                    if ((joyDevice = driver.ResolveDevice(hidDevice)) != null)
+					{
+
+						this.DeviceConnectEvent(this,new DeviceEventArgs<IDevice>(joyDevice));
+
+						__Generics[hidDevice.PID] = hidDevice;
+
+
 
 						Debug.Log("Device PID:" + joyDevice.PID + " VID:" + joyDevice.VID + " attached to " + driver.GetType().ToString());
 
@@ -315,16 +329,15 @@ namespace ws.winx.platform.osx
                 if (joyDevice == null)
                 {//set default driver as resolver if no custom driver match device
 
-					joyDevice = defaultDriver.ResolveDevice(new GenericHIDDevice(_joysticks.Count,vendor_id, product_id, device, this, path,description));//always return true
+					hidDevice=new GenericHIDDevice(__Generics.Count,vendor_id, product_id, device, this,path,description);
 
 
-
-
-					if (joyDevice != null)
+					if ((joyDevice = defaultDriver.ResolveDevice(hidDevice)) != null)
                     {
-                        _joysticks[device] = joyDevice;
-
-
+                       
+						this.DeviceConnectEvent(this,new DeviceEventArgs<IDevice>(joyDevice));
+						__Generics[hidDevice.PID] = hidDevice;
+						
 						
 						try{
 							
@@ -378,14 +391,19 @@ namespace ws.winx.platform.osx
             if (Native.IOHIDDeviceConformsTo(deviceRef, Native.HIDPage.GenericDesktop, Native.HIDUsageGD.Joystick)
                  || Native.IOHIDDeviceConformsTo(deviceRef, Native.HIDPage.GenericDesktop, Native.HIDUsageGD.GamePad)
                  || Native.IOHIDDeviceConformsTo(deviceRef, Native.HIDPage.GenericDesktop, Native.HIDUsageGD.MultiAxisController)
-             && Devices.ContainsKey(deviceRef))
-            {
-                UnityEngine.Debug.Log(String.Format("Joystick device {0:x} disconnected, sender is {1:x}", deviceRef, sender));
+            )
+			{
+				int product_id = (int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.IOHIDProductIDKey)))).ToInteger();
 
-				IDevice device=Devices[deviceRef];
-                Devices.Remove(deviceRef);
 
-				Generics.Remove(device);
+				if( !__Generics.ContainsKey(product_id)) return;
+
+			UnityEngine.Debug.Log(String.Format("Joystick device {0:x} disconnected, sender is {1:x}", deviceRef, sender));
+                
+				this.DeviceDisconnectEvent(this,new DeviceEventArgs<int>(product_id));
+
+				Generics.Remove(product_id);
+
 				 Native.IOHIDDeviceUnscheduleWithRunLoop(deviceRef, RunLoop, InputLoopMode);
 				Native.IOHIDDeviceRegisterInputValueCallback(deviceRef,IntPtr.Zero,IntPtr.Zero);
 				
@@ -407,155 +425,9 @@ namespace ws.winx.platform.osx
 
 
 
-#region IntPtrEqualityComparer
-        // Simple equality comparer to allow IntPtrs as keys in dictionaries
-        // without causing boxing/garbage generation.
-        // Seriously, Microsoft, shouldn't this have been in the BCL out of the box?
-        class IntPtrEqualityComparer : IEqualityComparer<IntPtr>
-        {
-            public bool Equals(IntPtr x, IntPtr y)
-            {
-                return x == y;
-            }
-
-            public int GetHashCode(IntPtr obj)
-            {
-                return obj.GetHashCode();
-            }
-        }
-        #endregion
-
-#region JoystickDevicesCollection
-
-        /// <summary>
-        /// Defines a collection of JoystickAxes.
-        /// </summary>
-        public sealed class JoystickDevicesCollection : IDeviceCollection
-        {
-#region Fields
-            readonly Dictionary<IntPtr, IDevice> JoystickDevices;
-            //readonly Dictionary<IntPtr, IDevice<IAxisDetails, IButtonDetails, IDeviceExtension>> JoystickDevices;
-
-            //readonly List<IntPtr> JoystickIndexToDevice;
-            readonly Dictionary<int, IntPtr> JoystickIDToDevice;
-
-            List<IDevice> _iterationCacheList;
-            bool _isEnumeratorDirty = true;
-
-            #endregion
-
-#region Constructors
-
-            internal JoystickDevicesCollection()
-            {
-                JoystickDevices = new Dictionary<IntPtr, IDevice>(new IntPtrEqualityComparer());
-                //JoystickDevices = new Dictionary<IntPtr, IDevice<IAxisDetails, IButtonDetails, IDeviceExtension>>(new IntPtrEqualityComparer());
-               // JoystickIndexToDevice = new List<IntPtr>();
-                JoystickIDToDevice = new Dictionary<int, IntPtr>();
-
-				
-            }
-
-            #endregion
-
-#region Public Members
-
-#region IDeviceCollection implementation
-
-            public void Remove(IntPtr device)
-            {
-                JoystickIDToDevice.Remove(JoystickDevices[device].ID);
-                JoystickDevices.Remove(device);
-            }
 
 
-            public void Remove(int inx)
-            {
-                IntPtr device = JoystickIDToDevice[inx];
-                JoystickIDToDevice.Remove(inx);
-                JoystickDevices.Remove(device);
-            }
-
-			public void Clear(){
-				JoystickIDToDevice.Clear();
-				JoystickDevices.Clear();
-			}
-
-
-
-
-
-
-
-
-            public IDevice this[int ID]
-            {
-                get { return JoystickDevices[JoystickIDToDevice[ID]]; }
-               
-            }
-
-
-			public IntPtr GetReference(int ID)
-			{
-				return JoystickIDToDevice[ID];
-			
-			}
-			
-			public IDevice this[IntPtr device]
-            {
-                get { return JoystickDevices[device]; }
-                internal set
-                {
-                    JoystickIDToDevice[value.ID] = device;
-                    JoystickDevices[device] = value;
-
-                }
-            }
-
-
-			public bool ContainsKey (int key)
-			{ 
-              
-				return JoystickIDToDevice.ContainsKey(key);
-			}
-
-
-
-            public bool ContainsKey(IntPtr key)
-            {
-                return JoystickDevices.ContainsKey(key);
-            }
-
-
-            public System.Collections.IEnumerator GetEnumerator()
-            {
-                if (_isEnumeratorDirty)
-                {
-                    _iterationCacheList = JoystickDevices.Values.ToList<IDevice>();
-                    _isEnumeratorDirty = false;
-
-                    
-                }
-
-                return _iterationCacheList.GetEnumerator();
-            }
-
-
-            /// <summary>
-            /// Gets a System.Int32 indicating the available amount of JoystickDevices.
-            /// </summary>
-            public int Count
-            {
-                get { return JoystickDevices.Count; }
-            }
-
-            #endregion
-
-            #endregion
-
-           
-        }
-        #endregion;
+       
 
 
 
@@ -580,7 +452,7 @@ namespace ws.winx.platform.osx
 								DeviceGCHandle.Free ();
 
 			if (Generics != null) {
-								foreach (KeyValuePair<IDevice, HIDDevice> entry in Generics) {
+								foreach (KeyValuePair<int, HIDDevice> entry in Generics) {
 										entry.Value.Dispose ();
 								}
 			
@@ -590,23 +462,7 @@ namespace ws.winx.platform.osx
 
 
 
-			//loop joysticks and check if default driver =>Unshedule InputValue loop
-			if (_joysticks != null){
-			
-				for(int i=0;i<_joysticks.Count;i++){
 
-					IntPtr device=_joysticks.GetReference(i);
-
-					if(_joysticks[device].driver == __defaultJoystickDriver){
-			        	Native.IOHIDDeviceUnscheduleWithRunLoop(device, RunLoop, InputLoopMode);
-			       		 Native.IOHIDDeviceRegisterInputValueCallback(device,IntPtr.Zero, IntPtr.Zero);
-					}
-				}
-			 
-
-			
-				_joysticks.Clear ();
-				        }
 
 
 				        if(__drivers!=null) __drivers.Clear();

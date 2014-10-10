@@ -67,7 +67,7 @@ namespace ws.winx.platform.windows
 
 
             //thru to get joystick info
-            JoystickError result = UnsafeNativeMethods.joyGetPosEx(joystick.ID, ref info);
+            JoystickError result = UnsafeNativeMethods.joyGetPosEx(joystick.Index, ref info);
 
             //			if (result == JoystickError.NoError && joystick.ID==3){
             //			   UnityEngine.Debug.Log("Update Joy"+joystick.PID+"++"+joystick.VID+" i"+info.Buttons);

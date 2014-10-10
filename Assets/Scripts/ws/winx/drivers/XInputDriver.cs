@@ -12,6 +12,7 @@ using ws.winx.platform;
 using System.Runtime.InteropServices;
 using ws.winx.devices;
 using UnityEngine;
+using ws.winx.input;
 
 
 
@@ -125,7 +126,7 @@ namespace ws.winx.drivers
             //    return;
             //else _lastFrameNum = Time.frameCount;
  //UnityEngine.Debug.Log("Update");
-            _hidInterface.Read(device, onRead);
+            _hidInterface.Read(device.PID, onRead);
 
            
 
@@ -147,7 +148,7 @@ namespace ws.winx.drivers
 
 
             HIDReport report = data as HIDReport;
-             IDevice device = _hidInterface.Devices[report.index];
+			IDevice device = InputManager.Devices.GetDeviceAt (report.index);// _hidInterface.Devices[report.index];
           
 
            // UnityEngine.Debug.Log(BitConverter.ToString(report.Data));
@@ -470,7 +471,7 @@ namespace ws.winx.drivers
         {
            
 
-            _hidInterface.Write(new byte[]{0x1, 0x3, mode},device);
+            _hidInterface.Write(new byte[]{0x1, 0x3, mode},device.PID);
         
         }
 
@@ -485,7 +486,8 @@ namespace ws.winx.drivers
         {
 
 
-            _hidInterface.Write(new byte[] { 0x00, 0x01, 0x0f, 0xc0, 0x00, leftMotor, rightMotor, 0x00, 0x00, 0x00, 0x00, 0x00 }, device,onSetMotor);
+            _hidInterface.Write(new byte[] { 0x00, 0x01, 0x0f, 0xc0, 0x00, leftMotor, rightMotor, 0x00, 0x00, 0x00, 0x00, 0x00 }, 
+			device.PID,onSetMotor);
   
         }
 

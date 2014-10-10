@@ -80,11 +80,16 @@ namespace ws.winx.platform.osx
 		/// <param name="valRef">Value reference.</param>
 		internal void DeviceValueReceived(IntPtr context, IOReturn res, IntPtr sender, IOHIDValueRef valRef)
 		{
+			UnityEngine.Debug.Log ("DeviceValueReceived");
+
 			IOHIDElementRef element = Native.IOHIDValueGetElement(valRef);
 			uint uid=Native.IOHIDElementGetCookie(element);
 			long value;
 			Native.IOHIDElementType  type = Native.IOHIDElementGetType(element);
 			IDevice device;
+
+
+
 			try{
 			GCHandle gch = GCHandle.FromIntPtr(context);
 			 device=(IDevice) gch.Target;
@@ -96,10 +101,11 @@ namespace ws.winx.platform.osx
 		}
 
 
-			if (!device.isReady)
-								return;
-
-			((JoystickDevice)device).isReady = false;
+//			if (!device.isReady)
+//								return;
+//
+//			UnityEngine.Debug.Log ("Lockcked");
+//			((JoystickDevice)device).isReady = false;
 
 
 //			if (Native.IOHIDValueGetLength(valRef) > 4) {
@@ -194,7 +200,7 @@ namespace ws.winx.platform.osx
 
 		}
 
-
+		 
 
 //					   0                 
 //					   |
@@ -256,14 +262,34 @@ namespace ws.winx.platform.osx
 
 #region IJoystickDriver implementation
 		/// <summary>
-		/// Update the specified joystick.
+		/// Update the specified device.
 		/// </summary>
-		/// <param name="joystick">Joystick.</param>
-         public void Update(IDevice joystick)
+		/// <param name="device">Joystick.</param>
+         public void Update(IDevice device)
 	
 		{
-			((JoystickDevice)joystick).isReady = true;
+			//UnityEngine.Debug.Log ("Update device ready");
+			//((JoystickDevice)joystick).isReady = true;
             //throw new Exception("OSX Default driver is meant to auto update on callback");
+			int numButtons = 1;//device.Buttons.Count;
+			float value;
+			
+			for (int buttonIndex = 0; buttonIndex < numButtons; buttonIndex++) {
+
+				value=device.Buttons[buttonIndex].value;
+				device.Buttons[buttonIndex].value=value;
+					
+					UnityEngine.Debug.Log("Update::::Button "+buttonIndex+" value:"+value+" State:"+device.Buttons[buttonIndex].buttonState);
+					
+					
+
+			}
+
+
+
+
+
+
 		}
 
 		/// <summary>
@@ -405,12 +431,10 @@ namespace ws.winx.platform.osx
 
 
 
-			joystick.isReady = false;
+			//joystick.isReady = false;
 
 						joystick.Extension=new OSXDefaultExtension();
-//			JoystickDevice<AxisDetails,ButtonDetails,OSXDefaultExtension> joystick;
-//			joystick=new JoystickDevice<AxisDetails,ButtonDetails,OSXDefaultExtension>(id,axes,buttons);
-//			joystick.Extension=new OSXDefaultExtension();
+
 
 
 
@@ -419,8 +443,7 @@ namespace ws.winx.platform.osx
 
 
              return joystick;
-			//return (IDevice<IAxisDetails,IButtonDetails,IDeviceExtension>)joystick;
-			//return joystick as IDevice<AxisDetails,ButtonDetails,OSXDefaultExtension>;
+
 		}
 		
 

@@ -219,7 +219,7 @@ namespace ws.winx.input
         public static bool GetAnyKeyDown(int id)
         {
 
-            return Input.anyKeyDown || InputManager.hidInterface.Devices[id].GetAnyKeyDown();
+            return Input.anyKeyDown || InputManager.Devices.GetDeviceAt(id).GetAnyKeyDown();
 
         }
 
@@ -242,7 +242,7 @@ namespace ws.winx.input
         /// <returns></returns>
         static bool anyKeyDownOnAny()
         {
-            IDeviceCollection devices = InputManager.hidInterface.Devices;
+            IDeviceCollection devices = InputManager.Devices;
 
             foreach (IDevice device in devices)
                 if (device.GetAnyKeyDown())
@@ -334,7 +334,7 @@ namespace ws.winx.input
 
             if (action.fromAny)
             {//first device that have value not equal 0 or return 0
-                IDeviceCollection devices = InputManager.hidInterface.Devices;
+                IDeviceCollection devices = InputManager.Devices;
                 float axisValue;
 
                 foreach (IDevice device in devices)
@@ -346,9 +346,9 @@ namespace ws.winx.input
             }
             else
             {
-                int ID = KeyCodeExtension.toJoystickID(code);
-                if (InputManager.hidInterface.Devices.ContainsKey(ID))
-                    return InputManager.hidInterface.Devices[ID].GetAxis(code);
+                int index = KeyCodeExtension.toJoystickID(code);
+                if (InputManager.Devices.ContainsIndex(index))
+					return InputManager.Devices.GetDeviceAt(index).GetAxis(code);
                 else
                     return 0;
             }
@@ -378,7 +378,7 @@ namespace ws.winx.input
             {
                 if (fromAny)
                 {
-                    IDeviceCollection devices = InputManager.hidInterface.Devices;
+                    IDeviceCollection devices = InputManager.Devices;
 
                     foreach (IDevice device in devices)
                         if (device.GetKey(code))
@@ -389,10 +389,10 @@ namespace ws.winx.input
                 }
                 else
                 {
-                    int ID = KeyCodeExtension.toJoystickID(code);
-                    if (InputManager.hidInterface.Devices.ContainsKey(ID))
+                    int index = KeyCodeExtension.toJoystickID(code);
+                    if (InputManager.Devices.ContainsIndex(index))
 
-                        return InputManager.hidInterface.Devices[ID].GetKey(code);
+                        return InputManager.Devices.GetDeviceAt(index).GetKey(code);
                     else
                         return false;
 
@@ -431,7 +431,7 @@ namespace ws.winx.input
             {
                 if (action.fromAny)
                 {
-                    IDeviceCollection devices = InputManager.hidInterface.Devices;
+                    IDeviceCollection devices = InputManager.Devices;
 
                     foreach (IDevice device in devices)
                         if (device.GetKeyUp(code))
@@ -442,10 +442,10 @@ namespace ws.winx.input
                 }
                 else
                 {
-                    int ID = KeyCodeExtension.toJoystickID(code);
-                    if (InputManager.hidInterface.Devices.ContainsKey(ID))
+                    int index = KeyCodeExtension.toJoystickID(code);
+                    if (InputManager.Devices.ContainsIndex(index))
 
-                        return InputManager.hidInterface.Devices[ID].GetKeyUp(code);
+                        return InputManager.Devices.GetDeviceAt(index).GetKeyUp(code);
                     else
                         return false;
 
@@ -470,7 +470,7 @@ namespace ws.winx.input
 
                 if (action.fromAny)
                 {
-                    IDeviceCollection devices = InputManager.hidInterface.Devices;
+                    IDeviceCollection devices = InputManager.Devices;
                     foreach (IDevice device in devices)
                         if (device.GetKeyDown(code))
                             return true;
@@ -480,10 +480,10 @@ namespace ws.winx.input
                 }
                 else
                 {
-                    int ID = KeyCodeExtension.toJoystickID(code);
-                    if (InputManager.hidInterface.Devices.ContainsKey(ID))
+                    int index = KeyCodeExtension.toJoystickID(code);
+                    if (InputManager.Devices.ContainsIndex(index))
 
-                        return InputManager.hidInterface.Devices[ID].GetKeyDown(code);
+                        return InputManager.Devices.GetDeviceAt(index).GetKeyDown(code);
                     else
                         return false;
 
@@ -586,7 +586,7 @@ namespace ws.winx.input
 
 
             //prioterize joysticks
-            IDeviceCollection devices = InputManager.hidInterface.Devices;
+            IDeviceCollection devices = InputManager.Devices;
 
 
 

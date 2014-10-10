@@ -14,11 +14,56 @@ namespace ws.winx.platform.osx
 {
 		public class GenericHIDDevice:HIDDevice
 		{
+		
+			private HIDReport __lastHIDReport;
+			
+			
+			private int _InputReportByteLength=8;
+			
+			override public int InputReportByteLength
+			{
+				get { return _InputReportByteLength; }
+				set {
+					if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  _InputReportByteLength = value; }
+			}
+			private int _OutputReportByteLength=8;
+			
+			override public int OutputReportByteLength
+			{
+				get { return _OutputReportByteLength; }
+				set { if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  _OutputReportByteLength = value; }
+			}
+
+
+
 				public GenericHIDDevice (int index, int VID, int PID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath, 
 		        string name = ""):base(index,VID,PID,deviceHandle,hidInterface,devicePath,name)
 				{
-						
+					__lastHIDReport = new HIDReport(this.index, CreateInputBuffer(),HIDReport.ReadStatus.Success);	
 				}
+
+
+		private byte[] CreateInputBuffer()
+		{
+			return CreateBuffer((int)InputReportByteLength - 1);
+		}
+		
+		private byte[] CreateOutputBuffer()
+		{
+			return CreateBuffer((int)OutputReportByteLength - 1);
+		}
+
+		private static byte[] CreateBuffer(int length)
+		{
+			byte[] buffer = null;
+			Array.Resize(ref buffer, length + 1);
+			return buffer;
+		}
+
+
+
+
+
 		}
 }
 

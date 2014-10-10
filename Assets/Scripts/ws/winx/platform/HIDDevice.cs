@@ -160,7 +160,8 @@ namespace ws.winx.platform
             /// <summary>
             /// Read Async
             /// </summary>
-            /// <param name="callback"></param>
+            /// <param name="callback"></param> 
+
                 public virtual void Read(ReadCallback callback, int timeout)
                 {
                     throw new NotImplementedException();
@@ -171,6 +172,11 @@ namespace ws.winx.platform
                 {
                     throw new NotImplementedException();
                 }
+
+		        
+		        public virtual HIDReport Read(){
+					throw new NotImplementedException();
+				}
 
 
                 public virtual void Write(object data, HIDDevice.WriteCallback callback)

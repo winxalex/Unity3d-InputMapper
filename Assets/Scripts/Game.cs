@@ -414,8 +414,9 @@ namespace ws.winx
 
 
             //don't take device here in the loop this is just for demo
-            if (InputManager.hidInterface.Devices.ContainsKey(0))
-                device = InputManager.hidInterface.Devices[0] as ThrustmasterRGTFFDDevice;
+
+            if (InputManager.Devices.ContainsIndex(0))
+                device = InputManager.Devices[(byte)0] as ThrustmasterRGTFFDDevice;
 
             if (device == null) return;
 

@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using ws.winx.platform;
 using System.Timers;
+using ws.winx.input;
 
 
 
@@ -59,8 +60,9 @@ namespace ws.winx.drivers
         public void Update(IDevice device)
         {
             
-            if(__hidInterface.Generics.ContainsKey(device))
-            __hidInterface.Generics[device].Read(onRead);
+            if (__hidInterface.Generics.ContainsKey (device.PID))
+										__hidInterface.Read (device.PID, onRead);
+           // __hidInterface.Generics[device].Read(onRead);
            
         }
 
@@ -71,7 +73,9 @@ namespace ws.winx.drivers
         /// <param name="forceXY">0xFF - 0xA7(left) and 0x00-0x64(rights) are measurable by feeling </param>
         internal void SetMotor(IDevice device, byte forceX,byte forceY,HIDDevice.WriteCallback callback)
         {
-            if (__hidInterface.Generics.ContainsKey(device))
+
+
+            if (__hidInterface.Generics.ContainsKey(device.PID))
             {
                 //TODO check if device use sbytes for 0x80 to 0x7f (-128 to 127)
                 //Couldn't figure out if forceY doing something
@@ -83,8 +87,8 @@ namespace ws.winx.drivers
                 data[3] = 0x00;
                 data[4] = 0x00;
 
-
-                __hidInterface.Generics[device].Write(data, callback);
+				__hidInterface.Write(data,device.PID,callback);
+                //__hidInterface.Generics[device].Write(data, callback);
             }
         }
         
@@ -105,7 +109,8 @@ namespace ws.winx.drivers
 
               // Debug.Log("ThustmasterDriver>>onRead:processRead" + BitConverter.ToString(report.Data));
 
-                JoystickDevice device = __hidInterface.Devices[report.index] as JoystickDevice;
+
+                JoystickDevice device = InputManager.Devices.GetDeviceAt(report.index) as JoystickDevice;
 
             //    Debug.Log("ThustmasterDriver>>onRead:Index" + report.index);
                 //do something with the data
@@ -300,7 +305,8 @@ namespace ws.winx.drivers
             data[4] = 0x00;
 
 
-            this.__hidInterface.Generics[device].Write(data);
+			this.__hidInterface.Write (data, device.PID);
+            //this.__hidInterface.Generics[device].Write(data);
                
         }
 
@@ -313,8 +319,8 @@ namespace ws.winx.drivers
             data[3] = 0x00;
             data[4] = 0x00;
 
-
-            this.__hidInterface.Generics[device].Write(data, callback);
+			this.__hidInterface.Write (data, device.PID, callback);
+            //this.__hidInterface.Generics[device].Write(data, callback);
         }
 
     

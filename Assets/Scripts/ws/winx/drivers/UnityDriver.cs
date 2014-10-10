@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -40,7 +40,7 @@ namespace ws.winx.drivers
             int numAxis = device.Axis.Count;
             int numButtons=device.Buttons.Count;
                    
-            int index=device.ID;
+            int index=device.Index;
 
            // Debug.Log("axis value raw:" + Input.GetAxisRaw("10") + " " + Input.GetAxis("11"));
             //Debug.Log("axis value raw:" + );

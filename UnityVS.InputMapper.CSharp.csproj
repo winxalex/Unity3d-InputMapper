@@ -82,14 +82,15 @@
     <Compile Include="Assets\Scripts\ws\winx\platform\Android\AndroidHIDListenerProxy.cs" />
     <Compile Include="Assets\Scripts\ws\winx\platform\Android\GenericHIDDevice.cs" />
     <Compile Include="Assets\Scripts\ws\winx\platform\Android\ReadWriteListenerProxy.cs" />
+    <Compile Include="Assets\Scripts\ws\winx\platform\DeviceEventArgs.cs" />
     <Compile Include="Assets\Scripts\ws\winx\platform\HIDDevice.cs" />
     <Compile Include="Assets\Scripts\ws\winx\platform\HIDReport.cs" />
     <Compile Include="Assets\Scripts\ws\winx\platform\IDeviceCollection.cs" />
     <Compile Include="Assets\Scripts\ws\winx\platform\IDriver.cs" />
     <Compile Include="Assets\Scripts\ws\winx\platform\IHIDDevice.cs" />
     <Compile Include="Assets\Scripts\ws\winx\platform\IHIDInterface.cs" />
-    <Compile Include="Assets\Scripts\ws\winx\platform\OSX\CoreFoundation.cs" />
     <Compile Include="Assets\Scripts\ws\winx\platform\OSX\GenericHIDDevice.cs" />
+    <Compile Include="Assets\Scripts\ws\winx\platform\OSX\Native.cs" />
     <Compile Include="Assets\Scripts\ws\winx\platform\OSX\OSXDriver.cs" />
     <Compile Include="Assets\Scripts\ws\winx\platform\OSX\OSXHIDInterface.cs" />
     <Compile Include="Assets\Scripts\ws\winx\platform\Web\GamePadJSON.cs" />

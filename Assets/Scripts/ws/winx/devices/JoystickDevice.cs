@@ -9,13 +9,12 @@ namespace ws.winx.devices
 		/// <summary>
 		/// Represents a joythis device and provides methods to query its status.
 		/// </summary>
-	public /*abstract*/ class JoystickDevice//<TAxisDetails,TButtonDetails,TDeviceExtension> 
+		public /*abstract*/ class JoystickDevice//<TAxisDetails,TButtonDetails,TDeviceExtension> 
         :IDevice
 //		: IDevice<TAxisDetails,TButtonDetails,TDeviceExtension>
-			//where TAxisDetails:IAxisDetails
-			//where TButtonDetails:IButtonDetails
-			//where TDeviceExtension:IDeviceExtension
-		
+				//where TAxisDetails:IAxisDetails
+				//where TButtonDetails:IButtonDetails
+				//where TDeviceExtension:IDeviceExtension
 		{
         #region Fields
 				
@@ -24,30 +23,29 @@ namespace ws.winx.devices
 
 				
 				IDriver _driver;
-				int _ID = -1;
+				int _index = -1;
 				string _description;
 				JoystickAxisCollection<IAxisDetails> axis_collection;
 				JoystickButtonCollection<IButtonDetails> button_collection;
-				int _numPOV=0;
-		  		int _numButtons;
+				int _numPOV = 0;
+				int _numButtons;
 				int _numAxis;
 				//bool _anyKeyDown = false;
 				int _VID;
 				int _PID;
-                bool _isReady=true;
-                int _lastFrameNum = -1;
+				bool _isReady = true;
+				int _lastFrameNum = -1;
 
-                public int LastFrameNum
-                {
-                    get { return _lastFrameNum; }
-                    set { _lastFrameNum = value; }
-                }
+				public int LastFrameNum {
+						get { return _lastFrameNum; }
+						set { _lastFrameNum = value; }
+				}
 
         #endregion
 
         #region Constructors
 
-				internal JoystickDevice (int id,int pid,int vid,int axes, int buttons,IDriver driver)
+				internal JoystickDevice (int index, int pid, int vid, int axes, int buttons, IDriver driver)
 				{
 						if (axes < 0)
 								throw new ArgumentOutOfRangeException ("axes");
@@ -58,15 +56,15 @@ namespace ws.winx.devices
 			        
 			     
 
-						_numAxis=axes;
-						_numButtons=buttons;
+						_numAxis = axes;
+						_numButtons = buttons;
 
                        
 
-						_ID = id;
-                        _VID = vid;
-                        _PID = pid;
-                        _driver = driver;
+						_index = index;
+						_VID = vid;
+						_PID = pid;
+						_driver = driver;
 						axis_collection = new JoystickAxisCollection<IAxisDetails> (axes);
 						button_collection = new JoystickButtonCollection<IButtonDetails> (buttons);
 			            
@@ -80,106 +78,96 @@ namespace ws.winx.devices
 		#region IDevice implementation
 
 
-                public bool isReady
-                {
-                    get
-                    {
-                        return _isReady;
-                    }
-                   internal set
-                    {
-                        _isReady = value;
-                    }
-                }
+				public bool isReady {
+						get {
+								return _isReady;
+						}
+						internal set {
+								_isReady = value;
+						}
+				}
 
-		public int numPOV {
-			get {
-				return _numPOV;
-			}
-			set {
-				_numPOV = value;
-			}
-		}
+				public int numPOV {
+						get {
+								return _numPOV;
+						}
+						set {
+								_numPOV = value;
+						}
+				}
 
-		public string Name {
-			get {
-				return _description;
-			}
-			set {
-				_description = value;
-			}
-		}
+				public string Name {
+						get {
+								return _description;
+						}
+						set {
+								_description = value;
+						}
+				}
 
-		public IDriver driver {
-			get {
-				return _driver;
-			}
+				public IDriver driver {
+						get {
+								return _driver;
+						}
 		
-		}
+				}
 
+				public int PID {
+						get {
+								return _PID;
+						}
+						internal set {
+								_PID = value;
+						}
+				}
 
-
-		public int PID {
-			get {
-				return _PID;
-			}
-			internal set {
-				_PID=value;
-			}
-		}
-
-		public int VID {
-			get {
-				return _VID;
-			}
-			internal set {
-				_VID=value;
-			}
-		}
+				public int VID {
+						get {
+								return _VID;
+						}
+						internal set {
+								_VID = value;
+						}
+				}
 
      
 	
-        /// <summary>
-        /// ID is value 0 to 15 and given by driver
-        /// </summary>
-		public int ID {
-			get { return _ID; }
-			internal set { _ID = value; }
-		}
+				/// <summary>
+				/// index is value 0 to 15 and given by driver
+				/// </summary>
+				public int Index {
+						get { return _index; }
+						internal set { _index = value; }
+				}
 
-
-
-        public virtual void Update()
-        {
+				public virtual void Update ()
+				{
 
 //
-           // if(this.ID==1)
-            //UnityEngine.Debug.Log("Update"+this.ID+" Current frame:"+Time.frameCount+" lastFrame:"+_lastFrameNum);
+						// if(this.ID==1)
+						//UnityEngine.Debug.Log("Update"+this.ID+" Current frame:"+Time.frameCount+" lastFrame:"+_lastFrameNum);
            
-            //lock is done so no other updates of joystick is done while frame
-            //many Joy.GetXXX could be called in same frame so updates would make JosytickDevice values unusable
-                if (_lastFrameNum == Time.frameCount)
-                {
-                  // if(this.ID==1)
-                  // UnityEngine.Debug.Log("skip" + this.ID + " cos its same frame"+Time.frameCount);
+						//lock is done so no other updates of joystick is done while frame
+						//many Joy.GetXXX could be called in same frame so updates would make JosytickDevice values unusable
+						if (_lastFrameNum == Time.frameCount) {
+								// if(this.ID==1)
+								// UnityEngine.Debug.Log("skip" + this.ID + " cos its same frame"+Time.frameCount);
                     
-                }
-                else
-                {
-                  // if(this.ID==1)
-                   // UnityEngine.Debug.Log("Update" + this.ID + " Current frame:" + Time.frameCount + " lastFrame:" + _lastFrameNum);
+						} else {
+								// if(this.ID==1)
+								// UnityEngine.Debug.Log("Update" + this.ID + " Current frame:" + Time.frameCount + " lastFrame:" + _lastFrameNum);
                  
-                    _lastFrameNum = Time.frameCount;
-                    _driver.Update(this);// as IDevice<IAxisDetails,IButtonDetails,IDeviceExtension>);
+								_lastFrameNum = Time.frameCount;
+								_driver.Update (this);// as IDevice<IAxisDetails,IButtonDetails,IDeviceExtension>);
 
                    
-                }
+						}
          
           
 
-			//_driver.Update(this);
+						//_driver.Update(this);
 
-        }
+				}
 
 			
 				/// <summary>
@@ -189,13 +177,13 @@ namespace ws.winx.devices
 				/// <param name="code">Code. joystick(4bits) + axis(4bits) + data(+/- 5bits)</param>
 				public float GetAxis (int code)
 				{
-                        Update();
+						Update ();
 
-						JoystickAxis axis = KeyCodeExtension.toAxis(code);
+						JoystickAxis axis = KeyCodeExtension.toAxis (code);
 						int data = KeyCodeExtension.toData (code);
 						float axisValue = axis_collection [axis].value;
 
-                        // axis_collection [axis].isHat
+						// axis_collection [axis].isHat
 						if (axis == JoystickAxis.AxisPovX) {
 								if ((data + 1) * 9000 == (int)JoystickPovPosition.Left && axisValue < 0)
 										return axisValue;
@@ -233,7 +221,7 @@ namespace ws.winx.devices
 				/// <param name="code">Code. joystick(4bits) + axis(4bits) + data(+/- 5bits);</param>
 				public virtual bool GetKey (int code)
 				{
-						Update();
+						Update ();
 
 
 
@@ -270,7 +258,7 @@ namespace ws.winx.devices
 								return false;
 						}
 						
-		//	Debug.Log("GetKey axis:"+axis+" JOY:"+KeyCodeExtension.toJoystickID(code)+" ID:"+this.ID+" data:"+data+" axisValue= "+axisValue);
+						//	Debug.Log("GetKey axis:"+axis+" JOY:"+KeyCodeExtension.toJoystickID(code)+" ID:"+this.ID+" data:"+data+" axisValue= "+axisValue);
 
 						//if (data == (int)JoystickPosition.Negative && axisAsButton_collection[axis]==JoystickButtonState.Hold)
 						if (data == (int)JoystickPosition.Negative && axisValue < 0)
@@ -290,9 +278,9 @@ namespace ws.winx.devices
 				/// <param name="code">Code.</param>
 				public virtual  bool GetKeyUp (int code)
 				{
-						Update();// 
+						Update ();// 
 
-                       // UnityEngine.Debug.Log("GetKeyUP");
+						// UnityEngine.Debug.Log("GetKeyUP");
 
 
 						JoystickAxis axis = KeyCodeExtension.toAxis (code);
@@ -301,10 +289,10 @@ namespace ws.winx.devices
 						if (axis == JoystickAxis.None)
 								return button_collection [data].buttonState == JoystickButtonState.Up;
 								
-						IAxisDetails axisDetails=axis_collection [axis];
+						IAxisDetails axisDetails = axis_collection [axis];
 
 						if (axis == JoystickAxis.AxisPovX) {
-						if ((data + 1) * 9000 == (int)JoystickPovPosition.Left && axisDetails.buttonState == JoystickButtonState.NegToUp)
+								if ((data + 1) * 9000 == (int)JoystickPovPosition.Left && axisDetails.buttonState == JoystickButtonState.NegToUp)
 										return true;
 								if ((data + 1) * 9000 == (int)JoystickPovPosition.Right && axisDetails.buttonState == JoystickButtonState.PosToUp)
 										return true;
@@ -335,29 +323,28 @@ namespace ws.winx.devices
 				/// <param name="code">Code.</param>
 				public virtual bool GetKeyDown (int code)
 				{
-                    Update();
+						Update ();
 
-                   // if (!this.isReady) return false;
+						// if (!this.isReady) return false;
 
-                    //UnityEngine.Debug.Log("GetKeyDown Joy"+this.ID);
+						//UnityEngine.Debug.Log("GetKeyDown Joy"+this.ID);
 
 						JoystickAxis axis = KeyCodeExtension.toAxis (code);
 						int data = KeyCodeExtension.toData (code);
 
-                        if (axis == JoystickAxis.None)   //MO data for axis => buttons data
-                        {
-                            //UnityEngine.Debug.Log("Button state>" + button_collection[data].buttonState);
+						if (axis == JoystickAxis.None) {   //MO data for axis => buttons data
+								//UnityEngine.Debug.Log("Button state>" + button_collection[data].buttonState);
                          
-                            return button_collection[data].buttonState == JoystickButtonState.Down;
+								return button_collection [data].buttonState == JoystickButtonState.Down;
 
-                        }
+						}
 						
-							IAxisDetails axisDetails=axis_collection[axis];
+						IAxisDetails axisDetails = axis_collection [axis];
 
 						if (axis == JoystickAxis.AxisPovX) {
-				if ((data + 1) * 9000 == (int)JoystickPovPosition.Left && axisDetails.buttonState == JoystickButtonState.Down && axisDetails.value < 0)
+								if ((data + 1) * 9000 == (int)JoystickPovPosition.Left && axisDetails.buttonState == JoystickButtonState.Down && axisDetails.value < 0)
 										return true;
-				if ((data + 1) * 9000 == (int)JoystickPovPosition.Right && axisDetails.buttonState == JoystickButtonState.Down && axisDetails.value > 0)
+								if ((data + 1) * 9000 == (int)JoystickPovPosition.Right && axisDetails.buttonState == JoystickButtonState.Down && axisDetails.value > 0)
 										return true;
 
 								return false;
@@ -386,116 +373,109 @@ namespace ws.winx.devices
 				}
 
 
-		/// <summary>
-		/// Gets the input.
-        /// IMPORTANT: If button or axis is already "DOWN" returns 0
-        /// GetInput is called in "edit mode" (when mapping in UI) and anykeydown for devices
-        /// during combos process
-		/// </summary>
-		/// <returns>The input.</returns>
-		public virtual int GetInput(){
+				/// <summary>
+				/// Gets the input.
+				/// IMPORTANT: If button or axis is already "DOWN" returns 0
+				/// GetInput is called in "edit mode" (when mapping in UI) and anykeydown for devices
+				/// during combos process
+				/// </summary>
+				/// <returns>The input.</returns>
+				public virtual int GetInput ()
+				{
 
-           // UnityEngine.Debug.Log("GetInput:" + Time.frameCount);
+						// UnityEngine.Debug.Log("GetInput:" + Time.frameCount);
 
-            //there is no  Time.frameCount in Editor (Edit mode - Editor scripts)
-            if(Application.isPlaying) 
-            {
-                   //prevents multiply update in frame
-                Update();
-               // if (!Update())
-               //     return 0;
-
-                
-
+						//there is no  Time.frameCount in Editor (Edit mode - Editor scripts)
+						if (Application.isPlaying) {
+								//prevents multiply update in frame
+								Update ();
+								// if (!Update())
+								//     return 0;
 
                 
-            }
-            else  
-                _driver.Update(this);
+
+
+                
+						} else  
+								_driver.Update (this);
             
 
           
-					int num_axes = _numAxis;
+						int num_axes = _numAxis;
 						
-					int axis = 0;
-					float joyValue=0f;
-					float joyValueMax = 0f;
+						int axis = 0;
+						float joyValue = 0f;
+						float joyValueMax = 0f;
 					
-					IAxisDetails axisDetails;
+						IAxisDetails axisDetails;
 
 
 
 
-                    /////////////////////////////////   HANDLE AXIS in DIGITAL MANNER //////////////////////////////
+						/////////////////////////////////   HANDLE AXIS in DIGITAL MANNER //////////////////////////////
 
-                    int dominantAxisInx = -1;
+						int dominantAxisInx = -1;
 
-                    while (axis < num_axes)
-                    {
+						while (axis < num_axes) {
 
-                        if (axis < num_axes && (axisDetails = axis_collection[axis]) != null)
-                        {
+								if (axis < num_axes && (axisDetails = axis_collection [axis]) != null) {
 
-                            axisDetails = axis_collection[axis];
-                            joyValue = axisDetails.value;
+										axisDetails = axis_collection [axis];
+										joyValue = axisDetails.value;
 
-                            joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
+										joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
 
-                            if (axisDetails.buttonState == JoystickButtonState.Down)
-                                if (joyValueMax < joyValue)
-                                {
-                                    joyValueMax = joyValue;
-                                    // dominantAxis = JoystickAxis.AxisV;
-                                    dominantAxisInx = axis;
-                                }
+										if (axisDetails.buttonState == JoystickButtonState.Down)
+										if (joyValueMax < joyValue) {
+												joyValueMax = joyValue;
+												// dominantAxis = JoystickAxis.AxisV;
+												dominantAxisInx = axis;
+										}
 
 
 
-                        }
+								}
 
-                        axis++;
-                    }
+								axis++;
+						}
 
 
-                    // UnityEngine.Debug.Log(dominantAxisInx);
-                    if (dominantAxisInx > -1)
-                    {
-                        //if (dominantAxis != JoystickAxis.None) {
+						// UnityEngine.Debug.Log(dominantAxisInx);
+						if (dominantAxisInx > -1) {
+								//if (dominantAxis != JoystickAxis.None) {
 
-                        //UnityEngine.Debug.Log("Count" + axis_collection.Count);
-                        // UnityEngine.Debug.Log("dominantAxis "+dominantAxis+" state"+axis_collection[dominantAxis].buttonState);
+								//UnityEngine.Debug.Log("Count" + axis_collection.Count);
+								// UnityEngine.Debug.Log("dominantAxis "+dominantAxis+" state"+axis_collection[dominantAxis].buttonState);
 
-                        //stick.AxisAsButtons [dominantAxis] != JoystickButtonState.Hold;
+								//stick.AxisAsButtons [dominantAxis] != JoystickButtonState.Hold;
 
-                        // index 6 and 7 are reserved for Pov Axes
-                        if (dominantAxisInx == 6) //(int)JoystickAxis.AxisPovX
-                        {
-                            if (axis_collection[dominantAxisInx].value > 0)
-                                return KeyCodeExtension.toCode((Joysticks)ID, dominantAxisInx, JoystickPovPosition.Right);
-                            else
-                                return KeyCodeExtension.toCode((Joysticks)ID, dominantAxisInx, JoystickPovPosition.Left);
-                        }
+								// index 6 and 7 are reserved for Pov Axes
+								if (dominantAxisInx == 6) { //(int)JoystickAxis.AxisPovX
+										if (axis_collection [dominantAxisInx].value > 0)
+												return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Right);
+										else
+												return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Left);
+								}
 
-                        //if (axis_collection[JoystickAxis.AxisPovX].buttonState == JoystickButtonState.Down)
-                        //{
+								//if (axis_collection[JoystickAxis.AxisPovX].buttonState == JoystickButtonState.Down)
+								//{
 
-                        if (dominantAxisInx == 7)//(int)JoystickAxis.AxisPovY
-                        {
+								if (dominantAxisInx == 7) {//(int)JoystickAxis.AxisPovY
 
-                            if (axis_collection[dominantAxisInx].value > 0)
-                                return KeyCodeExtension.toCode((Joysticks)ID, dominantAxisInx, JoystickPovPosition.Forward);
-                            else
-                                return KeyCodeExtension.toCode((Joysticks)ID, dominantAxisInx, JoystickPovPosition.Backward);
-                        }
+										if (axis_collection [dominantAxisInx].value > 0)
+												return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Forward);
+										else
+												return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Backward);
+								}
 
-                        if (axis_collection[dominantAxisInx].value > 0)
-                            return KeyCodeExtension.toCode((Joysticks)ID, dominantAxisInx, (int)JoystickPosition.Positive);
-                        else
-                            return KeyCodeExtension.toCode((Joysticks)ID, dominantAxisInx, (int)JoystickPosition.Negative);
+								if (axis_collection [dominantAxisInx].value > 0)
+										return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, (int)JoystickPosition.Positive);
+								else
+										return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, (int)JoystickPosition.Negative);
 
 
 
-                    }
+						}
 					
 					
 					
@@ -515,68 +495,65 @@ namespace ws.winx.devices
 						
 						
 						
-					/////TODO make possible any axes to be POV (add isHatFirstAxis)
-                        // axis_collection [JoystickAxis.AxisPovX].isHat
+						/////TODO make possible any axes to be POV (add isHatFirstAxis)
+						// axis_collection [JoystickAxis.AxisPovX].isHat
 
 
-                    ///////////////////////////////////   HANDLE BUTTONS  //////////////////////////////
+						///////////////////////////////////   HANDLE BUTTONS  //////////////////////////////
 
 					
-					int button = 0;
+						int button = 0;
 
-                    ////DEBUG
-                    //if (this is WiimoteDevice)
-                    //{
-                    //    UnityEngine.Debug.Log("GetInput took state:" + button_collection[button].buttonState);
-                    //    if (button_collection[button].buttonState == JoystickButtonState.Down)
-                    //        return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.None, button);
-                    //}
+						////DEBUG
+						//if (this is WiimoteDevice)
+						//{
+						//    UnityEngine.Debug.Log("GetInput took state:" + button_collection[button].buttonState);
+						//    if (button_collection[button].buttonState == JoystickButtonState.Down)
+						//        return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.None, button);
+						//}
 
-			UnityEngine.Debug.Log("GetInput from J"+this.ID+" took state:" + button_collection[0].buttonState);
+						UnityEngine.Debug.Log ("GetInput from J" + this.Index + " took state:" + button_collection [0].buttonState);
 
 
-                    while (button < _numButtons)
-                    {
+						while (button < _numButtons) {
 
                    
 
-                        if (button_collection[button].buttonState == JoystickButtonState.Down)
-                            return KeyCodeExtension.toCode((Joysticks)ID, JoystickAxis.None, button);
+								if (button_collection [button].buttonState == JoystickButtonState.Down)
+										return KeyCodeExtension.toCode ((Joysticks)Index, JoystickAxis.None, button);
 
-                        // UnityEngine.Debug.Log("AfterbuttonState " + button_collection[0]);
+								// UnityEngine.Debug.Log("AfterbuttonState " + button_collection[0]);
 
-                        button++;
+								button++;
 
-                    }//while buttons
+						}//while buttons
 		
-			return 0;
+						return 0;
 
 
-		}
+				}
 
 				public bool GetAnyKeyDown ()
 				{
-					return this.GetInput()>0;
+						return this.GetInput () > 0;
 						
 				}
 
-				
-
 				public override bool Equals (object obj)
 				{
-                    if (obj == null)
-                        return false;
+						if (obj == null)
+								return false;
 
-			            JoystickDevice objAsJoystickDevice = obj as JoystickDevice;
+						JoystickDevice objAsJoystickDevice = obj as JoystickDevice;
 						if (objAsJoystickDevice == null)
 								return false;
 						else
-								return this._ID.Equals (objAsJoystickDevice.ID);
+								return this._index.Equals (objAsJoystickDevice.Index);
 				}
 
 				public override int GetHashCode ()
 				{
-						return this._ID;
+						return this._index;
 				}
 
 			
@@ -665,18 +642,15 @@ namespace ws.winx.devices
 
 	
                
-                public IDeviceExtension Extension { get; set; }
-               
+				public IDeviceExtension Extension { get; set; }
 
-                public JoystickAxisCollection<IAxisDetails> Axis
-                {
-                    get { return axis_collection; }
-                }
+				public JoystickAxisCollection<IAxisDetails> Axis {
+						get { return axis_collection; }
+				}
 
-                public JoystickButtonCollection<IButtonDetails> Buttons
-                {
-                    get { return button_collection; }
-                }
+				public JoystickButtonCollection<IButtonDetails> Buttons {
+						get { return button_collection; }
+				}
 
 
 
@@ -685,7 +659,7 @@ namespace ws.winx.devices
 
 
               
-        }
+		}
 
 
 
@@ -766,19 +740,19 @@ namespace ws.winx.devices
 				/// <summary>The seventh axis of the JoystickDevice.</summary>
 				AxisPovX,
 				/// <summary>The eighth axis of the JoystickDevice.</summary>
-                AxisPovY,
-                /// <summary>The nineth axis of the JoystickDevice.</summary>
+				AxisPovY,
+				/// <summary>The nineth axis of the JoystickDevice.</summary>
 				AxisAccX,
-                /// <summary>The tenth axis of the JoystickDevice.</summary>
-                AxisAccY,
-                /// <summary>The eleventh axis of the JoystickDevice.</summary>
-                AxisAccZ,
-                /// <summary>The twelveth axis of the JoystickDevice.</summary>
-                AxisAccR,
-                /// <summary>The 13th axis of the JoystickDevice.</summary>
-                AxisAccU,
-                /// <summary>The 14th axis of the JoystickDevice.</summary>
-                AxisAccV,
+				/// <summary>The tenth axis of the JoystickDevice.</summary>
+				AxisAccY,
+				/// <summary>The eleventh axis of the JoystickDevice.</summary>
+				AxisAccZ,
+				/// <summary>The twelveth axis of the JoystickDevice.</summary>
+				AxisAccR,
+				/// <summary>The 13th axis of the JoystickDevice.</summary>
+				AxisAccU,
+				/// <summary>The 14th axis of the JoystickDevice.</summary>
+				AxisAccV,
 				None
         
 
@@ -820,7 +794,7 @@ namespace ws.winx.devices
 		/// <summary>
 		/// Defines a collection of JoystickButtons.
 		/// </summary>
-	    public sealed class JoystickButtonCollection<TButtonDetails> where TButtonDetails:IButtonDetails
+		public sealed class JoystickButtonCollection<TButtonDetails> where TButtonDetails:IButtonDetails
 		{
 		#region Fields
 		
@@ -901,12 +875,11 @@ namespace ws.winx.devices
 						get { return details [index]; }
 						internal set { details [index] = value; }
 				}
-
 				
 				public TAxisDetails this [JoystickAxis axis] {
 						get { 
-							return details [(int)axis]; 
-			    }
+								return details [(int)axis]; 
+						}
 						internal set { details [(int)axis] = value; }
 				}
 

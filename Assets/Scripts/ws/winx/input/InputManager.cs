@@ -21,6 +21,7 @@ using System.ComponentModel;
 using ws.winx.devices;
 using System.Threading;
 using System.Runtime.InteropServices;
+using System.Linq;
 
 namespace ws.winx.input 
 {
@@ -43,7 +44,18 @@ namespace ws.winx.input
         public static bool EditMode = false;
 
 
-     
+
+
+
+	 static JoystickDevicesCollection _joysticks;
+
+
+		internal static IDeviceCollection Devices
+		{
+			
+			get {  if(_joysticks==null)  _joysticks = new JoystickDevicesCollection(); return _joysticks; }
+			
+		}
       
 
 		internal static IHIDInterface hidInterface{
@@ -73,12 +85,28 @@ namespace ws.winx.input
                         Debug.Log(__hidInterface.GetType()+" is Initialized");
 				}
 
-
+				__hidInterface.DeviceDisconnectEvent+=new EventHandler<DeviceEventArgs<int>>(onRemoveDevice);
+				__hidInterface.DeviceConnectEvent+=new EventHandler<DeviceEventArgs<IDevice>>(onAddDevice);
 
 				return __hidInterface; }
 		}
 
-			
+
+	   internal static void onRemoveDevice(object sender,DeviceEventArgs<int> args){
+
+					if (_joysticks.ContainsIndex(args.data)) 
+					
+						_joysticks.Remove(args.data);
+					
+				}
+
+		internal static void onAddDevice(object sender,DeviceEventArgs<IDevice> args){
+					//do not allow duplicates
+					if (_joysticks.ContainsIndex(args.data.PID)) return;
+
+					_joysticks [args.data.PID] = args.data;
+
+		}
 
 		public static InputSettings Settings{
 			get{  if(__settings==null) __settings=new InputSettings(); return __settings;}
@@ -92,7 +120,7 @@ namespace ws.winx.input
         /// <returns></returns>
         public static List<T> GetJoysticks<T>()
         {
-            IDeviceCollection devices = InputManager.hidInterface.Devices;
+            IDeviceCollection devices = InputManager.Devices;
 
             List<T> Result = new List<T>();
 
@@ -986,6 +1014,162 @@ namespace ws.winx.input
 		}
 
 
+		
+	
+		
+		
+		#region JoystickDevicesCollection
+		
+		/// <summary>
+		/// Defines a collection of JoystickAxes.
+		/// </summary>
+		public sealed class JoystickDevicesCollection : IDeviceCollection
+		{
+			#region Fields
+			readonly Dictionary<int, IDevice> PIDToDevice;
+				
+			readonly Dictionary<byte, int> IndexToPID;
+			
+			
+			List<IDevice> _iterationCacheList;//
+			bool _isEnumeratorDirty = true;
+			
+			#endregion
+			
+			#region Constructors
+			
+			internal JoystickDevicesCollection()
+			{
+				PIDToDevice = new Dictionary<int, IDevice>();
+				
+				IndexToPID = new Dictionary<byte, int>();
+				
+			}
+			
+			#endregion
+			
+			#region Public Members
+			
+		
+			
+			
+			#region IDeviceCollection implementation
+
+
+			/// <summary>
+			/// Remove the specified device with specified PID.
+			/// </summary>
+			/// <param name="PID">PI.</param>
+			public void Remove(int PID)
+			{
+				IndexToPID.Remove((byte)PIDToDevice[PID].Index);
+				PIDToDevice.Remove(PID);
+				
+				_isEnumeratorDirty = true;
+			}
+			
+			/// <summary>
+			/// Remove the specified device with specified index byte(0-15)
+			/// </summary>
+			/// <param name="index">Index.</param>
+			public void Remove(byte index)
+			{
+				int pid = IndexToPID[index];
+				IndexToPID.Remove(index);
+				PIDToDevice.Remove(pid);
+				
+				_isEnumeratorDirty = true;
+			}
+			
+
+
+			/// <summary>
+			/// Gets the <see cref="ws.winx.input.InputManager+JoystickDevicesCollection"/> at the specified index.
+			/// use case (byte)#
+			/// </summary>
+			/// <param name="index">Index.</param>
+			public IDevice this[byte index]
+			{
+				get { return PIDToDevice[IndexToPID[index]]; }
+			
+			}
+			
+			
+			public IDevice GetDeviceAt(int index){
+				return PIDToDevice[IndexToPID[(byte)index]];
+			}
+			
+			
+			/// <summary>
+			/// Gets or sets the <see cref="ws.winx.input.InputManager+JoystickDevicesCollection"/> with the specified PID.
+			/// </summary>
+			/// <param name="PID">PI.</param>
+			public IDevice this[int PID]
+			{
+				get { return PIDToDevice[PID]; }
+				internal set
+				{
+					IndexToPID[(byte)value.Index] = PID;
+					PIDToDevice[PID] = value;
+					
+					_isEnumeratorDirty = true;
+					
+				}
+			}
+			
+			
+			public bool ContainsIndex(int index)
+			{
+				return IndexToPID.ContainsKey((byte)index);
+			}
+			
+			public bool ContainsPID(int pid)
+			{
+				return PIDToDevice.ContainsKey(pid);
+			}
+			
+			public void Clear(){
+				IndexToPID.Clear();
+				PIDToDevice.Clear();
+			}
+			
+			public System.Collections.IEnumerator GetEnumerator()
+			{
+				if (_isEnumeratorDirty)
+				{
+					_iterationCacheList = PIDToDevice.Values.ToList<IDevice>();
+					_isEnumeratorDirty = false;
+					
+					
+				}
+				
+				return _iterationCacheList.GetEnumerator();
+				
+			}
+			
+			
+			/// <summary>
+			/// Gets a System.Int32 indicating the available amount of JoystickDevices.
+			/// </summary>
+			public int Count
+			{
+				get { return PIDToDevice.Count; }
+			}
+			
+			#endregion
+			
+			#endregion
+			
+			
+			
+			
+			
+			
+			
+		}
+		#endregion;
+
+
 
         public static void Dispose(){
 
@@ -995,6 +1179,9 @@ namespace ws.winx.input
                 __hidInterface.Dispose();
                 __hidInterface = null;
             }
+
+
+			_joysticks.Clear();
 
         }
 

@@ -13,6 +13,7 @@ using ws.winx.devices;
 using System.Collections.Generic;
 using ws.winx.platform;
 using UnityEngine;
+using ws.winx.input;
 
 
 namespace ws.winx.drivers
@@ -111,7 +112,7 @@ namespace ws.winx.drivers
 
 
 
-                    _hidInterface.Read(wDevice, onRead);
+                    _hidInterface.Read(wDevice.PID, onRead);
                         //Start settup sequence
                         ClearExtension(wDevice);
 
@@ -120,7 +121,7 @@ namespace ws.winx.drivers
                 }
 
                 if(wDevice.isReady)
-                _hidInterface.Read(wDevice, onRead);
+                _hidInterface.Read(wDevice.PID, onRead);
            
             }
 
@@ -235,12 +236,13 @@ namespace ws.winx.drivers
             
             ParseInputReport(data as HIDReport);
 
-            WiimoteDevice device = _hidInterface.Devices[(data as HIDReport).index] as WiimoteDevice;
+			WiimoteDevice device = InputManager.Devices.GetDeviceAt((data as HIDReport).index) as WiimoteDevice;
+			//_hidInterface.Devices[(data as HIDReport).index] as WiimoteDevice;
 
          
 
             if(!device.isReady)
-            _hidInterface.Read(device, onRead);
+            _hidInterface.Read(device.PID, onRead);
 
         
         }
@@ -265,7 +267,7 @@ namespace ws.winx.drivers
 
 
                 // create new Device
-                device = new WiimoteDevice(((IHIDInterface)_hidInterface).Devices.Count, hidDevice.PID, hidDevice.VID, 16, 12, 4, 4, this);
+                device = new WiimoteDevice(((IHIDInterface)_hidInterface).Generics.Count, hidDevice.PID, hidDevice.VID, 16, 12, 4, 4, this);
 
 
 
@@ -393,7 +395,7 @@ namespace ws.winx.drivers
 
 
 
-                WiimoteDevice device = _hidInterface.Devices[report.index] as WiimoteDevice;
+                WiimoteDevice device = InputManager.Devices.GetDeviceAt(report.index) as WiimoteDevice;
                
 
                 InputReport type = (InputReport)buff[0];
@@ -1905,7 +1907,7 @@ float value;
             mBuff[1] = (byte)((continuous ? (uint)0x04 : (uint)0x00) | (uint)device.RumbleBit);
             mBuff[2] = (byte)type;
 
-            _hidInterface.Write(mBuff, device);
+            _hidInterface.Write(mBuff, device.PID);
         }
 
 
@@ -1918,8 +1920,8 @@ float value;
             mBuff[1] = (byte)((continuous ? (uint)0x04 : (uint)0x00) | (uint)device.RumbleBit);
             mBuff[2] =(byte)type;
 
-            _hidInterface.Write(mBuff, device, (suc) => { 
-                _hidInterface.Read(device,onRead); });
+            _hidInterface.Write(mBuff, device.PID, (suc) => { 
+                _hidInterface.Read(device.PID,onRead); });
         }
 
 
@@ -1967,7 +1969,7 @@ float value;
                 (led4 ? (uint)0x80 : (uint)0x00) |
                         device.RumbleBit);
 
-            _hidInterface.Write(mBuff, device);
+            _hidInterface.Write(mBuff, device.PID);
         }
 
         /// <summary>
@@ -2002,7 +2004,7 @@ float value;
                 ((leds & 0x08) > 0 ? (uint)0x80 : (uint)0x00) |
                         (uint)device.RumbleBit);
 
-            _hidInterface.Write(mBuff, device);
+            _hidInterface.Write(mBuff, device.PID);
         }
 
         /// <summary>
@@ -2028,7 +2030,7 @@ float value;
 
             UnityEngine.Debug.Log("GetStatus");
 
-            HIDDevice hidDevice = _hidInterface.Generics[device];
+            HIDDevice hidDevice = _hidInterface.Generics[device.PID];
             hidDevice.InputReportByteLength = REPORT_LENGTH;
             hidDevice.OutputReportByteLength = REPORT_LENGTH;
 
@@ -2038,7 +2040,7 @@ float value;
             mBuff[1] = (byte)device.RumbleBit;
            
 
-            _hidInterface.Write(mBuff, device);
+            _hidInterface.Write(mBuff, device.PID);
 
         }
 
@@ -2060,14 +2062,14 @@ float value;
             byte[] mBuff = new byte[REPORT_LENGTH];
             mBuff[0] = (byte)OutputReport.IR;
             mBuff[1] = (byte)(0x04 | device.RumbleBit);
-            _hidInterface.Write(mBuff, device);
+            _hidInterface.Write(mBuff, device.PID);
 
             UnityEngine.Debug.Log("Sync2");
             Array.Clear(mBuff, 0, mBuff.Length);
             mBuff = new byte[REPORT_LENGTH];
             mBuff[0] = (byte)OutputReport.IR2;
             mBuff[1] = (byte)(0x04 | device.RumbleBit);
-            _hidInterface.Write(mBuff, device);
+            _hidInterface.Write(mBuff, device.PID);
 
 
             UnityEngine.Debug.Log("Sync3");
@@ -2143,11 +2145,11 @@ float value;
             mBuff[0] = (byte)OutputReport.IR;
             mBuff[1] = (byte)device.RumbleBit;
 
-            _hidInterface.Write(mBuff, device, (suc) => {
+            _hidInterface.Write(mBuff, device.PID, (suc) => {
                  mBuff = new byte[27];
                 mBuff[0] = (byte)OutputReport.IR2;
                 mBuff[1] = (byte)device.RumbleBit;
-                _hidInterface.Write(mBuff, device);
+                _hidInterface.Write(mBuff, device.PID);
             });
 
            
@@ -2188,7 +2190,7 @@ float value;
             mBuff[6] = (byte)(size & 0xff);
 
         
-            _hidInterface.Write(mBuff,device, callback);
+            _hidInterface.Write(mBuff,device.PID, callback);
 
            
            
@@ -2216,7 +2218,7 @@ float value;
             mBuff[5] = (byte)((size & 0xff00) >> 8);
             mBuff[6] = (byte)(size & 0xff);
 
-            _hidInterface.Write(mBuff, device);
+            _hidInterface.Write(mBuff, device.PID);
 
 
         }
@@ -2258,9 +2260,9 @@ float value;
 
 
             if (callback == null)
-                _hidInterface.Write(mBuff, device);
+                _hidInterface.Write(mBuff, device.PID);
             else
-                _hidInterface.Write(mBuff, device, callback);
+                _hidInterface.Write(mBuff, device.PID, callback);
 
         }
 

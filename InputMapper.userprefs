@@ -1,27 +1,29 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ws/winx/platform/OSX/CoreFoundation.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ws/winx/input/InputManager.cs">
     <Files>
-      <File FileName="Assets/Scripts/ws/winx/platform/OSX/OSXHIDInterface.cs" Line="285" Column="1" />
-      <File FileName="Assets/Scripts/ws/winx/platform/OSX/OSXDriver.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ws/winx/input/InputManager.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ws/winx/platform/OSX/CoreFoundation.cs" Line="68" Column="61" />
+      <File FileName="Assets/Scripts/ws/winx/platform/OSX/OSXHIDInterface.cs" Line="109" Column="3" />
+      <File FileName="Assets/Scripts/ws/winx/platform/OSX/OSXDriver.cs" Line="333" Column="4" />
+      <File FileName="Assets/Scripts/ws/winx/platform/OSX/Native.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ws/winx/platform/OSX/GenericHIDDevice.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ws/winx/platform/HIDDevice.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ws/winx/devices/JoystickDevice.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ws/winx/platform/Windows/WinHIDInterface.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/ws/winx/devices/JoystickDevice.cs" Line="515" Column="7" />
       <File FileName="Assets/Scripts/ws/winx/drivers/ThrustMasterDriver.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Game.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ws/winx/input/InputCombination.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ws/winx/input/InputEx.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/ws/winx/input/InputEx.cs" Line="222" Column="60" />
+      <File FileName="Assets/Scripts/ws/winx/platform/Windows/WinHIDInterface.cs" Line="23" Column="49" />
+      <File FileName="Assets/Scripts/ws/winx/platform/Windows/GenericHIDDevice.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/ws/winx/platform/Windows/WinMMDriver.cs" Line="44" Column="1" />
+      <File FileName="Assets/Scripts/ws/winx/platform/Android/GenericHIDDevice.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/ws/winx/platform/Android/AndroidHIDBehaviour.cs" Line="10" Column="4" />
+      <File FileName="Assets/Scripts/ws/winx/platform/HIDReport.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/ws/winx/platform/Windows/Native.cs" Line="166" Column="33" />
+      <File FileName="Assets/Scripts/ws/winx/input/InputManager.cs" Line="1117" Column="5" />
+      <File FileName="Assets/Scripts/ws/winx/platform/DeviceEventArgs.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/ws/winx/platform/IHIDInterface.cs" Line="20" Column="4" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="/Projects/InputMapper/Assets/Scripts/ws/winx/platform/OSX/OSXHIDInterface.cs" line="376" />
-      <Breakpoint file="/Projects/InputMapper/Assets/Scripts/ws/winx/input/InputEx.cs" line="486" />
-      <Breakpoint file="/Projects/InputMapper/Assets/Scripts/ws/winx/platform/OSX/OSXHIDInterface.cs" line="331" />
-      <Breakpoint file="/Projects/InputMapper/Assets/Scripts/ws/winx/platform/OSX/OSXHIDInterface.cs" line="280" />
+      <Breakpoint file="/Projects/InputMapper/Assets/Scripts/ws/winx/platform/OSX/OSXHIDInterface.cs" line="393" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches>

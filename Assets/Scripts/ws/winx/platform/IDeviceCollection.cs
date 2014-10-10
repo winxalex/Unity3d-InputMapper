@@ -14,20 +14,34 @@ namespace ws.winx.platform
 {
 		public interface IDeviceCollection:IEnumerable
 		{
-			IDevice this [int index] 
-			//IDevice<IAxisDetails,IButtonDetails,IDeviceExtension> this [int index] 
-			{
-				get; 
-		    }
+			IDevice this [int PID] {get;}
 
-			IDevice this [IntPtr device]{get;}
-			//IDevice<IAxisDetails,IButtonDetails,IDeviceExtension> this [IntPtr device]{get;}
+		    /// <summary>
+		    /// Gets the <see cref="ws.winx.platform.IDeviceCollection"/> at the specified index.
+		/// Don't forget to cast number to (byte)#
+		    /// </summary>
+		    /// <param name="index">Index.</param>
+			IDevice this [byte index]{get;}
 
-			void Remove (IntPtr device);
-            void Remove(int inx);
+			IDevice GetDeviceAt (int index);	
+		  
 
-			bool ContainsKey(int key);
-			bool ContainsKey(IntPtr key);
+			void Remove (byte index);
+            void Remove(int pid);
+
+		    /// <summary>
+		    /// Containses the key of device.PID
+		    /// </summary>
+		    /// <returns><c>true</c>, if key was containsed, <c>false</c> otherwise.</returns>
+		    /// <param name="pid">Pid.</param>
+			bool ContainsPID(int pid);
+
+		    /// <summary>
+		    /// Containses the key of device index (0-15).
+		    /// </summary>
+		    /// <returns><c>true</c>, if key was containsed, <c>false</c> otherwise.</returns>
+		    /// <param name="index">Index.</param>
+			bool ContainsIndex(int index);
 			int Count{get;}
 				
 			
