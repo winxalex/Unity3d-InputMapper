@@ -26,6 +26,7 @@ namespace ws.winx.platform
             void Write(object data, int device,HIDDevice.WriteCallback callback);
             void Write(object data, int device);
 			void Update();
+			void Enumerate();
 		    
 
 		}

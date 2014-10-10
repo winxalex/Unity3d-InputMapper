@@ -20,17 +20,13 @@ namespace ws.winx.platform.osx
 {
 
 
-	using CFAllocatorRef = System.IntPtr;
-	using CFDictionaryRef = System.IntPtr;
-	using CFArrayRef = System.IntPtr;
-	using CFIndex = System.IntPtr;
-	using CFRunLoop = System.IntPtr;
+
 	using CFString = System.IntPtr;
-	using CFStringRef = System.IntPtr; // Here used interchangeably with the CFString
+
 	using CFTypeRef = System.IntPtr;
 	using IOHIDDeviceRef = System.IntPtr;
 	using IOHIDElementRef = System.IntPtr;
-	using IOHIDManagerRef = System.IntPtr;
+
 	using IOHIDValueRef = System.IntPtr;
 	using IOOptionBits = System.IntPtr;
 	using IOReturn =Native.IOReturn;// System.IntPtr;
@@ -46,7 +42,7 @@ namespace ws.winx.platform.osx
 
 #region Fields
 
-
+		IHIDInterface _hidInterface;
 
 		
 	
@@ -71,49 +67,17 @@ namespace ws.winx.platform.osx
 
 
 
-        /// <summary>
-		/// Devices the value received.
-		/// </summary>
-		/// <param name="context">Context.</param>
-		/// <param name="res">Res.</param>
-		/// <param name="sender">Sender.</param>
-		/// <param name="valRef">Value reference.</param>
-		internal void DeviceValueReceived(IntPtr context, IOReturn res, IntPtr sender, IOHIDValueRef valRef)
+     /// <summary>
+     /// Devices the value received.
+     /// </summary>
+     /// <param name="device">Device.</param>
+     /// <param name="type">Type.</param>
+     /// <param name="uid">Uid.</param>
+     /// <param name="value">Value.</param>
+		internal void DeviceValueReceived(IDevice device,Native.IOHIDElementType type,uint uid,long value)
 		{
 			UnityEngine.Debug.Log ("DeviceValueReceived");
-
-			IOHIDElementRef element = Native.IOHIDValueGetElement(valRef);
-			uint uid=Native.IOHIDElementGetCookie(element);
-			long value;
-			Native.IOHIDElementType  type = Native.IOHIDElementGetType(element);
-			IDevice device;
-
-
-
-			try{
-			GCHandle gch = GCHandle.FromIntPtr(context);
-			 device=(IDevice) gch.Target;
-
-			}
-			catch(Exception e){
-				UnityEngine.Debug.LogException(e);
-				return;
-		}
-
-
-//			if (!device.isReady)
-//								return;
-//
-//			UnityEngine.Debug.Log ("Lockcked");
-//			((JoystickDevice)device).isReady = false;
-
-
-//			if (Native.IOHIDValueGetLength(valRef) > 4) {
-//				// Workaround for a strange crash that occurs with PS3 controller; was getting lengths of 39 (!)
-//				return;
-//			}
-
-			value=Native.IOHIDValueGetIntegerValue(valRef);
+		
 
 			//AXIS
 			if(type==Native.IOHIDElementType.kIOHIDElementTypeInput_Misc
@@ -121,10 +85,6 @@ namespace ws.winx.platform.osx
 			{
 				int numAxes=device.Axis.Count;
 				AxisDetails axisDetails;
-
-
-
-
 
 
 				for (int axisIndex = 0; axisIndex < numAxes; axisIndex++) {
@@ -137,7 +97,7 @@ namespace ws.winx.platform.osx
 
 						//check hatch
 						//Check if POV element.
-						if((Native.IOHIDElementGetUsage(element) == (uint)Native.HIDUsageGD.Hatswitch))
+						if(axisDetails.isHat)
 						{
 									//Workaround for POV hat switches that do not have null states.
 									if(!axisDetails.isNullable)
@@ -265,29 +225,16 @@ namespace ws.winx.platform.osx
 		/// Update the specified device.
 		/// </summary>
 		/// <param name="device">Joystick.</param>
-         public void Update(IDevice device)
-	
+         public void Update(IDevice device)	
 		{
-			//UnityEngine.Debug.Log ("Update device ready");
-			//((JoystickDevice)joystick).isReady = true;
-            //throw new Exception("OSX Default driver is meant to auto update on callback");
-			int numButtons = 1;//device.Buttons.Count;
-			float value;
-			
-			for (int buttonIndex = 0; buttonIndex < numButtons; buttonIndex++) {
 
-				value=device.Buttons[buttonIndex].value;
-				device.Buttons[buttonIndex].value=value;
-					
-					UnityEngine.Debug.Log("Update::::Button "+buttonIndex+" value:"+value+" State:"+device.Buttons[buttonIndex].buttonState);
-					
-					
+			HIDReport report = _hidInterface.Generics [device.PID].Read ();
 
+			if (report.Status == HIDReport.ReadStatus.Success) {
+
+
+				DeviceValueReceived(device,(Native.IOHIDElementType)BitConverter.ToUInt32(report.Data,0),BitConverter.ToUInt32(report.Data,4),BitConverter.ToInt64(report.Data,8));
 			}
-
-
-
-
 
 
 		}
@@ -302,7 +249,7 @@ namespace ws.winx.platform.osx
 		
 		{
 	
-
+			this._hidInterface = hidDevice.hidInterface;
 
 			IntPtr device=hidDevice.deviceHandle;
 

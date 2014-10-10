@@ -9,16 +9,39 @@
 // ------------------------------------------------------------------------------
 using System;
 using ws.winx.platform;
+using ws.winx.devices;
+using System.Runtime.InteropServices;
 
 namespace ws.winx.platform.osx
 {
+
+	
+	using CFString = System.IntPtr;
+	
+	using CFTypeRef = System.IntPtr;
+	using IOHIDDeviceRef = System.IntPtr;
+	using IOHIDElementRef = System.IntPtr;
+	
+	using IOHIDValueRef = System.IntPtr;
+	using IOOptionBits = System.IntPtr;
+	using IOReturn =Native.IOReturn;// System.IntPtr;
+	
+	using IOHIDElementType=Native.IOHIDElementType;
+
+
+
+
+
 		public class GenericHIDDevice:HIDDevice
 		{
+
+
+
 		
 			private HIDReport __lastHIDReport;
 			
 			
-			private int _InputReportByteLength=8;
+		private int _InputReportByteLength=16;
 			
 			override public int InputReportByteLength
 			{
@@ -26,7 +49,7 @@ namespace ws.winx.platform.osx
 				set {
 					if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  _InputReportByteLength = value; }
 			}
-			private int _OutputReportByteLength=8;
+		private int _OutputReportByteLength=8;
 			
 			override public int OutputReportByteLength
 			{
@@ -41,6 +64,10 @@ namespace ws.winx.platform.osx
 				{
 					__lastHIDReport = new HIDReport(this.index, CreateInputBuffer(),HIDReport.ReadStatus.Success);	
 				}
+
+
+
+
 
 
 		private byte[] CreateInputBuffer()
@@ -59,6 +86,70 @@ namespace ws.winx.platform.osx
 			Array.Resize(ref buffer, length + 1);
 			return buffer;
 		}
+
+		public override HIDReport Read ()
+		{
+			return __lastHIDReport;
+		}
+
+
+
+
+
+
+
+		/// <summary>
+		/// Devices the value received.
+		/// </summary>
+		/// <param name="context">Context.</param>
+		/// <param name="res">Res.</param>
+		/// <param name="sender">Sender.</param>
+		/// <param name="valRef">Value reference.</param>
+		internal void DeviceValueReceived(IntPtr context, IOReturn res, IntPtr sender, IOHIDValueRef valRef)
+		{
+			UnityEngine.Debug.Log ("DeviceValueReceived");
+			
+			IOHIDElementRef element = Native.IOHIDValueGetElement(valRef);
+			uint uid=Native.IOHIDElementGetCookie(element);
+			long value;
+			Native.IOHIDElementType  type = Native.IOHIDElementGetType(element);
+			GenericHIDDevice device;
+
+			value = Native.IOHIDValueGetIntegerValue (valRef);
+
+			
+			try{
+				GCHandle gch = GCHandle.FromIntPtr(context);
+				device=(GenericHIDDevice) gch.Target;
+				
+			}
+			catch(Exception e){
+				UnityEngine.Debug.LogException(e);
+				return;
+			}
+
+
+		
+
+			byte[] typeBuff = BitConverter.GetBytes ((uint)type);
+			byte[] uidBuff = BitConverter.GetBytes (uid);
+			byte[] valueBuff = BitConverter.GetBytes (value);
+
+			
+		    byte[] result = new byte[ typeBuff.Length + uidBuff.Length + valueBuff.Length ];
+			System.Buffer.BlockCopy( typeBuff, 0, result, 0, typeBuff.Length );
+			System.Buffer.BlockCopy( uidBuff, 0, result, typeBuff.Length, uidBuff.Length );
+			System.Buffer.BlockCopy( valueBuff, 0, result, typeBuff.Length + uidBuff.Length, valueBuff.Length );
+			
+
+
+
+			device.__lastHIDReport.Data=result;
+			
+		}
+
+
+
 
 
 

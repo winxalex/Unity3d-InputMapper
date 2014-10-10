@@ -28,7 +28,7 @@ namespace ws.winx.input
 
     public static class InputManager
     {
-       
+
 		       
        
 		private static InputCombination[] __inputCombinations;
@@ -53,10 +53,21 @@ namespace ws.winx.input
 		internal static IDeviceCollection Devices
 		{
 			
-			get {  if(_joysticks==null)  _joysticks = new JoystickDevicesCollection(); return _joysticks; }
+			get {  if(_joysticks==null)  {
+					_joysticks = new JoystickDevicesCollection(); 
+
+					//TODO think of better entry point
+					IHIDInterface h=InputManager.hidInterface;
+					h.Enumerate();//won't work on ANdorin need to redesign
+				}
+
+				return _joysticks; }
 			
 		}
       
+
+	
+
 
 		internal static IHIDInterface hidInterface{
 			get{ 

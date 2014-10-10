@@ -32,6 +32,7 @@ namespace ws.winx.input
             {
                 Delegate[] delegates;
 
+			    if(Events!=null)
                 foreach (KeyValuePair<int, Delegate[]> pair in Events)
                 {
                     

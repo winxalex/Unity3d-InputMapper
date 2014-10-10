@@ -382,7 +382,7 @@ namespace ws.winx.platform.windows
 
 
 
-        void Enumerate()
+        public void Enumerate()
         {
 
 

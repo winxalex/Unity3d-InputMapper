@@ -80,7 +80,22 @@ namespace ws.winx.platform.osx
 
 #region IHIDInterface implementation
 
+		public void Enumerate(){
 
+
+			if (hidmanager != IntPtr.Zero) {	
+				
+				
+				__Generics = new Dictionary<int, HIDDevice>();
+				
+				//Register add/remove device handlers
+				RegisterHIDCallbacks(hidmanager);
+				
+				
+			}else
+				UnityEngine.Debug.LogError("Creating of OSX HIDManager failed");         
+
+				}
 
 
 		public void Read (int pid, HIDDevice.ReadCallback callback)
@@ -191,17 +206,6 @@ namespace ws.winx.platform.osx
             //create Hid manager	
             hidmanager = Native.IOHIDManagerCreate(IntPtr.Zero,(int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone);
 
-			if (hidmanager != IntPtr.Zero) {	
-
-
-				__Generics = new Dictionary<int, HIDDevice>();
-					
-				//Register add/remove device handlers
-				RegisterHIDCallbacks(hidmanager);
-				
-			
-			}else
-				UnityEngine.Debug.LogError("Creating of OSX HIDManager failed");         
 
 
 
@@ -343,13 +347,13 @@ namespace ws.winx.platform.osx
 							
 							
 							
-							DeviceGCHandle = GCHandle.Alloc(joyDevice);			
+							DeviceGCHandle = GCHandle.Alloc(hidDevice);			
 							
 							// The device is not normally available in the InputValueCallback (HandleDeviceValueReceived), so we include
 							// the device identifier as the context variable, so we can identify it and figure out the device later.
 							
 							
-							Native.IOHIDDeviceRegisterInputValueCallback(device,((OSXDriver)defaultDriver).DeviceValueReceived,GCHandle.ToIntPtr(DeviceGCHandle));
+							Native.IOHIDDeviceRegisterInputValueCallback(device, hidDevice.DeviceValueReceived,GCHandle.ToIntPtr(DeviceGCHandle));
 							
 							Native.IOHIDDeviceScheduleWithRunLoop(device, RunLoop, InputLoopMode);
 							
