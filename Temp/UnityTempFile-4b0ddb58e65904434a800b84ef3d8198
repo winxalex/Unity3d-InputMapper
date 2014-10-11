@@ -6,7 +6,8 @@
 -r:'/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll'
 -define:UNITY_4_5_4
 -define:UNITY_4_5
--define:UNITY_ANDROID
+-define:UNITY_WEBPLAYER
+-define:WEBPLUG
 -define:ENABLE_MICROPHONE
 -define:ENABLE_TEXTUREID_MAP
 -define:ENABLE_UNITYEVENTS
@@ -17,6 +18,7 @@
 -define:ENABLE_SUBSTANCE
 -define:ENABLE_GENERICS
 -define:INCLUDE_WP8SUPPORT
+-define:ENABLE_MOVIES
 -define:ENABLE_WWW
 -define:ENABLE_IMAGEEFFECTS
 -define:INCLUDE_WP_BLUE_SUPPORT
@@ -27,11 +29,11 @@
 -define:ENABLE_PHYSICS
 -define:ENABLE_CACHING
 -define:ENABLE_CLOTH
--define:UNITY_ANDROID_API
 -define:ENABLE_2D_PHYSICS
 -define:ENABLE_SHADOWS
 -define:ENABLE_AUDIO
 -define:ENABLE_NAVMESH_CARVING
+-define:ENABLE_DUCK_TYPING
 -define:ENABLE_SINGLE_INSTANCE_BUILD_SETTING
 -define:ENABLE_PROFILER
 -define:UNITY_EDITOR
@@ -95,6 +97,4 @@
 'Assets/Scripts/ws/winx/unity/Tags.cs'
 'Assets/Scripts/ws/winx/utils/ComplementaryFilter.cs'
 'Assets/Scripts/ws/winx/utils/Extensions.cs'
--r:'/Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/2.0/System.Runtime.Serialization.dll'
--r:'/Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/2.0/System.Xml.Linq.dll'
-@Assets/gmcs.rsp
+@Assets/smcs.rsp

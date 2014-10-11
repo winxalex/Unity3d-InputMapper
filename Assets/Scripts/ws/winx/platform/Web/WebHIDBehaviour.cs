@@ -8,11 +8,11 @@ using System.Timers;
 
 namespace ws.winx.platform.web
 {
-    public class WebMessageArgs : EventArgs
+    public class WebMessageArgs<T> : EventArgs
     {
-        public readonly string RawMessage;
+        public readonly T RawMessage;
 
-        public WebMessageArgs(string message)
+        public WebMessageArgs(T message)
         {
             this.RawMessage = message;
         }
@@ -23,11 +23,11 @@ namespace ws.winx.platform.web
 	public class WebHIDBehaviour: MonoBehaviour
 	{
 
-        public event EventHandler<WebMessageArgs> GamePadEventsSupportEvent;
+        public event EventHandler<WebMessageArgs<bool>> GamePadEventsSupportEvent;
 
-        public event EventHandler<WebMessageArgs> DeviceConnectedEvent;
-        public event EventHandler<WebMessageArgs> DeviceDisconnectedEvent;
-        public event EventHandler<WebMessageArgs> PositionUpdateEvent;
+		public event EventHandler<WebMessageArgs<GenericHIDDevice>> DeviceConnectedEvent;
+		public event EventHandler<WebMessageArgs<int>> DeviceDisconnectedEvent;
+        public event EventHandler<WebMessageArgs<WebHIDReport>> PositionUpdateEvent;
 
         protected bool _isInitialized = false;
         protected bool _hasEvents = false;
@@ -43,12 +43,12 @@ namespace ws.winx.platform.web
 
         public void onHaveGamepadEvents(string message)
         {
-
+			bool hasGamepadEvents = Convert.ToBoolean(message);
              Log("onHaveGamepadEvents:" + (message=="1" ? "true":"false"));
 
             if (GamePadEventsSupportEvent!=null)
             {
-                GamePadEventsSupportEvent(this, new WebMessageArgs(message));
+                GamePadEventsSupportEvent(this, new WebMessageArgs<bool>(hasGamepadEvents));
             }
 
 
@@ -56,14 +56,14 @@ namespace ws.winx.platform.web
           
 
 
-            if (message== "1")
+            if (hasGamepadEvents)
             {
                 _hasEvents=true;
  Application.ExternalEval(
    //  "window.addEventListener('gamepadconnected',function(e){  var buttons = [];  for (var i = 0; i < e.gamepad.buttons.length; i++)   buttons[i] = e.gamepad.buttons[i].value; UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onDeviceConnectedEvent',JSON.stringify({ id: e.gamepad.id, axes: e.gamepad.axes, buttons: buttons, index: e.gamepad.index }))});" +
    //  "window.addEventListener('gamepaddisconnected',function(e){ UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onDeviceDisconnectedEvent',e.gamepad.index.toString())});"
       "window.addEventListener('gamepadconnected',function(e){   UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onDeviceConnectedEvent',JSON.stringify({ id: e.gamepad.id,  numButtons:e.gamepad.buttons.length, numAxes:e.gamepad.axes.length,  index: e.gamepad.index }))});" +
-     "window.addEventListener('gamepaddisconnected',function(e){ UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onDeviceDisconnectedEvent',e.gamepad.index.toString())});"
+     "window.addEventListener('gamepaddisconnected',function(e){ UnityObject2.instances[0].getUnity().SendMessage('WebHIDBehaviourGO','onDeviceDisconnectedEvent',e.gamepad.id)});"
            
            );
 
@@ -88,7 +88,16 @@ namespace ws.winx.platform.web
             if (DeviceConnectedEvent != null)
             {
                 _isInitialized = true;
-                DeviceConnectedEvent(this, new WebMessageArgs(message));
+				GenericHIDDevice info=Json.Deserialize<GenericHIDDevice>(message) as GenericHIDDevice;
+				int PID;
+				int VID;
+				string Name;
+				IDToDeviceData (info.id,out PID,out VID,out Name);
+
+				info.PID=PID;
+				info.VID=VID;
+				info.Name=Name;
+                DeviceConnectedEvent(this, new WebMessageArgs<GenericHIDDevice>(info));
             }
         }
 
@@ -96,9 +105,48 @@ namespace ws.winx.platform.web
         {
             if (DeviceDisconnectedEvent != null)
             {
-                DeviceDisconnectedEvent(this, new WebMessageArgs(message));
+				int PID;
+				int VID;
+				string Name;
+				IDToDeviceData (message,out PID,out VID,out Name);
+                DeviceDisconnectedEvent(this, new WebMessageArgs<int>(PID));
             }
         }
+
+
+		internal void IDToDeviceData(String value,out int PID,out int VID,out string Name){
+			
+			String[] parts;
+			int inx;
+
+
+			parts = value.Split('-');
+			//044f-b653-NAME FF
+			//Name (Vendor: 044f Product: b653) Chrome
+
+			PID = 0x0;
+			VID = 0x0;
+
+
+			if (parts.Length > 2)
+			{
+				Name = parts[2];
+				PID = Convert.ToInt32(parts[1].Trim(), 16);
+				VID = Convert.ToInt32(parts[0].Trim(), 16);
+			}
+			else
+				if ((inx = value.IndexOf("(")) > -1)
+			{
+				Name = value.Substring(0, inx - 1);
+				parts = value.Substring(inx, value.Length - inx - 1).Replace("Product", "").Split(':');
+				
+				PID = Convert.ToInt32(parts[2].Trim(), 16);
+				VID = Convert.ToInt32(parts[1].Trim(), 16);
+			}
+			else
+				Name = value;
+			
+		}
 
 
         private string ENUMERATE_COMMAND = "var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);" +
@@ -159,10 +207,10 @@ namespace ws.winx.platform.web
                 
                 if (PositionUpdateEvent!=null)
                 {
-                   
+					WebHIDReport report= (WebHIDReport)Json.Deserialize<WebHIDReport>(message);
                    // Log("onJoyGetPos" + message);
                     //Debug.Log("Send Event");
-                    PositionUpdateEvent(this, new WebMessageArgs(message));
+                    PositionUpdateEvent(this, new WebMessageArgs<WebHIDReport>(report));
 
                 }
             }

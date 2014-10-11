@@ -6,6 +6,7 @@ using System.Text;
 using ws.winx.devices;
 using UnityEngine;
 using System.Reflection;
+using ws.winx.input;
 
 
 namespace ws.winx.platform.web
@@ -15,8 +16,7 @@ namespace ws.winx.platform.web
         protected bool _isReady=true;
        // protected WebHIDBehaviour _webHidBehavior;
         protected IHIDInterface _hidInterface;
-        protected EventHandler<WebMessageArgs> onUpdate;
-
+       
         public IDevice ResolveDevice(IHIDDevice info)
         {
 
@@ -24,8 +24,7 @@ namespace ws.winx.platform.web
 
             _hidInterface = info.hidInterface;
 
-            //(GenericHIDDevice),info.PositionUpdateEvent += new EventHandler<WebMessageArgs>(onPositionUpdate);
-             // onUpdate=new EventHandler<WebMessageArgs>(onPositionUpdate);
+           
 
             JoystickDevice joystick;
 
@@ -66,7 +65,13 @@ namespace ws.winx.platform.web
         }
 
 
-         protected void onPositionUpdate(object data){
+
+
+		/// <summary>
+		/// Ons the position update.
+		/// </summary>
+		/// <param name="data">Data.</param>
+         protected void onRead(object data){
 
 
 
@@ -78,7 +83,7 @@ namespace ws.winx.platform.web
             
             
             
-             JoystickDevice device = _hidInterface.Devices[report.index] as JoystickDevice; 
+             JoystickDevice device = InputManager.Devices.GetDeviceAt(report.index) as JoystickDevice; 
  
              //Device has already been updated in this call
              if(device.isReady) return;
@@ -199,12 +204,12 @@ namespace ws.winx.platform.web
            // Debug.Log("Update"+_isReady);
             if (device.isReady)
             {
-                if(_hidInterface.Generics.ContainsKey(device)){
+                if(_hidInterface.Generics.ContainsKey(device.PID)){
                   
                 // Debug.Log("Request Update Joy"+joystick.ID);
                 ((JoystickDevice)device).isReady = false;
 
-                     _hidInterface.Read(device,onPositionUpdate);
+                     _hidInterface.Read(device.PID,onRead);
                 }
 
                  //read from generic device

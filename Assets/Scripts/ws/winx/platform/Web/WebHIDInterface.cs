@@ -25,6 +25,9 @@ namespace ws.winx.platform.web
         internal readonly WebHIDBehaviour webHIDBehaviour;
         private Dictionary<int, HIDDevice> __Generics;
 
+		public event EventHandler<DeviceEventArgs<int>> DeviceDisconnectEvent;
+		public event EventHandler<DeviceEventArgs<IDevice>> DeviceConnectEvent;
+
        
         #endregion
 
@@ -33,15 +36,13 @@ namespace ws.winx.platform.web
         {
             __drivers = drivers;
            
-            __Generics=new Dictionary<pid,HIDDevice>();
+            __Generics=new Dictionary<int,HIDDevice>();
 
             //"{"id":"feed-face-VJoy Virtual Joystick","axes":[0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0,0,0,0,0,0,-1,0,0,0,0,0,0],"buttons":[{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}],"index":0}"
 
             _container = new GameObject("WebHIDBehaviourGO");
             webHIDBehaviour= _container.AddComponent<WebHIDBehaviour>();
-            webHIDBehaviour.DeviceDisconnectedEvent += new EventHandler<WebMessageArgs>(DeviceDisconnectedEventHandler);
-            webHIDBehaviour.DeviceConnectedEvent += new EventHandler<WebMessageArgs>(DeviceConnectedEventHandler);
-            webHIDBehaviour.GamePadEventsSupportEvent += new EventHandler<WebMessageArgs>(GamePadEventsSupportHandler);
+          
 
         }
         #endregion
@@ -53,22 +54,39 @@ namespace ws.winx.platform.web
 		}
 
 
-        public void Read(IDevice device, HIDDevice.ReadCallback callback)
+
+		public void Read (int pid, HIDDevice.ReadCallback callback, int timeout)
+		{
+			throw new NotImplementedException ();
+		}
+		public void Write (object data, int device, HIDDevice.WriteCallback callback, int timeout)
+		{
+			throw new NotImplementedException ();
+		}
+		public void Enumerate ()
+		{
+			webHIDBehaviour.DeviceDisconnectedEvent += new EventHandler<WebMessageArgs<int>>(DeviceDisconnectedEventHandler);
+			webHIDBehaviour.DeviceConnectedEvent += new EventHandler<WebMessageArgs<GenericHIDDevice>>(DeviceConnectedEventHandler);
+			webHIDBehaviour.GamePadEventsSupportEvent += new EventHandler<WebMessageArgs<bool>>(GamePadEventsSupportHandler);
+		}
+
+
+        public void Read(int pid, HIDDevice.ReadCallback callback)
         {
-            this.__Generics[device].Read(callback);
+            this.__Generics[pid].Read(callback);
         }
 
-        public void Write(object data, IDevice device, HIDDevice.WriteCallback callback)
+        public void Write(object data, int pid, HIDDevice.WriteCallback callback)
         {
             throw new NotImplementedException();
         }
 
-        public void Write(object data, IDevice device)
+        public void Write(object data, int pid)
         {
             throw new NotImplementedException();
         }
 
-        public Dictionary<IDevice, HIDDevice> Generics
+        public Dictionary<int, HIDDevice> Generics
         {
             get { return __Generics; }
 
@@ -126,7 +144,10 @@ namespace ws.winx.platform.web
                    // Debug.Log(__joysticks[deviceInfo.index]);
 
                     this.webHIDBehaviour.Log("Device index:" + joyDevice.Index+ " PID:" + joyDevice.PID + " VID:" + joyDevice.VID + " attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + deviceInfo.DevicePath + " Name:" + joyDevice.Name);
-                     this.__Generics[deviceInfo.PID]=deviceInfo;
+                    
+					webHIDBehaviour.PositionUpdateEvent += new EventHandler<WebMessageArgs<WebHIDReport>>(((GenericHIDDevice)deviceInfo).onPositionUpdate);
+
+					this.__Generics[deviceInfo.PID]=deviceInfo;
                 }
                 else
                 {
@@ -143,18 +164,28 @@ namespace ws.winx.platform.web
 
 
 
-        public void GamePadEventsSupportHandler(object sender, WebMessageArgs args)
+        public void GamePadEventsSupportHandler(object sender, WebMessageArgs<bool> args)
         {
            
         }
 
-        public void DeviceConnectedEventHandler(object sender,WebMessageArgs args)
+
+
+		/// <summary>
+		/// Devices the connected event handler.
+		/// </summary>
+		/// <param name="sender">Sender.</param>
+		/// <param name="args">Arguments.</param>
+        public void DeviceConnectedEventHandler(object sender,WebMessageArgs<GenericHIDDevice> args)
         {
            // UnityEngine.Debug.Log(args.Message);
-            GenericHIDDevice info=Json.Deserialize<GenericHIDDevice>(args.RawMessage) as GenericHIDDevice;
+			GenericHIDDevice info = args.RawMessage;
+
+
+
            
           
-             if(!__joysticks.ContainsKey(info.index))
+             if(!__Generics.ContainsKey(info.PID))
              {
                  info.hidInterface = this;
                  
@@ -162,17 +193,34 @@ namespace ws.winx.platform.web
              }
         }
 
-        public void DeviceDisconnectedEventHandler(object sender, WebMessageArgs args)
+
+
+		/// <summary>
+		/// Devices the disconnected event handler.
+		/// </summary>
+		/// <param name="sender">Sender.</param>
+		/// <param name="args">Arguments.</param>
+        public void DeviceDisconnectedEventHandler(object sender, WebMessageArgs<int> args)
         {
-          
-            int id = Int32.Parse(args.RawMessage);
-            this.webHIDBehaviour.Log("Device " + __joysticks[id].Name + " index:" + id + " Removed");
-            this.__Generics.Remove(__joysticks[id]);
-            __joysticks.Remove(id);
+            
+		
+
+		
+
+			if (__Generics.ContainsKey (args.RawMessage)) {
+				int PID=args.RawMessage;
+				string Name=__Generics[PID].Name;
+								this.webHIDBehaviour.Log ("Device " + Name + " PID:" + PID + " Removed");
+				this.__Generics.Remove (PID);
+	
+						}
            
            
              
         }
+
+
+
       
         
 
@@ -182,144 +230,15 @@ namespace ws.winx.platform.web
         }
 
 
-#region JoystickDevicesCollection
-
-        /// <summary>
-        /// Defines a collection of JoystickAxes.
-        /// </summary>
-        public sealed class JoystickDevicesCollection : IDeviceCollection
-        {
-#region Fields
-                readonly Dictionary<IntPtr, IDevice> JoystickDevices;
-                   // readonly Dictionary<IntPtr, IDevice<IAxisDetails, IButtonDetails, IDeviceExtension>> JoystickDevices;
-
-                readonly Dictionary<int, IntPtr> JoystickIDToDevice;
-
-
-            List<IDevice> _iterationCacheList;
-            bool _isEnumeratorDirty = true;
-
-#endregion
-
-#region Constructors
-
-            internal JoystickDevicesCollection()
-            {
-                
-                JoystickIDToDevice = new Dictionary<int, IntPtr>();
-
-                JoystickDevices = new Dictionary<IntPtr, IDevice>();
-            }
-
-#endregion
-
-#region Public Members
-
-#endregion
-
-#region IDeviceCollection implementation
-
-            public void Remove(IntPtr device)
-            {
-                JoystickIDToDevice.Remove(JoystickDevices[device].ID);
-                JoystickDevices.Remove(device);
-
-                _isEnumeratorDirty = true;
-            }
-
-
-            public void Remove(int inx)
-            {
-                IntPtr device = JoystickIDToDevice[inx];
-                JoystickIDToDevice.Remove(inx);
-                JoystickDevices.Remove(device);
-
-                _isEnumeratorDirty = true;
-            }
-
-
-
-
-            public IDevice this[int index]
-            {
-                get { return JoystickDevices[JoystickIDToDevice[index]]; }
-                				
-            }
-
-
-
-            public IDevice this[IntPtr pidPointer]
-            {
-                get { throw new Exception("Devices should be retrived only thru index"); }
-
-                set
-                {
-                    JoystickDevices[pidPointer] = value;
-                    JoystickIDToDevice[value.ID] = pidPointer;
-
-                    _isEnumeratorDirty = true;
-                }
-               
-            }
-
-
-            public bool ContainsKey(int key)
-            {
-                return JoystickIDToDevice.ContainsKey(key);
-            }
-
-            public bool ContainsKey(IntPtr key)
-            {
-                return JoystickDevices.ContainsKey(key);
-            }
-
-            public System.Collections.IEnumerator GetEnumerator()
-            {
-                if (_isEnumeratorDirty)
-                {
-					
-                    _iterationCacheList = JoystickDevices.Values.ToList<IDevice>();
-
-					
-
-                    _isEnumeratorDirty = false;
-
-
-                }
-
-                return _iterationCacheList.GetEnumerator();
-
-            }
-
-
-            public void Clear()
-            {
-                JoystickIDToDevice.Clear();
-                JoystickDevices.Clear();
-            }
-
-
-            /// <summary>
-            /// Gets a System.Int32 indicating the available amount of JoystickDevices.
-            /// </summary>
-            public int Count
-            {
-                get { return JoystickDevices.Count; }
-            }
-
-#endregion
-
-#endregion
-
 
 
            
-        }
+        
 
         public void Dispose()
         {
             this.__Generics.Clear();
-            __joysticks.Clear();
+           
         }
 
 
