@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Security;
 
 namespace ws.winx.platform.windows
 {
@@ -324,6 +325,142 @@ namespace ws.winx.platform.windows
         static internal extern bool WriteFile(IntPtr hFile, byte[] lpBuffer, uint nNumberOfBytesToWrite, out uint lpNumberOfBytesWritten, [In] ref System.Threading.NativeOverlapped lpOverlapped);
 
 
-    }
+
+
+		
+		[Flags]
+		internal enum PovType
+		{
+			None = 0x0,
+			Exists = 0x1,
+			Discrete = 0x2,
+			Continuous = 0x4
+		}
+		
+		
+		internal enum JoystickError : uint
+		{
+			NoError = 0,
+			InvalidParameters = 165,
+			NoCanDo = 166,
+			Unplugged = 167
+			//MM_NoDriver = 6,
+			//MM_InvalidParameter = 11
+		}
+		
+		[Flags]
+		internal enum JoystCapsFlags
+		{
+			HasZ = 0x1,
+			HasR = 0x2,
+			HasU = 0x4,
+			HasV = 0x8,
+			HasPov = 0x16,
+			HasPov4Dir = 0x32,
+			HasPovContinuous = 0x64
+		}
+		
+		
+		
+		internal struct JoyCaps
+		{
+			public ushort VID;
+			public ushort PID;
+			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+			public string
+			ProductName;
+			public int XMin;
+			public int XMax;
+			public int YMin;
+			public int YMax;
+			public int ZMin;
+			public int ZMax;
+			public int NumButtons;
+			public int PeriodMin;
+			public int PeriodMax;
+			public int RMin;
+			public int RMax;
+			public int UMin;
+			public int UMax;
+			public int VMin;
+			public int VMax;
+			public JoystCapsFlags Capabilities;
+			public int MaxAxes;
+			public int NumAxes;
+			public int MaxButtons;
+			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+			public string
+			RegKey;
+			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+			public string
+			OemVxD;
+			public static readonly int SizeInBytes;
+			
+			static JoyCaps()
+			{
+				SizeInBytes = Marshal.SizeOf(default(JoyCaps));
+			}
+		}
+		
+		[Flags]
+		internal enum JoystickFlags//:uint
+		{
+			X = 0x1,
+			Y = 0x2,
+			Z = 0x4,
+			R = 0x8,
+			U = 0x10,
+			V = 0x20,
+			Pov = 0x40,
+			Buttons = 0x80,
+			//			JOY_RETURNCENTERED=0x00000400,
+			All = X | Y | Z | R | U | V | Pov | Buttons
+		}
+		
+		
+		
+
+		internal struct JoyInfoEx
+		{
+			
+			public int Size;
+			[MarshalAs(UnmanagedType.I4)]
+			public JoystickFlags Flags;
+			public int XPos;
+			public int YPos;
+			public int ZPos;
+			public int RPos;
+			public int UPos;
+			public int VPos;
+			public uint Buttons;
+			public uint ButtonNumber;
+			public ushort Pov;
+			uint Reserved1;
+			uint Reserved2;
+			public static readonly int SizeInBytes;
+			
+			static JoyInfoEx()
+			{
+				
+				SizeInBytes = Marshal.SizeOf(default(JoyInfoEx));
+				
+			}
+		}
+		
+
+			[DllImport("Winmm.dll"), SuppressUnmanagedCodeSecurity]
+			internal static extern JoystickError joyGetPosEx(int uJoyID, ref JoyInfoEx pji);
+			
+			[DllImport("Winmm.dll"), SuppressUnmanagedCodeSecurity]
+			internal static extern JoystickError joyGetDevCaps(int uJoyID, out JoyCaps pjc, int cbjc);
+			
+			[DllImport("Winmm.dll"), SuppressUnmanagedCodeSecurity]
+			internal static extern int joyGetNumDevs();
+
+		
+
+
+		
+	}
 }
 #endif

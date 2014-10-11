@@ -97,6 +97,9 @@ namespace ws.winx.platform.osx
 
 				}
 
+		public HIDReport Read(int pid){
+			return Generics [pid].Read ();
+				}
 
 		public void Read (int pid, HIDDevice.ReadCallback callback)
 		{

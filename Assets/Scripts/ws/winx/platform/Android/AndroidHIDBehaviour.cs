@@ -7,11 +7,11 @@ using UnityEngine;
 
 namespace ws.winx.platform.android
 {
-    public class AndroidMessageArgs : EventArgs
+    public class AndroidMessageArgs<T> : EventArgs
     {
-         public readonly object data;
+         public readonly T data;
 
-         public AndroidMessageArgs(object data)
+         public AndroidMessageArgs(T data)
         {
             this.data = data;
 
@@ -24,7 +24,7 @@ namespace ws.winx.platform.android
       
         AndroidHIDListenerProxy listener = new AndroidHIDListenerProxy();
 
-        public event EventHandler<AndroidMessageArgs> DeviceConnectedEvent
+        public event EventHandler<AndroidMessageArgs<AndroidJavaObject>> DeviceConnectedEvent
         {
             add
             {
@@ -37,7 +37,7 @@ namespace ws.winx.platform.android
             }
         }
 
-        public event EventHandler<AndroidMessageArgs> DeviceDisconnectedEvent
+        public event EventHandler<AndroidMessageArgs<int>> DeviceDisconnectedEvent
         {
             add
             {
@@ -70,13 +70,17 @@ namespace ws.winx.platform.android
             UnityEngine.Debug.Log("AndroidHIDBehaviour >>>>> AndroidHID" + droidHID);  
                 //new AndroidJavaObject("ws.winx.hid.AndroidHID", activity, listener);
 
-            droidHID.CallStatic("Enumerate");
+			//call Enumerate inside AndoridHID Native pluggin
+            //droidHID.CallStatic("Enumerate");
         }
 
 
-//          public void Enumerate(){
-  //droidHID.CallStatic("Enumerate");
-//}
+		/// <summary>
+		/// Enumerate inside AndoridHID Native pluggin
+		/// </summary>
+          public void Enumerate(){
+  				droidHID.CallStatic("Enumerate");
+		  }
 
        
 

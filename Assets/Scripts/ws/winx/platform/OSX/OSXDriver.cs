@@ -228,7 +228,7 @@ namespace ws.winx.platform.osx
          public void Update(IDevice device)	
 		{
 
-			HIDReport report = _hidInterface.Generics [device.PID].Read ();
+			HIDReport report = _hidInterface.Read (device.PID);
 
 			if (report.Status == HIDReport.ReadStatus.Success) {
 

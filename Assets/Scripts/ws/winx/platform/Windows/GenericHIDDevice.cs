@@ -14,6 +14,9 @@ using System.Runtime.InteropServices;
 using ws.winx.devices;
 using System.Timers;
 using System.Diagnostics;
+using System.Collections.Generic;
+
+
 namespace ws.winx.platform.windows
 {
     public enum DeviceMode
@@ -85,11 +88,20 @@ namespace ws.winx.platform.windows
 
 
 
-       
+		internal Native.JoyInfoEx info;
 
 
 
-        public GenericHIDDevice(int index, int VID, int PID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath, string name = ""):base(index,VID,PID,deviceHandle,hidInterface,devicePath,name)
+		List<byte[]> _data;
+
+		public List<byte[]> CompactDeviceData {
+			get {
+				if(_data==null) _data=new List<byte[]>(8);
+				return _data;
+			}
+		}		
+		
+		public GenericHIDDevice(int index, int VID, int PID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath, string name = ""):base(index,VID,PID,deviceHandle,hidInterface,devicePath,name)
         {
             try
             {
@@ -99,7 +111,12 @@ namespace ws.winx.platform.windows
               
                 CloseDeviceIO(hidHandle);
 
-                __lastHIDReport = new HIDReport(this.index, CreateInputBuffer(),HIDReport.ReadStatus.Success);
+				info = new Native.JoyInfoEx();
+				info.Size = Native.JoyInfoEx.SizeInBytes;
+				info.Flags = Native.JoystickFlags.All;
+			
+				
+				__lastHIDReport = new HIDReport(this.index, CreateInputBuffer(),HIDReport.ReadStatus.NoDataRead);
                 
             }
             catch (Exception exception)
@@ -163,43 +180,86 @@ namespace ws.winx.platform.windows
             IsOpen = false;
         }
 
-      
 
-        override public void Read(ReadCallback callback)
-        {
-            Read(callback, 0);
-        }
+		public override HIDReport Read ()
+		{
+			//thru to get joystick info
+			Native.JoystickError result = Native.joyGetPosEx(__lastHIDReport.index, ref info);
 
-        override public void Read(ReadCallback callback,int timeout)
-        {
-            if (IsReadInProgress)
-            {
-                //UnityEngine.Debug.Log("Clone paket");
-                __lastHIDReport.Status = HIDReport.ReadStatus.Resent;
-                callback.BeginInvoke(__lastHIDReport, EndReadCallback, callback);
-                // callback.Invoke(__lastHIDReport);
-                return;
-            }
-
-            IsReadInProgress = true;
-
-            //TODO make this fields or use pool
-            var readDelegate = new ReadDelegate(Read);
-            var asyncState = new HidAsyncState(readDelegate, callback);
-             readDelegate.BeginInvoke(timeout,EndRead, asyncState);
-        }
+			
+			if (result == Native.JoystickError.NoError) {
 
 
-      
-      
+								CompactDeviceData [0] = BitConverter.GetBytes (info.Buttons);//4B
+								CompactDeviceData [1] = BitConverter.GetBytes (info.Pov);//2B	
+								CompactDeviceData [2] = BitConverter.GetBytes (info.XPos);//4B
+								CompactDeviceData [3] = BitConverter.GetBytes (info.YPos);
+								CompactDeviceData [4] = BitConverter.GetBytes (info.ZPos);
+								CompactDeviceData [5] = BitConverter.GetBytes (info.RPos);
+								CompactDeviceData [6] = BitConverter.GetBytes (info.UPos);
+								CompactDeviceData [7] = BitConverter.GetBytes (info.VPos);
 
-        protected HIDReport Read(int timeout)
-        {
-            
-                if (IsOpen == false) OpenDevice();
-                try
-                {
-                    return ReadData(timeout);
+								byte[] compactByteArray = new byte[ 30 ];
+								int inx = 0;
+								int len;
+
+								for (int i=0; i<8; i++) {
+										len = CompactDeviceData [i].Length;
+										System.Buffer.BlockCopy (CompactDeviceData [i], 0, compactByteArray, inx, len);
+										inx += len;
+					
+								}
+				
+
+				
+								__lastHIDReport.Data = compactByteArray;
+								__lastHIDReport.Status = HIDReport.ReadStatus.Success;
+				
+						} else {
+							__lastHIDReport.Data=new byte[1];
+							__lastHIDReport.Status=HIDReport.ReadStatus.ReadError;
+						}
+
+
+			return __lastHIDReport;
+		}
+		
+		
+		override public void Read(ReadCallback callback)
+		{
+			Read(callback, 0);
+		}
+		
+		override public void Read(ReadCallback callback,int timeout)
+		{
+			if (IsReadInProgress)
+			{
+				//UnityEngine.Debug.Log("Clone paket");
+				__lastHIDReport.Status = HIDReport.ReadStatus.Resent;
+				callback.BeginInvoke(__lastHIDReport, EndReadCallback, callback);
+				// callback.Invoke(__lastHIDReport);
+				return;
+			}
+			
+			IsReadInProgress = true;
+			
+			//TODO make this fields or use pool
+			var readDelegate = new ReadDelegate(Read);
+			var asyncState = new HidAsyncState(readDelegate, callback);
+			readDelegate.BeginInvoke(timeout,EndRead, asyncState);
+		}
+		
+		
+		
+		
+		
+		protected HIDReport Read(int timeout)
+		{
+			
+			if (IsOpen == false) OpenDevice();
+			try
+			{
+				return ReadData(timeout);
                 }
                 catch
                 {

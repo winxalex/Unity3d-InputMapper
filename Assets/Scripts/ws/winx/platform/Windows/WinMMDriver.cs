@@ -17,12 +17,14 @@ namespace ws.winx.platform.windows
 
 
         int devicesSupported;
-        JoyInfoEx info;
-        int[] joyPositions;
+       
+       
         bool disposed;
         
 
 
+
+		IHIDInterface _hidInterface;
         #endregion
 
         #region Constructors
@@ -30,12 +32,10 @@ namespace ws.winx.platform.windows
         public WinMMDriver()
         {
 
-            info = new JoyInfoEx();
-            info.Size = JoyInfoEx.SizeInBytes;
-            info.Flags = JoystickFlags.All;
+            
 
 
-            joyPositions = new int[6];
+           
         }
 
         #endregion
@@ -49,50 +49,25 @@ namespace ws.winx.platform.windows
         #region IJoystickDriver implementation
 
 
-        public void Update(IDevice joystick)
+        public void Update(IDevice device)
         {
-            // UnityEngine.Debug.Log("Update Driver called from:" + joystick.PID+" ID:"+joystick.ID);
-
-            //try
-            //{
-            //    throw new Exception("test");
-            //}
-            //catch (Exception e)
-            //{
-            //    UnityEngine.Debug.Log(e.StackTrace);
-            //}
+			HIDReport report = _hidInterface.Read (device.PID);
 
 
 
-
-
-            //thru to get joystick info
-            JoystickError result = UnsafeNativeMethods.joyGetPosEx(joystick.Index, ref info);
-
-            //			if (result == JoystickError.NoError && joystick.ID==3){
-            //			   UnityEngine.Debug.Log("Update Joy"+joystick.PID+"++"+joystick.VID+" i"+info.Buttons);
-            //			}
-
-            //                        for(int i=0;i<16;i++){
-            //			
-            //                                result= UnsafeNativeMethods.joyGetPosEx(i, ref info);
-            //                //UnityEngine.Debug.Log(result);
-            //                            if (result == JoystickError.NoError){
-            //                               // break;
-            //                                UnityEngine.Debug.Log("ID:"+i+" on PID:"+joystick.PID+" ");
-            //                            }
-            //                        }
-
-            if (result == JoystickError.NoError)
+            if (report.Status==HIDReport.ReadStatus.Success)
             {
 
                 //while buttons
                 int buttonInx = 0;
-                var numButtons = joystick.Buttons.Count;
+                var numButtons = device.Buttons.Count;
+
+				uint ButtonsFlag=BitConverter.ToUInt32(report.Data,0);
+
                 while (buttonInx < numButtons)
                 {
                     //stick.SetButton (buttonInx, (info.Buttons & (1 << buttonInx)) != 0);
-                    joystick.Buttons[buttonInx].value = info.Buttons & (1 << buttonInx);
+                    device.Buttons[buttonInx].value = ButtonsFlag & (1 << buttonInx);
                     buttonInx++;
                 }
 
@@ -101,14 +76,9 @@ namespace ws.winx.platform.windows
                 IAxisDetails axisDetails;
 
                 int axisIndex = 0;
-                int numAxis = joystick.Axis.Count - joystick.numPOV * 2;//minus POV axes
+                int numAxis = device.Axis.Count - device.numPOV * 2;//minus POV axes
 
-                joyPositions[0] = info.XPos;
-                joyPositions[1] = info.YPos;
-                joyPositions[2] = info.ZPos;
-                joyPositions[3] = info.RPos;
-                joyPositions[4] = info.UPos;
-                joyPositions[5] = info.VPos;
+             ;
 
                 // UnityEngine.Debug.Log("XPos:"+info.XPos+" YPos:" + info.YPos + " ZPos:" + info.ZPos+" RPos:"+info.RPos+" UPos:"+info.UPos);
 
@@ -121,16 +91,20 @@ namespace ws.winx.platform.windows
 
                 //axisDetails.value = CalculateOffset((float)joyPositions[1], axisDetails.min, axisDetails.max);
 
+				float value;
 
                 while (axisIndex < numAxis)
                 {
-                    axisDetails = joystick.Axis[axisIndex];
-                    if (axisDetails != null)
-                        if (axisDetails.isTrigger)
-                            axisDetails.value = NormalizeTrigger((float)joyPositions[axisIndex], axisDetails.min, axisDetails.max);
-                        else
-                            axisDetails.value = NormalizeAxis((float)joyPositions[axisIndex], axisDetails.min, axisDetails.max);
+                    axisDetails = device.Axis[axisIndex];
+                    if (axisDetails != null){
 
+						value=BitConverter.ToInt32(report.Data,axisIndex*4+6);
+
+                        if (axisDetails.isTrigger)
+                            axisDetails.value = NormalizeTrigger(value, axisDetails.min, axisDetails.max);
+                        else
+                            axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max);
+					}
 
                     axisIndex++;
                 }
@@ -139,33 +113,33 @@ namespace ws.winx.platform.windows
                 //UnityEngine.Debug.Log("YPos: "+info.YPos+"Joy:"+joystick.ID+" vle"+joystick.Axis[JoystickAxis.AxisY].value);
 
                 //set Point of View(Hat) if exist
-                if ((joystick.numPOV) > 0)
+                if ((device.numPOV) > 0)
                 {
 
                     int x = 0;
                     int y = 0;
 
 
-                    //	UnityEngine.Debug.Log("Pov is"+info.Pov);
+                    //	UnityEngine.Debug.Log("Pov is"+povPos);
+					JoystickPovPosition povPos=(JoystickPovPosition)BitConverter.ToUInt16(report.Data,4);
 
-
-                    if ((JoystickPovPosition)info.Pov != JoystickPovPosition.Centered)
+                    if (povPos != JoystickPovPosition.Centered)
                     {
-                        if (info.Pov > (ushort)JoystickPovPosition.Left || info.Pov < (ushort)JoystickPovPosition.Right)
+                        if (povPos > JoystickPovPosition.Left || povPos < JoystickPovPosition.Right)
                         { y = 1; }
-                        if ((info.Pov > 0) && (info.Pov < (int)JoystickPovPosition.Backward))
+                        if ((povPos > 0) && (povPos < JoystickPovPosition.Backward))
                         { x = 1; }
-                        if ((info.Pov > (ushort)JoystickPovPosition.Right) && (info.Pov < (ushort)JoystickPovPosition.Left))
+                        if ((povPos > JoystickPovPosition.Right) && (povPos < JoystickPovPosition.Left))
                         { y = -1; }
-                        if (info.Pov > (ushort)JoystickPovPosition.Backward)
+                        if (povPos > JoystickPovPosition.Backward)
                         { x = -1; }
                     }
 
                     //UnityEngine.Debug.Log(x+" "+y);
 
 
-                    joystick.Axis[JoystickAxis.AxisPovX].value = x;
-                    joystick.Axis[JoystickAxis.AxisPovY].value = y;
+                    device.Axis[JoystickAxis.AxisPovX].value = x;
+                    device.Axis[JoystickAxis.AxisPovY].value = y;
 
 
 
@@ -190,27 +164,22 @@ namespace ws.winx.platform.windows
 
         public IDevice ResolveDevice(IHIDDevice hidDevice)
         {
-          
-
-            return CreateDevice(hidDevice);
-        }
-
-        public IDevice CreateDevice(IHIDDevice hidDevice)
-        {
-            JoystickDevice joystick;
+			_hidInterface = hidDevice.hidInterface;
+				
+				JoystickDevice joystick;
 
             //Get jostick capabilities
-            JoyCaps caps;
-            JoystickError result = JoystickError.InvalidParameters;
+            Native.JoyCaps caps;
+            Native.JoystickError result = Native.JoystickError.InvalidParameters;
 
             int i;
             for (i = 0; i < 16; i++)
             {
 
-                result = UnsafeNativeMethods.joyGetDevCaps(i, out caps, JoyCaps.SizeInBytes);
+                result = Native.joyGetDevCaps(i, out caps, Native.JoyCaps.SizeInBytes);
 
 
-                if (result == JoystickError.NoError && caps.PID == hidDevice.PID && hidDevice.VID == caps.VID)
+                if (result == Native.JoystickError.NoError && caps.PID == hidDevice.PID && hidDevice.VID == caps.VID)
                 {
 
 
@@ -298,20 +267,21 @@ namespace ws.winx.platform.windows
                         axis++;
                     }
 
-                    if ((caps.Capabilities & JoystCapsFlags.HasPov) != 0)
+                    if ((caps.Capabilities & Native.JoystCapsFlags.HasPov) != 0)
                     {
                         joystick.Axis[JoystickAxis.AxisPovX] = new AxisDetails();
                         joystick.Axis[JoystickAxis.AxisPovY] = new AxisDetails();
 
 
                         joystick.numPOV = 1;
-                        WinDefaultExtension extension = joystick.Extension as WinDefaultExtension;
 
-                        extension.PovType = PovType.Exists;
-                        if ((caps.Capabilities & JoystCapsFlags.HasPov4Dir) != 0)
-                            extension.PovType |= PovType.Discrete;
-                        if ((caps.Capabilities & JoystCapsFlags.HasPovContinuous) != 0)
-                            extension.PovType |= PovType.Continuous;
+//                        WinDefaultExtension extension = joystick.Extension as WinDefaultExtension;
+//
+//                        extension.PovType = Native.PovType.Exists;
+//                        if ((caps.Capabilities & Native.JoystCapsFlags.HasPov4Dir) != 0)
+//                            extension.PovType |= Native.PovType.Discrete;
+//                        if ((caps.Capabilities & Native.JoystCapsFlags.HasPovContinuous) != 0)
+//                            extension.PovType |= Native.PovType.Continuous;
                     }
 
 
@@ -413,141 +383,7 @@ namespace ws.winx.platform.windows
 
         #endregion
 
-        #region UnsafeNativeMethods, flags, structs
-
-        [Flags]
-        public enum PovType
-        {
-            None = 0x0,
-            Exists = 0x1,
-            Discrete = 0x2,
-            Continuous = 0x4
-        }
-
-
-        public enum JoystickError : uint
-        {
-            NoError = 0,
-            InvalidParameters = 165,
-            NoCanDo = 166,
-            Unplugged = 167
-            //MM_NoDriver = 6,
-            //MM_InvalidParameter = 11
-        }
-
-        [Flags]
-        public enum JoystCapsFlags
-        {
-            HasZ = 0x1,
-            HasR = 0x2,
-            HasU = 0x4,
-            HasV = 0x8,
-            HasPov = 0x16,
-            HasPov4Dir = 0x32,
-            HasPovContinuous = 0x64
-        }
-
-
-
-        public struct JoyCaps
-        {
-            public ushort VID;
-            public ushort PID;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-            public string
-            ProductName;
-            public int XMin;
-            public int XMax;
-            public int YMin;
-            public int YMax;
-            public int ZMin;
-            public int ZMax;
-            public int NumButtons;
-            public int PeriodMin;
-            public int PeriodMax;
-            public int RMin;
-            public int RMax;
-            public int UMin;
-            public int UMax;
-            public int VMin;
-            public int VMax;
-            public JoystCapsFlags Capabilities;
-            public int MaxAxes;
-            public int NumAxes;
-            public int MaxButtons;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-            public string
-            RegKey;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-            public string
-            OemVxD;
-            public static readonly int SizeInBytes;
-
-            static JoyCaps()
-            {
-                SizeInBytes = Marshal.SizeOf(default(JoyCaps));
-            }
-        }
-
-        [Flags]
-        enum JoystickFlags//:uint
-        {
-            X = 0x1,
-            Y = 0x2,
-            Z = 0x4,
-            R = 0x8,
-            U = 0x10,
-            V = 0x20,
-            Pov = 0x40,
-            Buttons = 0x80,
-            //			JOY_RETURNCENTERED=0x00000400,
-            All = X | Y | Z | R | U | V | Pov | Buttons
-        }
-
-
-
-
-        struct JoyInfoEx
-        {
-
-            public int Size;
-            [MarshalAs(UnmanagedType.I4)]
-            public JoystickFlags Flags;
-            public int XPos;
-            public int YPos;
-            public int ZPos;
-            public int RPos;
-            public int UPos;
-            public int VPos;
-            public uint Buttons;
-            public uint ButtonNumber;
-            public ushort Pov;
-            uint Reserved1;
-            uint Reserved2;
-            public static readonly int SizeInBytes;
-
-            static JoyInfoEx()
-            {
-
-                SizeInBytes = Marshal.SizeOf(default(JoyInfoEx));
-
-            }
-        }
-
-        static class UnsafeNativeMethods
-        {
-            [DllImport("Winmm.dll"), SuppressUnmanagedCodeSecurity]
-            public static extern JoystickError joyGetPosEx(int uJoyID, ref JoyInfoEx pji);
-
-            [DllImport("Winmm.dll"), SuppressUnmanagedCodeSecurity]
-            public static extern JoystickError joyGetDevCaps(int uJoyID, out JoyCaps pjc, int cbjc);
-
-            [DllImport("Winmm.dll"), SuppressUnmanagedCodeSecurity]
-            public static extern int joyGetNumDevs();
-        }
-
-        #endregion
-
+       
 
 
 
@@ -841,7 +677,7 @@ namespace ws.winx.platform.windows
 
         public sealed class WinDefaultExtension : IDeviceExtension
         {
-            public PovType PovType;
+            
         }
 
 

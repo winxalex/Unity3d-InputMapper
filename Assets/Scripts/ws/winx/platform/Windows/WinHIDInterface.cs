@@ -67,7 +67,9 @@ namespace ws.winx.platform.windows
 
 
         #region IHIDInterface implementation
-
+		public HIDReport Read(int pid){
+			return this.__Generics [pid].Read ();
+	    }
 
         public void Read(int pid,HIDDevice.ReadCallback callback,int timeout)
         {

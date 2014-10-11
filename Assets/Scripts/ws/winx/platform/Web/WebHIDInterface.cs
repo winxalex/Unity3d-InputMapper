@@ -18,12 +18,12 @@ namespace ws.winx.platform.web
         private List<IDriver> __drivers;// = new List<IJoystickDriver>();
        
         private IDriver __defaultJoystickDriver;
-        JoystickDevicesCollection __joysticks;
+      
         GameObject _container;
 
         //link towards Browser
         internal readonly WebHIDBehaviour webHIDBehaviour;
-        private Dictionary<IDevice, HIDDevice> __Generics;
+        private Dictionary<int, HIDDevice> __Generics;
 
        
         #endregion
@@ -32,8 +32,8 @@ namespace ws.winx.platform.web
         public WebHIDInterface(List<IDriver> drivers)
         {
             __drivers = drivers;
-            __joysticks = new JoystickDevicesCollection();
-            __Generics=new Dictionary<IDevice,HIDDevice>();
+           
+            __Generics=new Dictionary<pid,HIDDevice>();
 
             //"{"id":"feed-face-VJoy Virtual Joystick","axes":[0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0,0,0,0,0,0,-1,0,0,0,0,0,0],"buttons":[{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}],"index":0}"
 
@@ -47,6 +47,10 @@ namespace ws.winx.platform.web
         #endregion
 
         #region IHIDInterface implementation
+
+		public HIDReport Read(int pid){
+			throw new NotImplementedException ();
+		}
 
 
         public void Read(IDevice device, HIDDevice.ReadCallback callback)
@@ -84,10 +88,7 @@ namespace ws.winx.platform.web
             }
         }
 
-        public IDeviceCollection Devices
-        {
-            get { return __joysticks; }
-        }
+      
 
 
 
@@ -107,11 +108,9 @@ namespace ws.winx.platform.web
                     joyDevice = driver.ResolveDevice(deviceInfo);
                     if (joyDevice != null)
                     {
-                        //new IntPtr just for compatibility
-                        __joysticks[new IntPtr(joyDevice.PID)] = joyDevice;
-
+                      
                         this.webHIDBehaviour.Log("Device PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + driver.GetType().ToString());
-                        this.__Generics[joyDevice]=deviceInfo;
+                        this.__Generics[deviceInfo.PID]=deviceInfo;
                         break;
                     }
                 }
@@ -124,13 +123,10 @@ namespace ws.winx.platform.web
                 if (joyDevice != null)
                 {
 
-                    //new IntPtr just for compatibility
-                    __joysticks[new IntPtr(joyDevice.PID)] = joyDevice;
-
                    // Debug.Log(__joysticks[deviceInfo.index]);
 
-                    this.webHIDBehaviour.Log("Device index:" + joyDevice.ID + " PID:" + joyDevice.PID + " VID:" + joyDevice.VID + " attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + deviceInfo.DevicePath + " Name:" + joyDevice.Name);
-                     this.__Generics[joyDevice]=deviceInfo;
+                    this.webHIDBehaviour.Log("Device index:" + joyDevice.Index+ " PID:" + joyDevice.PID + " VID:" + joyDevice.VID + " attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + deviceInfo.DevicePath + " Name:" + joyDevice.Name);
+                     this.__Generics[deviceInfo.PID]=deviceInfo;
                 }
                 else
                 {
