@@ -33,7 +33,7 @@ using System.Text;
 namespace ws.winx.platform.osx
 {
 
-	using CFRunLoop = IntPtr;
+	using CFRunLoopRef = IntPtr;
 	using CFAllocatorRef=System.IntPtr;
 	using CFDictionaryRef=System.IntPtr;
 	using CFStringRef=System.IntPtr;
@@ -86,14 +86,23 @@ namespace ws.winx.platform.osx
 	
 		
 		[DllImport(appServices)]
-		internal static extern CFRunLoop CFRunLoopGetCurrent();
+		internal static extern CFRunLoopRef CFRunLoopGetCurrent();
 		
 		[DllImport(appServices)]
-		internal static extern CFRunLoop CFRunLoopGetMain();
+		internal static extern CFRunLoopRef CFRunLoopGetMain();
 		
 		[DllImport(appServices)]
 		internal static extern CFRunLoopExitReason CFRunLoopRunInMode(
 			IntPtr cfstrMode, double interval, bool returnAfterSourceHandled);
+
+	
+
+		[DllImport(appServices)]
+		internal static extern void CFRunLoopRun();
+
+		[DllImport(appServices)]
+		internal static extern void CFRunLoopStop(CFRunLoopRef rl);
+
 
 		#region CFArray Func
 		[DllImport(coreFoundationLibrary)]
@@ -284,7 +293,9 @@ namespace ws.winx.platform.osx
 
 		[DllImport(coreFoundationLibrary)]
 		internal static extern void CFRelease (CFTypeRef cf);
-		
+
+
+		#region HID DLL
 		[DllImport(hid)]
 		public static extern IOHIDManagerRef IOHIDManagerCreate(
 			CFAllocatorRef allocator, IOOptionBits options);
@@ -318,7 +329,7 @@ namespace ws.winx.platform.osx
 		[DllImport(hid)]
 		public static extern void IOHIDManagerScheduleWithRunLoop(
 			IOHIDManagerRef inIOHIDManagerRef,
-			CFRunLoop inCFRunLoop,
+			CFRunLoopRef inCFRunLoop,
 			CFStringRef inCFRunLoopMode);
 		
 		[DllImport(hid)]
@@ -352,6 +363,10 @@ namespace ws.winx.platform.osx
 		public static extern IOReturn IOHIDDeviceOpen(
 			IOHIDDeviceRef manager,
 			IOOptionBits opts);
+
+		[DllImport(hid)]
+		public static extern IOReturn IOHIDDeviceClose( IOHIDDeviceRef  IOHIDDeviceRef,  // IOHIDDeviceRef for the HID device
+		                          IOOptionBits    inOptions ); // Option bits to be sent down to the HID device
 		
 		[DllImport(hid)]
 		public static extern CFTypeRef IOHIDDeviceGetProperty(
@@ -384,18 +399,24 @@ namespace ws.winx.platform.osx
 		[DllImport(hid)]
 		public static extern void IOHIDDeviceScheduleWithRunLoop(
 			IOHIDDeviceRef device,
-			CFRunLoop inCFRunLoop,
+			CFRunLoopRef inCFRunLoop,
 			CFStringRef inCFRunLoopMode);
 		
 		
 		[DllImport(hid)]
 		public static extern bool IOHIDElementHasNullState(
 			IOHIDElementRef element);
+
+		[DllImport(hid)]
+		public static extern void IOHIDDeviceUnscheduleFromRunLoop(
+			IOHIDDeviceRef device,
+			CFRunLoopRef runLoop,
+			CFStringRef runLoopMode);// AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER;
 		
 		[DllImport(hid)]
 		public static extern void IOHIDDeviceUnscheduleWithRunLoop(
 			IOHIDDeviceRef device,
-			CFRunLoop inCFRunLoop,
+			CFRunLoopRef inCFRunLoop,
 			CFString inCFRunLoopMode);
 		
 		[DllImport(hid)]
@@ -436,13 +457,37 @@ namespace ws.winx.platform.osx
 		[DllImport(hid)]
 		public static extern CFIndex IOHIDValueGetLength(IOHIDValueRef value);
 
+		[DllImport(hid)]
+		public static extern void IOHIDDeviceRegisterInputReportCallback(
+			IOHIDDeviceRef device, // IOHIDDeviceRef for the HID device
+			IntPtr report,  // pointer to the report data ( uint8_t's )
+			CFIndex reportLength,// number of bytes in the report ( CFIndex )
+			IOHIDReportCallback callback, // the callback routine
+			IntPtr context); //AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER;
 
+		#endregion
 		
 		
-		
+			public delegate void IOHIDReportCallback(
+				IntPtr          inContext,          // context from IOHIDDeviceRegisterInputReportCallback
+				IOReturn        inResult,           // completion result for the input report operation
+				IOHIDDeviceRef   inSender,           // IOHIDDeviceRef of the device this report is from
+				IOHIDReportType inType,             // the report type
+				uint        inReportID,         // the report ID
+				IntPtr       inReport,           // pointer to the report data
+			CFIndex         inReportLength ); // the actual size of the input report
+
+
 		public delegate void IOHIDDeviceCallback(IntPtr ctx, IOReturn res, IntPtr sender, IOHIDDeviceRef device);
 		public delegate void IOHIDValueCallback(IntPtr ctx, IOReturn res, IntPtr sender, IOHIDValueRef val);
 
+
+		internal enum IOHIDReportType{
+			kIOHIDReportTypeInput = 0,
+			kIOHIDReportTypeOutput,
+			kIOHIDReportTypeFeature,
+			kIOHIDReportTypeCount
+		};
 
 		internal enum IOReturn{
 			kIOReturnSuccess =0,//        KERN_SUCCESS            // OK

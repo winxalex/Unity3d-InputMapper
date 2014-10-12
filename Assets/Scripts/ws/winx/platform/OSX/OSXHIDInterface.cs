@@ -54,7 +54,7 @@ namespace ws.winx.platform.osx
 
         Native.IOHIDDeviceCallback HandleDeviceAdded;
         Native.IOHIDDeviceCallback HandleDeviceRemoved;
-        Native.IOHIDValueCallback HandleDeviceValueReceived;
+     
 
         bool disposed;
 

@@ -17,6 +17,7 @@ namespace ws.winx.platform.osx
 
 	
 	using CFString = System.IntPtr;
+
 	
 	using CFTypeRef = System.IntPtr;
 	using IOHIDDeviceRef = System.IntPtr;
@@ -27,19 +28,38 @@ namespace ws.winx.platform.osx
 	using IOReturn =Native.IOReturn;// System.IntPtr;
 	
 	using IOHIDElementType=Native.IOHIDElementType;
+	using CFIndex =System.Int64;
 
-
-
-
-
-		public class GenericHIDDevice:HIDDevice
-		{
-
-
-
+	public class HidAsyncState
+	{
+		private readonly object _callerDelegate;
+		private readonly object _callbackDelegate;
 		
-			private HIDReport __lastHIDReport;
-			
+		public HidAsyncState(object callerDelegate, object callbackDelegate)
+		{
+			_callerDelegate = callerDelegate;
+			_callbackDelegate = callbackDelegate;
+		}
+		
+		public object CallerDelegate { get { return _callerDelegate; } }
+		public object CallbackDelegate { get { return _callbackDelegate; } }
+	}
+	
+	
+	
+	public class GenericHIDDevice:HIDDevice
+	{
+		
+		protected delegate HIDReport ReadDelegate(int timeout);
+		private delegate bool WriteDelegate(byte[] data,int timeout);
+		
+		readonly IntPtr RunLoop = Native.CFRunLoopGetCurrent();
+
+		volatile bool IsReadInProgress = false;
+
+		private HIDReport __lastHIDReport;
+
+		public bool IsOpen { get; private set; }
 			
 		private int _InputReportByteLength=16;
 			
@@ -58,11 +78,25 @@ namespace ws.winx.platform.osx
 			}
 
 
+		private IntPtr __deviceHandle;
 
 				public GenericHIDDevice (int index, int VID, int PID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath, 
 		        string name = ""):base(index,VID,PID,deviceHandle,hidInterface,devicePath,name)
 				{
-					__lastHIDReport = new HIDReport(this.index, CreateInputBuffer(),HIDReport.ReadStatus.Success);	
+					__deviceHandle = deviceHandle;
+
+			        try{
+
+				OpenDevice();
+				CloseDevice();
+
+
+				__lastHIDReport = new HIDReport(this.index, CreateInputBuffer(),HIDReport.ReadStatus.Success);	
+			}catch(Exception e){
+
+				UnityEngine.Debug.LogException(e);
+						}
+					
 				}
 
 
@@ -94,10 +128,29 @@ namespace ws.winx.platform.osx
 
 
 
+		internal void IOHIDReportCallback(
+			IntPtr          inContext,          // context from IOHIDDeviceRegisterInputReportCallback
+			IOReturn        inResult,           // completion result for the input report operation
+			IOHIDDeviceRef   inSender,           // IOHIDDeviceRef of the device this report is from
+			Native.IOHIDReportType inType,             // the report type
+			uint        inReportID,         // the report ID
+			IntPtr       inReport,           // pointer to the report data
+			CFIndex         inReportLength ){
 
 
 
+			byte[] buffer = new byte[inReportLength];
+			Marshal.Copy(inReport, buffer, 0, (int)inReportLength);
 
+			__lastHIDReport.Data = buffer;
+
+		
+
+			Native.CFRunLoopStop(RunLoop);
+
+
+	    }
+		
 		/// <summary>
 		/// Devices the value received.
 		/// </summary>
@@ -149,12 +202,174 @@ namespace ws.winx.platform.osx
 		}
 
 
-
-
-
-
-
-
+		override public void Read(ReadCallback callback)
+		{
+			Read(callback, 0);
 		}
-}
+		
+		override public void Read(ReadCallback callback,int timeout)
+		{
+			if (IsReadInProgress)
+			{
+				//UnityEngine.Debug.Log("Clone paket");
+				__lastHIDReport.Status = HIDReport.ReadStatus.Resent;
+				callback.BeginInvoke(__lastHIDReport, EndReadCallback, callback);
+				// callback.Invoke(__lastHIDReport);
+				return;
+			}
+			
+			IsReadInProgress = true;
+			
+			//TODO make this fields or use pool
+			var readDelegate = new ReadDelegate(Read);
+			var asyncState = new HidAsyncState(readDelegate, callback);
+			readDelegate.BeginInvoke(timeout,EndRead, asyncState);
+		}
 
+
+
+
+
+		protected HIDReport Read(int timeout)
+		{
+			
+			if (IsOpen == false) OpenDevice();
+			try
+			{
+				return ReadData(timeout);
+			}
+			catch
+			{
+				return new HIDReport(-1,null,HIDReport.ReadStatus.ReadError);
+			}
+			
+			
+			
+		}
+
+		protected HIDReport ReadData(int timeout)
+		{
+			var buffer = new byte[] { };
+			var status = HIDReport.ReadStatus.NoDataRead;
+		
+			if (InputReportByteLength > 0)
+			{
+
+				
+				buffer = CreateInputBuffer();
+
+
+				IntPtr bufferIntPtr = Marshal.AllocHGlobal(buffer.Length);
+				Marshal.Copy(buffer, 0, bufferIntPtr, buffer.Length);
+
+				
+				
+				// Register a callback		
+				Native.IOHIDDeviceRegisterInputReportCallback(__deviceHandle, bufferIntPtr, InputReportByteLength,IOHIDReportCallback, IntPtr.Zero);
+				
+				// Schedule the device on the current run loop in case it isn't already scheduled
+				Native.IOHIDDeviceScheduleWithRunLoop(__deviceHandle, RunLoop, Native.RunLoopModeDefault);
+				
+				
+				
+				Marshal.FreeHGlobal(bufferIntPtr);
+
+				
+				if (timeout>0)
+				{
+					// Trap in the run loop until a report is received
+					Native.CFRunLoopRunInMode(Native.RunLoopModeDefault,timeout,false);
+					
+					// The run loop has returned, so unschedule the device
+					Native.IOHIDDeviceUnscheduleFromRunLoop(__deviceHandle, RunLoop, Native.RunLoopModeDefault);
+				}
+				else
+				{
+					try
+					{
+
+
+
+						// Trap in the run loop until a report is received
+						Native.CFRunLoopRun();
+						
+						// The run loop has returned, so unschedule the device
+						Native.IOHIDDeviceUnscheduleFromRunLoop(__deviceHandle, RunLoop, Native.RunLoopModeDefault);
+
+						Native.IOHIDDeviceRegisterInputValueCallback (__deviceHandle, IntPtr.Zero, IntPtr.Zero);
+						
+					}
+					catch { status = HIDReport.ReadStatus.ReadError; }
+				}
+			}
+			
+			
+			__lastHIDReport.Data = buffer;
+			
+			__lastHIDReport.index = this.index;
+			
+			__lastHIDReport.Status = status;
+			
+			
+			return __lastHIDReport;// new HIDReport(this.index, buffer, status);
+		}
+		
+
+		protected void EndReadCallback(IAsyncResult ar)
+		{
+			// Because you passed your original delegate in the asyncState parameter
+			// of the Begin call, you can get it back here to complete the call.
+			ReadCallback dlgt = (ReadCallback)ar.AsyncState;
+			
+			// Complete the call.
+			dlgt.EndInvoke(ar);
+		}
+		
+				protected void EndRead(IAsyncResult ar)
+				{
+					
+			var hidAsyncState = (HidAsyncState)ar.AsyncState;
+			var callerDelegate = (ReadDelegate)hidAsyncState.CallerDelegate;
+			var callbackDelegate = (ReadCallback)hidAsyncState.CallbackDelegate;
+			var data = callerDelegate.EndInvoke(ar);
+			
+			
+			if ((callbackDelegate != null)) callbackDelegate.BeginInvoke(data, EndReadCallback, callbackDelegate);
+			
+			//if ((callbackDelegate != null)) callbackDelegate.Invoke(data);
+			
+			IsReadInProgress = false;
+		}
+
+
+		internal void OpenDevice(){
+			IOReturn result=Native.IOHIDDeviceOpen(__deviceHandle, (int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone);
+			IsOpen = (result == IOReturn.kIOReturnSuccess);
+			
+		}
+		
+		internal void CloseDevice()
+		{
+			
+			if (__deviceHandle != IntPtr.Zero) {
+				Native.IOHIDDeviceRegisterInputValueCallback (__deviceHandle, IntPtr.Zero, IntPtr.Zero);
+				Native.IOHIDDeviceUnscheduleFromRunLoop (__deviceHandle, RunLoop, Native.RunLoopModeDefault);
+				Native.CFRunLoopStop (__deviceHandle);
+				
+				
+				if (IsOpen)
+					Native.IOHIDDeviceClose (__deviceHandle,(int) Native.IOHIDOptionsType.kIOHIDOptionsTypeNone);
+			}
+		}
+		
+		public override void Dispose ()
+		{
+			base.Dispose ();
+			
+			CloseDevice ();
+		}
+		
+		
+	}
+	
+}
