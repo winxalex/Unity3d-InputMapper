@@ -50,6 +50,7 @@ namespace ws.winx.platform.osx
 	using IOHIDElementCookie = System.UInt32;
 	using CFTypeID=System.Int32;//System.UInt64;
 	using CFIndex =System.Int64;
+	using CFTimeInterval=System.Double;
 
    
 
@@ -93,7 +94,7 @@ namespace ws.winx.platform.osx
 		
 		[DllImport(appServices)]
 		internal static extern CFRunLoopExitReason CFRunLoopRunInMode(
-			IntPtr cfstrMode, double interval, bool returnAfterSourceHandled);
+			CFStringRef cfstrMode, CFTimeInterval interval, bool returnAfterSourceHandled);
 
 	
 
@@ -404,20 +405,35 @@ namespace ws.winx.platform.osx
 		
 		
 		[DllImport(hid)]
-		public static extern bool IOHIDElementHasNullState(
+		internal static extern bool IOHIDElementHasNullState(
 			IOHIDElementRef element);
 
 		[DllImport(hid)]
-		public static extern void IOHIDDeviceUnscheduleFromRunLoop(
+		internal static extern void IOHIDDeviceUnscheduleFromRunLoop(
 			IOHIDDeviceRef device,
 			CFRunLoopRef runLoop,
 			CFStringRef runLoopMode);// AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER;
-		
+
 		[DllImport(hid)]
-		public static extern void IOHIDDeviceUnscheduleWithRunLoop(
+		internal static extern IOReturn IOHIDDeviceSetReport(
 			IOHIDDeviceRef device,
-			CFRunLoopRef inCFRunLoop,
-			CFString inCFRunLoopMode);
+			IOHIDReportType reportType,
+			CFIndex reportID,
+			IntPtr report,
+			CFIndex reportLength);// AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER;
+
+		[DllImport(hid)]
+		internal static extern IOReturn IOHIDDeviceSetReportWithCallback(
+			IOHIDDeviceRef device,
+			IOHIDReportType reportType,
+			CFIndex reportID,
+			IntPtr report,
+			CFIndex reportLength,
+			CFTimeInterval timeout,
+			IOHIDReportCallback callback,
+			IntPtr context) ;//AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER;
+		
+	
 		
 		[DllImport(hid)]
 		public static extern IOHIDElementCookie IOHIDElementGetCookie(

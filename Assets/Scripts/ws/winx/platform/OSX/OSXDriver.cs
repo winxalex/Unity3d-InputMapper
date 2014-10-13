@@ -76,7 +76,7 @@ namespace ws.winx.platform.osx
      /// <param name="value">Value.</param>
 		internal void DeviceValueReceived(IDevice device,Native.IOHIDElementType type,uint uid,long value)
 		{
-			UnityEngine.Debug.Log ("DeviceValueReceived");
+			//UnityEngine.Debug.Log ("OSXDriver>>DeviceValueReceived");
 		
 
 			//AXIS
@@ -106,15 +106,16 @@ namespace ws.winx.platform.osx
 									}
 
 							//Todo change them to float
-							float outX;
-							float outY;
+							float outX=0f;
+							float outY=0f;
 
+							if(value<15)
 							hatValueToXY(value,(axisDetails.max - axisDetails.min)+1,out outX,out outY);
 
 							device.Axis[JoystickAxis.AxisPovX].value=outX;
 							device.Axis[JoystickAxis.AxisPovY].value=outY;
 
-							//UnityEngine.Debug.Log("POVX:"+device.Axis[JoystickAxis.AxisPovX].value+" POVY:"+device.Axis[JoystickAxis.AxisPovY].value);	
+							UnityEngine.Debug.Log("POVX:"+device.Axis[JoystickAxis.AxisPovX].value+" POVY:"+device.Axis[JoystickAxis.AxisPovY].value);	
 						
 						}else{
 							//Sanity check.

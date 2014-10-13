@@ -300,6 +300,8 @@ namespace ws.winx.platform.windows
         /// <param name="data"></param>
         public override void Write(object data)
         {
+			if (IsOpen == false) OpenDevice();
+
             this.WriteData((byte[])data,0);
         }
        

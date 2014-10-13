@@ -64,7 +64,7 @@ namespace ws.winx.platform.osx
 
 
         private IDriver __defaultJoystickDriver;
-		private GCHandle DeviceGCHandle;
+	
 
       
 		private Dictionary<int, HIDDevice> __Generics;
@@ -286,10 +286,8 @@ namespace ws.winx.platform.osx
         /// <param name="device">Device.</param>
         void DeviceAdded(IntPtr context, IOReturn res, IntPtr sender, IOHIDDeviceRef device)
         {
-			IOReturn success = Native.IOHIDDeviceOpen (device, (int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone);
+			//IOReturn success = Native.IOHIDDeviceOpen (device, (int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone);
 
-			if (success==IOReturn.kIOReturnSuccess)
-            {
 				int product_id = (int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(device, Native.CFSTR(Native.IOHIDProductIDKey)))).ToInteger();
 
 				if(Generics.ContainsKey(product_id)) return;
@@ -346,24 +344,6 @@ namespace ws.winx.platform.osx
 						__Generics[hidDevice.PID] = hidDevice;
 						
 						
-						try{
-							
-							
-							
-							DeviceGCHandle = GCHandle.Alloc(hidDevice);			
-							
-							// The device is not normally available in the InputValueCallback (HandleDeviceValueReceived), so we include
-							// the device identifier as the context variable, so we can identify it and figure out the device later.
-							
-							
-							Native.IOHIDDeviceRegisterInputValueCallback(device, hidDevice.DeviceValueReceived,GCHandle.ToIntPtr(DeviceGCHandle));
-							
-							Native.IOHIDDeviceScheduleWithRunLoop(device, RunLoop, InputLoopMode);
-							
-							
-						}catch(Exception e){
-							UnityEngine.Debug.LogException(e);
-						}
                        
                     }
                         else
@@ -382,7 +362,7 @@ namespace ws.winx.platform.osx
 
 
 
-            }
+            
         }
 
 
@@ -411,7 +391,7 @@ namespace ws.winx.platform.osx
 
 				Generics.Remove(product_id);
 
-				 Native.IOHIDDeviceUnscheduleWithRunLoop(deviceRef, RunLoop, InputLoopMode);
+				 Native.IOHIDDeviceUnscheduleFromRunLoop(deviceRef, RunLoop, InputLoopMode);
 				Native.IOHIDDeviceRegisterInputValueCallback(deviceRef,IntPtr.Zero,IntPtr.Zero);
 				
 				
@@ -455,8 +435,7 @@ namespace ws.winx.platform.osx
 				Native.CFRelease(hidmanager);
 			}
 
-			if (DeviceGCHandle != null)
-								DeviceGCHandle.Free ();
+
 
 			if (Generics != null) {
 								foreach (KeyValuePair<int, HIDDevice> entry in Generics) {

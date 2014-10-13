@@ -1,14 +1,17 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ws/winx/platform/OSX/Native.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ws/winx/platform/OSX/GenericHIDDevice.cs">
     <Files>
-      <File FileName="Assets/Scripts/ws/winx/platform/OSX/GenericHIDDevice.cs" Line="174" Column="1" />
-      <File FileName="Assets/Scripts/ws/winx/platform/OSX/Native.cs" Line="415" Column="3" />
+      <File FileName="Assets/Scripts/ws/winx/platform/OSX/GenericHIDDevice.cs" Line="520" Column="4" />
+      <File FileName="Assets/Scripts/ws/winx/platform/Windows/GenericHIDDevice.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/ws/winx/platform/OSX/OSXHIDInterface.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/ws/winx/platform/OSX/OSXDriver.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="/Projects/InputMapper/Assets/Scripts/ws/winx/platform/OSX/OSXHIDInterface.cs" line="398" />
+      <Breakpoint file="/Projects/InputMapper/Assets/Scripts/ws/winx/platform/OSX/OSXHIDInterface.cs" line="378" />
+      <Breakpoint file="/Projects/InputMapper/Assets/Scripts/ws/winx/platform/OSX/GenericHIDDevice.cs" line="183" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches>

@@ -77,6 +77,8 @@ namespace ws.winx.platform.osx
 				set { if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  _OutputReportByteLength = value; }
 			}
 
+		GCHandle DeviceGCHandle;
+		bool isDeviceGCHandleIntialized=false;
 
 		private IntPtr __deviceHandle;
 
@@ -92,6 +94,9 @@ namespace ws.winx.platform.osx
 
 
 				__lastHIDReport = new HIDReport(this.index, CreateInputBuffer(),HIDReport.ReadStatus.Success);	
+
+
+
 			}catch(Exception e){
 
 				UnityEngine.Debug.LogException(e);
@@ -123,12 +128,49 @@ namespace ws.winx.platform.osx
 
 		public override HIDReport Read ()
 		{
+			if (IsOpen == false) OpenDevice();
+
+			if (!isDeviceGCHandleIntialized) {
+								try {
+				
+				
+				
+										DeviceGCHandle = GCHandle.Alloc (this);			
+				
+										// The device is not normally available in the InputValueCallback (HandleDeviceValueReceived), so we include
+										// the device identifier as the context variable, so we can identify it and figure out the device later.
+				
+				
+										Native.IOHIDDeviceRegisterInputValueCallback (__deviceHandle, DeviceValueReceived, GCHandle.ToIntPtr (DeviceGCHandle));
+				
+										Native.IOHIDDeviceScheduleWithRunLoop (__deviceHandle, RunLoop, Native.RunLoopModeDefault);
+
+										isDeviceGCHandleIntialized=true;
+						
+				
+								} catch (Exception e) {
+										UnityEngine.Debug.LogException (e);
+								}
+						}
+			
 			return __lastHIDReport;
 		}
+		
+		
+		internal void OutputReportCallback(
+			IntPtr          inContext,          // context from IOHIDDeviceRegisterInputReportCallback
+			IOReturn        inResult,           // completion result for the input report operation
+			IOHIDDeviceRef   inSender,           // IOHIDDeviceRef of the device this report is from
+			Native.IOHIDReportType inType,             // the report type
+			uint        inReportID,         // the report ID
+			IntPtr       inReport,           // pointer to the report data
+			CFIndex         inReportLength ){
+			
 
+			
+		}
 
-
-		internal void IOHIDReportCallback(
+		internal void InputReportCallback(
 			IntPtr          inContext,          // context from IOHIDDeviceRegisterInputReportCallback
 			IOReturn        inResult,           // completion result for the input report operation
 			IOHIDDeviceRef   inSender,           // IOHIDDeviceRef of the device this report is from
@@ -138,15 +180,18 @@ namespace ws.winx.platform.osx
 			CFIndex         inReportLength ){
 
 
+			GenericHIDDevice hidDevice = (GenericHIDDevice)GCHandle.FromIntPtr(inContext).Target;
+
 
 			byte[] buffer = new byte[inReportLength];
 			Marshal.Copy(inReport, buffer, 0, (int)inReportLength);
 
-			__lastHIDReport.Data = buffer;
+
+			hidDevice.__lastHIDReport.Data = buffer;
 
 		
 
-			Native.CFRunLoopStop(RunLoop);
+			Native.CFRunLoopStop(hidDevice.RunLoop);
 
 
 	    }
@@ -160,7 +205,7 @@ namespace ws.winx.platform.osx
 		/// <param name="valRef">Value reference.</param>
 		internal void DeviceValueReceived(IntPtr context, IOReturn res, IntPtr sender, IOHIDValueRef valRef)
 		{
-			UnityEngine.Debug.Log ("DeviceValueReceived");
+
 			
 			IOHIDElementRef element = Native.IOHIDValueGetElement(valRef);
 			uint uid=Native.IOHIDElementGetCookie(element);
@@ -169,6 +214,8 @@ namespace ws.winx.platform.osx
 			GenericHIDDevice device;
 
 			value = Native.IOHIDValueGetIntegerValue (valRef);
+
+			UnityEngine.Debug.Log ("DeviceValueReceived:"+value);
 
 			
 			try{
@@ -262,10 +309,13 @@ namespace ws.winx.platform.osx
 				IntPtr bufferIntPtr = Marshal.AllocHGlobal(buffer.Length);
 				Marshal.Copy(buffer, 0, bufferIntPtr, buffer.Length);
 
-				
+				if(isDeviceGCHandleIntialized){
+					DeviceGCHandle = GCHandle.Alloc (this);	
+				}
 				
 				// Register a callback		
-				Native.IOHIDDeviceRegisterInputReportCallback(__deviceHandle, bufferIntPtr, InputReportByteLength,IOHIDReportCallback, IntPtr.Zero);
+				Native.IOHIDDeviceRegisterInputReportCallback(__deviceHandle, bufferIntPtr, InputReportByteLength,InputReportCallback, 
+				                                              GCHandle.ToIntPtr(DeviceGCHandle) );
 				
 				// Schedule the device on the current run loop in case it isn't already scheduled
 				Native.IOHIDDeviceScheduleWithRunLoop(__deviceHandle, RunLoop, Native.RunLoopModeDefault);
@@ -325,8 +375,8 @@ namespace ws.winx.platform.osx
 			dlgt.EndInvoke(ar);
 		}
 		
-				protected void EndRead(IAsyncResult ar)
-				{
+		protected void EndRead(IAsyncResult ar)
+		{
 					
 			var hidAsyncState = (HidAsyncState)ar.AsyncState;
 			var callerDelegate = (ReadDelegate)hidAsyncState.CallerDelegate;
@@ -342,6 +392,119 @@ namespace ws.winx.platform.osx
 		}
 
 
+
+		public override void Write(object data, HIDDevice.WriteCallback callback,int timeout)
+		{
+			
+			var writeDelegate = new WriteDelegate(Write);
+			var asyncState = new HidAsyncState(writeDelegate, callback);
+			writeDelegate.BeginInvoke((byte[])data,timeout, EndWrite, asyncState);
+			
+		}
+		
+		public override void Write(object data, HIDDevice.WriteCallback callback)
+		{
+			this.Write((byte[])data,callback, 0);
+		}
+		
+		
+		/// <summary>
+		/// Syncro write
+		/// </summary>
+		/// <param name="data"></param>
+		public override void Write(object data)
+		{
+			this.WriteData((byte[])data,0);
+		}
+
+
+
+		protected bool Write(byte[] data, int timeout)
+		{
+			
+			if (IsOpen == false) OpenDevice();
+			try
+			{
+				return WriteData(data, timeout);
+			}
+			catch
+			{
+				return false;
+			}
+			
+		}
+		
+		
+		private bool WriteData(byte[] data, int timeout)
+		{
+			
+			
+			var buffer = CreateOutputBuffer();
+
+			
+			Array.Copy(data, 1, buffer, 0, data.Length-1);
+
+			IntPtr bufferIntPtr = Marshal.AllocHGlobal(buffer.Length);
+			Marshal.Copy(buffer, 0, bufferIntPtr, buffer.Length);
+
+			
+
+			if (timeout>0)
+			{
+				return IOReturn.kIOReturnSuccess== Native.IOHIDDeviceSetReportWithCallback(
+					__deviceHandle,
+					Native.IOHIDReportType.kIOHIDReportTypeOutput,
+					data[0],
+					bufferIntPtr,
+					buffer.Length,
+					timeout,
+					OutputReportCallback,
+					IntPtr.Zero);
+
+				
+
+			}
+			else
+			{
+				try
+				{
+					return IOReturn.kIOReturnSuccess == Native.IOHIDDeviceSetReport(__deviceHandle,
+					                                 Native.IOHIDReportType.kIOHIDReportTypeOutput,
+					                                 data[0],
+					                                 bufferIntPtr,
+					                                 buffer.Length);
+					
+				}
+				catch(Exception ex) {
+					UnityEngine.Debug.LogException(ex);
+					return false; }
+			}
+		}
+
+
+		
+		private void EndWrite(IAsyncResult ar)
+		{
+			var hidAsyncState = (HidAsyncState)ar.AsyncState;
+			var callerDelegate = (WriteDelegate)hidAsyncState.CallerDelegate;
+			var callbackDelegate = (WriteCallback)hidAsyncState.CallbackDelegate;
+			var result = callerDelegate.EndInvoke(ar);
+			
+			if ((callbackDelegate != null)) callbackDelegate.BeginInvoke(result, EndWriteCallback, callbackDelegate);
+			//if ((callbackDelegate != null)) callbackDelegate.Invoke(result);
+		}
+		
+		
+		protected void EndWriteCallback(IAsyncResult ar)
+		{
+			// Because you passed your original delegate in the asyncState parameter
+			// of the Begin call, you can get it back here to complete the call.
+			WriteCallback dlgt = (WriteCallback)ar.AsyncState;
+			
+			// Complete the call.
+			dlgt.EndInvoke(ar);
+		}
+		
 		internal void OpenDevice(){
 			IOReturn result=Native.IOHIDDeviceOpen(__deviceHandle, (int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone);
 			IsOpen = (result == IOReturn.kIOReturnSuccess);
@@ -352,21 +515,25 @@ namespace ws.winx.platform.osx
 		{
 			
 			if (__deviceHandle != IntPtr.Zero) {
-				Native.IOHIDDeviceRegisterInputValueCallback (__deviceHandle, IntPtr.Zero, IntPtr.Zero);
-				Native.IOHIDDeviceUnscheduleFromRunLoop (__deviceHandle, RunLoop, Native.RunLoopModeDefault);
-				Native.CFRunLoopStop (__deviceHandle);
-				
-				
-				if (IsOpen)
-					Native.IOHIDDeviceClose (__deviceHandle,(int) Native.IOHIDOptionsType.kIOHIDOptionsTypeNone);
+
+
+								if (IsOpen)
+										IsOpen = !(IOReturn.kIOReturnSuccess == Native.IOHIDDeviceClose (__deviceHandle, (int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone));
 			}
+
 		}
 		
 		public override void Dispose ()
 		{
-			base.Dispose ();
+
 			
-			CloseDevice ();
+			if (isDeviceGCHandleIntialized) {
+				DeviceGCHandle.Free ();
+			}
+
+
+
+
 		}
 		
 		
