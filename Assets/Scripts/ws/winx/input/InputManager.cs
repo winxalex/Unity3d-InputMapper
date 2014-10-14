@@ -89,9 +89,9 @@ namespace ws.winx.input
 						__hidInterface=new ws.winx.platform.web.WebHIDInterface(__drivers);
                     #endif
 
-#if UNITY_ANDROID && !UNITY_EDITOR
+                #if UNITY_ANDROID && !UNITY_EDITOR
                           __hidInterface=new ws.winx.platform.android.AndroidHIDInterface(__drivers);
-#endif
+                #endif
 
                         Debug.Log(__hidInterface.GetType()+" is Initialized");
 				}

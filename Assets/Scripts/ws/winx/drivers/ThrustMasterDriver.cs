@@ -59,9 +59,12 @@ namespace ws.winx.drivers
 
         public void Update(IDevice device)
         {
-            
-            if (__hidInterface.Generics.ContainsKey (device.PID))
-										__hidInterface.Read (device.PID, onRead);
+
+            if (__hidInterface.Generics.ContainsKey(device.PID))
+            {
+                ((JoystickDevice)device).isReady = true;
+                __hidInterface.Read(device.PID, onRead);
+            }
            // __hidInterface.Generics[device].Read(onRead);
            
         }
@@ -101,16 +104,24 @@ namespace ws.winx.drivers
 
            
 
+
            // Debug.Log("ThustmasterDriver>>onRead:" + data);
 
             if (report != null && (report.Status == HIDReport.ReadStatus.Success || report.Status==HIDReport.ReadStatus.Resent) && report.Data[0] == 0x01)
             {
 
-
+               
               // Debug.Log("ThustmasterDriver>>onRead:processRead" + BitConverter.ToString(report.Data));
 
 
                 JoystickDevice device = InputManager.Devices.GetDeviceAt(report.index) as JoystickDevice;
+
+                //TODO in future use some sofisticate syncronization system as things gone threading unpredicatable
+                //have noticed 2 packets sent in same frame
+                if (!device.isReady) return;
+
+                      ((JoystickDevice)device).isReady = false;
+                
 
             //    Debug.Log("ThustmasterDriver>>onRead:Index" + report.index);
                 //do something with the data
@@ -159,7 +170,7 @@ namespace ws.winx.drivers
                         buttonInx++;
                     }
 
-                   // UnityEngine.Debug.Log("but0:" + device.Buttons[0].value + " " + device.Buttons[0].buttonState+" frame "+device.LastFrameNum+"phase:"+report.Status);
+                    //UnityEngine.Debug.Log("but0:" + device.Buttons[0].value + " " + device.Buttons[0].buttonState+" frame "+device.LastFrameNum+"phase:"+report.Status);
 
 
                     //HAT
@@ -170,10 +181,10 @@ namespace ws.winx.drivers
                     int direction = (report.Data[2] >> 2) & 0xF;
 
                    
-
+                    //TODO use hatToXY function from OSXDRiver as more optimized
                     if(direction<0xff){
 
-                        //TODO optmize this
+                       
                         if (direction==0){
                             y=1;
                            
@@ -201,10 +212,14 @@ namespace ws.winx.drivers
 
                     }
 
-                   // UnityEngine.Debug.Log("Direction:" + direction+"x="+x+" y="+y);
+                    UnityEngine.Debug.Log("Direction:" + direction+"x="+x+" y="+y);
                     
                     device.Axis[JoystickAxis.AxisPovX].value=x;
                     device.Axis[JoystickAxis.AxisPovY].value=y;
+
+                    UnityEngine.Debug.Log("AxisPovX:" + device.Axis[JoystickAxis.AxisPovY].value + " " + device.Axis[JoystickAxis.AxisPovY].buttonState + " frame " + device.LastFrameNum + "phase:" + report.Status);
+
+
 
                     //X-Axis (8 bits of Data3 + 2bits of Data2
                     device.Axis[0].value = NormalizeAxis((float)((unchecked((sbyte)report.Data[3]) << 2) | (report.Data[2] >> 6)), -512, 511);

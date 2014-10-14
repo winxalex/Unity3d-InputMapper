@@ -710,7 +710,8 @@ namespace ws.winx.input
         }
 
 
-
+        //TODO Important (could happen to report very fast double click under<0.05 time length
+        //when click on POV (could be cos its same frame or something)
 
         /// <summary>
         /// Processes the input code into InputAction

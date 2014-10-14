@@ -64,6 +64,9 @@ namespace ws.winx.platform.windows
 
 				uint ButtonsFlag=BitConverter.ToUInt32(report.Data,0);
 
+                //UnityEngine.Debug.Log(BitConverter.ToString(report.Data,0,4));
+
+
                 while (buttonInx < numButtons)
                 {
                     //stick.SetButton (buttonInx, (info.Buttons & (1 << buttonInx)) != 0);
@@ -78,7 +81,7 @@ namespace ws.winx.platform.windows
                 int axisIndex = 0;
                 int numAxis = device.Axis.Count - device.numPOV * 2;//minus POV axes
 
-             ;
+             
 
                 // UnityEngine.Debug.Log("XPos:"+info.XPos+" YPos:" + info.YPos + " ZPos:" + info.ZPos+" RPos:"+info.RPos+" UPos:"+info.UPos);
 
