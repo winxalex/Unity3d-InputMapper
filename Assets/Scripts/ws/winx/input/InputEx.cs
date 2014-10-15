@@ -597,7 +597,7 @@ namespace ws.winx.input
                 //If 
                 if ((_code = device.GetInput()) != 0)
                 {
-                   // Debug.Log("Get Input Joy" + device.ID + " " + KeyCodeExtension.toEnumString(_code)+"frame:"+Time.frameCount);
+                    Debug.Log("Get Input Joy" + device.Index + " " + KeyCodeExtension.toEnumString(_code)+"frame:"+Time.frameCount);
                     return processInput(_code, time);
                 }
             }
@@ -710,9 +710,7 @@ namespace ws.winx.input
         }
 
 
-        //TODO Important (could happen to report very fast double click under<0.05 time length
-        //when click on POV (could be cos its same frame or something)
-
+     
         /// <summary>
         /// Processes the input code into InputAction
         /// </summary>
@@ -787,7 +785,7 @@ namespace ws.winx.input
                         {
                             action = new InputAction(_lastCode, InputActionType.LONG);
                             _lastCode = 0;//KeyCode.None;
-                           Debug.Log("Long " + (time - _lastCodeTime) + " " + InputActionType.LONG);
+                           Debug.Log("Long " + (time - _lastCodeTime) + " <" + InputActionType.LONG);
                         }
                     }
                     else

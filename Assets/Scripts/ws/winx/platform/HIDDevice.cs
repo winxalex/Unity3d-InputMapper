@@ -173,8 +173,16 @@ namespace ws.winx.platform
                     throw new NotImplementedException();
                 }
 
-		        
-		        public virtual HIDReport Read(){
+
+
+                public virtual HIDReport ReadDefault()
+                {
+					throw new NotImplementedException();
+				}
+
+
+                public virtual HIDReport ReadBuffered()
+                {
 					throw new NotImplementedException();
 				}
 

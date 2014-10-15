@@ -40,32 +40,40 @@ namespace ws.winx.platform.web
         }
 
 
-        public override void Read(HIDDevice.ReadCallback callback)
-        {
-             _readCallback=callback;
-
-            //read from the device thru behavior comunicaiton channal (SendMessage technology)
-             ((WebHIDInterface)this.hidInterface).webHIDBehaviour.Read(this.index);
-        }
-
-
-        //override public void Read(ReadCallback callback)
+        //public override void Read(HIDDevice.ReadCallback callback)
         //{
-        //  
+        //     _readCallback=callback;
 
-             
-        //   // WebHIDInterface(this.hidInterface).w += callback;
+        //    //read from the device thru behavior comunicaiton channal (SendMessage technology)
+        //     ((WebHIDInterface)this.hidInterface).webHIDBehaviour.Read(this.index);
         //}
 
 
-		internal void onPositionUpdate( object sender,WebMessageArgs<WebHIDReport> args){
-            if(_readCallback!=null){
+        override public HIDReport ReadBuffered(){
+
+                 
+                return __lastHIDReport;
+        }
+
+        internal void onPositionUpdate( object sender,WebMessageArgs<WebHIDReport> args){
+           
 				WebHIDReport hidReport=args.RawMessage;
 
+                //TODO add syncro lock
                 if(hidReport.index==this.index)
-                  _readCallback.Invoke(hidReport);
-            }
+                  __lastHIDReport=hidReport;
+            
         }
+
+
+        //internal void onPositionUpdate( object sender,WebMessageArgs<WebHIDReport> args){
+        //    if(_readCallback!=null){
+        //        WebHIDReport hidReport=args.RawMessage;
+
+        //        if(hidReport.index==this.index)
+        //          _readCallback.Invoke(hidReport);
+        //    }
+        //}
 
 
 
@@ -81,15 +89,52 @@ namespace ws.winx.platform.web
         }
 
 
+  int _InputReportByteLength=8;
+
+        override public int InputReportByteLength
+        {
+            get { return _InputReportByteLength; }
+            set {
+                if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  
+                _InputReportByteLength = value;
+                __lastHIDReport.Data = new byte[_InputReportByteLength];
+            }
+        }
+        
+        int _OutputReportByteLength=8;
+
+        override public int OutputReportByteLength
+        {
+            get { return _OutputReportByteLength; }
+            set { if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  _OutputReportByteLength = value; }
+        }
 
 
+        private byte[] CreateInputBuffer()
+        {
+            return CreateBuffer((int)InputReportByteLength - 1);
+        }
+
+        private byte[] CreateOutputBuffer()
+        {
+            return CreateBuffer((int)OutputReportByteLength - 1);
+        }
+
+        
+
+        private static byte[] CreateBuffer(int length)
+        {
+            byte[] buffer = null;
+            Array.Resize(ref buffer, length + 1);
+            return buffer;
+        }
      
-
+         private WebHIDReport __lastHIDReport;
 
         public GenericHIDDevice()
             : base(0, 0, 0, IntPtr.Zero, null, String.Empty)
         {
-            
+            __lastHIDReport = new WebHIDReport(this.index, CreateInputBuffer(),HIDReport.ReadStatus.NoDataRead);
         }
 
        

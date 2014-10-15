@@ -68,7 +68,10 @@ namespace ws.winx.platform.osx
 			{
 				get { return _InputReportByteLength; }
 				set {
-					if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  _InputReportByteLength = value; }
+					if (value < 2) throw new Exception("InputReportByteLength should be >1 ");     
+                    _InputReportByteLength = value;
+                    __lastHIDReport.Data = CreateInputBuffer();
+                }
 			}
 		private int _OutputReportByteLength=8;
 			
@@ -127,7 +130,7 @@ namespace ws.winx.platform.osx
 			return buffer;
 		}
 
-		public override HIDReport Read ()
+		public override HIDReport ReadDefault ()
 		{
 			if (IsOpen == false) OpenDevice();
 
@@ -250,6 +253,38 @@ namespace ws.winx.platform.osx
 		}
 
 
+        override public HIDReport ReadBuffered()
+        {
+            if (IsReadInProgress)
+            {
+                __lastHIDReport.Status = HIDReport.ReadStatus.Buffered;
+                return __lastHIDReport;
+            }
+
+            IsReadInProgress = true;
+
+            //TODO make this fields or use pool
+            var readDelegate = new ReadDelegate(Read);
+
+            readDelegate.BeginInvoke(0, EndReadBuffered, readDelegate);
+
+            return __lastHIDReport;
+
+        }
+
+
+
+        protected void EndReadBuffered(IAsyncResult ar)
+        {
+
+            var callerDelegate = (ReadDelegate)ar.AsyncState;
+
+            callerDelegate.EndInvoke(ar);
+
+
+            IsReadInProgress = false;
+        }
+
 		override public void Read(ReadCallback callback)
 		{
 			Read(callback, 0);
@@ -260,7 +295,7 @@ namespace ws.winx.platform.osx
 			if (IsReadInProgress)
 			{
 				//UnityEngine.Debug.Log("Clone paket");
-				__lastHIDReport.Status = HIDReport.ReadStatus.Resent;
+				__lastHIDReport.Status = HIDReport.ReadStatus.Buffered;
 				callback.BeginInvoke(__lastHIDReport, EndReadCallback, callback);
 				// callback.Invoke(__lastHIDReport);
 				return;

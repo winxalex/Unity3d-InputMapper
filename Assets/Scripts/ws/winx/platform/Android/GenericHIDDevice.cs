@@ -40,7 +40,10 @@ namespace ws.winx.platform.android
         {
             get { return _InputReportByteLength; }
             set {
-                if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  _InputReportByteLength = value; }
+                if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  
+                _InputReportByteLength = value;
+                __lastHIDReport.Data = new byte[_InputReportByteLength];
+            }
         }
         
         int _OutputReportByteLength=8;
@@ -65,7 +68,41 @@ namespace ws.winx.platform.android
             _listener = new ReadWriteListenerProxy();
         }
 
-      
+
+        override public HIDReport ReadBuffered()
+        {
+            if (IsReadInProgress)
+            {
+                __lastHIDReport.Status = HIDReport.ReadStatus.Buffered;
+                return __lastHIDReport;
+            }
+
+            _listener.ReadComplete = (bytes) =>
+            {
+
+
+
+                this.__lastHIDReport.index = this.index;
+                this.__lastHIDReport.Data = (byte[])bytes;
+                this.__lastHIDReport.Status = HIDReport.ReadStatus.Success;
+
+
+                IsReadInProgress = false;
+            };
+
+            IsReadInProgress = true;
+
+
+
+
+            //   UnityEngine.Debug.Log("GenericHIDDevice >>>>> try read");  
+            _device.Call("read", new byte[_InputReportByteLength], _listener, 0);
+
+           
+
+            return __lastHIDReport;
+
+        }
 
         //	public void read(byte[] into,IReadWriteListener listener, int timeout)
         public override void Read(HIDDevice.ReadCallback callback,int timeout)
@@ -95,8 +132,6 @@ namespace ws.winx.platform.android
             };
 
             IsReadInProgress = true;
-
-           
 
 
          //   UnityEngine.Debug.Log("GenericHIDDevice >>>>> try read");  

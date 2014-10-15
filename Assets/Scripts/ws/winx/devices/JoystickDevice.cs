@@ -388,14 +388,7 @@ namespace ws.winx.devices
 						//there is no  Time.frameCount in Editor (Edit mode - Editor scripts)
 						if (Application.isPlaying) {
 								//prevents multiply update in frame
-								Update ();
-								// if (!Update())
-								//     return 0;
-
-                
-
-
-                
+								Update ();      
 						} else  
 								_driver.Update (this);
             
@@ -410,6 +403,9 @@ namespace ws.winx.devices
 						IAxisDetails axisDetails;
 
 
+                        //UnityEngine.Debug.Log("Count" + axis_collection.Count);
+                   // if(this.Index==0)
+                   //     UnityEngine.Debug.Log("GetInput>Joy" + this.Index + "AxisPovY state:" + axis_collection[JoystickAxis.AxisPovY].buttonState + " frame:" + this.LastFrameNum);
 
 
 						/////////////////////////////////   HANDLE AXIS in DIGITAL MANNER //////////////////////////////
@@ -445,7 +441,7 @@ namespace ws.winx.devices
 								//if (dominantAxis != JoystickAxis.None) {
 
 								//UnityEngine.Debug.Log("Count" + axis_collection.Count);
-								// UnityEngine.Debug.Log("dominantAxis "+dominantAxis+" state"+axis_collection[dominantAxis].buttonState);
+                            UnityEngine.Debug.Log("GetInput> Joy" + this.Index + " dominantAxis " + dominantAxisInx + " state:" + axis_collection[dominantAxisInx].buttonState + " frame:" + this.LastFrameNum);
 
 								//stick.AxisAsButtons [dominantAxis] != JoystickButtonState.Hold;
 

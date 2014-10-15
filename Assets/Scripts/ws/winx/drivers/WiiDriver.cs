@@ -120,8 +120,14 @@ namespace ws.winx.drivers
                   
                 }
 
-                if(wDevice.isReady)
-                _hidInterface.Read(wDevice.PID, onRead);
+                if (wDevice.isReady)
+                {
+                   // _hidInterface.Read(wDevice.PID, onRead);
+
+                    HIDReport report = _hidInterface.ReadBuffered(wDevice.PID);
+
+                    ParseInputReport(report);
+                }
            
             }
 
@@ -389,7 +395,7 @@ namespace ws.winx.drivers
         {
 
 
-            if (report.Status == HIDReport.ReadStatus.Success || report.Status==HIDReport.ReadStatus.Resent)
+            if (report.Status == HIDReport.ReadStatus.Success || report.Status==HIDReport.ReadStatus.Buffered)
             {
                 byte[] buff = report.Data;
 
@@ -465,7 +471,7 @@ namespace ws.winx.drivers
 
 
 
-                        if (device.isInProccesingExtension || report.Status == HIDReport.ReadStatus.Resent) break;
+                        if (device.isInProccesingExtension || report.Status == HIDReport.ReadStatus.Buffered) break;
                      
 
 

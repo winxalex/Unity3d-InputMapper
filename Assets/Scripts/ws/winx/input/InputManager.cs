@@ -53,13 +53,7 @@ namespace ws.winx.input
 		internal static IDeviceCollection Devices
 		{
 			
-			get {  if(_joysticks==null)  {
-					_joysticks = new JoystickDevicesCollection(); 
-
-					//TODO think of better entry point
-					IHIDInterface h=InputManager.hidInterface;
-					h.Enumerate();//won't work on ANdorin need to redesign
-				}
+			get {  
 
 				return _joysticks; }
 			
@@ -96,6 +90,9 @@ namespace ws.winx.input
                         Debug.Log(__hidInterface.GetType()+" is Initialized");
 				}
 
+
+                _joysticks = new JoystickDevicesCollection(); 
+
 				__hidInterface.DeviceDisconnectEvent+=new EventHandler<DeviceEventArgs<int>>(onRemoveDevice);
 				__hidInterface.DeviceConnectEvent+=new EventHandler<DeviceEventArgs<IDevice>>(onAddDevice);
 
@@ -113,7 +110,7 @@ namespace ws.winx.input
 
 		internal static void onAddDevice(object sender,DeviceEventArgs<IDevice> args){
 					//do not allow duplicates
-					if (_joysticks.ContainsIndex(args.data.PID)) return;
+                  if (_joysticks.ContainsPID(args.data.PID)) return;
 
 					_joysticks [args.data.PID] = args.data;
 

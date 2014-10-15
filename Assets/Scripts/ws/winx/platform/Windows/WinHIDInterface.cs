@@ -67,15 +67,25 @@ namespace ws.winx.platform.windows
 
 
         #region IHIDInterface implementation
-		public HIDReport Read(int pid){
-			return this.__Generics [pid].Read ();
+
+
+		public HIDReport ReadDefault(int pid){
+            return this.__Generics[pid].ReadDefault();
 	    }
+
+        public HIDReport ReadBuffered(int pid)
+        {
+            return __Generics[pid].ReadBuffered();
+        }
 
         public void Read(int pid,HIDDevice.ReadCallback callback,int timeout)
         {
             this.__Generics[pid].Read(callback,timeout);
 
         }
+
+
+
 
         public void Read(int pid, HIDDevice.ReadCallback callback)
         {
@@ -146,13 +156,7 @@ namespace ws.winx.platform.windows
            
             __Generics = new Dictionary<int, HIDDevice>();
 
-            //Timer aTimer = new Timer(3000);
-            // aTimer.Elapsed += new ElapsedEventHandler(enumerateTimedEvent);
-            //  aTimer.Enabled = true;
-
-   //         Enumerate();
-
-
+      
             receiverWindowHandle = CreateReceiverWnd();
 
             if (receiverWindowHandle != IntPtr.Zero)
@@ -661,11 +665,13 @@ namespace ws.winx.platform.windows
                     joyDevice = driver.ResolveDevice(hidDevice);
                     if (joyDevice != null)
                     {
-                        
+                        joyDevice.Name = hidDevice.Name; 
 
-					DeviceConnectEvent(this,new DeviceEventArgs<IDevice>(joyDevice));
-					
-					Generics[hidDevice.PID] = hidDevice;
+	                    Generics[hidDevice.PID] = hidDevice;
+
+					    DeviceConnectEvent(this,new DeviceEventArgs<IDevice>(joyDevice));
+                   
+				
 
                         Debug.Log("Device"+hidDevice.index+" PID:" + hidDevice.PID + " VID:" + hidDevice.VID + " attached to " + driver.GetType().ToString());
 
@@ -682,11 +688,14 @@ namespace ws.winx.platform.windows
 
                 if (joyDevice != null)
                 {
-                   
+                    joyDevice.Name = hidDevice.Name;
+
+	                Generics[hidDevice.PID] = hidDevice;
+
 					DeviceConnectEvent(this,new DeviceEventArgs<IDevice>(joyDevice));
 
-					Generics[hidDevice.PID] = hidDevice;
-
+				
+                   
 
 
                     Debug.Log("Device" + hidDevice.index + "  PID:" + hidDevice.PID + " VID:" + hidDevice.VID + " attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + hidDevice.DevicePath + " Name:" + joyDevice.Name);

@@ -76,17 +76,24 @@ namespace ws.winx.platform.windows
         {
             get { return _InputReportByteLength; }
             set {
-                if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  _InputReportByteLength = value; }
+                if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  
+                _InputReportByteLength = value;
+                __lastHIDReport.Data = CreateInputBuffer();
+            
+            }
         }
         private int _OutputReportByteLength=8;
 
         override public int OutputReportByteLength
         {
             get { return _OutputReportByteLength; }
-            set { if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  _OutputReportByteLength = value; }
+            set { if (value < 2) throw new Exception("InputReportByteLength should be >1 "); 
+                
+                
+                _OutputReportByteLength = value; }
         }
 
-
+        internal int ord;
 
 		internal Native.JoyInfoEx info;
 
@@ -181,10 +188,10 @@ namespace ws.winx.platform.windows
         }
 
 
-		public override HIDReport Read ()
+        public override HIDReport ReadDefault()
 		{
 			//thru to get joystick info
-			Native.JoystickError result = Native.joyGetPosEx(__lastHIDReport.index, ref info);
+			Native.JoystickError result = Native.joyGetPosEx(ord, ref info);
 
 			
 			if (result == Native.JoystickError.NoError) {
@@ -228,13 +235,47 @@ namespace ws.winx.platform.windows
 		{
 			Read(callback, 0);
 		}
+
+
+
+        override public HIDReport ReadBuffered()
+        {
+            if (IsReadInProgress)
+            {
+                __lastHIDReport.Status = HIDReport.ReadStatus.Buffered;
+                return __lastHIDReport;
+            }
+
+            IsReadInProgress = true;
+
+            //TODO make this fields or use pool
+            var readDelegate = new ReadDelegate(Read);
+
+            readDelegate.BeginInvoke(0, EndReadBuffered, readDelegate);
+
+            return __lastHIDReport;
+
+        }
+
+
+
+        protected void EndReadBuffered(IAsyncResult ar)
+        {
+
+            var callerDelegate = (ReadDelegate)ar.AsyncState;
+ 
+             callerDelegate.EndInvoke(ar);
+
+
+            IsReadInProgress = false;
+        }
 		
 		override public void Read(ReadCallback callback,int timeout)
 		{
 			if (IsReadInProgress)
 			{
 				//UnityEngine.Debug.Log("Clone paket");
-				__lastHIDReport.Status = HIDReport.ReadStatus.Resent;
+				__lastHIDReport.Status = HIDReport.ReadStatus.Buffered;
 
 				callback.BeginInvoke(__lastHIDReport, EndReadCallback, callback);
 				// callback.Invoke(__lastHIDReport);
@@ -617,7 +658,7 @@ namespace ws.winx.platform.windows
                 }
             }
 
-
+            //TODO add syncronization
             __lastHIDReport.Data = buffer;
 
             __lastHIDReport.index = this.index;

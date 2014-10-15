@@ -179,8 +179,11 @@ namespace ws.winx.platform.android
 		}
 
 
+        public HIDReport ReadDefault(int pid){
+			throw new NotImplementedException ();
+		}
 
-		public HIDReport Read(int pid){
+		public HIDReport ReadBuffered(int pid){
 			throw new NotImplementedException ();
 		}
 
@@ -214,7 +217,7 @@ namespace ws.winx.platform.android
 
 
 
-		#endregion     
+        #endregion     
 
         
 

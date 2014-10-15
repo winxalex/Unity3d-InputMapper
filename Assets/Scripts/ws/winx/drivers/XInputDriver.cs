@@ -126,9 +126,16 @@ namespace ws.winx.drivers
             //    return;
             //else _lastFrameNum = Time.frameCount;
  //UnityEngine.Debug.Log("Update");
-            _hidInterface.Read(device.PID, onRead);
+           // _hidInterface.Read(device.PID, onRead);
 
-           
+            if (_hidInterface.Generics.ContainsKey(device.PID))
+            {
+
+                //  Debug.Log("Update Joy"+device.Index);
+                HIDReport data = _hidInterface.ReadBuffered(device.PID);
+                onRead(data);
+
+            }
 
             //if (device.isReady)
             //{
@@ -149,16 +156,17 @@ namespace ws.winx.drivers
 
             HIDReport report = data as HIDReport;
 			IDevice device = InputManager.Devices.GetDeviceAt (report.index);// _hidInterface.Devices[report.index];
-          
 
+          //  UnityEngine.Debug.Log("report.index"+report.index+"device.PID"+device.PID+" Name:"+device.Name);
            // UnityEngine.Debug.Log(BitConverter.ToString(report.Data));
 
-            if(report.Status==HIDReport.ReadStatus.Success || report.Status==HIDReport.ReadStatus.Resent){
+            if (report.Data!=null && (report.Status == HIDReport.ReadStatus.Success || report.Status == HIDReport.ReadStatus.Buffered))
+            {
               
                 byte[] buff = report.Data;
 
             //C3-85-47-7B-2A-76-6D-7A-00-80-00-80-00-8E
-
+               // UnityEngine.Debug.Log(BitConverter.ToString(report.Data));
         
 
             //controlTransfer(0x21, 0x09, 0x0240, 0, __outputBuffer, __outputBuffer.length, 0) > -1;

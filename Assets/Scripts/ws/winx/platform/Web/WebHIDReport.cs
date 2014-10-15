@@ -23,5 +23,10 @@ namespace ws.winx.platform.web
             set { _axes = value; }
         }
 
+            public WebHIDReport(int index,byte[] data, ReadStatus status):base(index,data,ReadStatus.NoDataRead)
+            {
+               
+            }
+
 	}
 }

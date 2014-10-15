@@ -97,9 +97,13 @@ namespace ws.winx.platform.osx
 
 				}
 
-		public HIDReport Read(int pid){
-			return Generics [pid].Read ();
-				}
+		public HIDReport ReadDefault(int pid){
+            return Generics[pid].ReadDefault(); 
+		}
+
+        public HIDReport ReadBuffered(int pid){
+			throw new NotImplementedException ();
+		}
 
 		public void Read (int pid, HIDDevice.ReadCallback callback)
 		{
@@ -160,7 +164,7 @@ namespace ws.winx.platform.osx
         {
         }
 
-        #endregion
+#endregion
 
 
 
@@ -216,7 +220,7 @@ namespace ws.winx.platform.osx
 
 
         }
-        #endregion
+#endregion
 
 
 
@@ -403,7 +407,7 @@ namespace ws.winx.platform.osx
         }
 
 
-        #endregion
+#endregion
 
 
 

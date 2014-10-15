@@ -51,9 +51,10 @@ namespace ws.winx.platform.windows
 
         public void Update(IDevice device)
         {
-			HIDReport report = _hidInterface.Read (device.PID);
+			HIDReport report = _hidInterface.ReadDefault (device.PID);
 
-
+            
+            //return;
 
             if (report.Status==HIDReport.ReadStatus.Success)
             {
@@ -197,8 +198,11 @@ namespace ws.winx.platform.windows
 
                     int num_axes = caps.NumAxes;
 
+                    //!!! save ordNumber(I don't have still function that would return ordNum for WinMM from PID);
+                    ((GenericHIDDevice)hidDevice).ord = i;
 
-                    joystick = new JoystickDevice(i, hidDevice.PID, hidDevice.VID, 8, caps.NumButtons, this);
+
+                    joystick = new JoystickDevice(hidDevice.index, hidDevice.PID, hidDevice.VID, 8, caps.NumButtons, this);
                     joystick.Extension = new WinDefaultExtension();
 
                     int buttonIndex = 0;
