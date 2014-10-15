@@ -115,7 +115,7 @@ namespace ws.winx.platform.osx
 							device.Axis[JoystickAxis.AxisPovX].value=outX;
 							device.Axis[JoystickAxis.AxisPovY].value=outY;
 
-							UnityEngine.Debug.Log("POVX:"+device.Axis[JoystickAxis.AxisPovX].value+" POVY:"+device.Axis[JoystickAxis.AxisPovY].value);	
+							//UnityEngine.Debug.Log("POVX:"+device.Axis[JoystickAxis.AxisPovX].value+" POVY:"+device.Axis[JoystickAxis.AxisPovY].value);	
 						
 						}else{
 							//Sanity check.

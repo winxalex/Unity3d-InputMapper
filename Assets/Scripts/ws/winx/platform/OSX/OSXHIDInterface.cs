@@ -98,12 +98,12 @@ namespace ws.winx.platform.osx
 				}
 
 		public HIDReport Read(int pid){
-			return Generics [pid].Read ();
+			return __Generics [pid].Read ();
 				}
 
 		public void Read (int pid, HIDDevice.ReadCallback callback)
 		{
-			throw new NotImplementedException ();
+			__Generics [pid].Read (callback);
 		}
 
 		public void Read (int pid, HIDDevice.ReadCallback callback, int timeout)
@@ -111,19 +111,19 @@ namespace ws.winx.platform.osx
 			throw new NotImplementedException ();
 		}
 
-		public void Write (object data, int device, HIDDevice.WriteCallback callback, int timeout)
+		public void Write (object data, int pid, HIDDevice.WriteCallback callback, int timeout)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public void Write (object data, int device, HIDDevice.WriteCallback callback)
+		public void Write (object data, int pid, HIDDevice.WriteCallback callback)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public void Write (object data, int device)
+		public void Write (object data, int pid)
 		{
-			throw new NotImplementedException ();
+			__Generics [pid].Write (data);
 		}
 
 

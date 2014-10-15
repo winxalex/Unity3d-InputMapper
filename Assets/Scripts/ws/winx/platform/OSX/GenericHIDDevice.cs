@@ -89,6 +89,48 @@ namespace ws.winx.platform.osx
 
 			        try{
 
+				//wish someone is so noble to help with this
+//				long service=Native.AllocateHIDObjectFromIOHIDDeviceRef(__deviceHandle);
+//				IntPtr pluggin;
+//				IntPtr score;
+//
+//				IOReturn res=Native.IOCreatePlugInInterfaceForService(service, Native.kIOUSBDeviceUserClientTypeID,
+//				                                  Native.kIOCFPlugInInterfaceID,out pluggin,out score);
+
+//				bool isTrue=(res==IOReturn.kIOReturnSuccess);
+//				IOObjectRelease(usbRef);
+//				(*plugin)->QueryInterface(plugin,
+//				                          CFUUIDGetUUIDBytes(kIOUSBDeviceInterfaceID300),
+//				                          (LPVOID)&usbDevice);
+//				(*plugin)->Release(plugin);
+
+
+//				result = (intf)->WritePipeAsync(intf, m_output_pipe, 
+//				                                data, OUTPUT_DATA_BUF_SZ, device_write_completion, 
+//				                                NULL);
+//
+//
+//				result = (intf)->ReadPipeAsync(intf, m_input_pipe, 
+//				                               data, INPUT_DATA_BUF_SZ, device_read_completion, 
+//				                               NULL);
+//
+//
+//				// Send data through pipe 1
+//				(*usbInterface)->WritePipe(usbInterface, 1, out, sizeof(out));
+//				
+//				// Read data through pipe 2
+//				numBytes = 64;
+//				in = malloc(numBytes);
+//				ret = (*usbInterface)->ReadPipe(usbInterface, 2, in, &numBytes);
+//				if (ret == kIOReturnSuccess)
+//				{
+//					printf("Read %d bytes\n", numBytes);
+//				}
+//				else
+//				{
+//					printf("Read failed (error: %x)\n", ret);
+//				}
+
 				OpenDevice();
 				CloseDevice();
 
@@ -180,6 +222,8 @@ namespace ws.winx.platform.osx
 			CFIndex         inReportLength ){
 
 
+
+			UnityEngine.Debug.Log ("InputReportCallbacK");
 			GenericHIDDevice hidDevice = (GenericHIDDevice)GCHandle.FromIntPtr(inContext).Target;
 
 
@@ -190,6 +234,8 @@ namespace ws.winx.platform.osx
 			hidDevice.__lastHIDReport.Data = buffer;
 
 		
+
+			Marshal.FreeHGlobal(inReport);
 
 			Native.CFRunLoopStop(hidDevice.RunLoop);
 
@@ -215,7 +261,7 @@ namespace ws.winx.platform.osx
 
 			value = Native.IOHIDValueGetIntegerValue (valRef);
 
-			UnityEngine.Debug.Log ("DeviceValueReceived:"+value);
+			//UnityEngine.Debug.Log ("DeviceValueReceived:"+value);
 
 			
 			try{
@@ -266,11 +312,13 @@ namespace ws.winx.platform.osx
 			}
 			
 			IsReadInProgress = true;
+
+			Read(0);
 			
 			//TODO make this fields or use pool
-			var readDelegate = new ReadDelegate(Read);
-			var asyncState = new HidAsyncState(readDelegate, callback);
-			readDelegate.BeginInvoke(timeout,EndRead, asyncState);
+//			var readDelegate = new ReadDelegate(Read);
+//			var asyncState = new HidAsyncState(readDelegate, callback);
+//			readDelegate.BeginInvoke(timeout,EndRead, asyncState);
 		}
 
 
@@ -305,24 +353,61 @@ namespace ws.winx.platform.osx
 				
 				buffer = CreateInputBuffer();
 
-
+				try{
 				IntPtr bufferIntPtr = Marshal.AllocHGlobal(buffer.Length);
 				Marshal.Copy(buffer, 0, bufferIntPtr, buffer.Length);
+				
 
 				if(isDeviceGCHandleIntialized){
 					DeviceGCHandle = GCHandle.Alloc (this);	
 				}
 				
-				// Register a callback		
+//				// Register a callback		
 				Native.IOHIDDeviceRegisterInputReportCallback(__deviceHandle, bufferIntPtr, InputReportByteLength,InputReportCallback, 
 				                                              GCHandle.ToIntPtr(DeviceGCHandle) );
-				
-				// Schedule the device on the current run loop in case it isn't already scheduled
+//				
+//				// Schedule the device on the current run loop in case it isn't already scheduled
 				Native.IOHIDDeviceScheduleWithRunLoop(__deviceHandle, RunLoop, Native.RunLoopModeDefault);
-				
-				
-				
-				Marshal.FreeHGlobal(bufferIntPtr);
+
+					Native.CFRunLoopRun();
+
+//					int inputbafSize=(int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(
+//						__deviceHandle, Native.CFSTR(Native.IOHIDMaxInputReportSizeKey)))).ToInteger();
+//
+//
+//					IntPtr reportSizePtr=new IntPtr(8);
+//					Native.CFNumber reportSize=new Native.CFNumber(buffer.Length); 
+//					//int reportSize=buffer.Length;
+//
+//					//Marshal.WriteInt32(reportSizePtr,8);
+//
+//					int watWrite=Marshal.ReadInt32(reportSizePtr);
+//
+//					//Marshal.WriteInt64(reportSize,buffer.Length);
+//					CFIndex reportID=0x1;
+//					IOReturn  tIOReturn = Native.IOHIDDeviceGetReport( 
+//					                                           __deviceHandle,          // IOHIDDeviceRef for the HID device
+//					                                           Native.IOHIDReportType.kIOHIDReportTypeInput,   // IOHIDReportType for the report
+//					                                           reportID,           // CFIndex for the report ID
+//					                                           bufferIntPtr,             // address of report buffer
+//					                                          reportSizePtr); // address of length of the report
+//
+//					bool suc=tIOReturn==IOReturn.kIOReturnSuccess;
+//					Native.CFNumber reportSize1=new Native.CFNumber(reportSize.typeRef); 
+//					int size=(int)reportSize1.ToInteger();
+//
+//					//int size=Marshal.ReadInt32(reportSize);
+//					byte[] buffer1 = new byte[size];
+//					Marshal.Copy(bufferIntPtr, buffer, 0,size);
+//
+//
+//				
+//					UnityEngine.Debug.Log ("ReadData"+BitConverter.ToString (buffer1));
+//					IsReadInProgress=false;
+
+				}catch(Exception ex){
+					UnityEngine.Debug.LogException(ex);
+				}
 
 				
 				if (timeout>0)
@@ -340,13 +425,13 @@ namespace ws.winx.platform.osx
 
 
 
-						// Trap in the run loop until a report is received
-						Native.CFRunLoopRun();
-						
-						// The run loop has returned, so unschedule the device
-						Native.IOHIDDeviceUnscheduleFromRunLoop(__deviceHandle, RunLoop, Native.RunLoopModeDefault);
-
-						Native.IOHIDDeviceRegisterInputValueCallback (__deviceHandle, IntPtr.Zero, IntPtr.Zero);
+//						// Trap in the run loop until a report is received
+//						Native.CFRunLoopRun();
+//						
+//						// The run loop has returned, so unschedule the device
+//						Native.IOHIDDeviceUnscheduleFromRunLoop(__deviceHandle, RunLoop, Native.RunLoopModeDefault);
+//
+//						Native.IOHIDDeviceRegisterInputReportCallback (__deviceHandle, IntPtr.Zero, IntPtr.Zero);
 						
 					}
 					catch { status = HIDReport.ReadStatus.ReadError; }
@@ -377,11 +462,14 @@ namespace ws.winx.platform.osx
 		
 		protected void EndRead(IAsyncResult ar)
 		{
-					
+			UnityEngine.Debug.Log ("EndReadData");
+
 			var hidAsyncState = (HidAsyncState)ar.AsyncState;
 			var callerDelegate = (ReadDelegate)hidAsyncState.CallerDelegate;
 			var callbackDelegate = (ReadCallback)hidAsyncState.CallbackDelegate;
 			var data = callerDelegate.EndInvoke(ar);
+
+
 			
 			
 			if ((callbackDelegate != null)) callbackDelegate.BeginInvoke(data, EndReadCallback, callbackDelegate);

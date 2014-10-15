@@ -101,7 +101,7 @@ namespace ws.winx.drivers
 
            
 
-           // Debug.Log("ThustmasterDriver>>onRead:" + data);
+            Debug.Log("ThustmasterDriver>>onRead:" + data);
 
             if (report != null && (report.Status == HIDReport.ReadStatus.Success || report.Status==HIDReport.ReadStatus.Resent) && report.Data[0] == 0x01)
             {

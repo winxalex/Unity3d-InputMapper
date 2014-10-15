@@ -51,6 +51,8 @@ namespace ws.winx.platform.osx
 	using CFTypeID=System.Int32;//System.UInt64;
 	using CFIndex =System.Int64;
 	using CFTimeInterval=System.Double;
+	using mach_port_t=System.UInt32;
+	using UInt8=System.Byte;
 
    
 
@@ -76,9 +78,34 @@ namespace ws.winx.platform.osx
 		public static readonly String IOHIDDeviceUsageKey = "DeviceUsage";
 		public static readonly String IOHIDDeviceUsagePageKey = "DeviceUsagePage";
 		public static readonly String IOHIDDeviceUsagePairsKey = "DeviceUsagePairs";
+		public static readonly String IOHIDMaxInputReportSizeKey= "MaxInputReportSize";
+		public static readonly String IOHIDDeviceKey ="IOHIDDevice";
 
 
+		public static readonly IntPtr kIOCFPlugInInterfaceID=Native.CFUUIDGetConstantUUIDWithBytes(IntPtr.Zero,	
+		                                                      0xC2, 0x44, 0xE8, 0x58, 0x10, 0x9C, 0x11, 0xD4,			
+		                                                                                   0x91, 0xD4, 0x00, 0x50, 0xE4, 0xC6, 0x42, 0x6F);
 
+
+		public static readonly IntPtr kIOUSBDeviceUserClientTypeID= Native.CFUUIDGetConstantUUIDWithBytes(IntPtr.Zero,
+		                                                                                   
+		                                                                                   0x9d,
+		                                                                                   0xc7,
+		                                                                                   0xb7,
+		                                                                                   0x80,
+		                                                                                   0x9e,
+		                                                                                   0xc0,
+		                                                                                   0x11,
+		                                                                                   0xD4,
+		                                                                                 
+		                                                                                   0xa5,
+		                                                                                   0x4f,
+		                                                                                   0x00,
+		                                                                                   0x0a,
+		                                                                                   0x27,
+		                                                                                   0x05,
+		                                                                                   0x28,
+		                                                                                   0x61);
 			
 
 		
@@ -142,6 +169,28 @@ namespace ws.winx.platform.osx
 		[DllImport(coreFoundationLibrary)]
 		internal static extern CFTypeID CFBooleanGetTypeID ();
 
+		[DllImport(coreFoundationLibrary)]
+		internal static extern IntPtr CFUUIDGetConstantUUIDWithBytes (
+			CFAllocatorRef alloc,
+			UInt8 byte0,
+			UInt8 byte1,
+			UInt8 byte2,
+			UInt8 byte3,
+			UInt8 byte4,
+			UInt8 byte5,
+			UInt8 byte6,
+			UInt8 byte7,
+			UInt8 byte8,
+			UInt8 byte9,
+			UInt8 byte10,
+			UInt8 byte11,
+			UInt8 byte12,
+			UInt8 byte13,
+			UInt8 byte14,
+			UInt8 byte15
+			);
+
+
 
 		#endregion
 
@@ -169,6 +218,9 @@ namespace ws.winx.platform.osx
 		
 		[DllImport(coreFoundationLibrary)]
 		internal static extern IntPtr CFDictionaryGetValue(IntPtr theDictionary, IntPtr theKey);
+
+		[DllImport(coreFoundationLibrary)]
+		internal static extern void CFDictionarySetValue (CFDictionaryRef theDict, IntPtr key, IntPtr value);
 
 		
 		[DllImport(coreFoundationLibrary)]
@@ -474,6 +526,87 @@ namespace ws.winx.platform.osx
 		public static extern CFIndex IOHIDValueGetLength(IOHIDValueRef value);
 
 		[DllImport(hid)]
+		internal static extern IntPtr IOServiceMatching(
+			IntPtr name );
+
+		[DllImport(hid)]
+		internal static extern long IOServiceGetMatchingService(
+			IntPtr masterPort,
+			CFDictionaryRef matching );
+
+		[DllImport(hid)]
+		internal static extern IOReturn IOCreatePlugInInterfaceForService(long service,
+		                                  IntPtr pluginType, IntPtr interfaceType,
+		                                  out IntPtr theInterface,out IntPtr theScore);
+
+
+
+//		[DllImport(hid)]
+//		internal static extern long AllocateHIDObjectFromIOHIDDeviceRef(IOHIDDeviceRef inIOHIDDeviceRef);
+
+		internal static long AllocateHIDObjectFromIOHIDDeviceRef(IOHIDDeviceRef inIOHIDDeviceRef) {
+						long result =0 ;
+						if (inIOHIDDeviceRef!=IntPtr.Zero) {
+								// Set up the matching criteria for the devices we're interested in.
+								// We are interested in instances of class IOHIDDevice.
+								// matchingDict is consumed below( in IOServiceGetMatchingService )
+								// so we have no leak here.
+								//CFMutableDictionaryRef matchingDict = IOServiceMatching(kIOHIDDeviceKey);
+				byte[] utf8Bytes = Encoding.UTF8.GetBytes(Native.IOHIDDeviceKey);
+				//char[] charArr=Native.IOHIDDeviceKey.ToCharArray(
+				IntPtr bufferIntPtr = Marshal.AllocHGlobal(utf8Bytes.Length);
+				Marshal.Copy(utf8Bytes, 0, bufferIntPtr, utf8Bytes.Length);
+
+
+
+				IntPtr matchingDictRef = Native.IOServiceMatching (bufferIntPtr);
+								matchingDictRef = Native.IOServiceMatching (Native.CFSTR(Native.IOHIDDeviceKey));
+				Marshal.FreeHGlobal(bufferIntPtr);
+								
+				                
+
+				if (matchingDictRef != IntPtr.Zero) {
+
+					Native.CFDictionary dict=new Native.CFDictionary(matchingDictRef);
+
+										// Add a key for locationID to our matching dictionary.  This works for matching to
+										// IOHIDDevices, so we will only look for a device attached to that particular port
+										// on the machine.
+
+										IntPtr tCFTypeRef = Native.IOHIDDeviceGetProperty (inIOHIDDeviceRef, Native.CFSTR (Native.IOHIDLocationIDKey));
+
+										if (tCFTypeRef != IntPtr.Zero) {
+
+												dict[Native.IOHIDLocationIDKey]=tCFTypeRef;
+
+
+
+												//CFDictionaryAddValue (matchingDictRef, CFSTR (Native.IOHIDLocationIDKey), tCFTypeRef);
+												// CFRelease( tCFTypeRef ); // don't release objects that we "Get".
+						
+												// IOServiceGetMatchingService assumes that we already know that there is only one device
+												// that matches.  This way we don't have to do the whole iteration dance to look at each
+												// device that matches.  This is a new API in 10.2
+												//result = Native.IOServiceGetMatchingService (kIOMasterPortDefault, matchingDictRef);
+												result = Native.IOServiceGetMatchingService (IntPtr.Zero, matchingDictRef);
+										}
+					
+										// Note: We're not leaking the matchingDict.
+										// One reference is consumed by IOServiceGetMatchingServices
+								}
+						}
+			return result;
+				}
+
+		[DllImport(hid)]
+		internal static extern IOReturn IOHIDDeviceGetReport(
+			IOHIDDeviceRef device,
+			IOHIDReportType reportType,
+			CFIndex reportID,
+			IntPtr report,
+			IntPtr pReportLength);
+
+		[DllImport(hid)]
 		public static extern void IOHIDDeviceRegisterInputReportCallback(
 			IOHIDDeviceRef device, // IOHIDDeviceRef for the HID device
 			IntPtr report,  // pointer to the report data ( uint8_t's )
@@ -602,7 +735,7 @@ namespace ws.winx.platform.osx
 
 			
 			internal IntPtr typeRef;
-			internal object value;
+			internal object Value;
 			
 			public CFType() { }
 			
@@ -814,12 +947,12 @@ namespace ws.winx.platform.osx
 			}  
 
 			public bool ToBoolean(){
-				if (base.value == null) {
-										base.value = CFBooleanGetValue (this.typeRef);
+				if (base.Value == null) {
+										base.Value = CFBooleanGetValue (this.typeRef);
 								}
 
 
-					return (bool)base.value;
+					return (bool)base.Value;
 			}
 
 			public override string ToString ()
@@ -927,7 +1060,7 @@ namespace ws.winx.platform.osx
 
 			public override string ToString ()
 			{
-				if(base.value==null){
+				if(base.Value==null){
 
 				if (typeRef == IntPtr.Zero)
 					return null;
@@ -949,10 +1082,10 @@ namespace ws.winx.platform.osx
 				}
 				if (buffer != IntPtr.Zero)
 					Marshal.FreeCoTaskMem(buffer);
-					base.value=str;
-					return base.value as String;
+					base.Value=str;
+					return base.Value as String;
 				}else 
-					return base.value as String;
+					return base.Value as String;
 			}
 
 			public static implicit operator CFString(IntPtr value)
@@ -998,19 +1131,24 @@ namespace ws.winx.platform.osx
 
 
 
-			public CFType this[string value]
+			public CFType this[string key]
 			{
 				get{
 										try {
 
 												
 												//return new CFType(CFDictionaryGetValue(base.typeRef, new CFString(value)));
-												return base.Factory(CFDictionaryGetValue (base.typeRef, CFSTR (value)));
+												return base.Factory(CFDictionaryGetValue (base.typeRef, CFSTR (key)));
 										} catch (Exception ex) {
 												UnityEngine.Debug.LogException (ex);
 												return new CFType (IntPtr.Zero);
 										}
 				   }
+
+			set{
+
+					CFDictionarySetValue(base.typeRef,CFSTR(key),value.typeRef);
+				}
 				
 			}
 
@@ -1100,7 +1238,7 @@ namespace ws.winx.platform.osx
 
 			public object ToInteger()
 			{
-				if (base.value == null) {
+				if (base.Value == null) {
 
 
 
@@ -1116,13 +1254,13 @@ namespace ws.winx.platform.osx
 					switch (type)
 					{
 					case Native.CFNumberType.kCFNumberSInt8Type:
-						return (base.value=Marshal.ReadInt16(buffer));
+						return (base.Value=Marshal.ReadInt16(buffer));
 					case Native.CFNumberType.kCFNumberSInt16Type:
-						return (base.value=Marshal.ReadInt16(buffer));
+						return (base.Value=Marshal.ReadInt16(buffer));
 					case Native.CFNumberType.kCFNumberSInt32Type:
-						return (base.value=Marshal.ReadInt32(buffer));
+						return (base.Value=Marshal.ReadInt32(buffer));
 					case Native.CFNumberType.kCFNumberSInt64Type:
-						return (base.value=Marshal.ReadInt64(buffer));
+						return (base.Value=Marshal.ReadInt64(buffer));
 					default:
 						UnityEngine.Debug.LogError("CFNumber value not recognize type of "+((Native.CFNumberType)type).ToString());
 						break;
@@ -1131,7 +1269,7 @@ namespace ws.winx.platform.osx
 
 				}
 
-				return base.value;
+				return base.Value;
 
 			}
 
