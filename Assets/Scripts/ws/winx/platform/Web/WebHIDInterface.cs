@@ -49,11 +49,25 @@ namespace ws.winx.platform.web
 
         #region IHIDInterface implementation
 
-		public HIDReport Read(int pid){
-			throw new NotImplementedException ();
+        public void Enumerate ()
+		{
+			webHIDBehaviour.DeviceDisconnectedEvent += new EventHandler<WebMessageArgs<int>>(DeviceDisconnectedEventHandler);
+			webHIDBehaviour.DeviceConnectedEvent += new EventHandler<WebMessageArgs<GenericHIDDevice>>(DeviceConnectedEventHandler);
+			webHIDBehaviour.GamePadEventsSupportEvent += new EventHandler<WebMessageArgs<bool>>(GamePadEventsSupportHandler);
 		}
 
+	
 
+        public HIDReport ReadDefault(int pid)
+        {
+            throw new NotImplementedException ();
+        }
+
+
+        public HIDReport ReadBuffered(int pid)
+        {
+            return this.__Generics[pid].ReadBuffered();
+        }
 
 		public void Read (int pid, HIDDevice.ReadCallback callback, int timeout)
 		{
@@ -63,17 +77,12 @@ namespace ws.winx.platform.web
 		{
 			throw new NotImplementedException ();
 		}
-		public void Enumerate ()
-		{
-			webHIDBehaviour.DeviceDisconnectedEvent += new EventHandler<WebMessageArgs<int>>(DeviceDisconnectedEventHandler);
-			webHIDBehaviour.DeviceConnectedEvent += new EventHandler<WebMessageArgs<GenericHIDDevice>>(DeviceConnectedEventHandler);
-			webHIDBehaviour.GamePadEventsSupportEvent += new EventHandler<WebMessageArgs<bool>>(GamePadEventsSupportHandler);
-		}
+		
 
 
         public void Read(int pid, HIDDevice.ReadCallback callback)
         {
-            this.__Generics[pid].Read(callback);
+            throw new NotImplementedException ();
         }
 
         public void Write(object data, int pid, HIDDevice.WriteCallback callback)

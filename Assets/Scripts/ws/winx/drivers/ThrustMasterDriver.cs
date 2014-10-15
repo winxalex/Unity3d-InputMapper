@@ -59,9 +59,15 @@ namespace ws.winx.drivers
 
         public void Update(IDevice device)
         {
-            
-            if (__hidInterface.Generics.ContainsKey (device.PID))
-										__hidInterface.Read (device.PID, onRead);
+
+            if (__hidInterface.Generics.ContainsKey(device.PID))
+            {
+              
+              //  Debug.Log("Update Joy"+device.Index);
+                HIDReport data = __hidInterface.ReadBuffered(device.PID);
+                onRead(data);
+                
+            }
            // __hidInterface.Generics[device].Read(onRead);
            
         }
@@ -101,16 +107,22 @@ namespace ws.winx.drivers
 
            
 
-            Debug.Log("ThustmasterDriver>>onRead:" + data);
 
-            if (report != null && (report.Status == HIDReport.ReadStatus.Success || report.Status==HIDReport.ReadStatus.Resent) && report.Data[0] == 0x01)
+           // Debug.Log("ThustmasterDriver>>onRead:" + data);
+
+            if (report != null && (report.Status == HIDReport.ReadStatus.Success || report.Status==HIDReport.ReadStatus.Buffered) && report.Data[0] == 0x01)
             {
 
-
+               
               // Debug.Log("ThustmasterDriver>>onRead:processRead" + BitConverter.ToString(report.Data));
 
 
                 JoystickDevice device = InputManager.Devices.GetDeviceAt(report.index) as JoystickDevice;
+
+                //TODO in future use some sofisticate syncronization system as things gone threading unpredicatable
+                //have noticed 2 packets sent in same frame
+               
+                
 
             //    Debug.Log("ThustmasterDriver>>onRead:Index" + report.index);
                 //do something with the data
@@ -140,6 +152,12 @@ namespace ws.winx.drivers
 
                 if (device != null)
                 {
+                    //if (!device.isReady) return;
+
+                    //((JoystickDevice)device).isReady = false;
+
+
+
                     int numButtons = device.Buttons.Count;
                     int buttonInx = 0;
 
@@ -159,52 +177,30 @@ namespace ws.winx.drivers
                         buttonInx++;
                     }
 
-                   // UnityEngine.Debug.Log("but0:" + device.Buttons[0].value + " " + device.Buttons[0].buttonState+" frame "+device.LastFrameNum+"phase:"+report.Status);
+                    //UnityEngine.Debug.Log("but0:" + device.Buttons[0].value + " " + device.Buttons[0].buttonState+" frame "+device.LastFrameNum+"phase:"+report.Status);
 
 
                     //HAT
-                    float x=0;
-                    float y=0;
+                    float x=0f;
+                    float y=0f;
 
-                    //from 2bit to 6bit
+                    //from 2th bit to 6th bit
                     int direction = (report.Data[2] >> 2) & 0xF;
 
                    
-
-                    if(direction<0xff){
-
-                        //TODO optmize this
-                        if (direction==0){
-                            y=1;
-                           
-                        }else if(direction==1){
-                            y=1;
-                            x=1;
-                        }else if(direction==2){
-                            x=1;
-                        }else if(direction==3){
-                            y=-1;
-                            x=1;
-                        }else if(direction==4){
-                            y=-1;
-                        }else if(direction==5){
-                            y=-1;
-                            x=-1;
-                        }else if(direction==6){
-                            x=-1;
-                        }
-                        else if(direction==7){
-                            x=-1;
-                            y=1;
-                        }
-
-
+                    //TODO use hatToXY function from OSXDRiver as more optimized
+                    if(direction<0xf){
+                        hatValueToXY(direction,8, out x, out y);
                     }
 
-                   // UnityEngine.Debug.Log("Direction:" + direction+"x="+x+" y="+y);
+                    //UnityEngine.Debug.Log("Direction:" + direction+"x="+x+" y="+y);
                     
                     device.Axis[JoystickAxis.AxisPovX].value=x;
                     device.Axis[JoystickAxis.AxisPovY].value=y;
+
+                   // UnityEngine.Debug.Log("AxisPovX:" + device.Axis[JoystickAxis.AxisPovY].value + " " + device.Axis[JoystickAxis.AxisPovY].buttonState + " frame " + device.LastFrameNum + "phase:" + report.Status);
+                    //UnityEngine.Debug.Log("Joy"+device.Index+" AxisPovY:" + device.Axis[JoystickAxis.AxisPovY].value + " " + device.Axis[JoystickAxis.AxisPovY].buttonState + " frame:" + device.LastFrameNum + " phase:" + report.Status);
+
 
                     //X-Axis (8 bits of Data3 + 2bits of Data2
                     device.Axis[0].value = NormalizeAxis((float)((unchecked((sbyte)report.Data[3]) << 2) | (report.Data[2] >> 6)), -512, 511);
@@ -234,6 +230,66 @@ namespace ws.winx.drivers
             
            
         }
+
+
+
+
+
+
+        //					   0                 
+        //					   |
+        //				3______|______1
+        //					   |
+        //					   |
+        //					   2
+
+
+
+        //				  7    0     1            
+        //				   \   |   /
+        //				6 _____|______2
+        // 					  /|\
+        //					/  |  \
+        //				   5   4    3
+
+
+        /// <summary>
+        /// Hats the value to X.
+        /// </summary>
+        /// <param name="value">Value.</param>
+        /// <param name="range">Range.</param>
+        /// <param name="outX">Out x.</param>
+        /// <param name="outY">Out y.</param>
+        void hatValueToXY(int value, int range, out float outX, out float outY)
+        {
+
+            outX = outY = 0f;
+            int rangeHalf = range >> 1;
+            int rangeQuat = range >> 2;
+
+            if (value > 0 && value < rangeHalf)
+            {
+                outX = 1f;
+
+            }
+            else if (value > rangeHalf)
+            {
+                outX = -1f;
+            }
+
+            if (value > rangeQuat * 3 || value < rangeQuat)
+            {
+                outY = 1f;
+
+            }
+            else if (value > rangeQuat && value < rangeQuat * 3)
+            {
+                outY = -1f;
+            }
+
+        }
+
+
 
 
 

@@ -76,17 +76,24 @@ namespace ws.winx.platform.windows
         {
             get { return _InputReportByteLength; }
             set {
-                if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  _InputReportByteLength = value; }
+                if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  
+                _InputReportByteLength = value;
+                __lastHIDReport.Data = CreateInputBuffer();
+            
+            }
         }
         private int _OutputReportByteLength=8;
 
         override public int OutputReportByteLength
         {
             get { return _OutputReportByteLength; }
-            set { if (value < 2) throw new Exception("InputReportByteLength should be >1 ");  _OutputReportByteLength = value; }
+            set { if (value < 2) throw new Exception("InputReportByteLength should be >1 "); 
+                
+                
+                _OutputReportByteLength = value; }
         }
 
-
+        internal int ord;
 
 		internal Native.JoyInfoEx info;
 
@@ -96,7 +103,7 @@ namespace ws.winx.platform.windows
 
 		public List<byte[]> CompactDeviceData {
 			get {
-				if(_data==null) _data=new List<byte[]>(8);
+				if(_data==null) _data=new List<byte[]>();
 				return _data;
 			}
 		}		
@@ -181,23 +188,23 @@ namespace ws.winx.platform.windows
         }
 
 
-		public override HIDReport Read ()
+        public override HIDReport ReadDefault()
 		{
 			//thru to get joystick info
-			Native.JoystickError result = Native.joyGetPosEx(__lastHIDReport.index, ref info);
+			Native.JoystickError result = Native.joyGetPosEx(ord, ref info);
 
 			
 			if (result == Native.JoystickError.NoError) {
 
-
-								CompactDeviceData [0] = BitConverter.GetBytes (info.Buttons);//4B
-								CompactDeviceData [1] = BitConverter.GetBytes (info.Pov);//2B	
-								CompactDeviceData [2] = BitConverter.GetBytes (info.XPos);//4B
-								CompactDeviceData [3] = BitConverter.GetBytes (info.YPos);
-								CompactDeviceData [4] = BitConverter.GetBytes (info.ZPos);
-								CompactDeviceData [5] = BitConverter.GetBytes (info.RPos);
-								CompactDeviceData [6] = BitConverter.GetBytes (info.UPos);
-								CompactDeviceData [7] = BitConverter.GetBytes (info.VPos);
+                CompactDeviceData.Clear();
+								CompactDeviceData.Add(BitConverter.GetBytes (info.Buttons));//4B
+								CompactDeviceData.Add( BitConverter.GetBytes (info.Pov));//2B	
+								CompactDeviceData.Add( BitConverter.GetBytes (info.XPos));//4B
+								CompactDeviceData.Add( BitConverter.GetBytes (info.YPos));
+								CompactDeviceData.Add( BitConverter.GetBytes (info.ZPos));
+								CompactDeviceData.Add( BitConverter.GetBytes (info.RPos));
+								CompactDeviceData.Add (BitConverter.GetBytes (info.UPos));
+								CompactDeviceData.Add( BitConverter.GetBytes (info.VPos));
 
 								byte[] compactByteArray = new byte[ 30 ];
 								int inx = 0;
@@ -207,7 +214,6 @@ namespace ws.winx.platform.windows
 										len = CompactDeviceData [i].Length;
 										System.Buffer.BlockCopy (CompactDeviceData [i], 0, compactByteArray, inx, len);
 										inx += len;
-					
 								}
 				
 
@@ -229,15 +235,51 @@ namespace ws.winx.platform.windows
 		{
 			Read(callback, 0);
 		}
+
+
+
+        override public HIDReport ReadBuffered()
+        {
+            if (IsReadInProgress)
+            {
+                __lastHIDReport.Status = HIDReport.ReadStatus.Buffered;
+                return __lastHIDReport;
+            }
+
+            IsReadInProgress = true;
+
+            //TODO make this fields or use pool
+            var readDelegate = new ReadDelegate(Read);
+
+            readDelegate.BeginInvoke(0, EndReadBuffered, readDelegate);
+
+            return __lastHIDReport;
+
+        }
+
+
+
+        protected void EndReadBuffered(IAsyncResult ar)
+        {
+
+            var callerDelegate = (ReadDelegate)ar.AsyncState;
+ 
+             callerDelegate.EndInvoke(ar);
+
+
+            IsReadInProgress = false;
+        }
 		
 		override public void Read(ReadCallback callback,int timeout)
 		{
 			if (IsReadInProgress)
 			{
 				//UnityEngine.Debug.Log("Clone paket");
-				__lastHIDReport.Status = HIDReport.ReadStatus.Resent;
+				__lastHIDReport.Status = HIDReport.ReadStatus.Buffered;
+
 				callback.BeginInvoke(__lastHIDReport, EndReadCallback, callback);
 				// callback.Invoke(__lastHIDReport);
+               
 				return;
 			}
 			
@@ -616,7 +658,7 @@ namespace ws.winx.platform.windows
                 }
             }
 
-
+            //TODO add syncronization
             __lastHIDReport.Data = buffer;
 
             __lastHIDReport.index = this.index;

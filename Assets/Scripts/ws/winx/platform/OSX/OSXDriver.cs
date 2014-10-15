@@ -115,7 +115,7 @@ namespace ws.winx.platform.osx
 							device.Axis[JoystickAxis.AxisPovX].value=outX;
 							device.Axis[JoystickAxis.AxisPovY].value=outY;
 
-							//UnityEngine.Debug.Log("POVX:"+device.Axis[JoystickAxis.AxisPovX].value+" POVY:"+device.Axis[JoystickAxis.AxisPovY].value);	
+							UnityEngine.Debug.Log("POVX:"+device.Axis[JoystickAxis.AxisPovX].value+" POVY:"+device.Axis[JoystickAxis.AxisPovY].value);	
 						
 						}else{
 							//Sanity check.
@@ -229,9 +229,9 @@ namespace ws.winx.platform.osx
          public void Update(IDevice device)	
 		{
 
-			HIDReport report = _hidInterface.Read (device.PID);
+			HIDReport report = _hidInterface.ReadDefault(device.PID);
 
-			if (report.Status == HIDReport.ReadStatus.Success) {
+			if (report.Status == HIDReport.ReadStatus.Success || report.Status == HIDReport.ReadStatus.Buffered) {
 
 
 				DeviceValueReceived(device,(Native.IOHIDElementType)BitConverter.ToUInt32(report.Data,0),BitConverter.ToUInt32(report.Data,4),BitConverter.ToInt64(report.Data,8));
@@ -474,12 +474,12 @@ namespace ws.winx.platform.osx
 					}
 				}//set
 			}
-			#endregion
-			#endregion
+#endregion
+#endregion
 			
-			#region Constructor
+#region Constructor
 			public ButtonDetails(uint uid=0){this.uid=uid; }
-			#endregion
+#endregion
 			
 			
 			
@@ -488,12 +488,12 @@ namespace ws.winx.platform.osx
 			
 		}
 		
-		#endregion
+#endregion
 		
-		#region AxisDetails
+#region AxisDetails
 		public sealed class AxisDetails:IAxisDetails{
 			
-			#region Fields
+#region Fields
 			float _value;
 			uint _uid;
 			int _min;
@@ -502,7 +502,7 @@ namespace ws.winx.platform.osx
 			bool _isNullable;
 			bool _isHat;
 			
-			#region IAxisDetails implementation
+#region IAxisDetails implementation
 				
 				
 				
@@ -558,7 +558,7 @@ namespace ws.winx.platform.osx
 			}
 
 
-            #endregion
+#endregion
 
 
 #region IDeviceDetails implementation
@@ -574,7 +574,7 @@ namespace ws.winx.platform.osx
 			}
 
 
-            #endregion
+#endregion
 
 			public JoystickButtonState buttonState{
 				get{return _buttonState; }
@@ -640,11 +640,11 @@ namespace ws.winx.platform.osx
 				}//set
 			}
 			
-			#endregion
+#endregion
 			
 		}
 		
-		#endregion
+#endregion
 		
 		
 		

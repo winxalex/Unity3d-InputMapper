@@ -97,13 +97,17 @@ namespace ws.winx.platform.osx
 
 				}
 
-		public HIDReport Read(int pid){
-			return __Generics [pid].Read ();
-				}
+		public HIDReport ReadDefault(int pid){
+            return Generics[pid].ReadDefault(); 
+		}
+
+        public HIDReport ReadBuffered(int pid){
+			throw new NotImplementedException ();
+		}
 
 		public void Read (int pid, HIDDevice.ReadCallback callback)
 		{
-			__Generics [pid].Read (callback);
+			throw new NotImplementedException ();
 		}
 
 		public void Read (int pid, HIDDevice.ReadCallback callback, int timeout)
@@ -111,19 +115,19 @@ namespace ws.winx.platform.osx
 			throw new NotImplementedException ();
 		}
 
-		public void Write (object data, int pid, HIDDevice.WriteCallback callback, int timeout)
+		public void Write (object data, int device, HIDDevice.WriteCallback callback, int timeout)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public void Write (object data, int pid, HIDDevice.WriteCallback callback)
+		public void Write (object data, int device, HIDDevice.WriteCallback callback)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public void Write (object data, int pid)
+		public void Write (object data, int device)
 		{
-			__Generics [pid].Write (data);
+			throw new NotImplementedException ();
 		}
 
 
@@ -160,7 +164,7 @@ namespace ws.winx.platform.osx
         {
         }
 
-        #endregion
+#endregion
 
 
 
@@ -216,7 +220,7 @@ namespace ws.winx.platform.osx
 
 
         }
-        #endregion
+#endregion
 
 
 
@@ -403,7 +407,7 @@ namespace ws.winx.platform.osx
         }
 
 
-        #endregion
+#endregion
 
 
 

@@ -78,16 +78,14 @@ namespace ws.winx.platform.web
              WebHIDReport report = (WebHIDReport)data;
             // GenericHIDDevice info = Json.Deserialize(args.Message) as GenericHIDDevice;
 
-               
-
+               if (report.Status == HIDReport.ReadStatus.Success || report.Status == HIDReport.ReadStatus.Buffered) {
+            
             
             
             
              JoystickDevice device = InputManager.Devices.GetDeviceAt(report.index) as JoystickDevice; 
  
-             //Device has already been updated in this call
-             if(device.isReady) return;
-
+            
             // UnityEngine.Debug.Log("onPositionUpdate:Joy" + info.index);
              
 
@@ -171,6 +169,8 @@ namespace ws.winx.platform.web
                     // axisValues
                //  UnityEngine.Debug.Log("axes value:" +device.Axis[i-1].value);
              }
+
+}
              
              
             // switch(guess always the last axes are hats
@@ -192,7 +192,7 @@ namespace ws.winx.platform.web
 			//_webHidBehavior.Log("numaxis: "+ device.Axis[7].value.ToString() + device.Axis[8].value.ToString()+device.Axis[9].value.ToString());
 
             // UnityEngine.Debug.Log(device.Axis[0].value + " " + device.Axis[1].value);
-              device.isReady = true;
+             // device.isReady = true;
       
 
              
@@ -207,9 +207,10 @@ namespace ws.winx.platform.web
                 if(_hidInterface.Generics.ContainsKey(device.PID)){
                   
                 // Debug.Log("Request Update Joy"+joystick.ID);
-                ((JoystickDevice)device).isReady = false;
+                //((JoystickDevice)device).isReady = false;
 
-                     _hidInterface.Read(device.PID,onRead);
+                     //_hidInterface.Read(device.PID,onRead);
+                        onRead(_hidInterface.ReadBuffered(device.PID));
                 }
 
                  //read from generic device

@@ -20,7 +20,13 @@ namespace ws.winx.platform
 			event EventHandler<DeviceEventArgs<IDevice>> DeviceConnectEvent;
 			IDriver defaultDriver{get;set;}
             Dictionary<int, HIDDevice> Generics{get;}
-			HIDReport Read(int pid);
+            /// <summary>
+            /// Reading by use of OS default driver (Win-WINMMDriver, Osx-OSXDriver...
+            /// </summary>
+            /// <param name="pid"></param>
+            /// <returns></returns>
+			HIDReport ReadDefault(int pid);
+            HIDReport ReadBuffered(int pid);
             void Read(int pid,HIDDevice.ReadCallback callback);
             void Read(int pid, HIDDevice.ReadCallback callback,int timeout);
             void Write(object data, int device, HIDDevice.WriteCallback callback, int timeout);

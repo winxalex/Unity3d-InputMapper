@@ -67,15 +67,25 @@ namespace ws.winx.platform.windows
 
 
         #region IHIDInterface implementation
-		public HIDReport Read(int pid){
-			return this.__Generics [pid].Read ();
+
+
+		public HIDReport ReadDefault(int pid){
+            return this.__Generics[pid].ReadDefault();
 	    }
+
+        public HIDReport ReadBuffered(int pid)
+        {
+            return __Generics[pid].ReadBuffered();
+        }
 
         public void Read(int pid,HIDDevice.ReadCallback callback,int timeout)
         {
             this.__Generics[pid].Read(callback,timeout);
 
         }
+
+
+
 
         public void Read(int pid, HIDDevice.ReadCallback callback)
         {
@@ -146,13 +156,7 @@ namespace ws.winx.platform.windows
            
             __Generics = new Dictionary<int, HIDDevice>();
 
-            //Timer aTimer = new Timer(3000);
-            // aTimer.Elapsed += new ElapsedEventHandler(enumerateTimedEvent);
-            //  aTimer.Enabled = true;
-
-            Enumerate();
-
-
+      
             receiverWindowHandle = CreateReceiverWnd();
 
             if (receiverWindowHandle != IntPtr.Zero)
@@ -326,11 +330,18 @@ namespace ws.winx.platform.windows
 
                                 HIDDevice hidDevice = CreateHIDDeviceFrom(PointerToDevicePath(lParam));
 
-                               // string name = ReadRegKey(Native.HKEY_CURRENT_USER, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_" + hidDevice.VID.ToString("X4") + "&PID_" + hidDevice.PID.ToString("X4"), Native.REGSTR_VAL_JOYOEMNAME);
+                                if (!Generics.ContainsKey(hidDevice.PID))
+                                {
+                                    // string name = ReadRegKey(Native.HKEY_CURRENT_USER, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_" + hidDevice.VID.ToString("X4") + "&PID_" + hidDevice.PID.ToString("X4"), Native.REGSTR_VAL_JOYOEMNAME);
 
-                                UnityEngine.Debug.Log("WinHIDInterface: " + hidDevice.Name + " Connected");
+                                    UnityEngine.Debug.Log("WinHIDInterface: " + hidDevice.Name + " Connected");
 
-                                ResolveDevice(hidDevice);
+                                    ResolveDevice(hidDevice);
+                                }
+                                else
+                                {
+                                    UnityEngine.Debug.Log("WinHIDInterface: " + hidDevice.Name + " Already Connected.");
+                                }
                             }
                             catch (Exception e)
                             {
@@ -445,7 +456,12 @@ namespace ws.winx.platform.windows
 
 
                     if (rawInputDeviceList.DeviceType == Native.RawInputDeviceType.HumanInterfaceDevice)
-                        ResolveDevice(CreateHIDDeviceFrom(rawInputDeviceList));
+                    {
+                        HIDDevice hidDevice = CreateHIDDeviceFrom(rawInputDeviceList);
+
+                        if(!__Generics.ContainsKey(hidDevice.PID))
+                        ResolveDevice(hidDevice);
+                    }
 
                 }
             }
@@ -636,21 +652,28 @@ namespace ws.winx.platform.windows
         {
 
             IDevice joyDevice = null;
+            
+           
 
             //loop thru drivers and attach the driver to device if compatible
             if (__drivers != null)
                 foreach (var driver in __drivers)
                 {
+
+                    
+
                     joyDevice = driver.ResolveDevice(hidDevice);
                     if (joyDevice != null)
                     {
-                        
+                        joyDevice.Name = hidDevice.Name; 
 
-					DeviceConnectEvent(this,new DeviceEventArgs<IDevice>(joyDevice));
-					
-					Generics[hidDevice.PID] = hidDevice;
+	                    Generics[hidDevice.PID] = hidDevice;
 
-                        Debug.Log("Device PID:" + hidDevice.PID + " VID:" + hidDevice.VID + " attached to " + driver.GetType().ToString());
+					    DeviceConnectEvent(this,new DeviceEventArgs<IDevice>(joyDevice));
+                   
+				
+
+                        Debug.Log("Device"+hidDevice.index+" PID:" + hidDevice.PID + " VID:" + hidDevice.VID + " attached to " + driver.GetType().ToString());
 
                         break;
                     }
@@ -665,14 +688,17 @@ namespace ws.winx.platform.windows
 
                 if (joyDevice != null)
                 {
-                   
+                    joyDevice.Name = hidDevice.Name;
+
+	                Generics[hidDevice.PID] = hidDevice;
+
 					DeviceConnectEvent(this,new DeviceEventArgs<IDevice>(joyDevice));
 
-					Generics[hidDevice.PID] = hidDevice;
-					
-					
+				
+                   
 
-                    Debug.Log("Device PID:" + hidDevice.PID + " VID:" + hidDevice.VID + " attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + hidDevice.DevicePath + " Name:" + joyDevice.Name);
+
+                    Debug.Log("Device" + hidDevice.index + "  PID:" + hidDevice.PID + " VID:" + hidDevice.VID + " attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + hidDevice.DevicePath + " Name:" + joyDevice.Name);
 
                 }
                 else

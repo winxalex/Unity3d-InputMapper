@@ -78,14 +78,24 @@ namespace ws.winx
 
             //supporting devices with custom drivers
             //When you add them add specialized first then XInputDriver  then wide range supporting drivers UnityDriver
-#if (UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_ANDROID)
+#if (UNITY_STANDALONE_WIN)
             InputManager.AddDriver(new ThrustMasterDriver());
-          //  InputManager.AddDriver(new WiiDriver());
-           // InputManager.AddDriver(new XInputDriver());
+            InputManager.AddDriver(new WiiDriver());
+            InputManager.AddDriver(new XInputDriver());
 
-
-            // InputManager.AddDriver(new ws.winx.platform.windows.XInputDriver());
 #endif
+
+#if (UNITY_STANDALONE_OSX)
+
+#endif
+
+#if (UNITY_STANDALONE_ANDROID)
+        InputManager.AddDriver(new ThrustMasterDriver());
+#endif
+
+
+            //TODO think of better entry point
+            InputManager.hidInterface.Enumerate();
 
             // !!!Postive аxes mapping only currently(need to find way to distinct postive from negative axis)
 
