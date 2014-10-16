@@ -102,7 +102,7 @@ namespace ws.winx.platform.osx
 		}
 
         public HIDReport ReadBuffered(int pid){
-			throw new NotImplementedException ();
+			return Generics [pid].ReadBuffered ();
 		}
 
 		public void Read (int pid, HIDDevice.ReadCallback callback)
@@ -326,6 +326,23 @@ namespace ws.winx.platform.osx
 						this.DeviceConnectEvent(this,new DeviceEventArgs<IDevice>(joyDevice));
 
 						__Generics[hidDevice.PID] = hidDevice;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -108,9 +108,40 @@ namespace ws.winx.platform.osx
 					
 				}
 
+		public void Test ()
+		{
+						byte[] buffer = new byte[8];
+
+			IOReturn result=Native.IOHIDDeviceOpen (__deviceHandle, 0);
+			if (result != Native.IOReturn.kIOReturnSuccess)
+								return;
+								
+			
+						IntPtr bufferIntPtr = Marshal.AllocHGlobal (buffer.Length);
+						Marshal.Copy (buffer, 0, bufferIntPtr, buffer.Length);
+
+		
+						if (!isDeviceGCHandleIntialized) {
+							DeviceGCHandle = GCHandle.Alloc (this);	
+						}
+			
+			
+						//				IOHIDDeviceScheduleWithRunLoop(dev, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+						//				IOHIDDeviceRegisterInputReportCallback(dev, h->buffer, sizeof(h->buffer),
+						//				                                       input_callback, h);
+			
+						// Schedule the device on the current run loop in case it isn't already scheduled
+			Native.IOHIDDeviceScheduleWithRunLoop (__deviceHandle, Native.CFRunLoopGetCurrent(), Native.RunLoopModeDefault);
+			
+			
+			
+						// Register a callback		
+						Native.IOHIDDeviceRegisterInputReportCallback (__deviceHandle, bufferIntPtr, 8, InputReportCallback,
+			                                              
+			                                              GCHandle.ToIntPtr (DeviceGCHandle));
 
 
-
+				}
 
 
 		private byte[] CreateInputBuffer()
@@ -168,36 +199,48 @@ namespace ws.winx.platform.osx
 			Native.IOHIDReportType inType,             // the report type
 			uint        inReportID,         // the report ID
 			IntPtr       inReport,           // pointer to the report data
-			CFIndex         inReportLength ){
+			int         inReportLength ){
 			
 
 			
 		}
 
-		internal void InputReportCallback(
+
+		//static void input_callback(void *context, IOReturn ret, void *sender,
+		//IOHIDReportType type, uint32_t id, uint8_t *data, CFIndex len)
+			internal void InputReportCallback(
 			IntPtr          inContext,          // context from IOHIDDeviceRegisterInputReportCallback
 			IOReturn        inResult,           // completion result for the input report operation
 			IOHIDDeviceRef   inSender,           // IOHIDDeviceRef of the device this report is from
 			Native.IOHIDReportType inType,             // the report type
 			uint        inReportID,         // the report ID
 			IntPtr       inReport,           // pointer to the report data
-			CFIndex         inReportLength ){
+			int         inReportLength ){
 
 
+		
 			GenericHIDDevice hidDevice = (GenericHIDDevice)GCHandle.FromIntPtr(inContext).Target;
 
+			if (hidDevice.__deviceHandle != inSender)
+								return;
 
-			byte[] buffer = new byte[inReportLength];
-			Marshal.Copy(inReport, buffer, 0, (int)inReportLength);
+			   byte[] buffer = new byte[hidDevice.InputReportByteLength];
+			Marshal.Copy(inReport, buffer, 0,hidDevice.InputReportByteLength);
+
+
 
 
 			hidDevice.__lastHIDReport.Data = buffer;
+			hidDevice.__lastHIDReport.Status = HIDReport.ReadStatus.Success;
 
-		
+			UnityEngine.Debug.Log (BitConverter.ToString (buffer));
 
-			Native.CFRunLoopStop(hidDevice.RunLoop);
+			hidDevice.IsReadInProgress = false;
 
-
+			//Marshal.FreeHGlobal (inReport);	
+			//Native.IOHIDDeviceRegisterInputReportCallback (hidDevice.__deviceHandle, IntPtr.Zero, 0, IntPtr.Zero, IntPtr.Zero);
+				
+				
 	    }
 		
 		/// <summary>
@@ -263,10 +306,37 @@ namespace ws.winx.platform.osx
 
             IsReadInProgress = true;
 
-            //TODO make this fields or use pool
-            var readDelegate = new ReadDelegate(Read);
+			if(!IsOpen) OpenDevice();
 
-            readDelegate.BeginInvoke(0, EndReadBuffered, readDelegate);
+			if (IsOpen) {
+								byte[] buffer =CreateInputBuffer();
+		
+			
+			
+								IntPtr bufferIntPtr = Marshal.AllocHGlobal (buffer.Length);
+								Marshal.Copy (buffer, 0, bufferIntPtr, buffer.Length);
+			
+			
+								if (!isDeviceGCHandleIntialized) {
+										DeviceGCHandle = GCHandle.Alloc (this);	
+								
+								isDeviceGCHandleIntialized=true;
+			
+							
+								// Schedule the device on the current run loop in case it isn't already scheduled
+								Native.IOHIDDeviceScheduleWithRunLoop (__deviceHandle, Native.CFRunLoopGetCurrent (), Native.RunLoopModeDefault);
+			
+								
+			
+								// Register a callback		
+								Native.IOHIDDeviceRegisterInputReportCallback (__deviceHandle, bufferIntPtr, buffer.Length, InputReportCallback,
+			                                               
+			                                               GCHandle.ToIntPtr (DeviceGCHandle));
+
+				}
+								
+
+						}
 
             return __lastHIDReport;
 
@@ -345,20 +415,27 @@ namespace ws.winx.platform.osx
 				IntPtr bufferIntPtr = Marshal.AllocHGlobal(buffer.Length);
 				Marshal.Copy(buffer, 0, bufferIntPtr, buffer.Length);
 
-				if(isDeviceGCHandleIntialized){
+				if(isDeviceGCHandleIntialized){//might use GCHanled.isAllocated
 					DeviceGCHandle = GCHandle.Alloc (this);	
 				}
-				
-				// Register a callback		
-				Native.IOHIDDeviceRegisterInputReportCallback(__deviceHandle, bufferIntPtr, InputReportByteLength,InputReportCallback, 
-				                                              GCHandle.ToIntPtr(DeviceGCHandle) );
-				
-				// Schedule the device on the current run loop in case it isn't already scheduled
-				Native.IOHIDDeviceScheduleWithRunLoop(__deviceHandle, RunLoop, Native.RunLoopModeDefault);
-				
-				
-				
-				Marshal.FreeHGlobal(bufferIntPtr);
+
+
+//				IOHIDDeviceScheduleWithRunLoop(dev, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+//				IOHIDDeviceRegisterInputReportCallback(dev, h->buffer, sizeof(h->buffer),
+//				                                       input_callback, h);
+
+//				// Schedule the device on the current run loop in case it isn't already scheduled
+//				Native.IOHIDDeviceScheduleWithRunLoop(__deviceHandle, RunLoop, Native.RunLoopModeDefault);
+//				
+//
+//				
+//				// Register a callback		
+//				Native.IOHIDDeviceRegisterInputReportCallback(__deviceHandle, bufferIntPtr, InputReportByteLength,InputReportCallback, 
+//				                                              GCHandle.ToIntPtr(DeviceGCHandle) );
+//				
+//
+//				
+//				Marshal.FreeHGlobal(bufferIntPtr);
 
 				
 				if (timeout>0)
@@ -376,14 +453,14 @@ namespace ws.winx.platform.osx
 
 
 
-						// Trap in the run loop until a report is received
-						Native.CFRunLoopRun();
-						
-						// The run loop has returned, so unschedule the device
-						Native.IOHIDDeviceUnscheduleFromRunLoop(__deviceHandle, RunLoop, Native.RunLoopModeDefault);
-
-						Native.IOHIDDeviceRegisterInputValueCallback (__deviceHandle, IntPtr.Zero, IntPtr.Zero);
-						
+//						// Trap in the run loop until a report is received
+//						Native.CFRunLoopRun();
+//						
+//						// The run loop has returned, so unschedule the device
+//						Native.IOHIDDeviceUnscheduleFromRunLoop(__deviceHandle, RunLoop, Native.RunLoopModeDefault);
+//
+//						Native.IOHIDDeviceRegisterInputValueCallback (__deviceHandle, IntPtr.Zero, IntPtr.Zero);
+//						
 					}
 					catch { status = HIDReport.ReadStatus.ReadError; }
 				}

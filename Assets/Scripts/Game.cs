@@ -86,7 +86,7 @@ namespace ws.winx
 #endif
 
 #if (UNITY_STANDALONE_OSX)
-
+			InputManager.AddDriver(new ThrustMasterDriver());
 #endif
 
 #if (UNITY_STANDALONE_ANDROID)

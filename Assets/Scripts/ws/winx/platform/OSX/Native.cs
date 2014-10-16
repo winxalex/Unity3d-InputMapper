@@ -610,7 +610,7 @@ namespace ws.winx.platform.osx
 		public static extern void IOHIDDeviceRegisterInputReportCallback(
 			IOHIDDeviceRef device, // IOHIDDeviceRef for the HID device
 			IntPtr report,  // pointer to the report data ( uint8_t's )
-			CFIndex reportLength,// number of bytes in the report ( CFIndex )
+			int reportLength,// number of bytes in the report ( CFIndex )
 			IOHIDReportCallback callback, // the callback routine
 			IntPtr context); //AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER;
 
@@ -624,7 +624,7 @@ namespace ws.winx.platform.osx
 				IOHIDReportType inType,             // the report type
 				uint        inReportID,         // the report ID
 				IntPtr       inReport,           // pointer to the report data
-			CFIndex         inReportLength ); // the actual size of the input report
+			int inReportLength ); // the actual size of the input report
 
 
 		public delegate void IOHIDDeviceCallback(IntPtr ctx, IOReturn res, IntPtr sender, IOHIDDeviceRef device);
