@@ -426,7 +426,7 @@ namespace ws.winx
             //don't take device here in the loop this is just for demo
 
             if (InputManager.Devices.ContainsIndex(0))
-                device = InputManager.Devices[(byte)0] as ThrustmasterRGTFFDDevice;
+                device = InputManager.Devices.GetDeviceAt(0) as ThrustmasterRGTFFDDevice;
 
             if (device == null) return;
 
@@ -436,7 +436,8 @@ namespace ws.winx
             // #endif
 
             if (vSliderValue != vSliderValuePrev)
-                device.SetMotor(Convert.ToByte(vSliderValue), 0xA7, onMotorSet);
+               // device.SetMotor(Convert.ToByte(vSliderValue), 0xA7, onMotorSet);
+				device.SetMotor(Convert.ToByte(vSliderValue), Convert.ToByte(vSliderValue), onMotorSet);
 
             vSliderValuePrev = vSliderValue;
 
@@ -445,6 +446,7 @@ namespace ws.winx
             if (GUI.Button(new Rect(25, 590, 100, 130), "Stop Motor"))
             {
                 //timer.Stop();
+				if(runEffectEnumerator!=null)
                 StopCoroutine(runEffectEnumerator);
                 device.StopMotor(onMotorStop);
                 vSliderValue = 128;

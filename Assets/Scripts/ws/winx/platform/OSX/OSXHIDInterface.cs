@@ -115,19 +115,19 @@ namespace ws.winx.platform.osx
 			throw new NotImplementedException ();
 		}
 
-		public void Write (object data, int device, HIDDevice.WriteCallback callback, int timeout)
+		public void Write (object data, int pid, HIDDevice.WriteCallback callback, int timeout)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public void Write (object data, int device, HIDDevice.WriteCallback callback)
+		public void Write (object data, int pid, HIDDevice.WriteCallback callback)
 		{
-			throw new NotImplementedException ();
+			__Generics [pid].Write (data, callback);
 		}
 
-		public void Write (object data, int device)
+		public void Write (object data, int pid)
 		{
-			throw new NotImplementedException ();
+				__Generics [pid].Write (data);
 		}
 
 
@@ -396,27 +396,28 @@ namespace ws.winx.platform.osx
         /// <param name="device">Device.</param>
         void DeviceRemoved(IntPtr context, IOReturn res, IntPtr sender, IOHIDDeviceRef deviceRef)
         {
-            if (Native.IOHIDDeviceConformsTo(deviceRef, Native.HIDPage.GenericDesktop, Native.HIDUsageGD.Joystick)
-                 || Native.IOHIDDeviceConformsTo(deviceRef, Native.HIDPage.GenericDesktop, Native.HIDUsageGD.GamePad)
-                 || Native.IOHIDDeviceConformsTo(deviceRef, Native.HIDPage.GenericDesktop, Native.HIDUsageGD.MultiAxisController)
-            )
-			{
+           
+
 				int product_id = (int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.IOHIDProductIDKey)))).ToInteger();
 
 
 				if( !__Generics.ContainsKey(product_id)) return;
 
-			UnityEngine.Debug.Log(String.Format("Joystick device {0:x} disconnected, sender is {1:x}", deviceRef, sender));
-                
+				HIDDevice hidDevice = __Generics [product_id];
+				
+			
+
 				this.DeviceDisconnectEvent(this,new DeviceEventArgs<int>(product_id));
 
 				Generics.Remove(product_id);
 
 				 Native.IOHIDDeviceUnscheduleFromRunLoop(deviceRef, RunLoop, InputLoopMode);
 				Native.IOHIDDeviceRegisterInputValueCallback(deviceRef,IntPtr.Zero,IntPtr.Zero);
+
+				Native.IOHIDDeviceClose (deviceRef,(int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone);
 				
-				
-			}
+				Debug.Log ("Device "+hidDevice.index+" PID:" + hidDevice.PID + " VID:" + hidDevice.VID + " Disconnected");
+
 
 
 		    

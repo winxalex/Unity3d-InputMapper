@@ -91,8 +91,8 @@ namespace ws.winx.input
 				}
 
 
-                _joysticks = new JoystickDevicesCollection(); 
-
+				if(_joysticks==null) _joysticks = new JoystickDevicesCollection(); 
+				
 				__hidInterface.DeviceDisconnectEvent+=new EventHandler<DeviceEventArgs<int>>(onRemoveDevice);
 				__hidInterface.DeviceConnectEvent+=new EventHandler<DeviceEventArgs<IDevice>>(onAddDevice);
 
@@ -102,17 +102,17 @@ namespace ws.winx.input
 
 	   internal static void onRemoveDevice(object sender,DeviceEventArgs<int> args){
 
-					if (_joysticks.ContainsIndex(args.data)) 
+			if (_joysticks.ContainsIndex(args.data)) 
 					
-						_joysticks.Remove(args.data);
+				_joysticks.Remove(args.data);
 					
 				}
 
 		internal static void onAddDevice(object sender,DeviceEventArgs<IDevice> args){
 					//do not allow duplicates
-                  if (_joysticks.ContainsPID(args.data.PID)) return;
+					if (_joysticks.ContainsPID(args.data.PID)) return;
 
-					_joysticks [args.data.PID] = args.data;
+					_joysticks[args.data.PID] = args.data;
 
 		}
 

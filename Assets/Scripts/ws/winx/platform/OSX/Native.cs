@@ -470,7 +470,7 @@ namespace ws.winx.platform.osx
 		internal static extern IOReturn IOHIDDeviceSetReport(
 			IOHIDDeviceRef device,
 			IOHIDReportType reportType,
-			CFIndex reportID,
+			int reportID,
 			IntPtr report,
 			CFIndex reportLength);// AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER;
 
@@ -478,9 +478,9 @@ namespace ws.winx.platform.osx
 		internal static extern IOReturn IOHIDDeviceSetReportWithCallback(
 			IOHIDDeviceRef device,
 			IOHIDReportType reportType,
-			CFIndex reportID,
+			int reportID,
 			IntPtr report,
-			CFIndex reportLength,
+			int reportLength,
 			CFTimeInterval timeout,
 			IOHIDReportCallback callback,
 			IntPtr context) ;//AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER;
