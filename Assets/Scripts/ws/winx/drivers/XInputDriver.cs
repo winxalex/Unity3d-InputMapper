@@ -150,15 +150,133 @@ namespace ws.winx.drivers
         }
 
 
-        void onRead(object data)
-        {
+
+		#if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+
+		//!!! Colin Munro didn't carry about correct xbox wireless controller ReportDescriptor
+		//so buttons and axis are mixed reversed and so on
+		//I have 2 options redo driver(you would dowload 100% from his site and not my version) or change XInputDriver.cs.
+		//The best option to have just driver for MS usb wirelless receiver and use direct reading of XBOx conntroller.
 
 
-            HIDReport report = data as HIDReport;
+		void onRead(object data)
+		{
+
+			HIDReport report = data as HIDReport;
 			IDevice device = InputManager.Devices.GetDeviceAt (report.index);// _hidInterface.Devices[report.index];
+			
+			//  UnityEngine.Debug.Log("report.index"+report.index+"device.PID"+device.PID+" Name:"+device.Name);
+			// UnityEngine.Debug.Log(BitConverter.ToString(report.Data));
+			
+			if (report.Data!=null && (report.Status == HIDReport.ReadStatus.Success || report.Status == HIDReport.ReadStatus.Buffered))
+			{
+				byte[] buff=report.Data;
 
-          //  UnityEngine.Debug.Log("report.index"+report.index+"device.PID"+device.PID+" Name:"+device.Name);
-           // UnityEngine.Debug.Log(BitConverter.ToString(report.Data));
+
+
+
+				////byte 11
+				///////////////////////////////////// BUTTONS ////////////////////////////////////////
+				device.Buttons[0].value = (buff[2] & 0x10) != 0 ? 1f : 0f;//Start
+				device.Buttons[1].value = (buff[2] & 0x20) != 0 ? 1f : 0f;//Back
+				device.Buttons[2].value = (buff[3] & 0x02) != 0 ? 1f : 0f;//LEFT_SHOULDER
+				device.Buttons[3].value = (buff[3] & 0x01) != 0 ? 1f : 0f;//RIGHT_SHOULDER
+				device.Buttons[4].value = (buff[3] & 0x10) != 0 ? 1f : 0f;//A
+				device.Buttons[5].value = (buff[3] & 0x20) != 0 ? 1f : 0f;//B
+				device.Buttons[6].value = (buff[3] & 0x40) != 0 ? 1f : 0f;//X
+				device.Buttons[7].value = (buff[3] & 0x80) != 0 ? 1f : 0f;//Y
+
+
+
+				////////////////////////////////  POV ////////////////////////////////////////
+				float x = 0, y = 0;
+
+
+				int pov=buff[2] & 0x0F;
+
+				if(pov>0){
+					if((pov & 0xC)!=0){
+
+						if((pov&0x8)!=0) x=1;
+						   else x=-1;
+					}
+
+
+					if((pov & 0x3) !=0) {
+						if((pov & 0x1) !=0)  y=1 ;
+						else y=-1;
+
+					}
+				}
+				 
+				
+				
+				
+				device.Axis[JoystickAxis.AxisPovX].value = x;
+				device.Axis[JoystickAxis.AxisPovY].value = y;
+				
+				// UnityEngine.Debug.Log("x=" + x+" y="+y);
+
+
+				IAxisDetails axisDetails;
+				float value;
+				value=(short)(buff[8] | (buff[9] << 8));
+				// UnityEngine.Debug.Log("raw valueX=" + value);
+				axisDetails = device.Axis[JoystickAxis.AxisY];
+				axisDetails.value = -NormalizeAxis(value, -32727, 32727, 0.1f);
+
+				value=(short)(buff[6] | (buff[7] << 8));
+				// UnityEngine.Debug.Log("raw valueX=" + value);
+				axisDetails = device.Axis[JoystickAxis.AxisX];
+				axisDetails.value = NormalizeAxis(value, -32727, 32727, 0.1f);
+
+				value=(short)(buff[10] | (buff[11] << 8));
+				// UnityEngine.Debug.Log("raw valueX=" + value);
+				axisDetails = device.Axis[JoystickAxis.AxisZ];
+				axisDetails.value = NormalizeAxis(value, -32727, 32727, 0.1f);
+
+
+
+				value=(short)(buff[12] | (buff[13] << 8));
+				// UnityEngine.Debug.Log("raw valueX=" + value);
+				axisDetails = device.Axis[JoystickAxis.AxisR];
+				axisDetails.value = -NormalizeAxis(value, -32727, 32727, 0.1f);
+
+				//byte 9,10??? (triggerL 80->FF  and triggerR 80->00)
+				value=buff[4];
+				
+				axisDetails = device.Axis[JoystickAxis.AxisV];
+
+				axisDetails.value =1 - NormalizeTrigger(value, 0, 255,0.05f);
+
+				value=buff[5];
+				
+				axisDetails = device.Axis[JoystickAxis.AxisU];
+				
+				axisDetails.value =1 - NormalizeTrigger(value, 0, 255,0.05f);
+
+				
+				//  UnityEngine.Debug.Log("LTigger=" + axisDetails.value);
+
+
+				//UnityEngine.Debug.Log("Normal:"+BitConverter.ToString(report.Data)+" "+axisDetails.value);
+
+				return;
+			}
+		}
+		#endif
+		
+		
+		#if !UNITY_STANDALONE_OSX
+		void onRead(object data)
+		{
+			
+			
+			HIDReport report = data as HIDReport;
+			IDevice device = InputManager.Devices.GetDeviceAt (report.index);// _hidInterface.Devices[report.index];
+			
+			//  UnityEngine.Debug.Log("report.index"+report.index+"device.PID"+device.PID+" Name:"+device.Name);
+			// UnityEngine.Debug.Log(BitConverter.ToString(report.Data));
 
             if (report.Data!=null && (report.Status == HIDReport.ReadStatus.Success || report.Status == HIDReport.ReadStatus.Buffered))
             {
@@ -166,8 +284,9 @@ namespace ws.winx.drivers
                 byte[] buff = report.Data;
 
             //C3-85-47-7B-2A-76-6D-7A-00-80-00-80-00-8E
-               // UnityEngine.Debug.Log(BitConverter.ToString(report.Data));
-        
+              //  UnityEngine.Debug.Log("Normal:"+BitConverter.ToString(report.Data));
+
+		
 
             //controlTransfer(0x21, 0x09, 0x0240, 0, __outputBuffer, __outputBuffer.length, 0) > -1;
 
@@ -192,7 +311,7 @@ namespace ws.winx.drivers
                 device.Buttons[7].value = (buff[11] & 0x08) != 0 ? 1f : 0f;//Y
 
           
-
+				//00-13-00-00-00-00-62-F2-27-FF-59-03-45-FE-00
            
 
 
@@ -325,6 +444,7 @@ namespace ws.winx.drivers
          ////   device.Write(new byte[] { 0x00, 0x01, 0x0f, 0xc0, 0x00, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00 });
 
           }
+#endif
 
         public IDevice ResolveDevice(IHIDDevice hidDevice)
         //public IDevice<IAxisDetails, IButtonDetails, IDeviceExtension> ResolveDevice(IHIDDeviceInfo info)
@@ -493,9 +613,13 @@ namespace ws.winx.drivers
         internal void SetMotor(XInputDevice device, byte leftMotor, byte rightMotor)
         {
 
+			////char buf[] = {0x00, 0x01, 0x0f, 0xc0, 0x00, large, small, 0x00, 0x00, 0x00, 0x00, 0x00};
+           // _hidInterface.Write(new byte[] { 0x00, 0x01, 0x0f, 0xc0, 0x00, leftMotor, rightMotor, 0x00, 0x00, 0x00, 0x00, 0x00 }, 
+//			_hidInterface.Write (new byte[]{ 0x01, 0x0f, 0xc0, 0x00, leftMotor, rightMotor},device.PID);
+//			_hidInterface.Write (new byte[]{ leftMotor, rightMotor},device.PID);
+//			_hidInterface.Write (new byte[]{ 0x40, leftMotor, rightMotor},device.PID);
+			throw new Exception ("Motor byte combination unknown");
 
-            _hidInterface.Write(new byte[] { 0x00, 0x01, 0x0f, 0xc0, 0x00, leftMotor, rightMotor, 0x00, 0x00, 0x00, 0x00, 0x00 }, 
-			device.PID,onSetMotor);
   
         }
 

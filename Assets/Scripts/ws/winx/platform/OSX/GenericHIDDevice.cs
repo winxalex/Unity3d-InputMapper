@@ -226,7 +226,7 @@ namespace ws.winx.platform.osx
 			hidDevice.__lastHIDReport.Data = buffer;
 			hidDevice.__lastHIDReport.Status = HIDReport.ReadStatus.Success;
 
-			UnityEngine.Debug.Log (BitConverter.ToString (buffer));
+			//UnityEngine.Debug.Log (BitConverter.ToString (buffer));
 
 			hidDevice.IsReadInProgress = false;
 

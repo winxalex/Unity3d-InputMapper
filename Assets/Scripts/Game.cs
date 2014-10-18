@@ -46,7 +46,8 @@ namespace ws.winx
         Animator animator = null;
         bool _settingsLoaded = false;
         private float vSliderValue;
-        private ThrustmasterRGTFFDDevice device;
+        private ThrustmasterRGTFFDDevice TTFFDDevice;
+		private XInputDevice XDevice;
         private byte forceX;
         private Timer timer;
         private float vSliderValuePrev;
@@ -87,6 +88,7 @@ namespace ws.winx
 
 #if (UNITY_STANDALONE_OSX)
 			InputManager.AddDriver(new ThrustMasterDriver());
+			InputManager.AddDriver(new XInputDriver());
 #endif
 
 #if (UNITY_STANDALONE_ANDROID)
@@ -321,7 +323,8 @@ namespace ws.winx
             // if (InputManager.GetInput((int)States.Wave,false))
             {
                 Debug.Log("Wave Down");
-                animator.Play((int)States.Wave);
+               // animator.Play((int)States.Wave);
+				animator.Play(Animator.StringToHash("Wave"));
             }
 
 
@@ -422,13 +425,34 @@ namespace ws.winx
         void OnGUI()
         {
 
+//			if (InputManager.Devices.ContainsIndex(0))
+//				XDevice = InputManager.Devices.GetDeviceAt(0) as XInputDevice;
+//
+//			if (GUI.Button(new Rect(150, 590, 100, 130), "Rumble"))
+//			{
+//				
+//
+//				
+//				XDevice.SetMotor(0x80,0xFF);
+//				
+//			
+//				
+//
+//
+//				
+//			}
+
 
             //don't take device here in the loop this is just for demo
 
             if (InputManager.Devices.ContainsIndex(0))
-                device = InputManager.Devices.GetDeviceAt(0) as ThrustmasterRGTFFDDevice;
+                TTFFDDevice = InputManager.Devices.GetDeviceAt(0) as ThrustmasterRGTFFDDevice;
 
-            if (device == null) return;
+
+
+
+
+            if (TTFFDDevice == null) return;
 
             //#if UNITY_ANDROID
 
@@ -437,7 +461,7 @@ namespace ws.winx
 
             if (vSliderValue != vSliderValuePrev)
                // device.SetMotor(Convert.ToByte(vSliderValue), 0xA7, onMotorSet);
-				device.SetMotor(Convert.ToByte(vSliderValue), Convert.ToByte(vSliderValue), onMotorSet);
+				TTFFDDevice.SetMotor(Convert.ToByte(vSliderValue), Convert.ToByte(vSliderValue), onMotorSet);
 
             vSliderValuePrev = vSliderValue;
 
@@ -448,20 +472,22 @@ namespace ws.winx
                 //timer.Stop();
 				if(runEffectEnumerator!=null)
                 StopCoroutine(runEffectEnumerator);
-                device.StopMotor(onMotorStop);
+                TTFFDDevice.StopMotor(onMotorStop);
                 vSliderValue = 128;
             }
 
             if (GUI.Button(new Rect(150, 590, 100, 130), "Rumble"))
             {
-                // timer.Stop();
-                // this.InvokeRepeating("runEffect",1,
+              
                 runEffectEnumerator = runEffect();
 
-                device.StopMotor(onMotorStop);
+                TTFFDDevice.StopMotor(onMotorStop);
 
                 StartCoroutine(runEffectEnumerator);
-                // timer.Start();
+
+
+				//char buf[] = {0x00, 0x01, 0x0f, 0xc0, 0x00, large, small, 0x00, 0x00, 0x00, 0x00, 0x00};
+               
             }
         }
 
@@ -481,7 +507,7 @@ namespace ws.winx
             while (true)
             {
                 forceX += 0xA7;
-                device.SetMotor(forceX, forceX, onMotorSet);
+                TTFFDDevice.SetMotor(forceX, forceX, onMotorSet);
 
                 yield return new WaitForSeconds(0.5f);
             }
@@ -493,7 +519,7 @@ namespace ws.winx
         void onTimerElapsed(object sender, ElapsedEventArgs args)
         {
             forceX += 0xA7;
-            device.SetMotor(forceX, forceX, onMotorSet);
+            TTFFDDevice.SetMotor(forceX, forceX, onMotorSet);
         }
 
 
@@ -507,8 +533,8 @@ namespace ws.winx
         /// </summary>
         void OnDestroy()
         {
-            if (device != null)
-                device.StopMotor();
+            if (TTFFDDevice != null)
+                TTFFDDevice.StopMotor();
             InputManager.Dispose();
         }
     }
