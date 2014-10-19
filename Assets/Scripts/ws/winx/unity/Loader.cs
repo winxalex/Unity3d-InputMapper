@@ -8,14 +8,14 @@ using System.Collections;
 
 namespace ws.winx.unity
 {
-    public class LoaderEvtArgs : EventArgs
+    public class LoaderEvtArgs<T> : EventArgs
     {
 
 
-        public readonly object data;
+        public readonly T data;
         
 
-        public LoaderEvtArgs(object data)
+        public LoaderEvtArgs(T data)
         {
             this.data = data;
 
@@ -25,9 +25,9 @@ namespace ws.winx.unity
 
 	public class Loader:IDisposable
 	{
-        public event EventHandler<LoaderEvtArgs> LoadComplete;
-        public event EventHandler<LoaderEvtArgs> Error;
-        public event EventHandler<LoaderEvtArgs> LoadItemComplete;
+        public event EventHandler<LoaderEvtArgs<List<WWW>>> LoadComplete;
+        public event EventHandler<LoaderEvtArgs<String>> Error;
+        public event EventHandler<LoaderEvtArgs<WWW>> LoadItemComplete;
 
 
         protected bool _isRunning=false;
@@ -115,7 +115,7 @@ namespace ws.winx.unity
                             if (Error != null)
                             {
                                 //Error(this,new LoaderEvtArgs(www));
-                                Dispatch(Error, new LoaderEvtArgs(www));
+                                Dispatch(Error, new LoaderEvtArgs<String>(www.error));
                             }
                             else
                             {
@@ -127,7 +127,7 @@ namespace ws.winx.unity
 
                         }else 
 							if (LoadItemComplete != null)
-                                Dispatch(LoadItemComplete, new LoaderEvtArgs(www));
+                                Dispatch(LoadItemComplete, new LoaderEvtArgs<WWW>(www));
 								//LoadItemComplete(this, new LoaderEvtArgs(www));
                        
                         queueList.RemoveAt(i);
@@ -144,7 +144,7 @@ namespace ws.winx.unity
 
                    if (LoadComplete != null)
                        //Dispatch(LoadComplete, new LoaderEvtArgs(wwwList));
-                        LoadComplete(this, new LoaderEvtArgs(wwwList));
+                        LoadComplete(this, new LoaderEvtArgs<List<WWW>>(wwwList));
 
                     yield break; 
                }
@@ -155,10 +155,10 @@ namespace ws.winx.unity
         }
 
 
-        private void EndAsyncEvent(IAsyncResult iar)
+        private void EndAsyncEvent<T>(IAsyncResult iar)
         {
             var ar = (System.Runtime.Remoting.Messaging.AsyncResult)iar;
-            var invokedMethod = (EventHandler<LoaderEvtArgs>)ar.AsyncDelegate;
+            var invokedMethod = (EventHandler<LoaderEvtArgs<T>>)ar.AsyncDelegate;
 
             try
             {
@@ -172,11 +172,11 @@ namespace ws.winx.unity
         }
 
 
-        protected void Dispatch(Delegate del,LoaderEvtArgs args)
+        protected void Dispatch<T>(Delegate del,LoaderEvtArgs<T> args)
         {
             Delegate[] delegates = del.GetInvocationList();
             foreach (Delegate d in delegates)
-                ((EventHandler<LoaderEvtArgs>)d).BeginInvoke(this, args, EndAsyncEvent, null);
+                ((EventHandler<LoaderEvtArgs<T>>)d).BeginInvoke(this, args, EndAsyncEvent<T>, null);
         }
 	
 public void  Dispose()

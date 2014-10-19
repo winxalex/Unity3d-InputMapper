@@ -155,9 +155,9 @@ namespace ws.winx
                 }
 
 
-                request.LoadComplete += new EventHandler<LoaderEvtArgs>(onLoadComplete);
-                request.Error += new EventHandler<LoaderEvtArgs>(onLoadItemComplete);
-                request.LoadItemComplete += new EventHandler<LoaderEvtArgs>(onLoadItemComplete);
+                request.LoadComplete += new EventHandler<LoaderEvtArgs<List<WWW>>>(onLoadComplete);
+                request.Error += new EventHandler<LoaderEvtArgs<String>>(onLoadError);
+                request.LoadItemComplete += new EventHandler<LoaderEvtArgs<WWW>>(onLoadItemComplete);
                 request.load();
             }
             else //TARGET=ANDROID but playing in EDITOR => use Standalone setup
@@ -230,7 +230,7 @@ namespace ws.winx
         }
 
 #if (UNITY_WEBPLAYER || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_STANDALONE
-        void onLoadComplete(object sender, LoaderEvtArgs args)
+        void onLoadComplete(object sender, LoaderEvtArgs<List<WWW>> args)
         {
            // Debug.Log(((List<WWW>)args.data).ElementAt(0).text);
 
@@ -246,7 +246,7 @@ namespace ws.winx
 
             if (ui != null)//without settingsXML defined =>load them manually and attach them
             {
-                InputManager.loadSettingsFromText(((List<WWW>)args.data).ElementAt(0).text);
+                InputManager.loadSettingsFromText(args.data.ElementAt(0).text);
                 ui.StateInputCombinations = InputManager.Settings.stateInputs;
             }
 
@@ -255,15 +255,15 @@ namespace ws.winx
        
         }
 
-        void onLoadItemComplete(object sender, LoaderEvtArgs args)
+        void onLoadItemComplete(object sender, LoaderEvtArgs<WWW> args)
         {
-           // Debug.Log(((WWW)args.data).text);
+           // Debug.Log(args.data.text);
         }
 
 
-        void onLoadError(object sender, LoaderEvtArgs args)
+        void onLoadError(object sender, LoaderEvtArgs<String> args)
         {
-             Debug.Log(((WWW)args.data).error);
+             Debug.Log(args.data);
         }
 #endif
 
