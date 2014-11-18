@@ -1,20 +1,20 @@
-﻿using UnityEngine;
-using System;
-using System.Xml;
-using System.Xml.Serialization;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using ws.winx.input;
-using System.Runtime.Serialization;
 using System.Linq;
-using ws.winx.platform;
-using ws.winx.devices;
-using ws.winx.input.states;
-using System.Collections;
-using ws.winx.gui;
-using ws.winx.unity;
+using System.Runtime.Serialization;
 using System.Timers;
+using System.Xml;
+using System.Xml.Serialization;
+using UnityEngine;
+using ws.winx.devices;
 using ws.winx.drivers;
+using ws.winx.gui;
+using ws.winx.input;
+using ws.winx.input.states;
+using ws.winx.platform;
+using ws.winx.unity;
 using ws.winx.utils;
 
 
@@ -23,23 +23,7 @@ namespace ws.winx
     public class Game : MonoBehaviour
     {
 
-        // What if you have 50 states. Would you need to define them manually. => Forget it about this
-        //		static int idleState = Animator.StringToHash("Base Layer.Idle");	
-        //		static int locoState = Animator.StringToHash("Base Layer.Locomotion");			// these integers are references to our animator's states
-        //		static int jumpState = Animator.StringToHash("Base Layer.Jump");				// and are used to check state for various actions to occur
-        //		static int jumpDownState = Animator.StringToHash("Base Layer.JumpDown");		// within our FixedUpdate() function below
-        //		static int fallState = Animator.StringToHash("Base Layer.Fall");
-        //		static int rollState = Animator.StringToHash("Base Layer.Roll");
-        //		static int waveState = Animator.StringToHash("Layer2.Wave");
-
-
-
-
-
-        //bool isConnected = usbI.Connect();
-        //Debug.Log(isConnected);
-        //USBHIDDRIVER.USB
-        //bool isConnected = usbI.Connect();
+      
 
 
 
@@ -185,7 +169,7 @@ namespace ws.winx
 #if(UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE && !UNITY_ANDROID
             Loader request = new Loader();
 
-                //UNITY_WEBPLAYER: application path gives "http://localhost/appfolder/"
+				//UNITY_WEBPLAYER: Application.dataPath "http://localhost/appfolder/"
                 request.Add(Application.dataPath+"/StreamingAssets/InputSettings.xml");
             
 
@@ -194,12 +178,6 @@ namespace ws.winx
             request.LoadItemComplete += new EventHandler<LoaderEvtArgs>(onLoadItemComplete);
             request.load();
 #endif
-
-
-
-
-			//test only
-			//ws.winx.platform.osx.OSXHIDInterface a = new ws.winx.platform.osx.OSXHIDInterface (new List<IDriver>());
 
 
 

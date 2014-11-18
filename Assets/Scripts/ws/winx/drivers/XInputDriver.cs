@@ -154,8 +154,8 @@ namespace ws.winx.drivers
 
 		//!!! Colin Munro tattlebogie didn't carry about correct xbox wireless controller ReportDescriptor
 		//so buttons and axis are mixed reversed and so on
-		//I have 3 options redo driver(you would dowload 100% from his site and not my version) or change XInputDriver.cs.
 		//The best option to have just driver for MS usb wirelless receiver and use direct reading of XBOx conntroller.
+		//I have 3 options redo driver(you would dowload 100% from his site and not my version) or change XInputDriver.cs.
 
 
 		void onRead(object data)
