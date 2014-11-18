@@ -58,7 +58,7 @@ namespace ws.winx
             timer = new Timer(500.0);
             timer.Elapsed += new ElapsedEventHandler(onTimerElapsed);
 
-            UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
+          
 
 
             //supporting devices with custom drivers
@@ -94,6 +94,7 @@ namespace ws.winx
 
 #if (UNITY_STANDALONE || UNITY_EDITOR ) && !UNITY_WEBPLAYER && !UNITY_ANDROID
             //UnityEngine.Debug.Log("Standalone");
+			UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
 
 
             if (ui != null && ui.settingsXML == null)
@@ -113,6 +114,7 @@ namespace ws.winx
 
 			#region Load InputSettings.xml Android
 #if UNITY_ANDROID
+			UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
 
 
             Loader request = new Loader();
@@ -173,9 +175,9 @@ namespace ws.winx
                 request.Add(Application.dataPath+"/StreamingAssets/InputSettings.xml");
             
 
-            request.LoadComplete += new EventHandler<LoaderEvtArgs>(onLoadComplete);
-            request.Error += new EventHandler<LoaderEvtArgs>(onLoadItemComplete);
-            request.LoadItemComplete += new EventHandler<LoaderEvtArgs>(onLoadItemComplete);
+			request.LoadComplete += new EventHandler<LoaderEvtArgs<List<WWW>>>(onLoadComplete);
+			request.Error += new EventHandler<LoaderEvtArgs<String>>(onLoadError);
+			request.LoadItemComplete += new EventHandler<LoaderEvtArgs<WWW>>(onLoadItemComplete);
             request.load();
 #endif
 

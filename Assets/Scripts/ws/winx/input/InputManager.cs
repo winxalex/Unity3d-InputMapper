@@ -1188,7 +1188,7 @@ namespace ws.winx.input
                 __hidInterface = null;
             }
 
-
+			if(_joysticks!=null)
 			_joysticks.Clear();
 
         }

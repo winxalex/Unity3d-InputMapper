@@ -32,7 +32,7 @@ namespace ws.winx
 			
 			animator = GameObject.FindObjectOfType<Animator>();
 		
-			UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
+		
 
 			
 			//supporting devices with custom drivers
@@ -57,7 +57,9 @@ namespace ws.winx
 			//!!!Application.streamingAssetPath gives "Raw" folder in web player
 			
 			#if (UNITY_STANDALONE || UNITY_EDITOR ) && !UNITY_WEBPLAYER && !UNITY_ANDROID
-			//UnityEngine.Debug.Log("Standalone");
+
+			UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
+
 			
 			
 			if (ui != null && ui.settingsXML == null)
@@ -176,36 +178,7 @@ namespace ws.winx
 			
 		
 			
-			//if (InputManager.GetInput((int)States.MyCustomState, false))
-			//{
-			//    Debug.Log(States.MyCustomState + "-Hold");
-			//    // animator.Play((int)States.Wave);
-			//}
-			
-			
-			//if (InputManager.GetInputUp((int)States.Wave))
-			//{
-			//    Debug.Log(States.Wave + "-Up");
-			//    // animator.Play((int)States.Wave);
-			//}
-			
-			
-			
-			//        if (InputManager.GetInput((int)States.Walk_Forward, false))
-			//        {
-			//
-			//        }
-			//	
-			//
-			//          if(InputManager.GetInputDown((int)States.Walk_Forward)){
-			//				Debug.Log("Down");
-			//			}
-			//
-			//			if(InputManager.GetInputUp((int)States.Walk_Forward)){
-			//				Debug.Log("Up");
-			//			}
-			//
-			////		
+
 			////
 			//          //using input as analog value
 			//			float analogValue=InputManager.GetInput((int)States.Walk_Forward,false,0.3f,0.1f,0f);

@@ -52,8 +52,7 @@ namespace ws.winx
 			timer = new Timer(500.0);
 			timer.Elapsed += new ElapsedEventHandler(onTimerElapsed);
 			
-			UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
-			
+
 			
 			//supporting devices with custom drivers
 			//When you add them add specialized first then XInputDriver  then wide range supporting drivers UnityDriver
@@ -73,7 +72,8 @@ namespace ws.winx
 			
 			#if (UNITY_STANDALONE || UNITY_EDITOR ) && !UNITY_WEBPLAYER && !UNITY_ANDROID
 			//UnityEngine.Debug.Log("Standalone");
-			
+			UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
+
 			
 			if (ui != null && ui.settingsXML == null)
 			{//settingsXML would trigger internal loading mechanism (only for testing)
@@ -93,7 +93,8 @@ namespace ws.winx
 			#region Load InputSettings.xml Android
 			#if UNITY_ANDROID
 			
-			
+			UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
+
 			Loader request = new Loader();
 			
 			
