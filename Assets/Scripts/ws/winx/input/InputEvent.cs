@@ -18,12 +18,7 @@ namespace ws.winx.input
         //public static delegate bool GetInputDelegate(int stateNameHash,bool atOnce);
 		protected static Func<int,bool,bool> _action;
 
-        protected enum EventType:uint
-        {
-            CONT=0,
-            UP,
-            DOWN
-        }
+ 
 
 
         public InputEvent(int stateNameHash)
@@ -60,12 +55,12 @@ namespace ws.winx.input
         {
             add
             {
-                AddHandler(_stateNameHash, value,(uint)EventType.UP);
+                AddHandler(_stateNameHash, value,1);
 
             }
             remove
             {
-                RemoveHandler(_stateNameHash, value,(uint)EventType.UP);
+                RemoveHandler(_stateNameHash, value,1);
             }
         }
 
@@ -75,13 +70,13 @@ namespace ws.winx.input
         {
             add
             {
-                AddHandler(_stateNameHash, value,(uint)EventType.DOWN);
+                AddHandler(_stateNameHash, value,2);
 
               
             }
             remove
             {
-                RemoveHandler(_stateNameHash, value,(uint)EventType.DOWN);
+                RemoveHandler(_stateNameHash, value,2);
             }
         }
 
@@ -89,11 +84,11 @@ namespace ws.winx.input
         public event EventHandler  INPUT 
         {
             add {
-                AddHandler(_stateNameHash, value, (uint)EventType.CONT);
+                AddHandler(_stateNameHash, value, 0);
             }
             remove
             {
-                RemoveHandler(_stateNameHash, value,(uint)EventType.CONT);
+                RemoveHandler(_stateNameHash, value,0);
             }
         }
 

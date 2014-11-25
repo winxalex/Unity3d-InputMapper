@@ -590,7 +590,7 @@ namespace ws.winx.input
 
 
 
-
+			if(devices!=null)
             foreach (IDevice device in devices)
             {
 

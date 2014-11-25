@@ -168,6 +168,12 @@ public class InputMapper : EditorWindow
 
 		
 				try {
+
+						///!!! OSX: error happen here cos of unity bug
+						/// Error running gmcs: Cannot find the specified file
+						/// workaround is (check your version mine was 2.10.11) typing this command line in terminal
+						/// sudo ln -s /Applications/Unity/MonoDevelop.app/Contents/Frameworks/Mono.framework/Versions/2.10.2/bin/gmcs /usr/bin
+						
 						generator.ProcessTemplate (Path.Combine (Path.Combine (Application.dataPath, "Editor"), "StatesEnumTemplate.tpl"), generated);
 			
 						UnityEngine.Debug.Log ("Generated States Enum at:" + generated);
