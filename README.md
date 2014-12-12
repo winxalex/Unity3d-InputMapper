@@ -248,7 +248,7 @@ Knowledge should be free.&nbsp;</div>
 <div class="separator" style="clear: both; text-align: left;">
 13.10.2014 (OSXDriver default driver pure C#)</div>
 <div class="separator" style="clear: both; text-align: left;">
-17.10.2014 (Thrustmaster Wheel FFD and XBOX360W working on OSX)&nbsp;</div>
+17.10.2014 <a href="https://www.youtube.com/watch?v=RpjxBU31k0o">(Thrustmaster Wheel FFD and XBOX360W working on OSX)</a>&nbsp;</div>
 <div class="separator" style="clear: both; text-align: left;">
 <b>CONCEPT PROVED!!!</b></div>
 <div class="separator" style="clear: both; text-align: left;">
