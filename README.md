@@ -266,9 +266,7 @@ Knowledge should be free.&nbsp;</div>
 </div>
 <br />
 <div style="-webkit-text-stroke-width: 0px; color: black; font-family: Times; font-size: medium; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: justify; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px;">
-<div style="margin: 0px;">
-I'll show you some of next post how you show for example WiiButtonA instead JoystickButton1....</div>
-</div>
+
 <br />
 <script type="text/javascript">
  SyntaxHighlighter.highlight();
