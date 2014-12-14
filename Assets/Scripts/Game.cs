@@ -17,52 +17,51 @@ using ws.winx.platform;
 using ws.winx.unity;
 using ws.winx.utils;
 
-
 namespace ws.winx
 {
-    public class Game : MonoBehaviour
-    {
+		public class Game : MonoBehaviour
+		{
 
       
 
 
 
-        Animator animator = null;
-        bool _settingsLoaded = false;
-        private float vSliderValue;
-        private ThrustmasterRGTFFDDevice TTFFDDevice;
-		private XInputDevice XDevice;
-        private byte forceX;
-        private Timer timer;
-        private float vSliderValuePrev;
-        IEnumerator runEffectEnumerator;
-        ComplementaryFilter complementaryFuzer;
-        float lastTime = -1f;
-        public static double RAD_TO_DEG = 180 / Math.PI;
-        public static double DEG_TO_RAD = Math.PI / 180;
-        GameObject wiimote;
-        Vector3 Angles;
+				Animator animator = null;
+				bool _settingsLoaded = false;
+				private float vSliderValue;
+				private ThrustmasterRGTFFDDevice TTFFDDevice;
+				private XInputDevice XDevice;
+				private byte forceX;
+				private Timer timer;
+				private float vSliderValuePrev;
+				IEnumerator runEffectEnumerator;
+				ComplementaryFilter complementaryFuzer;
+				float lastTime = -1f;
+				public static double RAD_TO_DEG = 180 / Math.PI;
+				public static double DEG_TO_RAD = Math.PI / 180;
+				GameObject wiimote;
+				Vector3 Angles;
 
 
-        // Use this for initialization
-        void Start()
-        {
-            complementaryFuzer = new ComplementaryFilter();
-            wiimote = GameObject.Find("wiimote");
-            Angles = new Vector3();
+				// Use this for initialization
+				void Start ()
+				{
+						complementaryFuzer = new ComplementaryFilter ();
+						wiimote = GameObject.Find ("wiimote");
+						Angles = new Vector3 ();
 
-            animator = GameObject.FindObjectOfType<Animator>();
+						animator = GameObject.FindObjectOfType<Animator> ();
 
-            vSliderValuePrev = vSliderValue = 128f;
+						vSliderValuePrev = vSliderValue = 128f;
 
-            timer = new Timer(500.0);
-            timer.Elapsed += new ElapsedEventHandler(onTimerElapsed);
+						timer = new Timer (500.0);
+						timer.Elapsed += new ElapsedEventHandler (onTimerElapsed);
 
           
 
 
-            //supporting devices with custom drivers
-            //When you add them add specialized first then XInputDriver  then wide range supporting drivers UnityDriver
+						//supporting devices with custom drivers
+						//When you add them add specialized first then XInputDriver  then wide range supporting drivers UnityDriver
 #if (UNITY_STANDALONE_WIN)
             InputManager.AddDriver(new ThrustMasterDriver());
             InputManager.AddDriver(new WiiDriver());
@@ -80,17 +79,17 @@ namespace ws.winx
 #endif
 
 
-            //TODO think of better entry point
-            InputManager.hidInterface.Enumerate();
+						//TODO think of better entry point
+						InputManager.hidInterface.Enumerate ();
 
-            // !!!Postive аxes mapping only currently(need to find way to distinct postive from negative axis)
+						// !!!Postive аxes mapping only currently(need to find way to distinct postive from negative axis)
 
-            // if(Application.isPlaying)
-            //     InputManager.AddDriver(new UnityDriver());
+						// if(Application.isPlaying)
+						//     InputManager.AddDriver(new UnityDriver());
 
 
-            //if you want to load some states from .xml and add custom manually first load settings xml
-            //!!!Application.streamingAssetPath gives "Raw" folder in web player
+						//if you want to load some states from .xml and add custom manually first load settings xml
+						//!!!Application.streamingAssetPath gives "Raw" folder in web player
 
 #if (UNITY_STANDALONE || UNITY_EDITOR ) && !UNITY_WEBPLAYER && !UNITY_ANDROID
             //UnityEngine.Debug.Log("Standalone");
@@ -112,7 +111,7 @@ namespace ws.winx
 
 #endif
 
-			#region Load InputSettings.xml Android
+						#region Load InputSettings.xml Android
 #if UNITY_ANDROID
 			UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
 
@@ -166,7 +165,7 @@ namespace ws.winx
 
             
 #endif
-			#endregion
+						#endregion
 
 #if(UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE && !UNITY_ANDROID
             Loader request = new Loader();
@@ -186,28 +185,27 @@ namespace ws.winx
 
 
 
-        }
+				}
 
+				void onUp (object o, EventArgs args)
+				{
+						Debug.Log ("Up");
+				}
 
-        void onUp(object o, EventArgs args)
-        {
-            Debug.Log("Up");
-        }
+				void onDown (object o, EventArgs args)
+				{
+						Debug.Log ("Down");
+				}
 
-        void onDown(object o, EventArgs args)
-        {
-            Debug.Log("Down");
-        }
+				void Handle1 (object o, EventArgs args)
+				{
+						Debug.Log ("Handle1");
+				}
 
-        void Handle1(object o, EventArgs args)
-        {
-            Debug.Log("Handle1");
-        }
-
-        void Handle2(object o, EventArgs args)
-        {
-            Debug.Log("Handle2");
-        }
+				void Handle2 (object o, EventArgs args)
+				{
+						Debug.Log ("Handle2");
+				}
 
 #if (UNITY_WEBPLAYER || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_STANDALONE
         void onLoadComplete(object sender, LoaderEvtArgs<List<WWW>> args)
@@ -250,160 +248,161 @@ namespace ws.winx
 
 
 
-        void manuallyAddStateAndHandlers()
-        {
+				void manuallyAddStateAndHandlers ()
+				{
 
 
 
-            //   UnityEngine.Debug.Log(InputManager.Log());
+						//   UnityEngine.Debug.Log(InputManager.Log());
 
-            //		adding input-states pairs manually
-            //			InputManager.MapStateToInput("My State1",new InputCombination(KeyCodeExtension.toCode(Joysticks.Joystick1,JoystickAxis.AxisPovX,JoystickPovPosition.Forward),(int)KeyCode.Joystick4Button9,(int)KeyCode.P,(int)KeyCode.JoystickButton0));
-            //			InputManager.MapStateToInput("My State2",new InputCombination(KeyCode.Joystick4Button9,KeyCode.P,KeyCode.JoystickButton0));
-            //			InputManager.MapStateToInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
-            //			InputManager.MapStateToInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
-
-
-
-            ////easiest way to map state to combination (ex.of single W and C click)
-            if (!InputManager.HasInputState("ManualAddedSTATE"))
-                InputManager.MapStateToInput("ManualAddedSTATE", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
-
-            UnityEngine.Debug.Log("Log:" + InputManager.Log());
-
-
-            ////Event Based input handling
-            InputEvent ev = new InputEvent("ManualAddedSTATE");
-            //InputEvent ev = new InputEvent((int)States.SomeState);
-
-            ev.INPUT += new EventHandler(Handle1);
-            ev.INPUT += new EventHandler(Handle2);
-            ev.UP += new EventHandler(onUp);//this wouldn't fire for combo inputs(single only)
-            ev.DOWN += new EventHandler(onDown);//this wouldn't fire for combo inputs(single only)
-
-            _settingsLoaded = true;
+						//		adding input-states pairs manually
+						//			InputManager.MapStateToInput("My State1",new InputCombination(KeyCodeExtension.toCode(Joysticks.Joystick1,JoystickAxis.AxisPovX,JoystickPovPosition.Forward),(int)KeyCode.Joystick4Button9,(int)KeyCode.P,(int)KeyCode.JoystickButton0));
+						//			InputManager.MapStateToInput("My State2",new InputCombination(KeyCode.Joystick4Button9,KeyCode.P,KeyCode.JoystickButton0));
+						//			InputManager.MapStateToInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
+						//			InputManager.MapStateToInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
 
 
 
-        }
+						////easiest way to map state to combination (ex.of single W and C click)
+						if (!InputManager.HasInputState ("ManualAddedSTATE"))
+								InputManager.MapStateToInput ("ManualAddedSTATE", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
+
+						//add secondary
+						//InputManager.MapStateToInput ("ManualAddedSTATE", 1, KeyCodeExtension.Joystick1AxisXPositive.SINGLE);
+
+						UnityEngine.Debug.Log ("Log:" + InputManager.Log ());
 
 
-        // Update is called once per frame
-        void Update()
-        {
+						////Event Based input handling
+						InputEvent ev = new InputEvent ("ManualAddedSTATE");
+						//InputEvent ev = new InputEvent((int)States.SomeState);
+
+						ev.INPUT += new EventHandler (Handle1);
+						ev.INPUT += new EventHandler (Handle2);
+						ev.UP += new EventHandler (onUp);//this wouldn't fire for combo inputs(single only)
+						ev.DOWN += new EventHandler (onDown);//this wouldn't fire for combo inputs(single only)
+
+						_settingsLoaded = true;
+
+
+
+				}
+
+
+				// Update is called once per frame
+				void Update ()
+				{
 		
 
 
-            //Use is mapping states so no quering keys during gameplay
-            if (InputManager.EditMode || !_settingsLoaded) return;
+						//Use is mapping states so no quering keys during gameplay
+						if (InputManager.EditMode || !_settingsLoaded)
+								return;
 
 
-            //Input.GetInput allows combos (combined input actions)
-            if (InputManager.GetInputDown((int)States.Wave))// || InputManager.GetInput((int)States.Wave,true))
+						//Input.GetInput allows combos (combined input actions)
+						if (InputManager.GetInputDown ((int)States.Wave)) {// || InputManager.GetInput((int)States.Wave,true))
             // if (InputManager.GetInput((int)States.Wave,false))
-            {
-                Debug.Log("Wave Down");
-               // animator.Play((int)States.Wave);
-				animator.Play(Animator.StringToHash("Wave"));
-            }
+								Debug.Log ("Wave Down");
+								// animator.Play((int)States.Wave);
+								animator.Play (Animator.StringToHash ("Wave"));
+						}
 
 
-            if (InputManager.GetInputUp((int)States.MyCustomState))
-            {
-                Debug.Log(States.MyCustomState + "-Up");
-                // animator.Play((int)States.Wave);
-            }
+						if (InputManager.GetInputUp ((int)States.MyCustomState)) {
+								Debug.Log (States.MyCustomState + "-Up");
+								// animator.Play((int)States.Wave);
+						}
 
 
-            #region Testing Fuzer
-            //Demo of use of M+ and Acc data from Wiimote
-            //you will use ofcourse some sofisticate algo based on Kalman or Magdwick filter to process data
+						#region Testing Fuzer
+						//Demo of use of M+ and Acc data from Wiimote
+						//you will use ofcourse some sofisticate algo based on Kalman or Magdwick filter to process data
 
 
-            //take all devices of type WiimoteDevice
-            List<WiimoteDevice> wiimoteDevices = InputManager.GetJoysticks<WiimoteDevice>();
+						//take all devices of type WiimoteDevice
+						List<WiimoteDevice> wiimoteDevices = InputManager.GetJoysticks<WiimoteDevice> ();
 
-            if (wiimoteDevices.Count > 0)
-            {
-                WiimoteDevice device = wiimoteDevices[0];
+						if (wiimoteDevices.Count > 0) {
+								WiimoteDevice device = wiimoteDevices [0];
 
-                if (device.isReady)
-                {
-                    if (device.motionPlus != null && device.motionPlus.Enabled)
-                    {
-                        if (lastTime < 0f)
-                        {
-                            lastTime = Time.time;
-                        }
+								if (device.isReady) {
+										if (device.motionPlus != null && device.motionPlus.Enabled) {
+												if (lastTime < 0f) {
+														lastTime = Time.time;
+												}
 
-                        complementaryFuzer.Update(device.Axis[JoystickAxis.AxisAccX].value, device.Axis[JoystickAxis.AxisAccY].value, device.Axis[JoystickAxis.AxisAccZ].value, device.motionPlus.Values.x * DEG_TO_RAD, device.motionPlus.Values.y * DEG_TO_RAD, device.motionPlus.Values.z * DEG_TO_RAD, Time.time - lastTime);
-                        lastTime = Time.time;
+												complementaryFuzer.Update (device.Axis [JoystickAxis.AxisAccX].value, device.Axis [JoystickAxis.AxisAccY].value, device.Axis [JoystickAxis.AxisAccZ].value, device.motionPlus.Values.x * DEG_TO_RAD, device.motionPlus.Values.y * DEG_TO_RAD, device.motionPlus.Values.z * DEG_TO_RAD, Time.time - lastTime);
+												lastTime = Time.time;
 
 
 
-                        Angles.x = (float)(complementaryFuzer.Angles.x * RAD_TO_DEG);
-                        Angles.y = (float)(complementaryFuzer.Angles.z * RAD_TO_DEG);
-                        Angles.z = (float)(complementaryFuzer.Angles.y * RAD_TO_DEG);
+												Angles.x = (float)(complementaryFuzer.Angles.x * RAD_TO_DEG);
+												Angles.y = (float)(complementaryFuzer.Angles.z * RAD_TO_DEG);
+												Angles.z = (float)(complementaryFuzer.Angles.y * RAD_TO_DEG);
 
-                        // UnityEngine.Debug.Log(Angles.z);
-                       // UnityEngine.Debug.Log(Angles.x + " " + Angles.y + " " + Angles.z);
+												// UnityEngine.Debug.Log(Angles.z);
+												// UnityEngine.Debug.Log(Angles.x + " " + Angles.y + " " + Angles.z);
 
-                        wiimote.transform.rotation = Quaternion.Euler(Angles);
-                    }
-                }
-            }
+												wiimote.transform.rotation = Quaternion.Euler (Angles);
+										}
+								}
+						}
 
-            #endregion
-
-
-            //if (InputManager.GetInput((int)States.MyCustomState, false))
-            //{
-            //    Debug.Log(States.MyCustomState + "-Hold");
-            //    // animator.Play((int)States.Wave);
-            //}
+						#endregion
 
 
-            //if (InputManager.GetInputUp((int)States.Wave))
-            //{
-            //    Debug.Log(States.Wave + "-Up");
-            //    // animator.Play((int)States.Wave);
-            //}
+						//if (InputManager.GetInput((int)States.MyCustomState, false))
+						//{
+						//    Debug.Log(States.MyCustomState + "-Hold");
+						//    // animator.Play((int)States.Wave);
+						//}
 
 
-
-            //        if (InputManager.GetInput((int)States.Walk_Forward, false))
-            //        {
-            //
-            //        }
-            //	
-            //
-            //          if(InputManager.GetInputDown((int)States.Walk_Forward)){
-            //				Debug.Log("Down");
-            //			}
-            //
-            //			if(InputManager.GetInputUp((int)States.Walk_Forward)){
-            //				Debug.Log("Up");
-            //			}
-            //
-            ////		
-            ////
-            //          //using input as analog value
-            //			float analogValue=InputManager.GetInput((int)States.Walk_Forward,false,0.3f,0.1f,0f);
-            //			analogValue-=InputManager.GetInput((int)States.Base_Layer_MyState,false,0.3f,0.1f,0f);
-            //
-            ////			Debug.Log(analogValue);
+						//if (InputManager.GetInputUp((int)States.Wave))
+						//{
+						//    Debug.Log(States.Wave + "-Up");
+						//    // animator.Play((int)States.Wave);
+						//}
 
 
 
-
-
-        }
+						//        if (InputManager.GetInput((int)States.Walk_Forward, false))
+						//        {
+						//
+						//        }
+						//	
+						//
+						//          if(InputManager.GetInputDown((int)States.Walk_Forward)){
+						//				Debug.Log("Down");
+						//			}
+						//
+						//			if(InputManager.GetInputUp((int)States.Walk_Forward)){
+						//				Debug.Log("Up");
+						//			}
+						//
+						////		
+//						InputManager.MapStateToInput ("WalkForward", KeyCodeExtension.W.SINGLE);
+//						InputManager.MapStateToInput ("WalkForward", 1, KeyCodeExtension.Joystick1AxisXPositive.SINGLE);
+//
+//
+//						InputManager.MapStateToInput ("WalkBackward", KeyCodeExtension.S.SINGLE);
+//						InputManager.MapStateToInput ("WalkBackward", 1, KeyCodeExtension.Joystick1AxisYNegative.SINGLE);
+//
+//						//Bind Axis in one part
+//						float analogValue = InputManager.GetInput (Animator.StringToHash ("WalkForward"), false, 0.3f, 0.1f, 0f);
+//						analogValue -= InputManager.GetInput (Animator.StringToHash ("WalkBackward"), false, 0.3f, 0.1f, 0f);
+//           
+//						Debug.Log (analogValue);//would go from  -1 to 1
 
 
 
 
-        void OnGUI()
-        {
+
+				}
+
+				void OnGUI ()
+				{
 
 //			if (InputManager.Devices.ContainsIndex(0))
 //				XDevice = InputManager.Devices.GetDeviceAt(0) as XInputDevice;
@@ -423,84 +422,81 @@ namespace ws.winx
 //			}
 
 
-            //don't take device here in the loop this is just for demo
+						//don't take device here in the loop this is just for demo
 
-            if (InputManager.Devices.ContainsIndex(0))
-                TTFFDDevice = InputManager.Devices.GetDeviceAt(0) as ThrustmasterRGTFFDDevice;
-
-
+						if (InputManager.Devices.ContainsIndex (0))
+								TTFFDDevice = InputManager.Devices.GetDeviceAt (0) as ThrustmasterRGTFFDDevice;
 
 
 
-            if (TTFFDDevice == null) return;
 
-            //#if UNITY_ANDROID
 
-            vSliderValue = GUI.HorizontalSlider(new Rect(25, 520, 400, 100), vSliderValue, 255.0F, 0.0F);
-            // #endif
+						if (TTFFDDevice == null)
+								return;
 
-            if (vSliderValue != vSliderValuePrev)
+						//#if UNITY_ANDROID
+
+						vSliderValue = GUI.HorizontalSlider (new Rect (25, 520, 400, 100), vSliderValue, 255.0F, 0.0F);
+						// #endif
+
+						if (vSliderValue != vSliderValuePrev)
                // device.SetMotor(Convert.ToByte(vSliderValue), 0xA7, onMotorSet);
-				TTFFDDevice.SetMotor(Convert.ToByte(vSliderValue), Convert.ToByte(vSliderValue), onMotorSet);
+								TTFFDDevice.SetMotor (Convert.ToByte (vSliderValue), Convert.ToByte (vSliderValue), onMotorSet);
 
-            vSliderValuePrev = vSliderValue;
+						vSliderValuePrev = vSliderValue;
 
 
 
-            if (GUI.Button(new Rect(25, 590, 100, 130), "Stop Motor"))
-            {
-                //timer.Stop();
-				if(runEffectEnumerator!=null)
-                StopCoroutine(runEffectEnumerator);
-                TTFFDDevice.StopMotor(onMotorStop);
-                vSliderValue = 128;
-            }
+						if (GUI.Button (new Rect (25, 590, 100, 130), "Stop Motor")) {
+								//timer.Stop();
+								if (runEffectEnumerator != null)
+										StopCoroutine (runEffectEnumerator);
+								TTFFDDevice.StopMotor (onMotorStop);
+								vSliderValue = 128;
+						}
 
-            if (GUI.Button(new Rect(150, 590, 100, 130), "Rumble"))
-            {
+						if (GUI.Button (new Rect (150, 590, 100, 130), "Rumble")) {
               
-                runEffectEnumerator = runEffect();
+								runEffectEnumerator = runEffect ();
 
-                TTFFDDevice.StopMotor(onMotorStop);
+								TTFFDDevice.StopMotor (onMotorStop);
 
-                StartCoroutine(runEffectEnumerator);
+								StartCoroutine (runEffectEnumerator);
 
 
-				//char buf[] = {0x00, 0x01, 0x0f, 0xc0, 0x00, large, small, 0x00, 0x00, 0x00, 0x00, 0x00};
+								//char buf[] = {0x00, 0x01, 0x0f, 0xc0, 0x00, large, small, 0x00, 0x00, 0x00, 0x00, 0x00};
                
-            }
-        }
+						}
+				}
 
+				void onMotorStop (bool success)
+				{
+						Debug.Log ("Motor stop was successful:" + success);
+				}
 
-        void onMotorStop(bool success)
-        {
-            Debug.Log("Motor stop was successful:" + success);
-        }
+				void onMotorSet (bool success)
+				{
+						Debug.Log ("Motor command was successful:" + success);
+				}
 
-        void onMotorSet(bool success)
-        {
-            Debug.Log("Motor command was successful:" + success);
-        }
+				IEnumerator runEffect ()
+				{
+						while (true) {
+								forceX += 0xA7;
+								TTFFDDevice.SetMotor (forceX, forceX, onMotorSet);
 
-        IEnumerator runEffect()
-        {
-            while (true)
-            {
-                forceX += 0xA7;
-                TTFFDDevice.SetMotor(forceX, forceX, onMotorSet);
+								yield return new WaitForSeconds (0.5f);
+						}
 
-                yield return new WaitForSeconds(0.5f);
-            }
+						// yield break;
 
-            // yield break;
+				}
 
-        }
-
-        void onTimerElapsed(object sender, ElapsedEventArgs args)
-        {
-            forceX += 0xA7;
-            TTFFDDevice.SetMotor(forceX, forceX, onMotorSet);
-        }
+				void onTimerElapsed (object sender, ElapsedEventArgs args)
+				{
+						forceX += 0xA7;
+						TTFFDDevice.SetMotor (forceX, forceX, onMotorSet);
+				}
 
 
 
@@ -508,14 +504,14 @@ namespace ws.winx
 
 
 
-        /// <summary>
-        /// DONT FORGET TO CLEAN AFTER YOURSELF
-        /// </summary>
-        void OnDestroy()
-        {
-            if (TTFFDDevice != null)
-                TTFFDDevice.StopMotor();
-            InputManager.Dispose();
-        }
-    }
+				/// <summary>
+				/// DONT FORGET TO CLEAN AFTER YOURSELF
+				/// </summary>
+				void OnDestroy ()
+				{
+						if (TTFFDDevice != null)
+								TTFFDDevice.StopMotor ();
+						InputManager.Dispose ();
+				}
+		}
 }
