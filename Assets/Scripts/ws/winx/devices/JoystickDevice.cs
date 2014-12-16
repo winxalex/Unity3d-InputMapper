@@ -773,6 +773,9 @@ namespace ws.winx.devices
 
 		}
 
+
+	//TODO remove that 9000 factor shit
+
 		public enum JoystickPovPosition : ushort
 		{
 				Centered = 0xFFFF,/* x */

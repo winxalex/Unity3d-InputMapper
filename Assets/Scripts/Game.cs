@@ -268,7 +268,7 @@ namespace ws.winx
 								InputManager.MapStateToInput ("ManualAddedSTATE", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
 
 						//add secondary
-						//InputManager.MapStateToInput ("ManualAddedSTATE", 1, KeyCodeExtension.Joystick1AxisXPositive.SINGLE);
+						InputManager.MapStateToInput ("AnyJoystick", KeyCodeExtension.JoystickAxisXPositive.SINGLE);
 
 						UnityEngine.Debug.Log ("Log:" + InputManager.Log ());
 
@@ -383,7 +383,7 @@ namespace ws.winx
 						//
 						////
 
-
+//Bind Axis as one part
 //						InputManager.MapStateToInput ("WalkForward", KeyCodeExtension.W.SINGLE);
 //						InputManager.MapStateToInput ("WalkForward", 1, KeyCodeExtension.Joystick1AxisXPositive.SINGLE);
 //
@@ -391,12 +391,19 @@ namespace ws.winx
 //						InputManager.MapStateToInput ("WalkBackward", KeyCodeExtension.S.SINGLE);
 //						InputManager.MapStateToInput ("WalkBackward", 1, KeyCodeExtension.Joystick1AxisYNegative.SINGLE);
 //
-//						//Bind Axis in one part
-						float analogValue = InputManager.GetInput ((int)States.Wave,  0.3f, 0.1f, 0f);
-//						float analogValue = InputManager.GetInput (Animator.StringToHash ("WalkForward"), 0.3f, 0.1f, 0f);
-//						analogValue -= InputManager.GetInput (Animator.StringToHash ("WalkBackward"),  0.3f, 0.1f, 0f);
-//           
-					Debug.Log (analogValue);//would go from  -1 to 1
+//						
+		
+			//Keys and mouses return analog values 0f to 1f
+			//PovForward,PovRight and Positive Axis return analog values from 0f to 1f and 
+			//PovBackard,PovLeft and Negative Axis return analog values from 0f to -1f
+			
+//			float axisPos = InputManager.GetInput (Animator.StringToHash ("WalkForward"), false, 0.3f, 0.1f, 0f);
+//			
+//			float axisNeg= InputManager.GetInput (Animator.StringToHash ("WalkBackward"), false, 0.3f, 0.1f, 0f);
+//			
+//			float analogVal=axisPos - Math.Sign(axisNeg)*axisNeg;
+//			
+//			Debug.Log (analogVal);//would go from  -1 to 1
 
 
 
