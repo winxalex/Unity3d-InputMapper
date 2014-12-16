@@ -63,7 +63,7 @@ namespace ws.winx.input
 	
 
 
-		internal static IHIDInterface hidInterface{
+		public static IHIDInterface hidInterface{
 			get{ 
                
 				if(__hidInterface==null){

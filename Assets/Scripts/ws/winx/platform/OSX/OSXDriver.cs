@@ -152,7 +152,7 @@ namespace ws.winx.platform.osx
 
 						device.Buttons[buttonIndex].value=value;
 
-						UnityEngine.Debug.Log("Button "+buttonIndex+" value:"+value+" State:"+device.Buttons[buttonIndex].buttonState);
+				//		UnityEngine.Debug.Log("Button "+buttonIndex+" value:"+value+" State:"+device.Buttons[buttonIndex].buttonState);
 						
 						return;
 					}

@@ -381,7 +381,9 @@ namespace ws.winx
 						//				Debug.Log("Up");
 						//			}
 						//
-						////		
+						////
+
+
 //						InputManager.MapStateToInput ("WalkForward", KeyCodeExtension.W.SINGLE);
 //						InputManager.MapStateToInput ("WalkForward", 1, KeyCodeExtension.Joystick1AxisXPositive.SINGLE);
 //
@@ -390,10 +392,11 @@ namespace ws.winx
 //						InputManager.MapStateToInput ("WalkBackward", 1, KeyCodeExtension.Joystick1AxisYNegative.SINGLE);
 //
 //						//Bind Axis in one part
-//						float analogValue = InputManager.GetInput (Animator.StringToHash ("WalkForward"), false, 0.3f, 0.1f, 0f);
-//						analogValue -= InputManager.GetInput (Animator.StringToHash ("WalkBackward"), false, 0.3f, 0.1f, 0f);
+						float analogValue = InputManager.GetInput ((int)States.Wave,  0.3f, 0.1f, 0f);
+//						float analogValue = InputManager.GetInput (Animator.StringToHash ("WalkForward"), 0.3f, 0.1f, 0f);
+//						analogValue -= InputManager.GetInput (Animator.StringToHash ("WalkBackward"),  0.3f, 0.1f, 0f);
 //           
-//						Debug.Log (analogValue);//would go from  -1 to 1
+					Debug.Log (analogValue);//would go from  -1 to 1
 
 
 

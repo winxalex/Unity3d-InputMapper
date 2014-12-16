@@ -21,6 +21,7 @@ using System.IO;
 using System.Linq;
 using Mono.TextTemplating;
 
+namespace ws.winx.editor{
 public class InputMapper : EditorWindow
 {
 
@@ -98,6 +99,9 @@ public class InputMapper : EditorWindow
 		{
 				if (_stateInputCombinations != null && _stateInputCombinations.Count > 0)
 						_stateInputCombinations = new Dictionary<int, InputState> ();
+
+
+				InputManager.hidInterface.Enumerate ();
 
 				// Get existing open window or if none, make a new one:
 				EditorWindow.GetWindow (typeof(InputMapper));
@@ -927,4 +931,5 @@ public class InputMapper : EditorWindow
 
             InputManager.Dispose();
         }
+}
 }
