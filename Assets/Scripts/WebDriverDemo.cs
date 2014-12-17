@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -134,7 +134,7 @@ namespace ws.winx
 			
 						////easiest way to map state to combination (ex.of single W and C click)
 						if (!InputManager.HasInputState ("ManualAddedSTATE"))
-								InputManager.MapStateToInput ("ManualAddedSTATE", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
+								InputManager.MapStateToInput ("ManualAddedSTATE", InputCode.W.SINGLE, InputCode.C.SINGLE);
 			
 						UnityEngine.Debug.Log ("Log:" + InputManager.Log ());
 			

@@ -973,43 +973,52 @@ namespace ws.winx.input
 		}
 
 
-		/// <summary>
-		/// Gets the input.
-		/// </summary>
-		/// <returns><c>true</c>, if input happen, <c>false</c> otherwise.</returns>
-		/// <param name="stateNameHash">State name hash.</param>
-		/// <param name="atOnce" default="false">Affect only in combo inputs!!!(default=false)Function returns true when combination pressed in row  If set to <c>true</c> function return true when all keys/buttons are pressed.</param>
-//		public static bool GetInput(int stateNameHash,bool atOnce=false){
-//            //Use is mapping states so no quering keys during gameplay
-//            if (InputManager.EditMode) return false;
-//			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
-//            return __inputCombinations[0].GetInput(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInput(atOnce));
-//        }
+	
+
 
 		/// <summary>
-		/// Gets the input up.
+		/// HOLD.
 		/// </summary>
-		/// <returns><c>true</c>, if input binded to state happen, <c>false</c> otherwise.</returns>
+		/// <returns><c>true</c>, while input binded to state returns signal, <c>false</c> otherwise.</returns>
 		/// <param name="stateNameHash">State name hash.</param>
-		public static bool GetInputUp(int stateNameHash){
+		/// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts Hold state in row </param>
+		public static bool GetInputHold(int stateNameHash,bool atOnce=false){
+			//Use is mapping states so no quering keys during gameplay
+			if (InputManager.EditMode) return false;
+			
+			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
+			return __inputCombinations[0].GetInputHold(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputHold(atOnce));
+		}
+
+		/// <summary>
+		/// UP.
+		/// </summary>
+		/// <returns><c>true</c>, if input binded to state stopped to return values(then is reseted), <c>false</c> otherwise.</returns>
+		/// <param name="stateNameHash">State name hash.</param>
+		/// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts up state in row 
+		/// Need questionable may would be implemented in next release if there is interests
+		/// </param>
+		/// 
+		public static bool GetInputUp(int stateNameHash,bool atOnce=false){
             //Use is mapping states so no quering keys during gameplay
             if (InputManager.EditMode) return false;
 
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
-            return __inputCombinations[0].GetInputUp() || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp());
+            return __inputCombinations[0].GetInputUp(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp(atOnce));
 		}
 
 		/// <summary>
-		/// Gets the input down.
+		/// DOWN.
 		/// </summary>
-		/// <returns><c>true</c>, if input binded to state down happen, <c>false</c> otherwise.</returns>
-		/// <param name="stateNameHash">State name hash.</param>		
-		public static bool GetInputDown(int stateNameHash){
+		/// <returns><c>true</c>, if input binded to state started to return values (than is reseted), <c>false</c> otherwise.</returns>
+		/// <param name="stateNameHash">State name hash.</param>
+		/// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts down state in row </param>		 
+		public static bool GetInputDown(int stateNameHash,bool atOnce=false){
 			//Use is mapping states so no quering keys during gameplay
 			if (InputManager.EditMode) return false;
 
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
-            return __inputCombinations[0].GetInputDown() || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputDown());
+            return __inputCombinations[0].GetInputDown(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputDown(atOnce));
 		}
 
 

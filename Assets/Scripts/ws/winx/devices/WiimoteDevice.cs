@@ -534,7 +534,7 @@ namespace ws.winx.devices
         /// during combos process
 		/// </summary>
 		/// <returns>The input.</returns>
-		 public override int GetInput(){
+		 public override int GetInputCode(){
            // UnityEngine.Debug.Log("GetInput:" + Time.frameCount);
 
             //there is no  Time.frameCount in Editor (Edit mode - Editor scripts)
@@ -605,9 +605,9 @@ namespace ws.winx.devices
                         if (dominantAxisInx == 6) //(int)JoystickAxis.AxisPovX
                         {
                             if (Axis[dominantAxisInx].value > 0)
-                                return KeyCodeExtension.toCode((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Right);
+                                return InputCode.toCode((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Right);
                             else
-                                return KeyCodeExtension.toCode((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Left);
+                                return InputCode.toCode((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Left);
                         }
 
                         //if (Axis[JoystickAxis.AxisPovX].buttonState == JoystickButtonState.Down)
@@ -617,15 +617,15 @@ namespace ws.winx.devices
                         {
 
                             if (Axis[dominantAxisInx].value > 0)
-                                return KeyCodeExtension.toCode((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Forward);
+                                return InputCode.toCode((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Forward);
                             else
-                                return KeyCodeExtension.toCode((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Backward);
+                                return InputCode.toCode((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Backward);
                         }
 
                         if (Axis[dominantAxisInx].value > 0)
-                            return KeyCodeExtension.toCode((Joysticks)Index, dominantAxisInx, (int)JoystickPosition.Positive);
+                            return InputCode.toCode((Joysticks)Index, dominantAxisInx, (int)JoystickPosition.Positive);
                         else
-                            return KeyCodeExtension.toCode((Joysticks)Index, dominantAxisInx, (int)JoystickPosition.Negative);
+                            return InputCode.toCode((Joysticks)Index, dominantAxisInx, (int)JoystickPosition.Negative);
 
 
 
@@ -674,7 +674,7 @@ namespace ws.winx.devices
                    
 
                         if (Buttons[button].buttonState == JoystickButtonState.Down)
-                            return KeyCodeExtension.toCode((Joysticks)Index, JoystickAxis.None, button);
+                            return InputCode.toCode((Joysticks)Index, JoystickAxis.None, button);
 
                         // UnityEngine.Debug.Log("AfterbuttonState " + button_collection[0]);
 

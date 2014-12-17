@@ -266,10 +266,10 @@ namespace ws.winx
 
 						////easiest way to map state to combination (ex.of single W and C click)
 						if (!InputManager.HasInputState ("ManualAddedSTATE"))
-								InputManager.MapStateToInput ("ManualAddedSTATE", KeyCodeExtension.W.SINGLE, KeyCodeExtension.C.SINGLE);
+								InputManager.MapStateToInput ("ManualAddedSTATE", InputCode.W.SINGLE, InputCode.C.SINGLE);
 
 						//add secondary
-						InputManager.MapStateToInput ("AnyJoystick", KeyCodeExtension.JoystickAxisXPositive.SINGLE);
+						InputManager.MapStateToInput ("AnyJoystick", InputCode.JoystickAxisXPositive.SINGLE);
 
 						UnityEngine.Debug.Log ("Log:" + InputManager.Log ());
 
@@ -300,37 +300,39 @@ namespace ws.winx
 								return;
 
 
-//						if (InputManager.GetInput ((int)States.Wave)) {
+//						if (InputManager.GetInputHold ((int)States.Wave)) {
 //							
 //							Debug.Log ("Wave -Hold");
 //							// animator.Play((int)States.Wave);
 //							//	animator.Play (Animator.StringToHash ("Wave"));
 //						}
 					
-						if (InputManager.GetInputDown ((int)States.Wave)) {
-           
-								Debug.Log ("Wave -Down");
-								// animator.Play((int)States.Wave);
-							//	animator.Play (Animator.StringToHash ("Wave"));
-						}
 
-						if (InputManager.GetInputUp ((int)States.Wave)) {
+			//NOTICED when used combos processor is reseted when used DOWN AND UP,HOLD toghther
+//						if (InputManager.GetInputDown ((int)States.Wave,true)) {
+//           
+//								Debug.Log ("Wave -Down");
+//								// animator.Play((int)States.Wave);
+//							//	animator.Play (Animator.StringToHash ("Wave"));
+//						}
+
+						if (InputManager.GetInputUp ((int)States.Wave,true)) {
 							
 							Debug.Log ("Wave -Up");
 							// animator.Play((int)States.Wave);
 							//	animator.Play (Animator.StringToHash ("Wave"));
 						}
-
-
-						if (InputManager.GetInputDown ((int)States.MyCustomState)) {
-							Debug.Log (States.MyCustomState + "-Down");
-							// animator.Play((int)States.Wave);
-						}
-
-						if (InputManager.GetInputUp ((int)States.MyCustomState)) {
-								Debug.Log (States.MyCustomState + "-Up");
-								// animator.Play((int)States.Wave);
-						}
+//
+//
+//						if (InputManager.GetInputDown ((int)States.MyCustomState)) {
+//							Debug.Log (States.MyCustomState + "-Down");
+//							// animator.Play((int)States.Wave);
+//						}
+//
+//						if (InputManager.GetInputUp ((int)States.MyCustomState)) {
+//								Debug.Log (States.MyCustomState + "-Up");
+//								// animator.Play((int)States.Wave);
+//						}
 
 
 						#region Testing Fuzer
@@ -412,13 +414,13 @@ namespace ws.winx
 //
 //						
 
-			float axisPos = InputManager.GetInput (Animator.StringToHash ("WalkForward"), 0.3f, 0.1f, 0.2f);
+//			float axisPos = InputManager.GetInput (Animator.StringToHash ("WalkForward"), 0.3f, 0.1f, 0.2f);
+//
+//			float axisNeg= InputManager.GetInput (Animator.StringToHash ("WalkBackward"),  0.3f, 0.1f, 0.1f);
+//
+//			float analogVal=axisPos - axisNeg;
 			
-			float axisNeg= InputManager.GetInput (Animator.StringToHash ("WalkBackward"),  0.3f, 0.1f, 0.1f);
-
-			float analogVal=axisPos - axisNeg;
-			
-			Debug.Log (analogVal);//would go from  -1 to 1
+			//Debug.Log (analogVal);//would go from  -1 to 1
 
 
 

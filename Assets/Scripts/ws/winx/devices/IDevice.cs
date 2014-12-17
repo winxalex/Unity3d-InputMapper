@@ -32,12 +32,12 @@ namespace ws.winx.devices
 		JoystickButtonCollection<IButtonDetails> Buttons {get;}
 
 		void Update();
-		int GetInput();
-		bool GetKey(int code);
-		bool GetKeyDown(int code);
-		bool GetKeyUp(int code);
-		float GetAxis (int code);
-		bool GetAnyKeyDown();
+		int GetInputCode();
+		bool GetInputHold(int code);
+		bool GetInputDown(int code);
+		bool GetInputUp(int code);
+		float GetInput (int code);
+		bool GetAnyInputDown();
     }
 
   

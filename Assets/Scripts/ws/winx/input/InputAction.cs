@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using ws.winx.input;
 using System.Collections.Generic;
@@ -108,13 +108,13 @@ namespace ws.winx.input
 		/// <param name="code">Code.</param>
 		/// <param name="type">Type.</param>
 		public InputAction(int code,InputActionType type=InputActionType.SINGLE){
-			if(code<KeyCodeExtension.MAX_KEY_CODE){
+			if(code<InputCode.MAX_KEY_CODE){
 
-				code=KeyCodeExtension.toCode((KeyCode) code);
+				code=InputCode.toCode((KeyCode) code);
 
 			}
 
-				if(KeyCodeExtension.toJoystickID(code)==(int)Joysticks.Joystick) _fromAny=true;
+				if(InputCode.toJoystickID(code)==(int)Joysticks.Joystick) _fromAny=true;
 
 
 			//Debug.Log("From Any:"+_fromAny);
@@ -132,11 +132,11 @@ namespace ws.winx.input
 		public InputAction(KeyCode code,InputActionType type=InputActionType.SINGLE){
 		
 
-			__defaultCode=_code=KeyCodeExtension.toCode(code);
+			__defaultCode=_code=InputCode.toCode(code);
 
 			__defaultType=_type=type;
 
-			if(KeyCodeExtension.toJoystickID(_code)==(int)Joysticks.Joystick) _fromAny=true;
+			if(InputCode.toJoystickID(_code)==(int)Joysticks.Joystick) _fromAny=true;
 			Debug.Log("From Any:"+_fromAny);
 
 			_codeString=ToString();
@@ -198,7 +198,7 @@ namespace ws.winx.input
 		protected virtual string ToEnumString(int code){
 		
            // InputManager.keyCodeExtension
-            return KeyCodeExtension.toEnumString(code);
+            return InputCode.toEnumString(code);
 		
 		
 
@@ -239,10 +239,10 @@ namespace ws.winx.input
 				 
 
 
-					_code=KeyCodeExtension.toCode(code);
+					_code=InputCode.toCode(code);
 
 
-					if(KeyCodeExtension.toJoystickID(_code)==(int)Joysticks.Joystick) _fromAny=true;
+					if(InputCode.toJoystickID(_code)==(int)Joysticks.Joystick) _fromAny=true;
 
 
 			}

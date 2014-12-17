@@ -219,7 +219,7 @@ namespace ws.winx.input
         public static bool GetAnyKeyDown(int id)
         {
 
-            return Input.anyKeyDown || InputManager.Devices.GetDeviceAt(id).GetAnyKeyDown();
+            return Input.anyKeyDown || InputManager.Devices.GetDeviceAt(id).GetAnyInputDown();
 
         }
 
@@ -245,7 +245,7 @@ namespace ws.winx.input
             IDeviceCollection devices = InputManager.Devices;
 
             foreach (IDevice device in devices)
-                if (device.GetAnyKeyDown())
+                if (device.GetAnyInputDown())
                     return true;
 
             return false;
@@ -327,7 +327,7 @@ namespace ws.winx.input
       /// </summary>
       /// <returns>The axis.</returns>
       /// <param name="action">Action.</param>
-        public static float GetAxis(InputAction action)
+        public static float GetInput(InputAction action)
         {
             int code = action.code;
 
@@ -338,7 +338,7 @@ namespace ws.winx.input
                 float axisValue;
 
                 foreach (IDevice device in devices)
-                    if ((axisValue = device.GetAxis(code)) != 0)
+                    if ((axisValue = device.GetInput(code)) != 0)
                         return axisValue;
 
                 return 0;
@@ -346,9 +346,9 @@ namespace ws.winx.input
             }
             else
             {
-                int index = KeyCodeExtension.toJoystickID(code);
+                int index = InputCode.toJoystickID(code);
                 if (InputManager.Devices.ContainsIndex(index))
-					return InputManager.Devices.GetDeviceAt(index).GetAxis(code);
+					return InputManager.Devices.GetDeviceAt(index).GetInput(code);
                 else
                     return 0;
             }
@@ -363,10 +363,10 @@ namespace ws.winx.input
         /// <returns><c>true</c>, if key was gotten, <c>false</c> otherwise.</returns>
         /// <param name="code">Code.</param>
         /// <param name="fromAny">If set to <c>true</c> from any.</param>
-        public static bool GetKey(int code, bool fromAny = false)
+        public static bool GetInputHold(int code, bool fromAny = false)
         {
 
-            if (code < KeyCodeExtension.MAX_KEY_CODE)
+            if (code < InputCode.MAX_KEY_CODE)
             {
                 if (Application.isPlaying)/*&& ! not procceing of GUI Event is used*/
                     return Input.GetKey((KeyCode)code);
@@ -381,7 +381,7 @@ namespace ws.winx.input
                     IDeviceCollection devices = InputManager.Devices;
 
                     foreach (IDevice device in devices)
-                        if (device.GetKey(code))
+                        if (device.GetInputHold(code))
                             return true;
 
                     return false;
@@ -389,10 +389,10 @@ namespace ws.winx.input
                 }
                 else
                 {
-                    int index = KeyCodeExtension.toJoystickID(code);
+                    int index = InputCode.toJoystickID(code);
                     if (InputManager.Devices.ContainsIndex(index))
 
-                        return InputManager.Devices.GetDeviceAt(index).GetKey(code);
+                        return InputManager.Devices.GetDeviceAt(index).GetInputHold(code);
                     else
                         return false;
 
@@ -406,9 +406,9 @@ namespace ws.winx.input
         /// </summary>
         /// <returns><c>true</c>, if key was gotten, <c>false</c> otherwise.</returns>
         /// <param name="action">Action.</param>
-        public static bool GetKey(InputAction action)
+        public static bool GetInputHold(InputAction action)
         {
-            return GetKey(action.code, action.fromAny);
+            return GetInputHold(action.code, action.fromAny);
 
         }
 
@@ -423,7 +423,7 @@ namespace ws.winx.input
         {
             int code = action.code;
 
-            if (code < KeyCodeExtension.MAX_KEY_CODE)
+            if (code < InputCode.MAX_KEY_CODE)
             {
                 return Input.GetKeyUp((KeyCode)code);
             }
@@ -434,7 +434,7 @@ namespace ws.winx.input
                     IDeviceCollection devices = InputManager.Devices;
 
                     foreach (IDevice device in devices)
-                        if (device.GetKeyUp(code))
+                        if (device.GetInputUp(code))
                             return true;
 
                     return false;
@@ -442,10 +442,10 @@ namespace ws.winx.input
                 }
                 else
                 {
-                    int index = KeyCodeExtension.toJoystickID(code);
+                    int index = InputCode.toJoystickID(code);
                     if (InputManager.Devices.ContainsIndex(index))
 
-                        return InputManager.Devices.GetDeviceAt(index).GetKeyUp(code);
+                        return InputManager.Devices.GetDeviceAt(index).GetInputUp(code);
                     else
                         return false;
 
@@ -460,7 +460,7 @@ namespace ws.winx.input
         {
 
             int code = action.code;
-            if (code < KeyCodeExtension.MAX_KEY_CODE)
+            if (code < InputCode.MAX_KEY_CODE)
             {
                 return Input.GetKeyDown((KeyCode)code);
             }
@@ -472,7 +472,7 @@ namespace ws.winx.input
                 {
                     IDeviceCollection devices = InputManager.Devices;
                     foreach (IDevice device in devices)
-                        if (device.GetKeyDown(code))
+                        if (device.GetInputDown(code))
                             return true;
 
                     return false;
@@ -480,10 +480,10 @@ namespace ws.winx.input
                 }
                 else
                 {
-                    int index = KeyCodeExtension.toJoystickID(code);
+                    int index = InputCode.toJoystickID(code);
                     if (InputManager.Devices.ContainsIndex(index))
 
-                        return InputManager.Devices.GetDeviceAt(index).GetKeyDown(code);
+                        return InputManager.Devices.GetDeviceAt(index).GetInputDown(code);
                     else
                         return false;
 
@@ -595,9 +595,9 @@ namespace ws.winx.input
             {
 
                 //If 
-                if ((_code = device.GetInput()) != 0)
+                if ((_code = device.GetInputCode()) != 0)
                 {
-                    Debug.Log("Get Input Joy" + device.Index + " " + KeyCodeExtension.toEnumString(_code)+"frame:"+Time.frameCount);
+                    Debug.Log("Get Input Joy" + device.Index + " " + InputCode.toEnumString(_code)+"frame:"+Time.frameCount);
                     return processInput(_code, time);
                 }
             }
@@ -673,7 +673,7 @@ namespace ws.winx.input
 
             if (action.type == InputActionType.LONG)
             {
-                if (InputEx.GetKey(action))
+                if (InputEx.GetInputHold(action))
                 {//if hold
                     if (_lastCode != action.code)
                     {
@@ -735,7 +735,7 @@ namespace ws.winx.input
                     _lastCode = code;
                     _lastCodeTime = time;
 
-                    Debug.Log("Last code " + KeyCodeExtension.toEnumString(_lastCode));
+                    Debug.Log("Last code " + InputCode.toEnumString(_lastCode));
                     //	Debug.Log("Take time "+_lastCodeTime);
                 }
                 else
@@ -779,7 +779,7 @@ namespace ws.winx.input
                 if (_lastCode != 0)
                 {//=KeyCode.None
                     //if key is still down and time longer then default long time click => display long click
-                    if (InputEx.GetKey(_lastCode))
+                    if (InputEx.GetInputHold(_lastCode))
                     {
                         if (time - _lastCodeTime >= InputAction.LONG_CLICK_SENSITIVITY)
                         {

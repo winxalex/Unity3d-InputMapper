@@ -841,7 +841,7 @@ namespace ws.winx.drivers
 						else
 						{
 							_buttonState = JoystickButtonState.Hold;
-							Debug.Log("val:"+value+"_buttonState:"+_buttonState);
+							//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
 						}
 	
 						
@@ -859,7 +859,7 @@ namespace ws.winx.drivers
 							else
 								_buttonState = JoystickButtonState.NegToUp;
 
-							Debug.Log("val:"+value+"_buttonState:"+_buttonState);
+							//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
 							
 						}
 						else
