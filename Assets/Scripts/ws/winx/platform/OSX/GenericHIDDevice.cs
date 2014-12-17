@@ -32,7 +32,7 @@ namespace ws.winx.platform.osx
 	using IOReturn =Native.IOReturn;// System.IntPtr;
 	
 	using IOHIDElementType=Native.IOHIDElementType;
-	using CFIndex =System.Int64;
+	using CFIndex =System.Int32;//System.Int64;
 
 	public class HidAsyncState
 	{
@@ -251,13 +251,13 @@ namespace ws.winx.platform.osx
 			
 			IOHIDElementRef element = Native.IOHIDValueGetElement(valRef);
 			uint uid=Native.IOHIDElementGetCookie(element);
-			long value;
+			int value;
 			Native.IOHIDElementType  type = Native.IOHIDElementGetType(element);
 			GenericHIDDevice device;
 
 			value = Native.IOHIDValueGetIntegerValue (valRef);
 
-			UnityEngine.Debug.Log ("DeviceValueReceived:"+value);
+			//UnityEngine.Debug.Log ("DeviceValueReceived:"+value);
 
 			
 			try{

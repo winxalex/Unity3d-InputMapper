@@ -49,7 +49,7 @@ namespace ws.winx.platform.osx
 	//using IOReturn = //System.IntPtr;
 	using IOHIDElementCookie = System.UInt32;
 	using CFTypeID=System.Int32;//System.UInt64;
-	using CFIndex =System.Int64;
+	using CFIndex =System.Int32;
 	using CFTimeInterval=System.Double;
 	using mach_port_t=System.UInt32;
 	using UInt8=System.Byte;

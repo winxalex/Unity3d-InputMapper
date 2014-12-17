@@ -42,6 +42,8 @@ namespace ws.winx.platform.osx
 
 #region Fields
 
+		public float dreadZone=0.05f;
+
 		IHIDInterface _hidInterface;
 
 		
@@ -74,7 +76,7 @@ namespace ws.winx.platform.osx
      /// <param name="type">Type.</param>
      /// <param name="uid">Uid.</param>
      /// <param name="value">Value.</param>
-		internal void DeviceValueReceived(IDevice device,Native.IOHIDElementType type,uint uid,long value)
+		internal void DeviceValueReceived(IDevice device,Native.IOHIDElementType type,uint uid,int value)
 		{
 			//UnityEngine.Debug.Log ("OSXDriver>>DeviceValueReceived");
 		
@@ -118,6 +120,12 @@ namespace ws.winx.platform.osx
 							UnityEngine.Debug.Log("POVX:"+device.Axis[JoystickAxis.AxisPovX].value+" POVY:"+device.Axis[JoystickAxis.AxisPovY].value);	
 						
 						}else{
+//							if(axisIndex==2){
+//								UnityEngine.Debug.Log("ORG Axis"+axisIndex+" Counts:"+ (int)value+" min:"+axisDetails.min+" max:"+axisDetails.max);
+//
+//							}
+
+
 							//Sanity check.
 							if(value < axisDetails.min)
 							{
@@ -129,9 +137,30 @@ namespace ws.winx.platform.osx
 							}
 
 							//Calculate the -1 to 1 float from the min and max possible values.
-							axisDetails.value=(value - axisDetails.min) / (float)(axisDetails.max - axisDetails.min) * 2.0f - 1.0f;
+							float analogValue=0f;
 
-							//UnityEngine.Debug.Log("AxisValue:"+axisDetails.value);
+							//if trigger
+							if(axisDetails.min==0)
+								analogValue=(float)value/axisDetails.max;
+							else
+								analogValue=(value - axisDetails.min) / (float)(axisDetails.max - axisDetails.min) * 2.0f - 1.0f;
+
+
+							//round
+							if (analogValue < dreadZone && analogValue > -dreadZone)
+								analogValue=0f;
+							else if(analogValue> 1-dreadZone && analogValue>0) analogValue=1f;
+							if(analogValue< -1+dreadZone && analogValue<0) analogValue=-1f;
+
+
+
+							axisDetails.value=analogValue;
+
+
+//							if(axisIndex==5){
+//								UnityEngine.Debug.Log("Axis"+axisIndex+" Counts:"+ value+" min:"+axisDetails.min+" max:"+axisDetails.max);
+//								UnityEngine.Debug.Log("Axis"+axisIndex+" Value:"+axisDetails.value);
+//							}
 
 						}
 
@@ -234,7 +263,7 @@ namespace ws.winx.platform.osx
 			if (report.Status == HIDReport.ReadStatus.Success || report.Status == HIDReport.ReadStatus.Buffered) {
 
 
-				DeviceValueReceived(device,(Native.IOHIDElementType)BitConverter.ToUInt32(report.Data,0),BitConverter.ToUInt32(report.Data,4),BitConverter.ToInt64(report.Data,8));
+				DeviceValueReceived(device,(Native.IOHIDElementType)BitConverter.ToUInt32(report.Data,0),BitConverter.ToUInt32(report.Data,4),BitConverter.ToInt32(report.Data,8));
 			}
 
 

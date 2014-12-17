@@ -252,7 +252,7 @@ namespace ws.winx.input
 						// reset
       
 						if (InputEx.GetAction (_pointer.Current)) {//and// if code and type are ok go in
-							//	UnityEngine.Debug.Log ("CODE:" + _pointer.Current.codeString);
+								//	UnityEngine.Debug.Log ("CODE:" + _pointer.Current.codeString);
                      
 
 								//save time when action happened if not saved or reseted
@@ -279,7 +279,7 @@ namespace ws.winx.input
 										_pointer.MoveNext ();//start from beginin
 										__actionHappenTime = 0;
 										InputEx.LastCode = 0;
-									//	UnityEngine.Debug.Log ("Reset Time Cos Time Passed (Too late):" + Time.time + " Time Allowed:" + (__actionHappenTime + InputAction.COMBINATION_CLICK_SENSITIVITY));
+										//	UnityEngine.Debug.Log ("Reset Time Cos Time Passed (Too late):" + Time.time + " Time Allowed:" + (__actionHappenTime + InputAction.COMBINATION_CLICK_SENSITIVITY));
 
 								}
 
