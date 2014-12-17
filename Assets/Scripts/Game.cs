@@ -82,8 +82,9 @@ namespace ws.winx
 						//TODO think of better entry point
 						InputManager.hidInterface.Enumerate ();
 
-						// !!!Postive аxes mapping only currently(need to find way to distinct postive from negative axis)
 
+
+						// !!!Postive аxes mapping only currently(need to find way to distinct postive from negative axis in Unity way of handling)
 						// if(Application.isPlaying)
 						//     InputManager.AddDriver(new UnityDriver());
 
@@ -277,10 +278,9 @@ namespace ws.winx
 						InputEvent ev = new InputEvent ("ManualAddedSTATE");
 						//InputEvent ev = new InputEvent((int)States.SomeState);
 
-						ev.INPUT += new EventHandler (Handle1);
-						ev.INPUT += new EventHandler (Handle2);
-						ev.UP += new EventHandler (onUp);//this wouldn't fire for combo inputs(single only)
-						ev.DOWN += new EventHandler (onDown);//this wouldn't fire for combo inputs(single only)
+						
+						ev.UP += new EventHandler (onUp);
+						ev.DOWN += new EventHandler (onDown);
 
 						_settingsLoaded = true;
 
@@ -300,14 +300,32 @@ namespace ws.winx
 								return;
 
 
-						//Input.GetInput allows combos (combined input actions)
-						if (InputManager.GetInputDown ((int)States.Wave)) {// || InputManager.GetInput((int)States.Wave,true))
-            // if (InputManager.GetInput((int)States.Wave,false))
-								Debug.Log ("Wave Down");
+//						if (InputManager.GetInput ((int)States.Wave)) {
+//							
+//							Debug.Log ("Wave -Hold");
+//							// animator.Play((int)States.Wave);
+//							//	animator.Play (Animator.StringToHash ("Wave"));
+//						}
+					
+						if (InputManager.GetInputDown ((int)States.Wave)) {
+           
+								Debug.Log ("Wave -Down");
 								// animator.Play((int)States.Wave);
-								animator.Play (Animator.StringToHash ("Wave"));
+							//	animator.Play (Animator.StringToHash ("Wave"));
 						}
 
+						if (InputManager.GetInputUp ((int)States.Wave)) {
+							
+							Debug.Log ("Wave -Up");
+							// animator.Play((int)States.Wave);
+							//	animator.Play (Animator.StringToHash ("Wave"));
+						}
+
+
+						if (InputManager.GetInputDown ((int)States.MyCustomState)) {
+							Debug.Log (States.MyCustomState + "-Down");
+							// animator.Play((int)States.Wave);
+						}
 
 						if (InputManager.GetInputUp ((int)States.MyCustomState)) {
 								Debug.Log (States.MyCustomState + "-Up");
@@ -384,6 +402,7 @@ namespace ws.winx
 						////
 
 //Bind Axis as one part
+
 //						InputManager.MapStateToInput ("WalkForward", KeyCodeExtension.W.SINGLE);
 //						InputManager.MapStateToInput ("WalkForward", 1, KeyCodeExtension.Joystick1AxisXPositive.SINGLE);
 //
@@ -392,20 +411,22 @@ namespace ws.winx
 //						InputManager.MapStateToInput ("WalkBackward", 1, KeyCodeExtension.Joystick1AxisYNegative.SINGLE);
 //
 //						
-		
-			//Keys and mouses return analog values 0f to 1f
-			//PovForward,PovRight and Positive Axis return analog values from 0f to 1f and 
-			//PovBackard,PovLeft and Negative Axis return analog values from 0f to -1f
+
+			float axisPos = InputManager.GetInput (Animator.StringToHash ("WalkForward"), 0.3f, 0.1f, 0.2f);
 			
-//			float axisPos = InputManager.GetInput (Animator.StringToHash ("WalkForward"), false, 0.3f, 0.1f, 0f);
-//			
-//			float axisNeg= InputManager.GetInput (Animator.StringToHash ("WalkBackward"), false, 0.3f, 0.1f, 0f);
-//			
-//			float analogVal=axisPos - Math.Sign(axisNeg)*axisNeg;
-//			
-//			Debug.Log (analogVal);//would go from  -1 to 1
+			float axisNeg= InputManager.GetInput (Animator.StringToHash ("WalkBackward"),  0.3f, 0.1f, 0.1f);
+
+			float analogVal=axisPos - axisNeg;
+			
+			Debug.Log (analogVal);//would go from  -1 to 1
 
 
+
+
+			// Hardware normalized value in range of -1f to 1f (keys,mouse would return 0f or 1f, triggers 0f to 1f)
+			//float analogVal2= InputManager.GetInput (Animator.StringToHash ("WalkBackward"));
+			//Debug.Log (analogVal2);
+		
 
 
 

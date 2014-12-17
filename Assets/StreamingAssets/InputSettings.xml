@@ -16,7 +16,7 @@
           <d1p1:InputCombination>
             <d1p1:InputActions>
               <d1p1:InputAction>
-                <d1p1:Code>Joystick0AxisYPositive</d1p1:Code>
+                <d1p1:Code>Joystick0AxisXNegative</d1p1:Code>
               </d1p1:InputAction>
             </d1p1:InputActions>
           </d1p1:InputCombination>
@@ -39,7 +39,7 @@
           <d1p1:InputCombination>
             <d1p1:InputActions>
               <d1p1:InputAction>
-                <d1p1:Code>Joystick0Button0</d1p1:Code>
+                <d1p1:Code>Joystick0AxisXPositive</d1p1:Code>
               </d1p1:InputAction>
             </d1p1:InputActions>
           </d1p1:InputCombination>
@@ -72,6 +72,57 @@
           <d1p1:InputCombination i:nil="true" />
         </d1p1:InputCombinations>
         <d1p1:Name>ManualAddedSTATE</d1p1:Name>
+      </d2p1:Value>
+    </d2p1:KeyValueOfintInputState>
+    <d2p1:KeyValueOfintInputState>
+      <d2p1:Key>-1887939231</d2p1:Key>
+      <d2p1:Value>
+        <d1p1:Hash>-1887939231</d1p1:Hash>
+        <d1p1:InputCombinations>
+          <d1p1:InputCombination>
+            <d1p1:InputActions>
+              <d1p1:InputAction>
+                <d1p1:Code>JoystickAxisXPositive</d1p1:Code>
+              </d1p1:InputAction>
+            </d1p1:InputActions>
+          </d1p1:InputCombination>
+          <d1p1:InputCombination i:nil="true" />
+        </d1p1:InputCombinations>
+        <d1p1:Name>AnyJoystick</d1p1:Name>
+      </d2p1:Value>
+    </d2p1:KeyValueOfintInputState>
+    <d2p1:KeyValueOfintInputState>
+      <d2p1:Key>-2035216068</d2p1:Key>
+      <d2p1:Value>
+        <d1p1:Hash>-2035216068</d1p1:Hash>
+        <d1p1:InputCombinations>
+          <d1p1:InputCombination>
+            <d1p1:InputActions>
+              <d1p1:InputAction>
+                <d1p1:Code>Joystick0AxisYPositive</d1p1:Code>
+              </d1p1:InputAction>
+            </d1p1:InputActions>
+          </d1p1:InputCombination>
+          <d1p1:InputCombination i:nil="true" />
+        </d1p1:InputCombinations>
+        <d1p1:Name>WalkForward</d1p1:Name>
+      </d2p1:Value>
+    </d2p1:KeyValueOfintInputState>
+    <d2p1:KeyValueOfintInputState>
+      <d2p1:Key>2035415549</d2p1:Key>
+      <d2p1:Value>
+        <d1p1:Hash>2035415549</d1p1:Hash>
+        <d1p1:InputCombinations>
+          <d1p1:InputCombination>
+            <d1p1:InputActions>
+              <d1p1:InputAction>
+                <d1p1:Code>Joystick0AxisYNegative</d1p1:Code>
+              </d1p1:InputAction>
+            </d1p1:InputActions>
+          </d1p1:InputCombination>
+          <d1p1:InputCombination i:nil="true" />
+        </d1p1:InputCombinations>
+        <d1p1:Name>WalkBackward</d1p1:Name>
       </d2p1:Value>
     </d2p1:KeyValueOfintInputState>
   </d1p1:StateInputs>

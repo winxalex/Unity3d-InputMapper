@@ -36,11 +36,11 @@ namespace ws.winx.input
                 foreach (KeyValuePair<int, Delegate[]> pair in Events)
                 {
                     
-                    if(pair.Value[0]!=null && InputManager.GetInput(pair.Key,false)){
-                        delegates= pair.Value[0].GetInvocationList();
-                        foreach(Delegate d in delegates)
-                            ((EventHandler)d).BeginInvoke(this, args, EndAsyncEvent, null);
-                    }
+//                    if(pair.Value[0]!=null && InputManager.GetInput(pair.Key,false)){
+//                        delegates= pair.Value[0].GetInvocationList();
+//                        foreach(Delegate d in delegates)
+//                            ((EventHandler)d).BeginInvoke(this, args, EndAsyncEvent, null);
+//                    }
 
                     if (pair.Value[1] != null && InputManager.GetInputUp(pair.Key))
                     {

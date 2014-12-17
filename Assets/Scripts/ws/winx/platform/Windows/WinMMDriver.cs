@@ -609,67 +609,62 @@ namespace ws.winx.platform.windows
             {
                 get { return _buttonState; }
             }
-            public float value
-            {
-                get { return _value; }
-                set
-                {
+			public float value
+			{
+				get { return _value; }
+				set
+				{
+					
+					if (value == -1 || value==1)
+					{
+						if (_buttonState == JoystickButtonState.None
+						    || _buttonState == JoystickButtonState.Up)
+						{
+							
+							_buttonState = JoystickButtonState.Down;
+							
+							//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
+							
+						}
+						else
+						{
+							_buttonState = JoystickButtonState.Hold;
+						}
+						
+						
+					}
+					else
+					{
+						
+						if (_buttonState == JoystickButtonState.Down
+						    || _buttonState == JoystickButtonState.Hold)
+						{
+							
+							//if previous value was >0 => PosToUp
+							if (_value>1)
+								_buttonState = JoystickButtonState.PosToUp;
+							else
+								_buttonState = JoystickButtonState.NegToUp;
+							
+							//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
+							
+						}
+						else
+						{//if(buttonState==JoystickButtonState.Up){
+							_buttonState = JoystickButtonState.None;
+						}
+						
+						
+					}
+					
+					
+					_value = value;
+					
+					
+					
+				}//set
+			}
 
-                    if (value == 0)
-                    {
-                        if (_buttonState == JoystickButtonState.Down
-                            || _buttonState == JoystickButtonState.Hold)
-                        {
-
-                            //axis float value isn't yet update so it have value before getting 0
-                            if (_value > 0)//0 come after positive values
-                                _buttonState = JoystickButtonState.PosToUp;
-                            else
-                                _buttonState = JoystickButtonState.NegToUp;
-
-                        }
-                        else
-                        {//if(buttonState==JoystickButtonState.Up){
-                            _buttonState = JoystickButtonState.None;
-                        }
-
-
-                    }
-                    else
-                    //!!! value can jump from >0 to <0 without go to 0(might go to "Down" directly for triggers axis)
-                    {
-                        if (_value > 0 && value < 0)
-                        {
-                            _buttonState = JoystickButtonState.PosToUp;
-                        }
-                        else if (_value < 0 && value > 0)
-                        {
-                            _buttonState = JoystickButtonState.NegToUp;
-                        }
-                        else if (_buttonState == JoystickButtonState.None
-                           || _buttonState == JoystickButtonState.PosToUp || _buttonState == JoystickButtonState.NegToUp)
-                        {
-
-                            _buttonState = JoystickButtonState.Down;
-
-                        }
-                        else
-                        {
-                            _buttonState = JoystickButtonState.Hold;
-                        }
-
-
-                    }
-
-
-
-
-                    _value = value;
-
-                    //UnityEngine.Debug.Log("ButtonState:"+_buttonState+"_value:"+_value);
-
-                }//set
-            }
 
             #endregion
 

@@ -932,25 +932,46 @@ namespace ws.winx.input
         //}
 
 		/// <summary>
-		/// Gets the input of real or virutal axis(2keys used as axis) mapped to State.
+		/// Gets the input of generic created values in range 0f to 1f
+		/// in steps defined with "sensitivity" param
+		/// while key, button,axis are HOLD
 		/// </summary>
-		/// <returns>The input.</returns>
+		/// <returns> 0f to 1f</returns>
 		/// <param name="stateNameHash">State name hash.</param>
-		/// <param name="fromRange">From range.</param>
-		/// <param name="toRange">To range.</param>
-		/// <param name="sensitivity">Sensitivity.</param>
-		/// <param name="dreadzone">Dreadzone.</param>
-		/// <param name="gravity">Gravity.</param>
-		public static float GetInput(int stateNameHash,float sensitivity=0.3f,float dreadzone=0.1f,float gravity=0.3f){
+		/// <param name="sensitivity">Sensitivity of rising value 0f to 1f</param>
+		/// <param name="dreadzone">Dreadzone.If value drop under dreadzone value would be nullify</param>
+		/// <param name="gravity">Gravity. After no signal from input value would drop with step of gravity or immidiately</param>
+		public static float GetInput(int stateNameHash,float sensitivity,float dreadzone=0.1f,float gravity=0.3f){
            //Use is mapping states so no quering keys during gameplay
             if (InputManager.EditMode) return 0f;
             
             __inputCombinations=__settings.stateInputs[stateNameHash].combinations;
 
 
-            return __inputCombinations[0].GetAxis(sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetAxis(sensitivity, dreadzone, gravity) : 0);
+            return __inputCombinations[0].GetGenericAnalogValue(sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetGenericAnalogValue(sensitivity, dreadzone, gravity) : 0);
 
 		}
+
+
+
+
+		/// <summary>
+		/// Gets the input of device(hardware)
+		/// if device mapped is digital would return 0f or 1f 
+		/// if device mapped is analog would return 0f to 1f(positive axis) or 0f to -1f(negative axis) in steps depending of device sensitivity
+		/// </summary>
+		/// <returns>-1f to 1f.</returns>
+		/// <param name="stateNameHash">State name hash.</param>
+		public static float GetInput(int stateNameHash){
+			//Use is mapping states so no quering keys during gameplay
+			if (InputManager.EditMode) return 0f;
+			
+			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
+
+			return __inputCombinations[0].GetAnalogValue() + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetAnalogValue() : 0f);
+			
+		}
+
 
 		/// <summary>
 		/// Gets the input.
@@ -958,12 +979,12 @@ namespace ws.winx.input
 		/// <returns><c>true</c>, if input happen, <c>false</c> otherwise.</returns>
 		/// <param name="stateNameHash">State name hash.</param>
 		/// <param name="atOnce" default="false">Affect only in combo inputs!!!(default=false)Function returns true when combination pressed in row  If set to <c>true</c> function return true when all keys/buttons are pressed.</param>
-		public static bool GetInput(int stateNameHash,bool atOnce=false){
-            //Use is mapping states so no quering keys during gameplay
-            if (InputManager.EditMode) return false;
-			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
-            return __inputCombinations[0].GetInput(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInput(atOnce));
-        }
+//		public static bool GetInput(int stateNameHash,bool atOnce=false){
+//            //Use is mapping states so no quering keys during gameplay
+//            if (InputManager.EditMode) return false;
+//			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
+//            return __inputCombinations[0].GetInput(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInput(atOnce));
+//        }
 
 		/// <summary>
 		/// Gets the input up.
@@ -973,6 +994,7 @@ namespace ws.winx.input
 		public static bool GetInputUp(int stateNameHash){
             //Use is mapping states so no quering keys during gameplay
             if (InputManager.EditMode) return false;
+
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
             return __inputCombinations[0].GetInputUp() || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp());
 		}
@@ -981,11 +1003,11 @@ namespace ws.winx.input
 		/// Gets the input down.
 		/// </summary>
 		/// <returns><c>true</c>, if input binded to state down happen, <c>false</c> otherwise.</returns>
-		/// <param name="stateNameHash">State name hash.</param>
-		
+		/// <param name="stateNameHash">State name hash.</param>		
 		public static bool GetInputDown(int stateNameHash){
 			//Use is mapping states so no quering keys during gameplay
 			if (InputManager.EditMode) return false;
+
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
             return __inputCombinations[0].GetInputDown() || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputDown());
 		}

@@ -81,16 +81,7 @@ namespace ws.winx.input
         }
 
 
-        public event EventHandler  INPUT 
-        {
-            add {
-                AddHandler(_stateNameHash, value, 0);
-            }
-            remove
-            {
-                RemoveHandler(_stateNameHash, value,0);
-            }
-        }
+       
 
 
 

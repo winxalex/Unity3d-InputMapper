@@ -137,10 +137,9 @@ namespace ws.winx
 			InputEvent ev = new InputEvent("ManualAddedSTATE");
 			//InputEvent ev = new InputEvent((int)States.SomeState);
 			
-			ev.INPUT += new EventHandler(Handle1);
-			ev.INPUT += new EventHandler(Handle2);
-			ev.UP += new EventHandler(onUp);//this wouldn't fire for combo inputs(single only)
-			ev.DOWN += new EventHandler(onDown);//this wouldn't fire for combo inputs(single only)
+	
+			ev.UP += new EventHandler(onUp);
+			ev.DOWN += new EventHandler(onDown);
 			
 			_settingsLoaded = true;
 			

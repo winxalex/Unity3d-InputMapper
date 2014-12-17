@@ -75,6 +75,8 @@ namespace ws.winx.gui
 				void Update ()
 				{
 
+
+						
 						if (_selectedStateHash != 0) {
 								// UnityEngine.Debug.Log("Edit mode true");
 								//Use is mapping states so no quering keys during gameplay
@@ -94,7 +96,7 @@ namespace ws.winx.gui
 
 
 
-										//					Debug.Log ("Action:"+_action+" "+_action.code);
+															Debug.Log ("Action:"+_action+" "+_action.code);
 								}
 
 

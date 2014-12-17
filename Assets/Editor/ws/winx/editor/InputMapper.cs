@@ -101,6 +101,8 @@ public class InputMapper : EditorWindow
 						_stateInputCombinations = new Dictionary<int, InputState> ();
 
 
+			InputManager.Dispose ();
+
 				InputManager.hidInterface.Enumerate ();
 
 				// Get existing open window or if none, make a new one:

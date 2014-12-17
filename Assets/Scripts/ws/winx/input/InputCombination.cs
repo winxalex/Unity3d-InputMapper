@@ -229,17 +229,17 @@ namespace ws.winx.input
 
         internal bool GetInputUp()
         {
-            if (_actionsList.Count == 1)
-                return GetInputBase(InputEx.GetKeyUp);
-            else { /*Debug.LogWarning("Use GetInput only with Combos");*/ return false; }
+            //if (_actionsList.Count == 1)
+                return GetInputBase(InputEx.GetInputUp);
+            //else { /*Debug.LogWarning("Use GetInput only with Combos");*/ return false; }
 
         }
 
         internal bool GetInputDown()
         {
-            if (_actionsList.Count == 1)
+           // if (_actionsList.Count == 1)
                 return GetInputBase(InputEx.GetKeyDown);
-            else { /*Debug.LogWarning("Use GetInput only with Combos");*/ return false; }
+           // else { /*Debug.LogWarning("Use GetInput only with Combos");*/ return false; }
         }
 
 
@@ -372,22 +372,33 @@ namespace ws.winx.input
 		}
 
 
-        internal float GetAxis(float sensitivity, float dreadzone, float gravity)
+
+		/// <summary>
+		/// Gets the analog value.
+		/// </summary>
+		/// <returns> for analog input return -1f to 1f and for digital 0f or 1f</returns>
+        internal float GetAnalogValue()
         {
             if (_actionsList.Count > 1) return 0;
 
             if (__currentInputAction.code < KeyCodeExtension.MAX_KEY_CODE || KeyCodeExtension.toAxis(__currentInputAction.code) == JoystickAxis.None)
             {//if keys are used as axis
-                return GetVirtualAxis(sensitivity, dreadzone, gravity);
+				return InputEx.GetKeyDown(__currentInputAction)  || InputEx.GetKey(__currentInputAction) ? 1f : 0f;
             }
 
-            //TODO made dreadzone rounding to axis
+          
             return InputEx.GetAxis(__currentInputAction);
 
         }
 
-
-        internal float GetVirtualAxis(float sensitivity, float dreadzone, float gravity)
+		/// <summary>
+		/// Gets the interpolated analog value.
+		/// </summary>
+		/// <returns>The interpolated analog value.</returns>
+		/// <param name="sensitivity">Sensitivity.</param>
+		/// <param name="dreadzone">Dreadzone.</param>
+		/// <param name="gravity">Gravity.</param>
+        internal float GetGenericAnalogValue(float sensitivity, float dreadzone, float gravity)
         {
 
 
@@ -400,22 +411,21 @@ namespace ws.winx.input
                 _analogValue = Mathf.Lerp(0, 1, Mathf.Clamp01(_timeDelta));
 
 
-                if (_analogValue < dreadzone)
-                {
-                    _analogValue = 0;
-                }
-
+				Debug.Log("hold");
 
 
             }
             else
             { //on KeyUp reset _timeDelta
-                if (InputEx.GetKeyUp(__currentInputAction))
+                if (InputEx.GetInputUp(__currentInputAction))
                 {
                     _isActive = false;
                     _timeDelta = 0f;//reset
 
-                    if (!(gravity > 0)) _analogValue = 0;
+					Debug.Log("UP g="+gravity);
+
+					//if gravity is not set => drop _analogValue to 0 immidiately
+					if (!(gravity > 0)) _analogValue = 0;
 
                     return _analogValue;
                 }
@@ -427,10 +437,13 @@ namespace ws.winx.input
 
                     _timeDelta += Time.deltaTime * gravity;
                     _analogValue = Mathf.Lerp(_analogValue, 0, Mathf.Clamp01(_timeDelta));
+
+					Debug.Log("gravity");
                 }
             }
 
 
+			if(_analogValue<dreadzone) _analogValue=0f;
 
 
             return _analogValue;

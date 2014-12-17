@@ -35,6 +35,7 @@ namespace ws.winx.devices
 				int _PID;
 				bool _isReady = true;
 				int _lastFrameNum = -1;
+				int axisDominantPrevInx = -1;
 
 				public int LastFrameNum {
 						get { return _lastFrameNum; }
@@ -215,7 +216,7 @@ namespace ws.winx.devices
 				}
 
 				/// <summary>
-				/// returns true if the key/axisAsKey is pressed
+				/// returns true if the key/axisAsKey is holded
 				/// </summary>
 				/// <returns><c>true</c>, if key was gotten, <c>false</c> otherwise.</returns>
 				/// <param name="code">Code. joystick(4bits) + axis(4bits) + data(+/- 5bits);</param>
@@ -228,6 +229,7 @@ namespace ws.winx.devices
 						JoystickAxis axis = KeyCodeExtension.toAxis (code);
 						int data = KeyCodeExtension.toData (code);
 						float axisValue;
+						bool isHold;
 
 
 
@@ -238,10 +240,13 @@ namespace ws.winx.devices
 
 						axisValue = axis_collection [axis].value;
 
+
+						isHold = axis_collection [axis].buttonState == JoystickButtonState.Hold;
+
 						if (axis == JoystickAxis.AxisPovX) {
-								if ((data + 1) * 9000 == (int)JoystickPovPosition.Left && axisValue < 0)
+								if ((data + 1) * 9000 == (int)JoystickPovPosition.Left && isHold && axisValue < 0)
 										return true;
-								if ((data + 1) * 9000 == (int)JoystickPovPosition.Right && axisValue > 0)
+								if ((data + 1) * 9000 == (int)JoystickPovPosition.Right && isHold && axisValue > 0)
 										return true;
 
 
@@ -251,20 +256,25 @@ namespace ws.winx.devices
 
 
 						if (axis == JoystickAxis.AxisPovY) {
-								if ((data + 1) * 9000 == (int)JoystickPovPosition.Backward && axisValue < 0)
+								if ((data + 1) * 9000 == (int)JoystickPovPosition.Backward && isHold && axisValue < 0)
 										return true;
-								if ((data + 1) * 9000 == (int)JoystickPovPosition.Forward && axisValue > 0)
+								if ((data + 1) * 9000 == (int)JoystickPovPosition.Forward && isHold && axisValue > 0)
 										return true;
 								return false;
 						}
 						
+
 						//	Debug.Log("GetKey axis:"+axis+" JOY:"+KeyCodeExtension.toJoystickID(code)+" ID:"+this.ID+" data:"+data+" axisValue= "+axisValue);
 
-						//if (data == (int)JoystickPosition.Negative && axisAsButton_collection[axis]==JoystickButtonState.Hold)
-						if (data == (int)JoystickPosition.Negative && axisValue < 0)
+					
+
+						if (data == (int)JoystickPosition.Negative && isHold && axisValue < 0) 
 								return true;
-						if (data == (int)JoystickPosition.Positive && axisValue > 0)
+												
+						if (data == (int)JoystickPosition.Positive && isHold && axisValue > 0) 
 								return true;
+
+
 
 
 						return false;
@@ -403,73 +413,83 @@ namespace ws.winx.devices
 						IAxisDetails axisDetails;
 
 
-                        //UnityEngine.Debug.Log("Count" + axis_collection.Count);
-                   // if(this.Index==0)
-                   //     UnityEngine.Debug.Log("GetInput>Joy" + this.Index + "AxisPovY state:" + axis_collection[JoystickAxis.AxisPovY].buttonState + " frame:" + this.LastFrameNum);
+						//UnityEngine.Debug.Log("Count" + axis_collection.Count);
+						// if(this.Index==0)
+						//     UnityEngine.Debug.Log("GetInput>Joy" + this.Index + "AxisPovY state:" + axis_collection[JoystickAxis.AxisPovY].buttonState + " frame:" + this.LastFrameNum);
 
 
 						/////////////////////////////////   HANDLE AXIS in DIGITAL MANNER //////////////////////////////
 
 						int dominantAxisInx = -1;
 
-						while (axis < num_axes) {
 
-								if (axis < num_axes && (axisDetails = axis_collection [axis]) != null) {
+						//only if there is no last dominant axis or  when last axis have been released you can search for new dominant axis
+						if (axisDominantPrevInx < 0 || (axisDominantPrevInx > -1 && ((axisDetails = axis_collection [axisDominantPrevInx]).buttonState == JoystickButtonState.PosToUp || axisDetails.buttonState == JoystickButtonState.NegToUp))) {
+								
+								axisDominantPrevInx = -1;
 
-										axisDetails = axis_collection [axis];
-										joyValue = axisDetails.value;
+								while (axis < num_axes) {
 
-										joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
+										if (axis < num_axes && (axisDetails = axis_collection [axis]) != null) {
 
-										if (axisDetails.buttonState == JoystickButtonState.Down)
-										if (joyValueMax < joyValue) {
-												joyValueMax = joyValue;
-												// dominantAxis = JoystickAxis.AxisV;
-												dominantAxisInx = axis;
+												axisDetails = axis_collection [axis];
+												joyValue = axisDetails.value;
+
+												joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
+
+												if (axisDetails.buttonState == JoystickButtonState.Down)
+												if (joyValueMax < joyValue) {
+														joyValueMax = joyValue;
+												
+														dominantAxisInx = axis;
+												}
+
+
+
 										}
 
-
-
+										axis++;
 								}
 
-								axis++;
-						}
 
+								// UnityEngine.Debug.Log(dominantAxisInx);
+								if (dominantAxisInx > -1) {
+										//if (dominantAxis != JoystickAxis.None) {
 
-						// UnityEngine.Debug.Log(dominantAxisInx);
-						if (dominantAxisInx > -1) {
-								//if (dominantAxis != JoystickAxis.None) {
+										axisDominantPrevInx = dominantAxisInx;
 
-								//UnityEngine.Debug.Log("Count" + axis_collection.Count);
-                            UnityEngine.Debug.Log("GetInput> Joy" + this.Index + " dominantAxis " + dominantAxisInx + " state:" + axis_collection[dominantAxisInx].buttonState + " frame:" + this.LastFrameNum);
+										//UnityEngine.Debug.Log("Count" + axis_collection.Count);
+										UnityEngine.Debug.Log ("GetInput> Joy" + this.Index + " dominantAxis " + dominantAxisInx + " state:" + axis_collection [dominantAxisInx].buttonState + " frame:" + this.LastFrameNum);
 
-								//stick.AxisAsButtons [dominantAxis] != JoystickButtonState.Hold;
+										//stick.AxisAsButtons [dominantAxis] != JoystickButtonState.Hold;
 
-								// index 6 and 7 are reserved for Pov Axes
-								if (dominantAxisInx == 6) { //(int)JoystickAxis.AxisPovX
+										// index 6 and 7 are reserved for Pov Axes
+										if (dominantAxisInx == 6) { //(int)JoystickAxis.AxisPovX
+												if (axis_collection [dominantAxisInx].value > 0)
+														return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Right);
+												else
+														return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Left);
+										}
+
+										//if (axis_collection[JoystickAxis.AxisPovX].buttonState == JoystickButtonState.Down)
+										//{
+
+										if (dominantAxisInx == 7) {//(int)JoystickAxis.AxisPovY
+
+												if (axis_collection [dominantAxisInx].value > 0)
+														return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Forward);
+												else
+														return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Backward);
+										}
+
 										if (axis_collection [dominantAxisInx].value > 0)
-												return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Right);
+												return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, (int)JoystickPosition.Positive);
 										else
-												return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Left);
+												return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, (int)JoystickPosition.Negative);
+
+
+
 								}
-
-								//if (axis_collection[JoystickAxis.AxisPovX].buttonState == JoystickButtonState.Down)
-								//{
-
-								if (dominantAxisInx == 7) {//(int)JoystickAxis.AxisPovY
-
-										if (axis_collection [dominantAxisInx].value > 0)
-												return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Forward);
-										else
-												return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, JoystickPovPosition.Backward);
-								}
-
-								if (axis_collection [dominantAxisInx].value > 0)
-										return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, (int)JoystickPosition.Positive);
-								else
-										return KeyCodeExtension.toCode ((Joysticks)Index, dominantAxisInx, (int)JoystickPosition.Negative);
-
-
 
 						}
 					
@@ -774,7 +794,7 @@ namespace ws.winx.devices
 		}
 
 
-	//TODO remove that 9000 factor shit
+		//TODO remove that 9000 factor shit
 
 		public enum JoystickPovPosition : ushort
 		{

@@ -116,17 +116,8 @@ namespace ws.winx.drivers
         #region IJoystickDriver implementation
 
         public void Update(IDevice device)
-        //public void Update (IDevice<ws.winx.devices.IAxisDetails, ws.winx.devices.IButtonDetails, ws.winx.devices.IDeviceExtension> joystick)
-        {
-          
+		 {
 
-
-            ////don't update in same frame twice
-            //if (_lastFrameNum == Time.frameCount)
-            //    return;
-            //else _lastFrameNum = Time.frameCount;
- //UnityEngine.Debug.Log("Update");
-           // _hidInterface.Read(device.PID, onRead);
 
             if (_hidInterface.Generics.ContainsKey(device.PID))
             {
@@ -136,15 +127,6 @@ namespace ws.winx.drivers
                 onRead(data);
 
             }
-
-            //if (device.isReady)
-            //{
-            //    ((JoystickDevice)device).isReady = false;
-            //    _hidInterface.Read(device, onRead);
-            //}
-
-        
-           
 
 
         }
@@ -845,42 +827,49 @@ namespace ws.winx.drivers
                 set
                 {
 
-                    if (value == 0)
-                    {
-                        if (_buttonState == JoystickButtonState.Down
-                            || _buttonState == JoystickButtonState.Hold)
-                        {
+					if (value == -1 || value==1)
+					{
+						if (_buttonState == JoystickButtonState.None
+						    || _buttonState == JoystickButtonState.Up)
+						{
+							
+							_buttonState = JoystickButtonState.Down;
+							
+							//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
+							
+						}
+						else
+						{
+							_buttonState = JoystickButtonState.Hold;
+							Debug.Log("val:"+value+"_buttonState:"+_buttonState);
+						}
+	
+						
+					}
+					else
+					{
+						
+						if (_buttonState == JoystickButtonState.Down
+						    || _buttonState == JoystickButtonState.Hold)
+						{
+							
+							//if previous value was >0 => PosToUp
+							if (_value>0)
+								_buttonState = JoystickButtonState.PosToUp;
+							else
+								_buttonState = JoystickButtonState.NegToUp;
 
-                            //axis float value isn't yet update so it have value before getting 0
-                            if (_value > 0)//0 come after positive values
-                                _buttonState = JoystickButtonState.PosToUp;
-                            else
-                                _buttonState = JoystickButtonState.NegToUp;
+							Debug.Log("val:"+value+"_buttonState:"+_buttonState);
+							
+						}
+						else
+						{//if(buttonState==JoystickButtonState.Up){
+							_buttonState = JoystickButtonState.None;
+						}
+	
+						
+					}
 
-                        }
-                        else
-                        {//if(buttonState==JoystickButtonState.Up){
-                            _buttonState = JoystickButtonState.None;
-                        }
-
-
-                    }
-                    else
-                    {
-                        if (_buttonState == JoystickButtonState.None
-                            || _buttonState == JoystickButtonState.Up)
-                        {
-
-                            _buttonState = JoystickButtonState.Down;
-
-                        }
-                        else
-                        {
-                            _buttonState = JoystickButtonState.Hold;
-                        }
-
-
-                    }
 
                     _value = value;
 

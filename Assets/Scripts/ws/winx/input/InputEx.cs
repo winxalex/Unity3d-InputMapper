@@ -322,11 +322,11 @@ namespace ws.winx.input
         //!!! IMPORTANT: Input happen every frame. If there is no refresh from the hardware device 
         // Input give same values just states are refreshed from DOWN->HOLD (value=1 stay) and UP->NONE (value=0 stay)
 
-        /// <summary>
-        /// Gets the axis.
-        /// </summary>
-        /// <returns>The axis.</returns>
-        /// <param name="action">Action.</param>
+      /// <summary>
+      /// Gets the axis.
+      /// </summary>
+      /// <returns>The axis.</returns>
+      /// <param name="action">Action.</param>
         public static float GetAxis(InputAction action)
         {
             int code = action.code;
@@ -419,7 +419,7 @@ namespace ws.winx.input
         /// </summary>
         /// <returns><c>true</c>, if key up was gotten, <c>false</c> otherwise.</returns>
         /// <param name="action">Action.</param>
-        public static bool GetKeyUp(InputAction action)
+        public static bool GetInputUp(InputAction action)
         {
             int code = action.code;
 
