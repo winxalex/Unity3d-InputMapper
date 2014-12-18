@@ -14,7 +14,7 @@ namespace ws.winx.devices
 		{
 			uint uid{get;set;}
 			float value{get;set;}
-			JoystickButtonState buttonState{get;}
+			ButtonState buttonState{get;}
 
 		}
 }

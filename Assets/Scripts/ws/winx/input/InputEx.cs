@@ -39,7 +39,14 @@ namespace ws.winx.input
 
 
 
-        public delegate object GetKeyBaseDelegate(int code);
+    //    public delegate object GetKeyBaseDelegate(int code);
+
+
+		public delegate bool KeyCodeInputResolverCallback(KeyCode code);
+
+		static KeyCodeInputResolverCallback GetKey=Input.GetKey;
+		static KeyCodeInputResolverCallback GetKeyUp=Input.GetKeyUp;
+		static KeyCodeInputResolverCallback GetKeyDown=Input.GetKeyDown;
 
         static Dictionary<int, bool> _isKeyState = new Dictionary<int, bool>();
         static int _numJoystickButtons = InputEx.MAX_NUM_JOYSTICK_BUTTONS;
@@ -216,7 +223,7 @@ namespace ws.winx.input
 
         }
 
-        public static bool GetAnyKeyDown(int id)
+        public static bool GetAnyInputDown(int id)
         {
 
             return Input.anyKeyDown || InputManager.Devices.GetDeviceAt(id).GetAnyInputDown();
@@ -357,48 +364,7 @@ namespace ws.winx.input
 
 
 
-        /// <summary>
-        /// Gets the key.
-        /// </summary>
-        /// <returns><c>true</c>, if key was gotten, <c>false</c> otherwise.</returns>
-        /// <param name="code">Code.</param>
-        /// <param name="fromAny">If set to <c>true</c> from any.</param>
-        public static bool GetInputHold(int code, bool fromAny = false)
-        {
-
-            if (code < InputCode.MAX_KEY_CODE)
-            {
-                if (Application.isPlaying)/*&& ! not procceing of GUI Event is used*/
-                    return Input.GetKey((KeyCode)code);
-                else
-                    return _isKeyState[code];
-
-            }
-            else
-            {
-                if (fromAny)
-                {
-                    IDeviceCollection devices = InputManager.Devices;
-
-                    foreach (IDevice device in devices)
-                        if (device.GetInputHold(code))
-                            return true;
-
-                    return false;
-
-                }
-                else
-                {
-                    int index = InputCode.toJoystickID(code);
-                    if (InputManager.Devices.ContainsIndex(index))
-
-                        return InputManager.Devices.GetDeviceAt(index).GetInputHold(code);
-                    else
-                        return false;
-
-                }
-            }
-        }
+    
 
 
         /// <summary>
@@ -406,11 +372,24 @@ namespace ws.winx.input
         /// </summary>
         /// <returns><c>true</c>, if key was gotten, <c>false</c> otherwise.</returns>
         /// <param name="action">Action.</param>
-        public static bool GetInputHold(InputAction action)
+        internal static bool GetInputHold(InputAction action)
         {
-            return GetInputHold(action.code, action.fromAny);
+			return GetInputBase (InputEx.GetKey, action, ButtonState.Hold);
 
         }
+
+
+	
+		/// <summary>
+		/// Gets the input hold.
+		/// </summary>
+		/// <returns><c>true</c>, if input hold was gotten, <c>false</c> otherwise.</returns>
+		/// <param name="code">Code.</param>
+		internal static bool GetInputHold(int code)
+		{
+			return GetInputBase (InputEx.GetKey, code, ButtonState.Hold);
+			
+		}
 
 
 
@@ -419,80 +398,66 @@ namespace ws.winx.input
         /// </summary>
         /// <returns><c>true</c>, if key up was gotten, <c>false</c> otherwise.</returns>
         /// <param name="action">Action.</param>
-        public static bool GetInputUp(InputAction action)
+        internal static bool GetInputUp(InputAction action)
         {
-            int code = action.code;
-
-            if (code < InputCode.MAX_KEY_CODE)
-            {
-                return Input.GetKeyUp((KeyCode)code);
-            }
-            else
-            {
-                if (action.fromAny)
-                {
-                    IDeviceCollection devices = InputManager.Devices;
-
-                    foreach (IDevice device in devices)
-                        if (device.GetInputUp(code))
-                            return true;
-
-                    return false;
-
-                }
-                else
-                {
-                    int index = InputCode.toJoystickID(code);
-                    if (InputManager.Devices.ContainsIndex(index))
-
-                        return InputManager.Devices.GetDeviceAt(index).GetInputUp(code);
-                    else
-                        return false;
-
-
-                }
-
-
-            }
+			return GetInputBase (InputEx.GetKeyUp, action, ButtonState.Up);
         }
 
-        public static bool GetKeyDown(InputAction action)
+
+		/// <summary>
+		/// Gets the input down.
+		/// </summary>
+		/// <returns><c>true</c>, if input down was gotten, <c>false</c> otherwise.</returns>
+		/// <param name="action">Action.</param>
+        public static bool GetInputDown(InputAction action)
         {
-
-            int code = action.code;
-            if (code < InputCode.MAX_KEY_CODE)
-            {
-                return Input.GetKeyDown((KeyCode)code);
-            }
-            else
-            {
-
-
-                if (action.fromAny)
-                {
-                    IDeviceCollection devices = InputManager.Devices;
-                    foreach (IDevice device in devices)
-                        if (device.GetInputDown(code))
-                            return true;
-
-                    return false;
-
-                }
-                else
-                {
-                    int index = InputCode.toJoystickID(code);
-                    if (InputManager.Devices.ContainsIndex(index))
-
-                        return InputManager.Devices.GetDeviceAt(index).GetInputDown(code);
-                    else
-                        return false;
-
-
-                }
-            }
+			return GetInputBase (InputEx.GetKeyDown, action, ButtonState.Down);
         }
 
-        protected static int GetGUIKeyboardInput()
+
+		public static bool GetInputBase(KeyCodeInputResolverCallback keycodeInputHandlerCallback,int code,ButtonState buttonState,bool fromAny=false)
+		{
+
+				if (code < InputCode.MAX_KEY_CODE)
+				{
+					return keycodeInputHandlerCallback((KeyCode)code);
+				}
+				else
+				{
+					
+					
+					if (fromAny)
+					{
+						IDeviceCollection devices = InputManager.Devices;
+						foreach (IDevice device in devices)
+							if (device.GetInputBase(code,buttonState))
+								return true;
+						
+						return false;
+						
+					}
+					else
+					{
+						int index = InputCode.toJoystickID(code);
+						if (InputManager.Devices.ContainsIndex(index))
+							
+							return InputManager.Devices.GetDeviceAt(index).GetInputBase(code,buttonState);
+						else
+							return false;
+						
+						
+					}
+				}
+
+		}
+
+		private static bool GetInputBase(KeyCodeInputResolverCallback keycodeInputHandlerCallback,InputAction action,ButtonState buttonState){
+
+				return GetInputBase(keycodeInputHandlerCallback,action.code,buttonState,action.fromAny);
+
+		}
+
+        private static int GetGUIKeyboardInput()
         {
             return _codeFromGUIEvent;
         }
@@ -618,7 +583,7 @@ namespace ws.winx.input
        
 
         /// <summary>
-        /// Check if InputActin happened
+        /// Check if InputActin happened( SINGLE,DOUBLE,LONG)
         /// </summary>
         /// <returns>true/false</returns>
         /// <param name="action">InputAction to be compared with input</param>
@@ -627,9 +592,10 @@ namespace ws.winx.input
 
             if (action.type == InputActionType.SINGLE)
             {
-                if (InputEx.GetKeyDown(action))
+                if (InputEx.GetInputBase(Input.GetKeyDown,action,ButtonState.Down))
                 {
                     Debug.Log("Single <" + InputActionType.SINGLE);
+					//action.startTime = Time.time;
                     _lastCode = action.code;
                     return true;
                 }
@@ -640,7 +606,7 @@ namespace ws.winx.input
 
             if (action.type == InputActionType.DOUBLE)
             {
-                if (InputEx.GetKeyDown(action))
+				if (InputEx.GetInputBase(Input.GetKeyDown,action,ButtonState.Down))
                 {
                     if (_lastCode != action.code)
                     {//first click
@@ -673,7 +639,7 @@ namespace ws.winx.input
 
             if (action.type == InputActionType.LONG)
             {
-                if (InputEx.GetInputHold(action))
+				if (InputEx.GetInputBase(Input.GetKey,action,ButtonState.Hold))
                 {//if hold
                     if (_lastCode != action.code)
                     {

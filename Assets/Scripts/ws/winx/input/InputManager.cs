@@ -823,7 +823,7 @@ namespace ws.winx.input
                 {
                     actionsString = "";
 
-                    foreach (InputAction action in combination.actions)
+                    foreach (InputAction action in combination.actionsList)
                     {
                         actionsString += String.Format(ACTIONFORMAT, action.ToString());
                     }
@@ -834,7 +834,7 @@ namespace ws.winx.input
                 if ((combination = combinations[1]) != null)
                 {
                     actionsString = "";
-                    foreach (InputAction action in combination.actions)
+                    foreach (InputAction action in combination.actionsList)
                     {
                         actionsString += String.Format(ACTIONFORMAT, action.ToString());
                     }
@@ -981,13 +981,12 @@ namespace ws.winx.input
 		/// </summary>
 		/// <returns><c>true</c>, while input binded to state returns signal, <c>false</c> otherwise.</returns>
 		/// <param name="stateNameHash">State name hash.</param>
-		/// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts Hold state in row </param>
-		public static bool GetInputHold(int stateNameHash,bool atOnce=false){
+		public static bool GetInputHold(int stateNameHash){
 			//Use is mapping states so no quering keys during gameplay
 			if (InputManager.EditMode) return false;
 			
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
-			return __inputCombinations[0].GetInputHold(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputHold(atOnce));
+			return __inputCombinations[0].GetInputHold() || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputHold());
 		}
 
 		/// <summary>
@@ -995,16 +994,18 @@ namespace ws.winx.input
 		/// </summary>
 		/// <returns><c>true</c>, if input binded to state stopped to return values(then is reseted), <c>false</c> otherwise.</returns>
 		/// <param name="stateNameHash">State name hash.</param>
-		/// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts up state in row 
-		/// Need questionable may would be implemented in next release if there is interests
 		/// </param>
 		/// 
-		public static bool GetInputUp(int stateNameHash,bool atOnce=false){
+		public static bool GetInputUp(int stateNameHash){
             //Use is mapping states so no quering keys during gameplay
             if (InputManager.EditMode) return false;
 
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
-            return __inputCombinations[0].GetInputUp(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp(atOnce));
+
+
+
+            return __inputCombinations[0].GetInputUp() || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp());
+
 		}
 
 		/// <summary>
@@ -1017,8 +1018,10 @@ namespace ws.winx.input
 			//Use is mapping states so no quering keys during gameplay
 			if (InputManager.EditMode) return false;
 
+
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
-            return __inputCombinations[0].GetInputDown(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputDown(atOnce));
+
+          	 return __inputCombinations[0].GetInputDown(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputDown(atOnce));
 		}
 
 

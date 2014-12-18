@@ -575,7 +575,7 @@ namespace ws.winx.devices
 
                             joyValue = joyValue < 0 ? -joyValue : joyValue;//abs
 
-                            if (axisDetails.buttonState == JoystickButtonState.Down)
+                            if (axisDetails.buttonState == ButtonState.Down)
                                 if (joyValueMax < joyValue)
                                 {
                                     joyValueMax = joyValue;
@@ -673,7 +673,7 @@ namespace ws.winx.devices
 
                    
 
-                        if (Buttons[button].buttonState == JoystickButtonState.Down)
+                        if (Buttons[button].buttonState == ButtonState.Down)
                             return InputCode.toCode((Joysticks)Index, JoystickAxis.None, button);
 
                         // UnityEngine.Debug.Log("AfterbuttonState " + button_collection[0]);

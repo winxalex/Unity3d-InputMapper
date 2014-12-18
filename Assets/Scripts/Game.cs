@@ -308,15 +308,15 @@ namespace ws.winx
 //						}
 					
 
-			//NOTICED when used combos processor is reseted when used DOWN AND UP,HOLD toghther
-//						if (InputManager.GetInputDown ((int)States.Wave,true)) {
-//           
-//								Debug.Log ("Wave -Down");
-//								// animator.Play((int)States.Wave);
-//							//	animator.Play (Animator.StringToHash ("Wave"));
-//						}
 
-						if (InputManager.GetInputUp ((int)States.Wave,true)) {
+						if (InputManager.GetInputDown ((int)States.Wave)) {
+           
+								Debug.Log ("Wave -Down");
+								// animator.Play((int)States.Wave);
+							//	animator.Play (Animator.StringToHash ("Wave"));
+						}
+
+						if (InputManager.GetInputUp ((int)States.Wave)) {
 							
 							Debug.Log ("Wave -Up");
 							// animator.Play((int)States.Wave);
@@ -426,7 +426,7 @@ namespace ws.winx
 
 
 			// Hardware normalized value in range of -1f to 1f (keys,mouse would return 0f or 1f, triggers 0f to 1f)
-			//float analogVal2= InputManager.GetInput (Animator.StringToHash ("WalkBackward"));
+			float analogVal2= InputManager.GetInput (Animator.StringToHash ("WalkBackward"));
 			//Debug.Log (analogVal2);
 		
 

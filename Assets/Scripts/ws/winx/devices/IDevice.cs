@@ -33,9 +33,7 @@ namespace ws.winx.devices
 
 		void Update();
 		int GetInputCode();
-		bool GetInputHold(int code);
-		bool GetInputDown(int code);
-		bool GetInputUp(int code);
+		bool GetInputBase(int code,ButtonState buttonState);
 		float GetInput (int code);
 		bool GetAnyInputDown();
     }

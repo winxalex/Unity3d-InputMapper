@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using ws.winx.devices;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -394,7 +394,7 @@ namespace ws.winx.drivers
 
         float _value;
         uint _uid;
-        JoystickButtonState _buttonState;
+        ButtonState _buttonState;
 
         #region IDeviceDetails implementation
 
@@ -414,7 +414,7 @@ namespace ws.winx.drivers
 
 
 
-        public JoystickButtonState buttonState
+        public ButtonState buttonState
         {
             get { return _buttonState; }
         }
@@ -437,11 +437,11 @@ namespace ws.winx.drivers
 
                 if (value > 0)
                 {
-                    if (_buttonState == JoystickButtonState.None
-                        || _buttonState == JoystickButtonState.Up)
+                    if (_buttonState == ButtonState.None
+                        || _buttonState == ButtonState.Up)
                     {
 
-                        _buttonState = JoystickButtonState.Down;
+                        _buttonState = ButtonState.Down;
 
 
 
@@ -449,7 +449,7 @@ namespace ws.winx.drivers
                     else
                     {
                         //if (buttonState == JoystickButtonState.Down)
-                        _buttonState = JoystickButtonState.Hold;
+                        _buttonState = ButtonState.Hold;
 
                     }
 
@@ -457,14 +457,14 @@ namespace ws.winx.drivers
                 }
                 else
                 { //
-                    if (_buttonState == JoystickButtonState.Down
-                        || _buttonState == JoystickButtonState.Hold)
+                    if (_buttonState == ButtonState.Down
+                        || _buttonState == ButtonState.Hold)
                     {
-                        _buttonState = JoystickButtonState.Up;
+                        _buttonState = ButtonState.Up;
                     }
                     else
                     {//if(buttonState==JoystickButtonState.Up){
-                        _buttonState = JoystickButtonState.None;
+                        _buttonState = ButtonState.None;
                     }
 
                 }
@@ -495,7 +495,7 @@ namespace ws.winx.drivers
         int _uid;
         int _min;
         int _max;
-        JoystickButtonState _buttonState = JoystickButtonState.None;
+        ButtonState _buttonState = ButtonState.None;
         bool _isNullable;
         bool _isHat;
         bool _isTrigger;
@@ -589,7 +589,7 @@ namespace ws.winx.drivers
 
         #endregion
 
-        public JoystickButtonState buttonState
+        public ButtonState buttonState
         {
             get { return _buttonState; }
         }
@@ -602,18 +602,18 @@ namespace ws.winx.drivers
 				
 				if (value == -1 || value==1)
 				{
-					if (_buttonState == JoystickButtonState.None
-					    || _buttonState == JoystickButtonState.Up)
+					if (_buttonState == ButtonState.None
+					    || _buttonState == ButtonState.Up)
 					{
 						
-						_buttonState = JoystickButtonState.Down;
+						_buttonState = ButtonState.Down;
 						
 						//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
 						
 					}
 					else
 					{
-						_buttonState = JoystickButtonState.Hold;
+						_buttonState = ButtonState.Hold;
 					}
 					
 					
@@ -621,22 +621,22 @@ namespace ws.winx.drivers
 				else
 				{
 					
-					if (_buttonState == JoystickButtonState.Down
-					    || _buttonState == JoystickButtonState.Hold)
+					if (_buttonState == ButtonState.Down
+					    || _buttonState == ButtonState.Hold)
 					{
 						
 						//if previous value was >0 => PosToUp
 						if (_value>1)
-							_buttonState = JoystickButtonState.PosToUp;
+							_buttonState = ButtonState.PosToUp;
 						else
-							_buttonState = JoystickButtonState.NegToUp;
+							_buttonState = ButtonState.NegToUp;
 						
 						//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
 						
 					}
 					else
 					{//if(buttonState==JoystickButtonState.Up){
-						_buttonState = JoystickButtonState.None;
+						_buttonState = ButtonState.None;
 					}
 					
 					

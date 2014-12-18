@@ -8,6 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 using System.Runtime.InteropServices;
+using UnityEngine;
 
 
 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
@@ -42,7 +43,7 @@ namespace ws.winx.platform.osx
 
 #region Fields
 
-		public float dreadZone=0.05f;
+		public float dreadZone=0.1f;
 
 		IHIDInterface _hidInterface;
 
@@ -432,7 +433,7 @@ namespace ws.winx.platform.osx
 			
 			float _value;
 			uint _uid;
-			JoystickButtonState _buttonState;
+			ButtonState _buttonState;
 
 #region IDeviceDetails implementation
 
@@ -449,7 +450,7 @@ namespace ws.winx.platform.osx
 
 
 
-			public JoystickButtonState buttonState{
+			public ButtonState buttonState{
 				get{return _buttonState; }
 			}
 
@@ -458,7 +459,7 @@ namespace ws.winx.platform.osx
 			public float value{
 				get{
 					return _value;
-					//return (_buttonState==JoystickButtonState.Hold || _buttonState==JoystickButtonState.Down);
+					//return (_buttonState==ButtonState.Hold || _buttonState==ButtonState.Down);
 				}
 				set{
 
@@ -470,19 +471,19 @@ namespace ws.winx.platform.osx
 					//TODO check the code with triggers
 					if (value > 0)
 					{
-						if (_buttonState == JoystickButtonState.None
-						    || _buttonState == JoystickButtonState.Up)
+						if (_buttonState == ButtonState.None
+						    || _buttonState == ButtonState.Up)
 						{
 							
-							_buttonState = JoystickButtonState.Down;
+							_buttonState = ButtonState.Down;
 							
 							
 							
 						}
 						else
 						{
-							//if (buttonState == JoystickButtonState.Down)
-							_buttonState = JoystickButtonState.Hold;
+							//if (buttonState == ButtonState.Down)
+							_buttonState = ButtonState.Hold;
 							
 						}
 						
@@ -490,14 +491,14 @@ namespace ws.winx.platform.osx
 					}
 					else
 					{ //
-						if (_buttonState == JoystickButtonState.Down
-						    || _buttonState == JoystickButtonState.Hold)
+						if (_buttonState == ButtonState.Down
+						    || _buttonState == ButtonState.Hold)
 						{
-							_buttonState = JoystickButtonState.Up;
+							_buttonState = ButtonState.Up;
 						}
 						else
-						{//if(buttonState==JoystickButtonState.Up){
-							_buttonState = JoystickButtonState.None;
+						{//if(buttonState==ButtonState.Up){
+							_buttonState = ButtonState.None;
 						}
 						
 					}
@@ -527,7 +528,7 @@ namespace ws.winx.platform.osx
 			uint _uid;
 			int _min;
 			int _max;
-			JoystickButtonState _buttonState;
+			ButtonState _buttonState;
 			bool _isNullable;
 			bool _isHat;
 			
@@ -605,7 +606,7 @@ namespace ws.winx.platform.osx
 
 #endregion
 
-			public JoystickButtonState buttonState{
+			public ButtonState buttonState{
 				get{return _buttonState; }
 			}
 			public float value
@@ -616,18 +617,18 @@ namespace ws.winx.platform.osx
 					
 					if (value == -1 || value==1)
 					{
-						if (_buttonState == JoystickButtonState.None
-						    || _buttonState == JoystickButtonState.Up)
+						if (_buttonState == ButtonState.None)
+						    //|| _buttonState == ButtonState.PosToUp || _buttonState==ButtonState.NegToUp)
 						{
 							
-							_buttonState = JoystickButtonState.Down;
+							_buttonState = ButtonState.Down;
 							
 							//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
-							
+							Debug.Log("_buttonState:"+_buttonState);
 						}
 						else
 						{
-							_buttonState = JoystickButtonState.Hold;
+							_buttonState = ButtonState.Hold;
 						}
 						
 						
@@ -635,22 +636,23 @@ namespace ws.winx.platform.osx
 					else
 					{
 						
-						if (_buttonState == JoystickButtonState.Down
-						    || _buttonState == JoystickButtonState.Hold)
+						if (_buttonState == ButtonState.Down
+						    || _buttonState == ButtonState.Hold)
 						{
 							
 							//if previous value was >0 => PosToUp
 							if (_value==1)
-								_buttonState = JoystickButtonState.PosToUp;
+								_buttonState = ButtonState.PosToUp;
 							else
-								_buttonState = JoystickButtonState.NegToUp;
-							
+								_buttonState = ButtonState.NegToUp;
+
+							Debug.Log("_buttonState:"+_buttonState);
 							//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
 							
 						}
 						else
-						{//if(buttonState==JoystickButtonState.Up){
-							_buttonState = JoystickButtonState.None;
+						{//if(buttonState==ButtonState.Up){
+							_buttonState = ButtonState.None;
 						}
 						
 						

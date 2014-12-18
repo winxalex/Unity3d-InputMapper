@@ -5,6 +5,7 @@ using System.Text;
 using UnityEngine;
 using System.Runtime.Serialization;
 using ws.winx.devices;
+using ws.winx.input;
 
 namespace ws.winx.input
 {
@@ -15,15 +16,21 @@ namespace ws.winx.input
 		{
 
 
-				public delegate bool InputDelegate (InputAction action);
+		public delegate bool InputDelegate(InputEx.KeyCodeInputResolverCallback keycodeInputHandlerCallback,InputAction action,ButtonState buttonState);
 
 				protected List<InputAction> _actionsList;
+				protected InputAction[] _actions;
 				protected String _combinationString;
-				protected List<InputAction>.Enumerator _pointer;
+			
 				protected float _analogValue = 0f;
 				protected float _timeDelta;
 				protected bool _isActive = false;
-				private InputAction __currentInputAction;
+				private InputAction __currentInputAction
+				{
+					get{ return actions[__currentIndex]; }
+				}
+
+				private int __currentIndex = 0;
 				/// <summary>
 				/// time when action in combination has started
 				/// (by diffrence this time with the current time and comparing to Combination sensitivity we could know 
@@ -36,14 +43,27 @@ namespace ws.winx.input
 #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 		[DataMember(Name = "InputActions")]
 #endif
-				public List<InputAction> actions {
+				public List<InputAction> actionsList {
 						get { return _actionsList; }
 						set {
 								_actionsList = value;
 								_combinationString = ToString (value);
-								initPointer ();
+								__currentIndex=0;
 
 						}
+				}
+
+				public InputAction[] actions{
+					get { 
+
+						if(_actions==null || _actions.Length!=_actionsList.Count)
+							_actions=_actionsList.ToArray();
+
+						return _actions; 
+			
+			
+					}
+				
 				}
 
 				public int numActions {
@@ -83,7 +103,7 @@ namespace ws.winx.input
 						for (int i = 0; i < actions.Length; i++)
 								_actionsList.Add (actions [i]);
 
-						initPointer ();
+						
 
 
 				}
@@ -99,7 +119,7 @@ namespace ws.winx.input
 						for (int i = 0; i < codes.Length; i++)
 								_actionsList.Add (new InputAction (codes [i]));
 
-						initPointer ();
+						
 				}
 
 				/// <summary>
@@ -114,7 +134,7 @@ namespace ws.winx.input
 						for (int i = 0; i < codes.Length; i++)
 								_actionsList.Add (new InputAction (codes [i]));
 
-						initPointer ();
+						
 
 
 				}
@@ -133,7 +153,7 @@ namespace ws.winx.input
 						_actionsList = combinations;
 
 
-						initPointer ();
+						
 
 
 				}
@@ -149,7 +169,7 @@ namespace ws.winx.input
 						this.combinationString = combinationString;
 
 
-						initPointer ();
+						
 
 				}
 
@@ -162,15 +182,16 @@ namespace ws.winx.input
 				{
 						_actionsList.Add (action);
 						_combinationString = ToString (_actionsList);
+						_actions = _actionsList.ToArray ();
 
-						//if(_actionsList.Count>0)
-						initPointer ();
+					
 				}
 
 				public void Clear ()
 				{
 						_actionsList.Clear ();
 						_combinationString = String.Empty;
+						_actions = null;
 				}
 
 				public bool Pop ()
@@ -178,62 +199,56 @@ namespace ws.winx.input
 						return _actionsList.Remove (_actionsList.Last ());
 				}
 
-				protected bool GetInputBase (InputDelegate keyCallback, bool atOnce = false)
+				
+
+				internal bool GetInputHold ()
 				{
-						if (__currentInputAction.type == InputActionType.SINGLE && _actionsList.Count == 1) {
+					if (_actionsList.Count > 1 || __currentInputAction.type!=InputActionType.SINGLE)
+					{ /*Debug.LogWarning("You found need of GetInputHold with combos. Fork code on github");*/ return false; }
 
-								return keyCallback (__currentInputAction);
-
-						} else {
-								if (atOnce)
-										return GetCombinationInput (keyCallback);
-								else
-										return GetCombinationInput ();
-						}
+								else return InputEx.GetInputHold(__currentInputAction);
+								
+					}
 
 
-						//return GetCombinationInput();
-
-				}
-
-				internal bool GetInputHold (bool atOnce)
+				internal bool GetInputUp ()
 				{
-
-						return GetInputBase (InputEx.GetInputHold, atOnce);
-				}
-
-				internal bool GetInputUp (bool atOnce=false)
-				{
-						//if (_actionsList.Count == 1)
-						return GetInputBase (InputEx.GetInputUp, atOnce);
-						//else { /*Debug.LogWarning("Use GetInput only with Combos");*/ return false; }
-
+						if (_actionsList.Count > 1 || __currentInputAction.type!=InputActionType.SINGLE)
+						{ 
+							/*Debug.LogWarning("You found need of GetInputUp with combos. Fork code on github");*/ return false; }
+						
+						else return InputEx.GetInputUp(__currentInputAction);
 				}
 
 				internal bool GetInputDown (bool atOnce=false)
 				{
-						// if (_actionsList.Count == 1)
-						return GetInputBase (InputEx.GetKeyDown, atOnce);
-						// else { /*Debug.LogWarning("Use GetInput only with Combos");*/ return false; }
+						
+					if (__currentInputAction.type == InputActionType.SINGLE && _actionsList.Count == 1) {
+						
+						return InputEx.GetInputDown(__currentInputAction);				
+
+						
+					} else {
+						if (atOnce){
+								int len=actions.Length;
+
+								for(int i=0;i<len;i++){
+									if(!InputEx.GetInputDown(actions[i]))
+								    return false;
+								}
+
+							return true;
+						}
+						else // Double,Long are also count as combinations handled by InputEx.GetAction
+							return GetCombinationInput ();
+					}
+
+
 				}
 
 
-				//TODO this with corutine to compare performace
-				internal bool GetCombinationInput (InputDelegate inputResolverCallback)
-				{
-						_pointer = _actionsList.GetEnumerator ();
-						_pointer.MoveNext ();
+				
 
-						do {
-								if (inputResolverCallback (_pointer.Current) == false)
-										return false;
-
-						} while (_pointer.MoveNext() != false);
-
-
-
-						return true;
-				}
 
 
 
@@ -242,16 +257,7 @@ namespace ws.winx.input
 				{
 
 
-                            
-          
-						//int code=0;
-                           
-            
-						//TODO
-						//if(_pointer.Current!=_pointer.Head &&    InputEx.LastCode!=prevActionCode //then something jump between
-						// reset
-      
-						if (InputEx.GetAction (_pointer.Current)) {//and// if code and type are ok go in
+						if (InputEx.GetAction (__currentInputAction)) {//and// if code and type are ok go in
 								//	UnityEngine.Debug.Log ("CODE:" + _pointer.Current.codeString);
                      
 
@@ -268,15 +274,15 @@ namespace ws.winx.input
 										//get the time when current action of combination happened
 										__actionHappenTime = Time.time;
 
+											__currentIndex++;
+
 										//just move to next if possible => combination happend or reset if couldn't
-										if (!_pointer.MoveNext ()) {
-												_pointer = _actionsList.GetEnumerator ();//Reset pointer
-												_pointer.MoveNext ();//start from beginin
+										if (!(__currentIndex<actions.Length)) {
+												__currentIndex=0;
 												return true;
 										}
 								} else {//reset cos time has passed for next action
-										_pointer = _actionsList.GetEnumerator ();//Reset pointer
-										_pointer.MoveNext ();//start from beginin
+										__currentIndex=0;
 										__actionHappenTime = 0;
 										InputEx.LastCode = 0;
 										//	UnityEngine.Debug.Log ("Reset Time Cos Time Passed (Too late):" + Time.time + " Time Allowed:" + (__actionHappenTime + InputAction.COMBINATION_CLICK_SENSITIVITY));
@@ -295,21 +301,21 @@ namespace ws.winx.input
 						if (__actionHappenTime > 0 && Time.time > __actionHappenTime + InputAction.COMBINATION_CLICK_SENSITIVITY) {
 								//UnityEngine.Debug.Log ("Reset in Idle " + Time.time + " Time Allowed:" + (__actionHappenTime + InputAction.COMBINATION_CLICK_SENSITIVITY));
 
-								_pointer = _actionsList.GetEnumerator ();//Reset pointer
-								_pointer.MoveNext ();//start from beginin
+								__currentIndex=0;
 								__actionHappenTime = 0;
 								InputEx.LastCode = 0;
 								return false;
 
 						}
 
+			//TODO check current type and time waiting for type of
+
 						// time passed while waiting for double/long action to happen => don't reset we aren't idle
-						if (Time.time > _pointer.Current.startTime + InputAction.COMBINATION_CLICK_SENSITIVITY && InputEx.LastCode == _pointer.Current.code) {// or waiting for double/long action to happen => don't reset we aren't idle
+						if (Time.time > __currentInputAction.startTime + InputAction.COMBINATION_CLICK_SENSITIVITY && InputEx.LastCode == __currentInputAction.code) {// or waiting for double/long action to happen => don't reset we aren't idle
 
 								//UnityEngine.Debug.Log ("Reset in cos time waiting for double/long passed" + Time.time + " Time Allowed:" + (_pointer.Current.startTime + InputAction.COMBINATION_CLICK_SENSITIVITY));
 
-								_pointer = _actionsList.GetEnumerator ();//Reset pointer
-								_pointer.MoveNext ();//start from beginin
+								__currentIndex=0;
 								__actionHappenTime = 0;
 								InputEx.LastCode = 0;
 
@@ -323,13 +329,12 @@ namespace ws.winx.input
 
 
                
-                          
-						if (InputEx.anyKeyDown && InputEx.LastCode != _pointer.Current.code && __actionHappenTime > 0) {
+                        //key happend that isn't expected inbetween combination sequence
+						if (InputEx.anyKeyDown && InputEx.LastCode != __currentInputAction.code && __actionHappenTime > 0) {
 								// UnityEngine.Debug.Log("Last Code:"+InputEx.LastCode+" current"+_pointer.Current.codeString);
 								//  UnityEngine.Debug.Log("Reset cos some other key is pressed" + InputEx.anyKeyDown + " Unity anykey:" + Input.anyKeyDown);
 
-								_pointer = _actionsList.GetEnumerator ();//Reset pointer
-								_pointer.MoveNext ();//start from beginin
+								__currentIndex=0;
 								__actionHappenTime = 0;
 								InputEx.LastCode = 0;
 								return false;
@@ -356,7 +361,7 @@ namespace ws.winx.input
 								return 0;
 
 						if (__currentInputAction.code < InputCode.MAX_KEY_CODE || InputCode.toAxis (__currentInputAction.code) == JoystickAxis.None) {//if keys are used as axis
-								return InputEx.GetKeyDown (__currentInputAction) || InputEx.GetInputHold (__currentInputAction) ? 1f : 0f;
+								return InputEx.GetInputDown(__currentInputAction) || InputEx.GetInputHold(__currentInputAction) ? 1f : 0f;
 						}
 
           
@@ -444,16 +449,7 @@ namespace ws.winx.input
 				}
 
 
-				/// <summary>
-				/// Inits the pointer.
-				/// </summary>
-				protected void initPointer ()
-				{
-						_pointer = _actionsList.GetEnumerator ();
-
-						_pointer.MoveNext ();
-						__currentInputAction = _pointer.Current;
-				}
+			
 
 
 				/// <summary>
