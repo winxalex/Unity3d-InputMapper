@@ -101,7 +101,7 @@ public class InputMapper : EditorWindow
 						_stateInputCombinations = new Dictionary<int, InputState> ();
 
 
-			InputManager.Dispose ();
+
 
 				InputManager.hidInterface.Enumerate ();
 
@@ -928,6 +928,8 @@ public class InputMapper : EditorWindow
        ///////////////////     ON DESTROY     ////////////////
         void OnDestroy()
         {
+			Debug.Log ("InputMapper OnDestroy");
+
             if(_stateInputCombinations!=null)
             _stateInputCombinations.Clear();
 

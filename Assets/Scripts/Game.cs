@@ -299,29 +299,29 @@ namespace ws.winx
 						if (InputManager.EditMode || !_settingsLoaded)
 								return;
 
-
+//
 //						if (InputManager.GetInputHold ((int)States.Wave)) {
 //							
-//							Debug.Log ("Wave -Hold");
-//							// animator.Play((int)States.Wave);
-//							//	animator.Play (Animator.StringToHash ("Wave"));
+//								Debug.Log ("Wave -Hold");
+//								// animator.Play((int)States.Wave);
+//								//	animator.Play (Animator.StringToHash ("Wave"));
 //						}
-					
-
-
-						if (InputManager.GetInputDown ((int)States.Wave)) {
-           
-								Debug.Log ("Wave -Down");
-								// animator.Play((int)States.Wave);
-							//	animator.Play (Animator.StringToHash ("Wave"));
-						}
-
-						if (InputManager.GetInputUp ((int)States.Wave)) {
-							
-							Debug.Log ("Wave -Up");
-							// animator.Play((int)States.Wave);
-							//	animator.Play (Animator.StringToHash ("Wave"));
-						}
+//					
+//
+//
+//						if (InputManager.GetInputDown ((int)States.Wave)) {
+//           
+//								Debug.Log ("Wave -Down");
+//								// animator.Play((int)States.Wave);
+//								//	animator.Play (Animator.StringToHash ("Wave"));
+//						}
+//
+//						if (InputManager.GetInputUp ((int)States.Wave)) {
+//							
+//								Debug.Log ("Wave -Up");
+//								// animator.Play((int)States.Wave);
+//								//	animator.Play (Animator.StringToHash ("Wave"));
+//						}
 //
 //
 //						if (InputManager.GetInputDown ((int)States.MyCustomState)) {
@@ -372,34 +372,38 @@ namespace ws.winx
 						#endregion
 
 
-						//if (InputManager.GetInput((int)States.MyCustomState, false))
-						//{
-						//    Debug.Log(States.MyCustomState + "-Hold");
-						//    // animator.Play((int)States.Wave);
-						//}
-
-
-						//if (InputManager.GetInputUp((int)States.Wave))
-						//{
-						//    Debug.Log(States.Wave + "-Up");
-						//    // animator.Play((int)States.Wave);
-						//}
+						
 
 
 
-						//        if (InputManager.GetInput((int)States.Walk_Forward, false))
-						//        {
-						//
-						//        }
+				
 						//	
 						//
-						//          if(InputManager.GetInputDown((int)States.Walk_Forward)){
-						//				Debug.Log("Down");
-						//			}
-						//
-						//			if(InputManager.GetInputUp((int)States.Walk_Forward)){
-						//				Debug.Log("Up");
-						//			}
+						if (InputManager.GetInputHold (Animator.StringToHash ("WalkBackward"))) {
+								Debug.Log ("WalkBackward-Hold");
+						}
+
+
+						if (InputManager.GetInputDown (Animator.StringToHash ("WalkBackward"))) {
+								Debug.Log ("WalkBackward-Down");
+						}
+												
+						if (InputManager.GetInputUp (Animator.StringToHash ("WalkBackward"))) {
+								Debug.Log ("WalkBackward-Up");
+						}
+			
+
+						if (InputManager.GetInputHold (Animator.StringToHash ("WalkForward"))) {
+								Debug.Log ("WalkForward-Hold");
+						}
+			
+						if (InputManager.GetInputDown (Animator.StringToHash ("WalkForward"))) {
+							Debug.Log ("WalkForward-Down");
+						}
+						
+						if (InputManager.GetInputUp (Animator.StringToHash ("WalkForward"))) {
+							Debug.Log ("WalkForward-Up");
+						}
 						//
 						////
 
@@ -420,14 +424,14 @@ namespace ws.winx
 //
 //			float analogVal=axisPos - axisNeg;
 			
-			//Debug.Log (analogVal);//would go from  -1 to 1
+						//Debug.Log (analogVal);//would go from  -1 to 1
 
 
 
 
-			// Hardware normalized value in range of -1f to 1f (keys,mouse would return 0f or 1f, triggers 0f to 1f)
-			float analogVal2= InputManager.GetInput (Animator.StringToHash ("WalkBackward"));
-			//Debug.Log (analogVal2);
+						// Hardware normalized value in range of -1f to 1f (keys,mouse would return 0f or 1f, triggers 0f to 1f)
+						//float analogVal2= InputManager.GetInput (Animator.StringToHash ("WalkBackward"));
+						//Debug.Log (analogVal2);
 		
 
 

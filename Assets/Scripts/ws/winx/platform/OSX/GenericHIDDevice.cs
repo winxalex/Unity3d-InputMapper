@@ -87,7 +87,7 @@ namespace ws.winx.platform.osx
 			}
 
 		GCHandle DeviceGCHandle;
-		bool isDeviceGCHandleIntialized=false;
+	
 
 		private IntPtr __InputBufferPtr;
 		private IntPtr __OutputBufferPtr;
@@ -156,7 +156,11 @@ namespace ws.winx.platform.osx
 		{
 			if (IsOpen == false) OpenDevice();
 
-			if (!isDeviceGCHandleIntialized) {
+
+
+
+			//do this only once
+			if (!DeviceGCHandle.IsAllocated) {
 								try {
 				
 				
@@ -171,7 +175,7 @@ namespace ws.winx.platform.osx
 				
 										Native.IOHIDDeviceScheduleWithRunLoop (__deviceHandle, RunLoop, Native.RunLoopModeDefault);
 
-										isDeviceGCHandleIntialized=true;
+										
 						
 				
 								} catch (Exception e) {
@@ -191,10 +195,18 @@ namespace ws.winx.platform.osx
 			uint        inReportID,         // the report ID
 			IntPtr       inReport,           // pointer to the report data
 			int         inReportLength ){
-			
-			GenericHIDDevice hidDevice = (GenericHIDDevice)GCHandle.FromIntPtr (inContext).Target;
 
-			hidDevice.OutputAutoResetEvent.Set ();
+
+			GenericHIDDevice hidDevice;
+
+			if (inContext != IntPtr.Zero) {
+								hidDevice = (GenericHIDDevice)GCHandle.FromIntPtr (inContext).Target;
+								hidDevice.OutputAutoResetEvent.Set ();
+			}
+			else
+				UnityEngine.Debug.LogError("OutputReportCallback inContext ZeroPointer");
+
+
 			
 		}
 
@@ -212,28 +224,35 @@ namespace ws.winx.platform.osx
 
 
 		
-			GenericHIDDevice hidDevice = (GenericHIDDevice)GCHandle.FromIntPtr(inContext).Target;
-
-			if (hidDevice.__deviceHandle != inSender)
-								return;
-
-			   byte[] buffer = new byte[hidDevice.InputReportByteLength];
-			Marshal.Copy(inReport, buffer, 0,hidDevice.InputReportByteLength);
+			GenericHIDDevice hidDevice;
 
 
+			if (inContext != IntPtr.Zero) {
+								hidDevice = (GenericHIDDevice)GCHandle.FromIntPtr (inContext).Target;
+			
+								
+								if (hidDevice.__deviceHandle != inSender)
+										return;
+
+								byte[] buffer = new byte[hidDevice.InputReportByteLength];
+								Marshal.Copy (inReport, buffer, 0, hidDevice.InputReportByteLength);
 
 
-			hidDevice.__lastHIDReport.Data = buffer;
-			hidDevice.__lastHIDReport.Status = HIDReport.ReadStatus.Success;
 
-			//UnityEngine.Debug.Log (BitConverter.ToString (buffer));
 
-			hidDevice.IsReadInProgress = false;
+								hidDevice.__lastHIDReport.Data = buffer;
+								hidDevice.__lastHIDReport.Status = HIDReport.ReadStatus.Success;
 
-			//Marshal.FreeHGlobal (inReport);	
-			//Native.IOHIDDeviceRegisterInputReportCallback (hidDevice.__deviceHandle, IntPtr.Zero, 0, IntPtr.Zero, IntPtr.Zero);
+								//UnityEngine.Debug.Log (BitConverter.ToString (buffer));
 
-			hidDevice.InputAutoResetEvent.Set ();
+								hidDevice.IsReadInProgress = false;
+
+								//Marshal.FreeHGlobal (inReport);	
+								//Native.IOHIDDeviceRegisterInputReportCallback (hidDevice.__deviceHandle, IntPtr.Zero, 0, IntPtr.Zero, IntPtr.Zero);
+
+								hidDevice.InputAutoResetEvent.Set ();
+			}else
+				UnityEngine.Debug.LogError("InputReportCallback inContext ZeroPointer");
 				
 				
 	    }
@@ -285,7 +304,7 @@ namespace ws.winx.platform.osx
 			
 
 
-
+			device.__lastHIDReport.Status = HIDReport.ReadStatus.Success;
 			device.__lastHIDReport.Data=result;
 			
 		}
@@ -333,10 +352,10 @@ namespace ws.winx.platform.osx
 				Marshal.Copy (buffer, 0, __InputBufferPtr, buffer.Length);
 				
 				
-				if (!isDeviceGCHandleIntialized) {
+				if (!DeviceGCHandle.IsAllocated) {
 					DeviceGCHandle = GCHandle.Alloc (this);	
 					
-					isDeviceGCHandleIntialized=true;
+
 					
 					
 					// Schedule the device on the current run loop in case it isn't already scheduled
@@ -540,10 +559,10 @@ namespace ws.winx.platform.osx
 			{
 
 				
-				if (!isDeviceGCHandleIntialized) {
+				if (!DeviceGCHandle.IsAllocated) {
 					DeviceGCHandle = GCHandle.Alloc (this);	
 					
-					isDeviceGCHandleIntialized=true;
+
 					
 					
 					// Schedule the device on the current run loop in case it isn't already scheduled
@@ -633,7 +652,7 @@ namespace ws.winx.platform.osx
 			if (__OutputBufferPtr != IntPtr.Zero)
 				Marshal.FreeHGlobal (__OutputBufferPtr);
 			
-			if (isDeviceGCHandleIntialized) {
+			if (DeviceGCHandle.IsAllocated) {
 				DeviceGCHandle.Free ();
 			}
 

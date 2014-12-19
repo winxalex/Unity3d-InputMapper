@@ -829,8 +829,8 @@ namespace ws.winx.drivers
 
 					if (value == -1 || value==1)
 					{
-						if (_buttonState == ButtonState.None
-						    || _buttonState == ButtonState.Up)
+						if (_buttonState == ButtonState.None)
+						    //|| _buttonState == ButtonState.Up)
 						{
 							
 							_buttonState = ButtonState.Down;

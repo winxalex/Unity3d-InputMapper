@@ -326,8 +326,13 @@ namespace ws.winx.devices
 							
 						if (data == (int)JoystickPosition.Negative && isEqualToButtonState && axisDetails.value < 0)
 								return true;
-						if (data == (int)JoystickPosition.Positive && isEqualToButtonState && axisDetails.value > 0)
+
+
+						if (data == (int)JoystickPosition.Positive && isEqualToButtonState && axisDetails.value > 0) {
+
+							//	UnityEngine.Debug.Log("data:" + data+"buttotnState:"+buttonState+" equal"+isEqualToButtonState+" value:"+axisDetails.value);
 								return true;
+						}
 							
 							
 						return false;

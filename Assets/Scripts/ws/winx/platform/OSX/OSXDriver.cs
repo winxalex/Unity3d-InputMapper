@@ -10,7 +10,6 @@
 using System.Runtime.InteropServices;
 using UnityEngine;
 
-
 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
 using System;
 using ws.winx.devices;
@@ -43,7 +42,7 @@ namespace ws.winx.platform.osx
 
 #region Fields
 
-		public float dreadZone=0.1f;
+		public float dreadZone=0.3f;
 
 		IHIDInterface _hidInterface;
 
@@ -79,7 +78,7 @@ namespace ws.winx.platform.osx
      /// <param name="value">Value.</param>
 		internal void DeviceValueReceived(IDevice device,Native.IOHIDElementType type,uint uid,int value)
 		{
-			//UnityEngine.Debug.Log ("OSXDriver>>DeviceValueReceived");
+	//		UnityEngine.Debug.Log ("OSXDriver>>DeviceValueReceived type="+type+" uid:"+uid+" value:"+value);
 		
 
 			//AXIS
@@ -89,26 +88,33 @@ namespace ws.winx.platform.osx
 				int numAxes=device.Axis.Count;
 				AxisDetails axisDetails;
 
-
+				//numAxes
 				for (int axisIndex = 0; axisIndex < numAxes; axisIndex++) {
 
 					axisDetails=device.Axis[axisIndex] as AxisDetails;
 
-					if (axisDetails!=null && axisDetails.uid== uid) {
+					//UnityEngine.Debug.Log ("OSXDriver>>DeviceValueReceived axisDetails="+axisDetails.uid);
 
+					if (axisDetails!=null) 
 
+					   if(axisDetails.uid== uid) {
 
+						//UnityEngine.Debug.Log ("OSXDriver>>DeviceValueReceived Axis["+axisIndex+"] axisDetails.uid="+axisDetails.uid);
+						
 						//check hatch
 						//Check if POV element.
 						if(axisDetails.isHat)
 						{
+
+							//UnityEngine.Debug.Log ("OSXDriver>>DeviceValueReceived axisDetails.uid="+axisDetails.isHat);
+
 									//Workaround for POV hat switches that do not have null states.
 									if(!axisDetails.isNullable)
 									{
 										value = value < axisDetails.min ? axisDetails.max - axisDetails.min + 1 : value - 1;
 									}
 
-							//Todo change them to float
+
 							float outX=0f;
 							float outY=0f;
 
@@ -147,44 +153,68 @@ namespace ws.winx.platform.osx
 								analogValue=(value - axisDetails.min) / (float)(axisDetails.max - axisDetails.min) * 2.0f - 1.0f;
 
 
-							//round
-							if (analogValue < dreadZone && analogValue > -dreadZone)
-								analogValue=0f;
-							else if(analogValue> 1-dreadZone && analogValue>0) analogValue=1f;
-							if(analogValue< -1+dreadZone && analogValue<0) analogValue=-1f;
+							//odd axes are inverted (are they inverted in all devices???)
+							//inverted meaning that Forward push gives Negative values
+							//opposite to establish rull Forward axis to be + 
+							if(axisIndex % 2 != 0)
+								analogValue=-analogValue;
+
+						
+
+//							//round
+//							if (analogValue < dreadZone && analogValue > -dreadZone)
+//								analogValue=0f;
+////
+//							else if(analogValue>0  && analogValue> 1-dreadZone  ) analogValue=1f;
+//							if(analogValue<0  && analogValue< -1+dreadZone ) analogValue=-1f;
 
 
 
 							axisDetails.value=analogValue;
 
 
-//							if(axisIndex==5){
-//								UnityEngine.Debug.Log("Axis"+axisIndex+" Counts:"+ value+" min:"+axisDetails.min+" max:"+axisDetails.max);
-//								UnityEngine.Debug.Log("Axis"+axisIndex+" Value:"+axisDetails.value);
-//							}
+
 
 						}
 
 
 
-						return;
+
+					}else{//cos update of values happen only on "interrupt" and its returning only one element value
+						//the rest should take previous value which would update ButtonState
+						//!!! side effect inputput might left to "hold" forever
+
+						axisDetails.value=axisDetails.value;
 					}
 
+//					if(axisIndex==1){
+//						//UnityEngine.Debug.Log("Axis"+axisIndex+" Counts:"+ value+" min:"+axisDetails.min+" max:"+axisDetails.max);
+//						//UnityEngine.Debug.Log("Axis"+axisIndex+" Value:"+axisDetails.value);
+//		}
+					
 				}//end for
 
 			//BUTTONS
 			}else if(type==Native.IOHIDElementType.kIOHIDElementTypeInput_Button){
 
 				int numButtons=device.Buttons.Count;
+				IButtonDetails buttonDetails;
 
 				for (int buttonIndex = 0; buttonIndex < numButtons; buttonIndex++) {
-					if ( device.Buttons[buttonIndex].uid== uid) {
 
-						device.Buttons[buttonIndex].value=value;
+					buttonDetails=device.Buttons[buttonIndex];
+
+					if ( buttonDetails.uid== uid) {
+
+						buttonDetails.value=value;
 
 				//		UnityEngine.Debug.Log("Button "+buttonIndex+" value:"+value+" State:"+device.Buttons[buttonIndex].buttonState);
 						
-						return;
+					
+					}else{//cos update of values happen only on "interrupt" and its returning only one element value
+						//the rest should take previous value which would update ButtonState
+
+						buttonDetails.value=buttonDetails.value;
 					}
 				}
 			}
@@ -261,9 +291,11 @@ namespace ws.winx.platform.osx
 
 			HIDReport report = _hidInterface.ReadDefault(device.PID);
 
+			//Debug.Log (report.Status);
+
 			if (report.Status == HIDReport.ReadStatus.Success || report.Status == HIDReport.ReadStatus.Buffered) {
 
-
+				//Debug.Log ("update value");
 				DeviceValueReceived(device,(Native.IOHIDElementType)BitConverter.ToUInt32(report.Data,0),BitConverter.ToUInt32(report.Data,4),BitConverter.ToInt32(report.Data,8));
 			}
 
@@ -304,33 +336,37 @@ namespace ws.winx.platform.osx
 
 			
 							for (int elementIndex = 0; elementIndex < numElements; elementIndex++){
-									element =  elements[elementIndex].typeRef;
-				if(element!=IntPtr.Zero && Native.CFGetTypeID(element) == HIDElementType){
-								
-								type = Native.IOHIDElementGetType(element);
-			
-			
-								// All of the axis elements I've ever detected have been kIOHIDElementTypeInput_Misc. kIOHIDElementTypeInput_Axis is only included for good faith...
-								if (type == IOHIDElementType.kIOHIDElementTypeInput_Misc ||
-								    type == IOHIDElementType.kIOHIDElementTypeInput_Axis) {
-									numAxis++;
-						            
-									if(Native.IOHIDElementGetUsage(element)==(uint)Native.HIDUsageGD.Hatswitch){
-							numPov++;
-						}
 
-						          
+									element =  elements[elementIndex].typeRef;
+
+
+								if(element!=IntPtr.Zero && Native.CFGetTypeID(element) == HIDElementType){
+												
+												type = Native.IOHIDElementGetType(element);
 							
-								} else if (type == IOHIDElementType.kIOHIDElementTypeInput_Button) {
-									numButtons++;
+							
+												// All of the axis elements I've ever detected have been kIOHIDElementTypeInput_Misc. kIOHIDElementTypeInput_Axis is only included for good faith...
+												if (type == IOHIDElementType.kIOHIDElementTypeInput_Misc ||
+												    type == IOHIDElementType.kIOHIDElementTypeInput_Axis) {
+													numAxis++;
+										            
+													if(Native.IOHIDElementGetUsage(element)==(uint)Native.HIDUsageGD.Hatswitch){
+													numPov++;
+													}
+
+										          
+											
+												} else if (type == IOHIDElementType.kIOHIDElementTypeInput_Button) {
+													numButtons++;
+												}
 								}
-				}
 			
 						}
 
 
 			if (numPov > 0)
-								numAxis = Math.Max (8, numAxis);
+			numAxis = Math.Max (8, numAxis);
+
 
 			joystick=new JoystickDevice(hidDevice.index,hidDevice.PID,hidDevice.VID,numAxis,numButtons,this);
 			joystick.numPOV = numPov;
@@ -531,6 +567,7 @@ namespace ws.winx.platform.osx
 			ButtonState _buttonState;
 			bool _isNullable;
 			bool _isHat;
+			float sensitivityOffset=0.3f;
 			
 #region IAxisDetails implementation
 				
@@ -614,8 +651,11 @@ namespace ws.winx.platform.osx
 				get { return _value; }
 				set
 				{
-					
-					if (value == -1 || value==1)
+
+					//TODO maybe dreadzone should goes here
+					//sometimes even if stick is pushed to the end gives 0.7 instead 1f
+					//maybe if value>0.7 should be counted as one
+					if ( -value> 1- sensitivityOffset || value>1-sensitivityOffset)
 					{
 						if (_buttonState == ButtonState.None)
 						    //|| _buttonState == ButtonState.PosToUp || _buttonState==ButtonState.NegToUp)
@@ -624,11 +664,13 @@ namespace ws.winx.platform.osx
 							_buttonState = ButtonState.Down;
 							
 							//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
-							Debug.Log("_buttonState:"+_buttonState);
+							//Debug.Log("_buttonState:"+_buttonState);
 						}
 						else
 						{
 							_buttonState = ButtonState.Hold;
+
+							//Debug.Log("_buttonState:"+_buttonState);
 						}
 						
 						
@@ -641,18 +683,19 @@ namespace ws.winx.platform.osx
 						{
 							
 							//if previous value was >0 => PosToUp
-							if (_value==1)
+							if (_value>0)
 								_buttonState = ButtonState.PosToUp;
 							else
 								_buttonState = ButtonState.NegToUp;
 
-							Debug.Log("_buttonState:"+_buttonState);
+//							Debug.Log("_buttonState:"+_buttonState);
 							//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
 							
 						}
 						else
 						{//if(buttonState==ButtonState.Up){
 							_buttonState = ButtonState.None;
+//							Debug.Log("_buttonState:"+_buttonState);
 						}
 						
 						
