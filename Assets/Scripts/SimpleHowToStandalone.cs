@@ -7,6 +7,7 @@ using ws.winx.input.states;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using ws.winx.drivers;
 
 
 namespace ws.winx
@@ -38,6 +39,9 @@ namespace ws.winx
 			//supporting devices with custom drivers
 			//When you add them add specialized first then XInputDriver  then wide range supporting drivers UnityDriver
 //			#if (UNITY_STANDALONE_WIN)
+
+			//change default driver
+			//InputManager.hidInterface.defaultDriver=new UnityDriver();
 //			InputManager.AddDriver(new ThrustMasterDriver());
 //			InputManager.AddDriver(new WiiDriver());
 //			InputManager.AddDriver(new XInputDriver());
@@ -45,11 +49,13 @@ namespace ws.winx
 //			#endif
 //			
 //			#if (UNITY_STANDALONE_OSX)
+			//change default driver
+			//InputManager.hidInterface.defaultDriver=new UnityDriver();
 //			InputManager.AddDriver(new ThrustMasterDriver());
 //			InputManager.AddDriver(new XInputDriver());
 //			#endif
 	
-			//TODO think of better entry point
+		
 			InputManager.hidInterface.Enumerate();
 				
 			
@@ -156,35 +162,68 @@ namespace ws.winx
 			
 			//Use is mapping states so no quering keys during gameplay
 			if (InputManager.EditMode || !_settingsLoaded) return;
-			
-			
-			//Input.GetInput allows combos (combined input actions)
-			if (InputManager.GetInputDown((int)States.Wave))// || InputManager.GetInput((int)States.Wave,true))
-				// if (InputManager.GetInput((int)States.Wave,false))
-			{
-				Debug.Log("Wave Down");
-				// animator.Play((int)States.Wave);
-				animator.Play(Animator.StringToHash("Wave"));
-			}
-			
-			
-			if (InputManager.GetInputUp((int)States.MyCustomState))
-			{
-				Debug.Log(States.MyCustomState + "-Up");
-				// animator.Play((int)States.Wave);
-			}
-			
-			
-		
-			
 
-			////
-			//          //using input as analog value
-			//			float analogValue=InputManager.GetInput((int)States.Walk_Forward,false,0.3f,0.1f,0f);
-			//			analogValue-=InputManager.GetInput((int)States.Base_Layer_MyState,false,0.3f,0.1f,0f);
-			//
-			////			Debug.Log(analogValue);
+
 			
+			if (InputManager.GetInputDown ((int)States.Wave)) {
+				GameObject.Find("Dude").GetComponent<Animator>().Play("Wave");
+			}
+			
+			//	
+			//
+			if (InputManager.GetInputHold (Animator.StringToHash ("WalkBackward"))) {
+				Debug.Log ("WalkBackward-Hold");
+			}
+			
+			
+			if (InputManager.GetInputDown (Animator.StringToHash ("WalkBackward"))) {
+				Debug.Log ("WalkBackward-Down");
+			}
+			
+			if (InputManager.GetInputUp (Animator.StringToHash ("WalkBackward"))) {
+				Debug.Log ("WalkBackward-Up");
+			}
+			
+			
+			if (InputManager.GetInputHold (Animator.StringToHash ("WalkForward"))) {
+				Debug.Log ("WalkForward-Hold");
+			}
+			
+			if (InputManager.GetInputDown (Animator.StringToHash ("WalkForward"))) {
+				Debug.Log ("WalkForward-Down");
+			}
+			
+			if (InputManager.GetInputUp (Animator.StringToHash ("WalkForward"))) {
+				Debug.Log ("WalkForward-Up");
+			}
+			//
+			////
+			
+			//Bind Axis as one part
+			
+			//						InputManager.MapStateToInput ("WalkForward", KeyCodeExtension.W.SINGLE);
+			//						InputManager.MapStateToInput ("WalkForward", 1, KeyCodeExtension.Joystick1AxisXPositive.SINGLE);
+			//
+			//
+			//						InputManager.MapStateToInput ("WalkBackward", KeyCodeExtension.S.SINGLE);
+			//						InputManager.MapStateToInput ("WalkBackward", 1, KeyCodeExtension.Joystick1AxisYNegative.SINGLE);
+			//
+			//						
+			
+			//			float axisPos = InputManager.GetInput (Animator.StringToHash ("WalkForward"), 0.3f, 0.1f, 0.2f);
+			//
+			//			float axisNeg= InputManager.GetInput (Animator.StringToHash ("WalkBackward"),  0.3f, 0.1f, 0.1f);
+			//
+			//			float analogVal=axisPos - axisNeg;
+			
+			//Debug.Log (analogVal);//would go from  -1 to 1
+			
+			
+			
+			
+			// Hardware normalized value in range of -1f to 1f (keys,mouse would return 0f or 1f, triggers 0f to 1f)
+			//float analogVal2= InputManager.GetInput (Animator.StringToHash ("WalkBackward"));
+			//Debug.Log (analogVal2);
 			
 			
 			

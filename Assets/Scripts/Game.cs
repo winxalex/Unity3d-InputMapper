@@ -26,7 +26,7 @@ namespace ws.winx
 
 
 
-				Animator animator = null;
+				
 				bool _settingsLoaded = false;
 				private float vSliderValue;
 				private ThrustmasterRGTFFDDevice TTFFDDevice;
@@ -50,7 +50,7 @@ namespace ws.winx
 						wiimote = GameObject.Find ("wiimote");
 						Angles = new Vector3 ();
 
-						animator = GameObject.FindObjectOfType<Animator> ();
+						
 
 						vSliderValuePrev = vSliderValue = 128f;
 
@@ -72,6 +72,8 @@ namespace ws.winx
 #if (UNITY_STANDALONE_OSX)
 			InputManager.AddDriver(new ThrustMasterDriver());
 			//InputManager.AddDriver(new XInputDriver());
+
+			InputManager.hidInterface.defaultDriver=new UnityDriver();
 #endif
 
 #if (UNITY_STANDALONE_ANDROID)
