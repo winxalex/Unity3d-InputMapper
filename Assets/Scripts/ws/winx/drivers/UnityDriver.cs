@@ -15,7 +15,7 @@ namespace ws.winx.drivers
 				public devices.IDevice ResolveDevice (IHIDDevice info)
 				{
 						int i = 0;
-						JoystickDevice device = new JoystickDevice (info.index, info.PID, info.VID, 12, 10, this);
+						JoystickDevice device = new JoystickDevice (info.index, info.PID, info.VID, 12, 20, this);
 
 						int numAxis = device.Axis.Count;
 						int numButtons = device.Buttons.Count;
@@ -28,6 +28,8 @@ namespace ws.winx.drivers
 						for (i=0; i < numButtons; i++) {
 								device.Buttons [i] = new ButtonDetails ();
 						}
+
+
 
 						return device;
 				}
@@ -44,15 +46,25 @@ namespace ws.winx.drivers
 						//Debug.Log("axis value raw:" + );
 						//   joystick.Axis[0].value=Input.GetAxis("00");//index-of joystick, i-ord number of axis
 						// Debug.Log("axis value:" + joystick.Axis[0].value + " state:" + joystick.Axis[0].buttonState);
-						string axisValue = "";
-						for (; i < numAxis; i++) {
-								device.Axis [i].value = (Input.GetAxis (index.ToString () + i.ToString ()) + 1f) * 0.5f;//index-of joystick, i-ord number of axis
 
-								axisValue += Input.GetAxis (index.ToString () + i.ToString ()) + " ";
+
+						float axisValue=0f;
+						for (; i < numAxis; i++) {
+
+								axisValue=Input.GetAxisRaw (index.ToString () + i.ToString ());
+								device.Axis [i].value = axisValue;
+								//(Input.GetAxis (index.ToString () + i.ToString ()) + 1f) * 0.5f;//index-of joystick, i-ord number of axis
+
+								//axisValue = Input.GetAxis (index.ToString () + i.ToString ()) + " ";
+
+//							if(i==1){
+//								Debug.Log(axisValue);
+//								
+//							}
 
 						}
 
-						//  Debug.Log(axisValue);
+						
 
 
 						for (i=0; i < numButtons; i++) {

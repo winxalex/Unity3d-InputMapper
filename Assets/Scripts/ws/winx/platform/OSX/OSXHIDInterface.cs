@@ -162,7 +162,11 @@ namespace ws.winx.platform.osx
         public IDriver defaultDriver
         {
             get { if (__defaultJoystickDriver == null) { __defaultJoystickDriver = new OSXDriver(); } return __defaultJoystickDriver; }
-            set { __defaultJoystickDriver = value; }
+            set { __defaultJoystickDriver = value; 
+				if(value is ws.winx.drivers.UnityDriver){
+					Debug.LogWarning("UnityDriver set as default driver.\n Warring:Unity doesn't make distinction between triggers/axis/pow and axes happen to be mapped on different Joysticks#, doesn't support plug&play and often return weired raw results");
+				}
+			}
 
         }
 
@@ -342,23 +346,6 @@ namespace ws.winx.platform.osx
 						this.DeviceConnectEvent(this,new DeviceEventArgs<IDevice>(joyDevice));
 
 						__Generics[hidDevice.PID] = hidDevice;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

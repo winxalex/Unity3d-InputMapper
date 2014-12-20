@@ -15,61 +15,54 @@ using ws.winx.devices;
 
 namespace ws.winx.input
 {
-    public class InputExArgs : EventArgs
-    {
+		public class InputExArgs : EventArgs
+		{
 
-        public InputAction action;
+				public InputAction action;
 
-        public InputExArgs(InputAction action)
-        {
+				public InputExArgs (InputAction action)
+				{
 
-            this.action = action;
+						this.action = action;
 
-        }
-    }
+				}
+		}
 
-    public class InputEx
-    {
-
-
-        public event EventHandler<InputExArgs> InputProcessed;
-        public static int MAX_NUM_JOYSTICK_BUTTONS = 20;
-        public static int MAX_NUM_MOUSE_BUTTONS = 7;
+		public class InputEx
+		{
 
 
+				public event EventHandler<InputExArgs> InputProcessed;
+
+				public static int MAX_NUM_JOYSTICK_BUTTONS = 20;
+				public static int MAX_NUM_MOUSE_BUTTONS = 7;
 
 
-    //    public delegate object GetKeyBaseDelegate(int code);
+				public delegate bool KeyCodeInputResolverCallback (KeyCode code);
 
+				static KeyCodeInputResolverCallback IGetKey = Input.GetKey;
+				static KeyCodeInputResolverCallback IGetKeyUp = Input.GetKeyUp;
+				static KeyCodeInputResolverCallback IGetKeyDown = Input.GetKeyDown;
+				static Dictionary<int, ButtonDetails> _isKeyState = new Dictionary<int,ButtonDetails> ();
+				static int _numJoystickButtons = InputEx.MAX_NUM_JOYSTICK_BUTTONS;
+				static int _numMouseButtons = InputEx.MAX_NUM_MOUSE_BUTTONS;
+				static int _code;
+				static int _codeFromGUIEvent;
+				static int _frameCountEditor;
+				static int _frameCountEditorPrev;
+				static int _frameCountPrev;
+				static int _lastCode;
 
-		public delegate bool KeyCodeInputResolverCallback(KeyCode code);
-
-		static KeyCodeInputResolverCallback IGetKey=Input.GetKey;
-		static KeyCodeInputResolverCallback IGetKeyUp=Input.GetKeyUp;
-		static KeyCodeInputResolverCallback IGetKeyDown=Input.GetKeyDown;
-
-        static Dictionary<int, ButtonDetails> _isKeyState = new Dictionary<int,ButtonDetails>();
-        static int _numJoystickButtons = InputEx.MAX_NUM_JOYSTICK_BUTTONS;
-        static int _numMouseButtons = InputEx.MAX_NUM_MOUSE_BUTTONS;
-        static int _code;
-        static int _codeFromGUIEvent;
-		static int _frameCountEditor;
-
-		static int _frameCountEditorPrev;
-
-        static int _lastCode;
-
-        public static int LastCode
-        {
-            get { return InputEx._lastCode; }
-            internal set { InputEx._lastCode = value; }
-        }
+				public static int LastCode {
+						get { return InputEx._lastCode; }
+						internal set { InputEx._lastCode = value; }
+				}
       
-        //		static 		int _lastFrame=-1;
-        static KeyCode _key;
-        static KeyCode _button;
-        static int _numJoysticks = 0;
-        static KeyCode[] _keys = new KeyCode[]{
+				//		static 		int _lastFrame=-1;
+				static KeyCode _key;
+				static KeyCode _button;
+				static int _numJoysticks = 0;
+				static KeyCode[] _keys = new KeyCode[]{
 			KeyCode.Backspace,
 			KeyCode.A,
 			KeyCode.B,
@@ -139,134 +132,122 @@ namespace ws.winx.input
 			KeyCode.RightApple,
 			KeyCode.RightWindows
 		};
-        private static float _lastCodeTime;
-        private static volatile InputEx instance;
+				private static float _lastCodeTime;
+				private static volatile InputEx instance;
 
 
 
 
 
-        /// <summary>
-        /// Gets or sets the number joystick buttons.
-        /// </summary>
-        /// <value>The number joystick buttons.</value>
-        public static int numJoystickButtons
-        {
-            get { return _numJoystickButtons; }
-            set { _numJoystickButtons = Mathf.Min(MAX_NUM_JOYSTICK_BUTTONS, value); }
-        }
+				/// <summary>
+				/// Gets or sets the number joystick buttons.
+				/// </summary>
+				/// <value>The number joystick buttons.</value>
+				public static int numJoystickButtons {
+						get { return _numJoystickButtons; }
+						set { _numJoystickButtons = Mathf.Min (MAX_NUM_JOYSTICK_BUTTONS, value); }
+				}
 
-        /// <summary>
-        /// Gets the number joysticks.
-        /// </summary>
-        /// <value>The number joysticks.</value>
-        public static int numJoysticks
-        {
-            get { return _numJoysticks; }
+				/// <summary>
+				/// Gets the number joysticks.
+				/// </summary>
+				/// <value>The number joysticks.</value>
+				public static int numJoysticks {
+						get { return _numJoysticks; }
 
-        }
+				}
 
-        /// <summary>
-        /// Gets the key.
-        /// </summary>
-        /// <value>The key.</value>
-        public static KeyCode key
-        {
-            get { return _key; }
-        }
+				/// <summary>
+				/// Gets the key.
+				/// </summary>
+				/// <value>The key.</value>
+				public static KeyCode key {
+						get { return _key; }
+				}
 
-        /// <summary>
-        /// Gets the button.
-        /// </summary>
-        /// <value>The button.</value>
-        public static KeyCode button
-        {
-            get { return _button; }
-        }
+				/// <summary>
+				/// Gets the button.
+				/// </summary>
+				/// <value>The button.</value>
+				public static KeyCode button {
+						get { return _button; }
+				}
 
 
 
-        /// <summary>
-        /// Gets or sets the array of KeyCode keys that could be used in the InputMapping
-        /// </summary>
-        /// <value>The keys.</value>
-        public static KeyCode[] keys
-        {
-            get { return _keys; }
-            set { _keys = value; }
-        }
+				/// <summary>
+				/// Gets or sets the array of KeyCode keys that could be used in the InputMapping
+				/// </summary>
+				/// <value>The keys.</value>
+				public static KeyCode[] keys {
+						get { return _keys; }
+						set { _keys = value; }
+				}
 
 
-        /// <summary>
-        /// Sets the keys from string array. Ex. string[]{"A","UpArrow","F1",...}
-        /// </summary>
-        /// <value>The string keys.</value>
-        public static String[] stringKeys
-        {
-            set
-            {
-                if (value != null && value.Length < 1)
-                    return;
-                int len = value.Length;
-                _keys = new KeyCode[len];
-                for (int i = 0; i < len; i++)
-                {
-                    _keys[i] = (KeyCode)Enum.Parse(typeof(KeyCode), value[i]);
-                }
-            }
-        }
+				/// <summary>
+				/// Sets the keys from string array. Ex. string[]{"A","UpArrow","F1",...}
+				/// </summary>
+				/// <value>The string keys.</value>
+				public static String[] stringKeys {
+						set {
+								if (value != null && value.Length < 1)
+										return;
+								int len = value.Length;
+								_keys = new KeyCode[len];
+								for (int i = 0; i < len; i++) {
+										_keys [i] = (KeyCode)Enum.Parse (typeof(KeyCode), value [i]);
+								}
+						}
+				}
 
 
-        /// <summary>
-        /// Gets the code.
-        /// </summary>
-        /// <value>The code.</value>
-        public static int code
-        {
-            get { return _code; }
+				/// <summary>
+				/// Gets the code.
+				/// </summary>
+				/// <value>The code.</value>
+				public static int code {
+						get { return _code; }
 
-        }
+				}
 
-        public static bool GetAnyInputDown(int id)
-        {
+				public static bool GetAnyInputDown (int id)
+				{
 
-            return Input.anyKeyDown || InputManager.Devices.GetDeviceAt(id).GetAnyInputDown();
+						return Input.anyKeyDown || InputManager.Devices.GetDeviceAt (id).GetAnyInputDown ();
 
-        }
+				}
 
-        /// <summary>
-        /// Gets a value indicating whether this <see cref="ws.winx.input.InputEx"/> any key down.
-        /// from any Joystick (not to be used in 2plr hot seat)
-        /// </summary>
-        /// <value><c>true</c> if any key down; otherwise, <c>false</c>.</value>
-        public static bool anyKeyDown
-        {
-            get
-            {
-                return Input.anyKeyDown || anyKeyDownOnAny();
-            }
-        }
+				/// <summary>
+				/// Gets a value indicating whether this <see cref="ws.winx.input.InputEx"/> any key down.
+				/// from any Joystick (not to be used in 2plr hot seat)
+				/// </summary>
+				/// <value><c>true</c> if any key down; otherwise, <c>false</c>.</value>
+				public static bool anyKeyDown {
+						get {
+								return Input.anyKeyDown || anyKeyDownOnAny ();
+						}
+				}
 
-        /// <summary>
-        /// any key on any joystick device
-        /// </summary>
-        /// <returns></returns>
-        static bool anyKeyDownOnAny()
-        {
-            IDeviceCollection devices = InputManager.Devices;
+				/// <summary>
+				/// any key on any joystick device
+				/// </summary>
+				/// <returns></returns>
+				static bool anyKeyDownOnAny ()
+				{
+						IDeviceCollection devices = InputManager.Devices;
 
-            foreach (IDevice device in devices)
-                if (device.GetAnyInputDown())
-                    return true;
+						foreach (IDevice device in devices)
+								if (device.GetAnyInputDown ())
+										return true;
 
-            return false;
-        }
+						return false;
+				}
 
-        public int numMouseButtons
-        {
-            get { return _numMouseButtons; }
-            set { _numMouseButtons = Mathf.Min(MAX_NUM_MOUSE_BUTTONS, value); }
-        }
+				public int numMouseButtons {
+						get { return _numMouseButtons; }
+						set { _numMouseButtons = Mathf.Min (MAX_NUM_MOUSE_BUTTONS, value); }
+				}
 
 
 
@@ -276,40 +257,37 @@ namespace ws.winx.input
       
 
 
-        //!!! IMPORTANT: Input happen every frame. If there is no refresh from the hardware device 
-        // Input give same values just states are refreshed from DOWN->HOLD (value=1 stay) and UP->NONE (value=0 stay)
+				//!!! IMPORTANT: Input happen every frame. If there is no refresh from the hardware device 
+				// Input give same values just states are refreshed from DOWN->HOLD (value=1 stay) and UP->NONE (value=0 stay)
 
-      /// <summary>
-      /// Gets the axis.
-      /// </summary>
-      /// <returns>The axis.</returns>
-      /// <param name="action">Action.</param>
-        public static float GetInput(InputAction action)
-        {
-            int code = action.code;
+				/// <summary>
+				/// Gets the axis.
+				/// </summary>
+				/// <returns>The axis.</returns>
+				/// <param name="action">Action.</param>
+				public static float GetInput (InputAction action)
+				{
+						int code = action.code;
 
 
-            if (action.fromAny)
-            {//first device that have value not equal 0 or return 0
-                IDeviceCollection devices = InputManager.Devices;
-                float axisValue;
+						if (action.fromAny) {//first device that have value not equal 0 or return 0
+								IDeviceCollection devices = InputManager.Devices;
+								float axisValue;
 
-                foreach (IDevice device in devices)
-                    if ((axisValue = device.GetInput(code)) != 0)
-                        return axisValue;
+								foreach (IDevice device in devices)
+										if ((axisValue = device.GetInput (code)) != 0)
+												return axisValue;
 
-                return 0;
+								return 0;
 
-            }
-            else
-            {
-                int index = InputCode.toJoystickID(code);
-                if (InputManager.Devices.ContainsIndex(index))
-					return InputManager.Devices.GetDeviceAt(index).GetInput(code);
-                else
-                    return 0;
-            }
-        }
+						} else {
+								int index = InputCode.toJoystickID (code);
+								if (InputManager.Devices.ContainsIndex (index))
+										return InputManager.Devices.GetDeviceAt (index).GetInput (code);
+								else
+										return 0;
+						}
+				}
 
 
 
@@ -317,333 +295,345 @@ namespace ws.winx.input
     
 
 
-        /// <summary>
-        /// Gets the key.
-        /// </summary>
-        /// <returns><c>true</c>, if key was gotten, <c>false</c> otherwise.</returns>
-        /// <param name="action">Action.</param>
-        internal static bool GetInputHold(InputAction action)
-        {
-			return GetInputBase (InputEx.IGetKey, action, ButtonState.Hold);
+				/// <summary>
+				/// Gets the key.
+				/// </summary>
+				/// <returns><c>true</c>, if key was gotten, <c>false</c> otherwise.</returns>
+				/// <param name="action">Action.</param>
+				internal static bool GetInputHold (InputAction action)
+				{
+						return GetInputBase (InputEx.IGetKey, action, ButtonState.Hold);
 
-        }
+				}
 
 
 	
-		/// <summary>
-		/// Gets the input hold.
-		/// </summary>
-		/// <returns><c>true</c>, if input hold was gotten, <c>false</c> otherwise.</returns>
-		/// <param name="code">Code.</param>
-		internal static bool GetInputHold(int code)
-		{
-			return GetInputBase (InputEx.IGetKey, code, ButtonState.Hold);
+				/// <summary>
+				/// Gets the input hold.
+				/// </summary>
+				/// <returns><c>true</c>, if input hold was gotten, <c>false</c> otherwise.</returns>
+				/// <param name="code">Code.</param>
+				internal static bool GetInputHold (int code)
+				{
+						return GetInputBase (InputEx.IGetKey, code, ButtonState.Hold);
 			
-		}
-
-
-
-        /// <summary>
-        /// Gets the key up.
-        /// </summary>
-        /// <returns><c>true</c>, if key up was gotten, <c>false</c> otherwise.</returns>
-        /// <param name="action">Action.</param>
-        internal static bool GetInputUp(InputAction action)
-        {
-			return GetInputBase (InputEx.IGetKeyUp, action, ButtonState.Up);
-        }
-
-
-		/// <summary>
-		/// Gets the input down.
-		/// </summary>
-		/// <returns><c>true</c>, if input down was gotten, <c>false</c> otherwise.</returns>
-		/// <param name="action">Action.</param>
-        public static bool GetInputDown(InputAction action)
-        {
-			return GetInputBase (InputEx.IGetKeyDown, action, ButtonState.Down);
-        }
-
-
-		public static bool GetInputBase(KeyCodeInputResolverCallback keycodeInputHandlerCallback,int code,ButtonState buttonState,bool fromAny=false)
-		{
-
-				if (code < InputCode.MAX_KEY_CODE)
-				{
-					return keycodeInputHandlerCallback((KeyCode)code);
 				}
-				else
+
+
+
+				/// <summary>
+				/// Gets the key up.
+				/// </summary>
+				/// <returns><c>true</c>, if key up was gotten, <c>false</c> otherwise.</returns>
+				/// <param name="action">Action.</param>
+				internal static bool GetInputUp (InputAction action)
 				{
+						return GetInputBase (InputEx.IGetKeyUp, action, ButtonState.Up);
+				}
+
+
+				/// <summary>
+				/// Gets the input down.
+				/// </summary>
+				/// <returns><c>true</c>, if input down was gotten, <c>false</c> otherwise.</returns>
+				/// <param name="action">Action.</param>
+				public static bool GetInputDown (InputAction action)
+				{
+						return GetInputBase (InputEx.IGetKeyDown, action, ButtonState.Down);
+				}
+
+				public static bool GetInputBase (KeyCodeInputResolverCallback keycodeInputHandlerCallback, int code, ButtonState buttonState, bool fromAny=false)
+				{
+
+						if (code < InputCode.MAX_KEY_CODE) {
+								return keycodeInputHandlerCallback ((KeyCode)code);
+						} else {
 					
 					
-					if (fromAny)
-					{
-						IDeviceCollection devices = InputManager.Devices;
-						foreach (IDevice device in devices)
-							if (device.GetInputBase(code,buttonState))
-								return true;
+								if (fromAny) {
+										IDeviceCollection devices = InputManager.Devices;
+										foreach (IDevice device in devices)
+												if (device.GetInputBase (code, buttonState))
+														return true;
 						
-						return false;
+										return false;
 						
-					}
-					else
-					{
-						int index = InputCode.toJoystickID(code);
-						if (InputManager.Devices.ContainsIndex(index))
+								} else {
+										int index = InputCode.toJoystickID (code);
+										if (InputManager.Devices.ContainsIndex (index))
 							
-							return InputManager.Devices.GetDeviceAt(index).GetInputBase(code,buttonState);
+												return InputManager.Devices.GetDeviceAt (index).GetInputBase (code, buttonState);
+										else
+												return false;
+						
+						
+								}
+						}
+
+				}
+
+				private static bool GetInputBase (KeyCodeInputResolverCallback keycodeInputHandlerCallback, InputAction action, ButtonState buttonState)
+				{
+
+						return GetInputBase (keycodeInputHandlerCallback, action.code, buttonState, action.fromAny);
+
+				}
+
+//				private static int GetJoystickInput ()
+//				{
+//
+//
+//						int numAxis = 8;
+//						float axisValue = 0f;
+//						string axisName;
+//						KeyCode code;
+//		
+//						if (_frameCountPrev == Time.frameCount)
+//								return 0;
+//
+//
+//						_frameCountPrev = Time.frameCount;
+//
+//
+//
+//
+//						_numJoysticks = Input.GetJoystickNames ().Length;
+//
+//
+//						//check for joysticks clicks
+//						for (int i=0; i<_numJoysticks; i++) {
+//				
+//						for (int k=0; k < 1; k++) {
+//							axisName=i.ToString () + k.ToString ();
+//							axisValue = Input.GetAxisRaw(axisName);// + 1f;//index-of joystick, k-ord number of axis
+//							
+//					Debug.Log("axisValue :"+axisValue);
+//
+////							if(axisValue>0)
+////								return InputCode.toCode((Joysticks)i,(JoystickAxis)k,JoystickPosition.Positive);
+////							else if(axisValue<0)
+////								return InputCode.toCode((Joysticks)i,(JoystickAxis)k,JoystickPosition.Negative);  
+//						}
+//					        
+//					        
+//								//Let Unity handle JoystickButtons
+//								for (int j=0; j<_numJoystickButtons; j++) {
+//
+//										code = (KeyCode)Enum.Parse (typeof(KeyCode), "Joystick" + (i + 1) + "Button" + j);
+//
+//										//Debug.Log("Joystick"+i+"Button"+j+" code:"+code);
+//					          
+//										if (Input.GetKeyDown (code)) {
+//												return InputCode.toCode ((Joysticks)i, JoystickAxis.None, j);
+//
+//												// InputCode.toCode(code);
+//										}
+//								}
+//						}
+//
+//
+//						return 0;
+//
+//
+//				}
+
+
+				/// <summary>
+				/// Gets the GUI keyboard input.
+				/// first found key or mouse button pressed would be returned
+				/// used for mapping states to current input
+				/// </summary>
+				/// <returns>The GUI keyboard input.</returns>
+				private static int GetGUIKeyboardInput ()
+				{
+						KeyCode keyCode;
+						int numKeys = _keys.Length;
+
+						if (_frameCountEditorPrev == _frameCountEditor)
+								return 0;
 						else
-							return false;
+								_frameCountEditorPrev = _frameCountEditor;
+
+			
+						for (int i = 0; i < numKeys; i++) {
+
+								//check for mouse clicks
+								if (i < _numMouseButtons) {
+										keyCode = (KeyCode)Enum.Parse (typeof(KeyCode), "Mouse" + i);
+
+										if (InputEx.GetMouseButtonDown (keyCode)) {
+												return (int)keyCode;		
+										}
+								}
+				
+
+								keyCode = _keys [i];//
+								if (InputEx.GetKeyDown (keyCode)) {
+
+										return (int)keyCode;
 						
-						
-					}
+								}
+
+						}
+
+
+						return 0;
 				}
 
-		}
 
-		private static bool GetInputBase(KeyCodeInputResolverCallback keycodeInputHandlerCallback,InputAction action,ButtonState buttonState){
-
-				return GetInputBase(keycodeInputHandlerCallback,action.code,buttonState,action.fromAny);
-
-		}
-
-
-
-		private static int GetJoystickInput(){
-
-			_numJoysticks = Input.GetJoystickNames().Length;
-			int numAxis=8;
-			float axisValue=0f;
-			string axisName;
-			KeyCode code;
 		
-			
-			//check for joysticks clicks
-			for(int i=0;i<_numJoysticks;i++){
-				
-						for (int k=0; k < numAxis; k++) {
-							axisName=i.ToString () + k.ToString ();
-							axisValue = Input.GetAxis(axisName) + 1f;//index-of joystick, k-ord number of axis
-							
-							
-							if(axisValue>0)
-								return InputCode.toCode((Joysticks)i,(JoystickAxis)k,JoystickPosition.Positive);
-							else if(axisValue<0)
-								return InputCode.toCode((Joysticks)i,(JoystickAxis)k,JoystickPosition.Negative);  
-						}
-					        
-					        
-					        //Let Unity handle JoystickButtons
-					        for(int j=0;j<_numJoystickButtons;j++){
-
-						code=(KeyCode)Enum.Parse(typeof(KeyCode),"Joystick"+i+"Button"+j);
-
-						if(Input.GetKeyDown(code)){
-							return InputCode.toCode(code);
-						}
-					}
-			}
 
 
-			return 0;
-
-
-		}
-
-        private static int GetGUIKeyboardInput()
-		{
-			KeyCode keyCode;
-			int numKeys = _keys.Length;
-
-			if (_frameCountEditorPrev == _frameCountEditor)
-				return 0;
-			else
-				_frameCountEditorPrev = _frameCountEditor;
-
-			
-			for (int i = 0; i < numKeys; i++)
-			{
-
-				//check for mouse clicks
-				if (i < _numMouseButtons)
+				/// <summary>
+				/// Gets the key(Editor only). Use it in onGUI after processGUIEvent
+				/// or in Update but with check of frameCountEditor
+				/// <example>
+				/// if (_frameCountEditorPrev == _frameCountEditor)
+				///  	return 0;
+				///  else
+				///		_frameCountEditorPrev = _frameCountEditor;
+				/// 
+				/// </example>
+				/// </summary>
+				/// <returns><c>true</c>, if key hold, <c>false</c> otherwise.</returns>
+				/// <param name="code">Code.</param>
+				public static bool GetKey (KeyCode code)
 				{
-					keyCode = (KeyCode)Enum.Parse(typeof(KeyCode), "Mouse" + i);
+						if (_isKeyState.ContainsKey ((int)code))
+								return _isKeyState [(int)code].buttonState == ButtonState.Hold;
+			
+						return false;
 
-					if (InputEx.GetMouseButtonDown(keyCode))
-					{
-						return (int)keyCode;		
-					}
 				}
-				
-
-					keyCode = _keys[i];//
-					if (InputEx.GetKeyDown(keyCode))
-					{
-
-						return (int)keyCode;
-						
-					}
-
-			 }
 
 
-			return 0;
-		}
+				/// <summary>
+				/// Gets the key(Editor only). Use it in onGUI after processGUIEvent
+				/// or in Update but with check of frameCountEditor
+				/// <example>
+				/// if (_frameCountEditorPrev == _frameCountEditor)
+				///  	return 0;
+				///  else
+				///		_frameCountEditorPrev = _frameCountEditor;
+				/// 
+				/// </example>
+				/// </summary>
+				/// <returns><c>true</c>, if key was gotten, <c>false</c> otherwise.</returns>
+				/// <param name="code">Code.</param>
+				public static bool GetMouseButtonDown (KeyCode code)
+				{
+
+						return GetKeyDown ((int)code);
+
+				}
 
 
-		
+				/// <summary>
+				/// Gets the key(Editor only). Use it in onGUI after processGUIEvent
+				/// or in Update but with check of frameCountEditor
+				/// <example>
+				/// if (_frameCountEditorPrev == _frameCountEditor)
+				///  	return 0;
+				///  else
+				///		_frameCountEditorPrev = _frameCountEditor;
+				/// 
+				/// </example>
+				/// </summary>
+				/// <returns><c>true</c>, if key was gotten, <c>false</c> otherwise.</returns>
+				/// <param name="code">Code.</param>
+				public static bool GetKeyDown (KeyCode code)
+				{
+						return GetKeyDown ((int)code);
+				}
 
 
-		/// <summary>
-		/// Gets the key(Editor only). Use it in onGUI after processGUIEvent
-		/// or in Update but with check of frameCountEditor
-		/// <example>
-		/// if (_frameCountEditorPrev == _frameCountEditor)
-		///  	return 0;
-		///  else
-		///		_frameCountEditorPrev = _frameCountEditor;
-		/// 
-		/// </example>
-		/// </summary>
-		/// <returns><c>true</c>, if key hold, <c>false</c> otherwise.</returns>
-		/// <param name="code">Code.</param>
-		public static bool GetKey(KeyCode code){
-			if(_isKeyState.ContainsKey((int)code))
-				return _isKeyState[(int)code].buttonState==ButtonState.Hold;
+				/// <summary>
+				/// Gets the keyDown(Editor only). Use it in onGUI after processGUIEvent
+				/// or in Update but with check of frameCountEditor
+				/// <example>
+				/// if (_frameCountEditorPrev == _frameCountEditor)
+				///  	return 0;
+				///  else
+				///		_frameCountEditorPrev = _frameCountEditor;
+				/// 
+				/// </example>
+				/// </summary>
+				/// <returns><c>true</c>, if key was down, <c>false</c> otherwise.</returns>
+				/// <param name="code">Code.</param>
+				public static bool GetKeyDown (int code)
+				{
+						if (_isKeyState.ContainsKey (code))
+								return _isKeyState [code].buttonState == ButtonState.Down;
 			
-			return false;
+						return false;
 
-		}
+				}
 
-
-		/// <summary>
-		/// Gets the key(Editor only). Use it in onGUI after processGUIEvent
-		/// or in Update but with check of frameCountEditor
-		/// <example>
-		/// if (_frameCountEditorPrev == _frameCountEditor)
-		///  	return 0;
-		///  else
-		///		_frameCountEditorPrev = _frameCountEditor;
-		/// 
-		/// </example>
-		/// </summary>
-		/// <returns><c>true</c>, if key was gotten, <c>false</c> otherwise.</returns>
-		/// <param name="code">Code.</param>
-		public static bool GetMouseButtonDown(KeyCode code){
-
-			return GetKeyDown ((int)code);
-
-		}
-
-
-		/// <summary>
-		/// Gets the key(Editor only). Use it in onGUI after processGUIEvent
-		/// or in Update but with check of frameCountEditor
-		/// <example>
-		/// if (_frameCountEditorPrev == _frameCountEditor)
-		///  	return 0;
-		///  else
-		///		_frameCountEditorPrev = _frameCountEditor;
-		/// 
-		/// </example>
-		/// </summary>
-		/// <returns><c>true</c>, if key was gotten, <c>false</c> otherwise.</returns>
-		/// <param name="code">Code.</param>
-		public static bool GetKeyDown(KeyCode code){
-			return GetKeyDown ((int)code);
-		}
-
-
-		/// <summary>
-		/// Gets the keyDown(Editor only). Use it in onGUI after processGUIEvent
-		/// or in Update but with check of frameCountEditor
-		/// <example>
-		/// if (_frameCountEditorPrev == _frameCountEditor)
-		///  	return 0;
-		///  else
-		///		_frameCountEditorPrev = _frameCountEditor;
-		/// 
-		/// </example>
-		/// </summary>
-		/// <returns><c>true</c>, if key was down, <c>false</c> otherwise.</returns>
-		/// <param name="code">Code.</param>
-		public static bool GetKeyDown(int code){
-			if(_isKeyState.ContainsKey(code))
-				return _isKeyState[code].buttonState==ButtonState.Down;
+				/// <summary>
+				/// Gets the key(Editor only). Use it in onGUI after processGUIEvent
+				/// or in Update but with check of frameCountEditor
+				/// <example>
+				/// if (_frameCountEditorPrev == _frameCountEditor)
+				///  	return 0;
+				///  else
+				///		_frameCountEditorPrev = _frameCountEditor;
+				/// 
+				/// </example>
+				/// </summary>
+				/// <returns><c>true</c>, if key was up, <c>false</c> otherwise.</returns>
+				/// <param name="code">Code.</param>
+				public static bool GetKeyUp (int code)
+				{
+						if (_isKeyState.ContainsKey (code))
+								return _isKeyState [code].buttonState == ButtonState.Up;
 			
-			return false;
-
-		}
-
-		/// <summary>
-		/// Gets the key(Editor only). Use it in onGUI after processGUIEvent
-		/// or in Update but with check of frameCountEditor
-		/// <example>
-		/// if (_frameCountEditorPrev == _frameCountEditor)
-		///  	return 0;
-		///  else
-		///		_frameCountEditorPrev = _frameCountEditor;
-		/// 
-		/// </example>
-		/// </summary>
-		/// <returns><c>true</c>, if key was up, <c>false</c> otherwise.</returns>
-		/// <param name="code">Code.</param>
-		public static bool GetKeyUp(int code){
-			if(_isKeyState.ContainsKey(code))
-				return _isKeyState[code].buttonState==ButtonState.Up;
+						return false;
 			
-			return false;
-			
-		}
+				}
 
-        /// <summary>
-        /// Process runtime input
-        ///  Useful for building Input mapper
-        /// </summary>
-        protected static int GetKeyboardInput()
-        {
+				/// <summary>
+				/// Process runtime input
+				///  Useful for building Input mapper
+				/// </summary>
+				protected static int GetKeyboardInput ()
+				{
 
-            KeyCode keyCode;
+						KeyCode keyCode;
 
 
 
 
-            _button = _key = 0;//KeyCode.None; 
+						_button = _key = 0;//KeyCode.None; 
 
           
 
-            int numKeys = _keys.Length;
-            int maxLoops = Mathf.Max(numKeys, _numJoystickButtons);
+						int numKeys = _keys.Length;
+						int maxLoops = Mathf.Max (numKeys, _numJoystickButtons);
 
 
 
 
-            for (int i = 0; i < maxLoops; i++)
-            {
+						for (int i = 0; i < maxLoops; i++) {
 
-                //check for mouse clicks
-                if (i < _numMouseButtons)
-                {
+								//check for mouse clicks
+								if (i < _numMouseButtons) {
 
-                    if (Input.GetMouseButtonDown(i))
-                    {
-                        _button = (KeyCode)Enum.Parse(typeof(KeyCode), "Mouse" + i);
-                        return (int)_button;
+										if (Input.GetMouseButtonDown (i)) {
+												_button = (KeyCode)Enum.Parse (typeof(KeyCode), "Mouse" + i);
+												return (int)_button;
 
-                    }
-                }
+										}
+								}
 
-                //check for key clicks
-                if (i < numKeys)
-                {
-                    keyCode = _keys[i];//
-                    if (Input.GetKeyDown(keyCode))
-                    {
-                        _key = (KeyCode)keyCode;
-                        return (int)keyCode;
+								//check for key clicks
+								if (i < numKeys) {
+										keyCode = _keys [i];//
+										if (Input.GetKeyDown (keyCode)) {
+												_key = (KeyCode)keyCode;
+												return (int)keyCode;
 
-                    }
-                }
+										}
+								}
 
 
              
@@ -651,34 +641,35 @@ namespace ws.winx.input
 
 
 
-            }
+						}
 
 
 
 
-            return 0;
+						return 0;
 
 
 
-        }
+				}
 
-        public static InputAction GetInput()
-        {
+				public static InputAction GetInput ()
+				{
 
-            bool isPlaying = Application.isPlaying;
+						bool isPlaying = Application.isPlaying;
 
-            float time = isPlaying ? Time.time : Time.realtimeSinceStartup;
+						float time = isPlaying ? Time.time : Time.realtimeSinceStartup;
 
            
 
 
 
-            //prioterize joysticks vs keys/mouse
-            IDeviceCollection devices = InputManager.Devices;
+						//prioterize joysticks vs keys/mouse
+						IDeviceCollection devices = InputManager.Devices;
 
 
 
-			if (devices.Count > 0) {
+						if (devices.Count > 0) 
+						{
 								foreach (IDevice device in devices) {
 
 										//If 
@@ -687,380 +678,312 @@ namespace ws.winx.input
 												return processInput (_code, time);
 										}
 								}
-			} else {//check Unity way
-				if(isPlaying){
-
-				
-					_code=InputEx.GetJoystickInput();
-							 
-
-				}
-			}
+						} 
 
 
-           				 if (isPlaying) {
-							_code = InputEx.GetKeyboardInput ();
-						}
-						else {
-							//	Debug.Log("Code request at time:"+time);
-							_code = InputEx.GetGUIKeyboardInput ();
-				//Application.targetFrameRate=60;
-//								if(time-_lastCodeTime>0.3)
-//									
-//								else
-//									_code=0;
-						//		Debug.Log("Code "+_code+" at time:"+time);
+						if (isPlaying) {
+								_code = InputEx.GetKeyboardInput ();
+						} else {
+								_code = InputEx.GetGUIKeyboardInput ();
 						}
 
 
 
             
 
-			return processInput(_code, time);
-        }
+						return processInput (_code, time);
+				}
 
        
 
-        /// <summary>
-        /// Check if InputActin happened( SINGLE,DOUBLE,LONG)
-        /// </summary>
-        /// <returns>true/false</returns>
-        /// <param name="action">InputAction to be compared with input</param>
-       internal static bool GetAction(InputAction action)
-        {
+				/// <summary>
+				/// Check if InputActin happened( SINGLE,DOUBLE,LONG)
+				/// </summary>
+				/// <returns>true/false</returns>
+				/// <param name="action">InputAction to be compared with input</param>
+				internal static bool GetAction (InputAction action)
+				{
 
-            if (action.type == InputActionType.SINGLE)
-            {
-                if (InputEx.GetInputBase(Input.GetKeyDown,action,ButtonState.Down))
-                {
-                    Debug.Log("Single <" + InputActionType.SINGLE);
-					//action.startTime = Time.time;
-                    _lastCode = action.code;
-                    return true;
-                }
+						if (action.type == InputActionType.SINGLE) {
+								if (InputEx.GetInputBase (Input.GetKeyDown, action, ButtonState.Down)) {
+										Debug.Log ("Single <" + InputActionType.SINGLE);
+										//action.startTime = Time.time;
+										_lastCode = action.code;
+										return true;
+								}
 
-                return false;
-            }
+								return false;
+						}
 
 
-            if (action.type == InputActionType.DOUBLE)
-            {
-				if (InputEx.GetInputBase(Input.GetKeyDown,action,ButtonState.Down))
-                {
-                    if (_lastCode != action.code)
-                    {//first click
+						if (action.type == InputActionType.DOUBLE) {
+								if (InputEx.GetInputBase (Input.GetKeyDown, action, ButtonState.Down)) {
+										if (_lastCode != action.code) {//first click
 
-                        _lastCode = action.code;
-                        action.startTime = Time.time;
-                        Debug.Log("First Click" + Time.time + ":" + action.startTime + " going for " + InputActionType.DOUBLE);
-                        return false;
-                    }
-                    else
-                    {//InputEx.LastCode==_pointer.Current.code //second click
-                        //check time diffrence if less then
-                        if (Time.time - action.startTime < InputAction.DOUBLE_CLICK_SENSITIVITY)
-                        {
+												_lastCode = action.code;
+												action.startTime = Time.time;
+												Debug.Log ("First Click" + Time.time + ":" + action.startTime + " going for " + InputActionType.DOUBLE);
+												return false;
+										} else {//InputEx.LastCode==_pointer.Current.code //second click
+												//check time diffrence if less then
+												if (Time.time - action.startTime < InputAction.DOUBLE_CLICK_SENSITIVITY) {
 
-                            _lastCode = 0;//???
-                            action.startTime = 0;
-                            Debug.Log("Double " + Time.time + ":" + action.startTime + "<" + InputActionType.DOUBLE);
+														_lastCode = 0;//???
+														action.startTime = 0;
+														Debug.Log ("Double " + Time.time + ":" + action.startTime + "<" + InputActionType.DOUBLE);
 
-                            return true;
-                        }
+														return true;
+												}
 
-                       // Debug.Log("Lost Double " + Time.time + ":" + action.startTime + "<" + InputActionType.DOUBLE);
-                    }
-                }
+												// Debug.Log("Lost Double " + Time.time + ":" + action.startTime + "<" + InputActionType.DOUBLE);
+										}
+								}
 
-                return false;
-            }
+								return false;
+						}
 
 
-            if (action.type == InputActionType.LONG)
-            {
-				if (InputEx.GetInputBase(Input.GetKey,action,ButtonState.Hold))
-                {//if hold
-                    if (_lastCode != action.code)
-                    {
+						if (action.type == InputActionType.LONG) {
+								if (InputEx.GetInputBase (Input.GetKey, action, ButtonState.Hold)) {//if hold
+										if (_lastCode != action.code) {
 
-                        _lastCode = action.code;
+												_lastCode = action.code;
 
-                        action.startTime = Time.time;
+												action.startTime = Time.time;
 
-                        return false;
-                    }
-                    else
-                    {//InputEx.LastCode==_pointer.Current.code //hold
-                        //check time diffrence if less then
-                        if (Time.time - action.startTime >= InputAction.LONG_CLICK_SENSITIVITY)
-                        {
+												return false;
+										} else {//InputEx.LastCode==_pointer.Current.code //hold
+												//check time diffrence if less then
+												if (Time.time - action.startTime >= InputAction.LONG_CLICK_SENSITIVITY) {
 
-                            _lastCode = 0;//KeyCode.None;
-                            action.startTime = 0;
-                            Debug.Log("Long " + (Time.time - action.startTime) + " " + InputActionType.LONG);
+														_lastCode = 0;//KeyCode.None;
+														action.startTime = 0;
+														Debug.Log ("Long " + (Time.time - action.startTime) + " " + InputActionType.LONG);
 
-                            return true;
-                        }
-                    }
-                }
+														return true;
+												}
+										}
+								}
 
-                return false;
+								return false;
 
-            }
+						}
 
 
-            return false;
+						return false;
 
 
-        }
+				}
 
 
-		/// <summary>
-		/// Proccess input information returned in Event in onGUI
-		/// Useful for building Input mapper editor in "Edit mode"
-		/// </summary>
-		/// <param name="e">Event dispatched inside onGUI.</param>
-		public static void processGUIEvent(Event e)
-		{
+				/// <summary>
+				/// Proccess input information returned in Event in onGUI
+				/// Useful for building Input mapper editor in "Edit mode"
+				/// </summary>
+				/// <param name="e">Event dispatched inside onGUI.</param>
+				public static void processGUIEvent (Event e)
+				{
 			
 	
 			
 			
-			if ((e.isKey && e.keyCode>0) || e.isMouse)
-			{
-				_frameCountEditor++;
+						if ((e.isKey && e.keyCode > 0) || e.isMouse) {
+								_frameCountEditor++;
 				
-				if(e.isMouse)
-					_code = (int)Enum.Parse(typeof(KeyCode), "Mouse" + e.button);
-				else
-					_code=(int)e.keyCode;
+								if (e.isMouse)
+										_code = (int)Enum.Parse (typeof(KeyCode), "Mouse" + e.button);
+								else
+										_code = (int)e.keyCode;
 				
-				bool containsKey=_isKeyState.ContainsKey(_code);
+								bool containsKey = _isKeyState.ContainsKey (_code);
 				
-				if(!containsKey)
-					_isKeyState[_code] = new ButtonDetails();
+								if (!containsKey)
+										_isKeyState [_code] = new ButtonDetails ();
 				
-				//	Debug.Log ("processGUIEvent "+e.keyCode+" "+(int)e.keyCode);
+								//	Debug.Log ("processGUIEvent "+e.keyCode+" "+(int)e.keyCode);
 				
 				
-				//if event is KeyDown and ((if is in keystate tracking should be false (keyup)) or if new not in key state tracking)
-				if (e.type == EventType.KeyDown || e.type==EventType.MouseDown)
-				{
+								//if event is KeyDown and ((if is in keystate tracking should be false (keyup)) or if new not in key state tracking)
+								if (e.type == EventType.KeyDown || e.type == EventType.MouseDown) {
 					
-					_isKeyState[_code].value=1f;
+										_isKeyState [_code].value = 1f;
 					
 					
-					//         Debug.Log ("DOWN :"+e.type+" "+e.keyCode+" buttonState:"+_isKeyState[(int)e.keyCode].buttonState);
+										//         Debug.Log ("DOWN :"+e.type+" "+e.keyCode+" buttonState:"+_isKeyState[(int)e.keyCode].buttonState);
 					
-				}
-				else if (e.type == EventType.KeyUp || e.type==EventType.MouseUp)
-				{
-					_isKeyState[_code].value=0;
+								} else if (e.type == EventType.KeyUp || e.type == EventType.MouseUp) {
+										_isKeyState [_code].value = 0;
 					
-					//		Debug.Log ("UP :"+e.type+" "+e.keyCode);
+										//		Debug.Log ("UP :"+e.type+" "+e.keyCode);
 					
-				}
+								}
 				
 				
-				e.Use();
+								e.Use ();
 				
 				
-			}
+						}
 			
 			
-		}
+				}
 
 		
 		
-		/// <summary>
-		/// Processes the input code into InputAction
-		/// </summary>
-		/// <returns>InputAction (single,double,long) or null.</returns>
-        /// <param name="code">Code.</param>
-        /// <param name="time">Time.</param>
-        internal static InputAction processInput(int code, float time)
-        {
+				/// <summary>
+				/// Processes the input code into InputAction
+				/// </summary>
+				/// <returns>InputAction (single,double,long) or null.</returns>
+				/// <param name="code">Code.</param>
+				/// <param name="time">Time.</param>
+				internal static InputAction processInput (int code, float time)
+				{
 
 
-            InputAction action = null;
+						InputAction action = null;
 
-           // Debug.Log ("process "+code);
+						// Debug.Log ("process "+code);
 
-            if (code != 0)
-            {//=KeyCode.None 
+						if (code != 0) {//=KeyCode.None 
 
 
-                if (_lastCode == 0)
-                {//=KeyCode.None
-                    //save key event and time needed for double check
-                    _lastCode = code;
-                    _lastCodeTime = time;
+								if (_lastCode == 0) {//=KeyCode.None
+										//save key event and time needed for double check
+										_lastCode = code;
+										_lastCodeTime = time;
 
-                    Debug.Log("Last code " + InputCode.toEnumString(_lastCode)+" at time:"+_lastCodeTime);
-                    //	Debug.Log("Take time "+_lastCodeTime);
-                }
-                else
-                {
-                    //if new pressed key is different then the last
-                    if (_lastCode != code)
-                    {
-                        //consturct string from lastCode
-                        action = new InputAction(_lastCode, InputActionType.SINGLE);
+										Debug.Log ("Last code " + InputCode.toEnumString (_lastCode) + " at time:" + _lastCodeTime);
+										//	Debug.Log("Take time "+_lastCodeTime);
+								} else {
+										//if new pressed key is different then the last
+										if (_lastCode != code) {
+												//consturct string from lastCode
+												action = new InputAction (_lastCode, InputActionType.SINGLE);
 
-                        //take new pressed code as lastCode
-                        _lastCode = code;
+												//take new pressed code as lastCode
+												_lastCode = code;
 
-                       Debug.Log("Single " + time + ":" + _lastCodeTime + " " + InputActionType.SINGLE);
+												Debug.Log ("Single " + time + ":" + _lastCodeTime + " " + InputActionType.SINGLE);
 
 
 
-                    }
-                    else
-                    {
+										} else {
 
 
-                        if (time - _lastCodeTime < InputAction.DOUBLE_CLICK_SENSITIVITY)
-                        {
-                            action = new InputAction(_lastCode, InputActionType.DOUBLE);
-                            _lastCode = 0;//KeyCode.None;
-                            Debug.Log("Double " + time + ":" + _lastCodeTime + "<" + InputActionType.DOUBLE);
-                        }
+												if (time - _lastCodeTime < InputAction.DOUBLE_CLICK_SENSITIVITY) {
+														action = new InputAction (_lastCode, InputActionType.DOUBLE);
+														_lastCode = 0;//KeyCode.None;
+														Debug.Log ("Double " + time + ":" + _lastCodeTime + "<" + InputActionType.DOUBLE);
+												}
 
 
-                    }
+										}
 
-                }
+								}
 
-            }
-            else
-            {
+						} else {
 
 
 
-                if (_lastCode != 0)
-                {//=KeyCode.None
-                    //if key is still down and time longer then default long time click => display long click
-                    if (InputEx.GetInputHold(_lastCode) || (!Application.isPlaying && InputEx.GetKeyDown(_lastCode)))
-                    {
-                        if (time - _lastCodeTime >= InputAction.LONG_CLICK_SENSITIVITY)
-                        {
-                            action = new InputAction(_lastCode, InputActionType.LONG);
-                            _lastCode = 0;//KeyCode.None;
-                           Debug.Log("Long " + (time - _lastCodeTime) + " <" + InputActionType.LONG);
-                        }
-                    }
-                    else
-                    {//time wating for double click activity passed => display last code
-                        if (time - _lastCodeTime >= InputAction.DOUBLE_CLICK_SENSITIVITY)
-                        {
-                            action = new InputAction(_lastCode, InputActionType.SINGLE);
-                            _lastCode = 0;//KeyCode.None;
+								if (_lastCode != 0) {//=KeyCode.None
+										//if key is still down and time longer then default long time click => display long click
+										if (InputEx.GetInputHold (_lastCode) || (!Application.isPlaying && InputEx.GetKeyDown (_lastCode))) {
+												if (time - _lastCodeTime >= InputAction.LONG_CLICK_SENSITIVITY) {
+														action = new InputAction (_lastCode, InputActionType.LONG);
+														_lastCode = 0;//KeyCode.None;
+														Debug.Log ("Long " + (time - _lastCodeTime) + " <" + InputActionType.LONG);
+												}
+										} else {//time wating for double click activity passed => display last code
+												if (time - _lastCodeTime >= InputAction.DOUBLE_CLICK_SENSITIVITY) {
+														action = new InputAction (_lastCode, InputActionType.SINGLE);
+														_lastCode = 0;//KeyCode.None;
 
-                           Debug.Log("Single after wating Double time pass " + (time - _lastCodeTime) + " " + InputActionType.SINGLE);
-                        }
+														Debug.Log ("Single after wating Double time pass " + (time - _lastCodeTime) + " " + InputActionType.SINGLE);
+												}
 
-                    }
+										}
 
 
 
-                }
+								}
 
-            }
-            return action;
-        }
+						}
+						return action;
+				}
 
 
 		#region ButtonDetails
-		public sealed class ButtonDetails : IButtonDetails
-		{
+				public sealed class ButtonDetails : IButtonDetails
+				{
 			
 			#region Fields
 			
-			float _value;
-			uint _uid;
-			ButtonState _buttonState;
+						float _value;
+						uint _uid;
+						ButtonState _buttonState;
 			
 			#region IDeviceDetails implementation
 			
 			
-			public uint uid
-			{
-				get
-				{
-					return _uid;
-				}
-				set
-				{
-					_uid = value;
-				}
-			}
-			
-			
-			
-			
-			public ButtonState buttonState
-			{
-				get { return _buttonState; }
-			}
-			
-			
-			
-			public float value
-			{
-				get
-				{
-					return _value;
-					//return (_buttonState==ButtonState.Hold || _buttonState==ButtonState.Down);
-				}
-				set
-				{
-					
-					_value = value;
-					
-					//  UnityEngine.Debug.Log("Value:" + _value);
-					
-					//if pressed==TRUE
-					//TODO check the code with triggers
-					if (value > 0)
-					{
-						if (_buttonState == ButtonState.None
-						    || _buttonState == ButtonState.Up)
-						{
-							
-							_buttonState = ButtonState.Down;
-							
-							
-							
+						public uint uid {
+								get {
+										return _uid;
+								}
+								set {
+										_uid = value;
+								}
 						}
-						else
-						{
-							//if (buttonState == ButtonState.Down)
-							_buttonState = ButtonState.Hold;
-							
+			
+						public ButtonState buttonState {
+								get { return _buttonState; }
 						}
+			
+						public float value {
+								get {
+										return _value;
+										//return (_buttonState==ButtonState.Hold || _buttonState==ButtonState.Down);
+								}
+								set {
+					
+										_value = value;
+					
+										//  UnityEngine.Debug.Log("Value:" + _value);
+					
+										//if pressed==TRUE
+										//TODO check the code with triggers
+										if (value > 0) {
+												if (_buttonState == ButtonState.None
+														|| _buttonState == ButtonState.Up) {
+							
+														_buttonState = ButtonState.Down;
+							
+							
+							
+												} else {
+														//if (buttonState == ButtonState.Down)
+														_buttonState = ButtonState.Hold;
+							
+												}
 						
 						
-					}
-					else
-					{ //
-						if (_buttonState == ButtonState.Down
-						    || _buttonState == ButtonState.Hold)
-						{
-							_buttonState = ButtonState.Up;
-						}
-						else
-						{//if(buttonState==ButtonState.Up){
-							_buttonState = ButtonState.None;
-						}
+										} else { //
+												if (_buttonState == ButtonState.Down
+														|| _buttonState == ButtonState.Hold) {
+														_buttonState = ButtonState.Up;
+												} else {//if(buttonState==ButtonState.Up){
+														_buttonState = ButtonState.None;
+												}
 						
-					}
-				}//set
-			}
+										}
+								}//set
+						}
 			#endregion
 			#endregion
 			
 			#region Constructor
-			public ButtonDetails(uint uid = 0) { this.uid = uid; }
+						public ButtonDetails (uint uid = 0)
+						{
+								this.uid = uid;
+						}
 			#endregion
 			
 			
@@ -1068,7 +991,7 @@ namespace ws.winx.input
 			
 			
 			
-		}
+				}
 		
 		#endregion
 
@@ -1076,6 +999,6 @@ namespace ws.winx.input
 
 
 
-    }
+		}
 }
 
