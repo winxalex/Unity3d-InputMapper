@@ -15,7 +15,17 @@ namespace ws.winx.drivers
 				public devices.IDevice ResolveDevice (IHIDDevice info)
 				{
 						int i = 0;
-						JoystickDevice device = new JoystickDevice (info.index, info.PID, info.VID, 12, 20, this);
+
+                        int inx;
+                    
+                        //find device match based on "names"
+                        inx = Array.IndexOf(Input.GetJoystickNames(), info.Name);
+
+                        if (inx < 0) return null;
+
+                        if (inx > 3) { Debug.LogWarning("Unity supports up to 4 Joysticks"); return null; }
+
+						JoystickDevice device = new JoystickDevice (inx, info.PID, info.VID, 12, 20, this);
 
 						int numAxis = device.Axis.Count;
 						int numButtons = device.Buttons.Count;

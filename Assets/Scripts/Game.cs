@@ -63,9 +63,10 @@ namespace ws.winx
 						//supporting devices with custom drivers
 						//When you add them add specialized first then XInputDriver  then wide range supporting drivers UnityDriver
 #if (UNITY_STANDALONE_WIN)
+            InputManager.hidInterface.defaultDriver = new UnityDriver();
             InputManager.AddDriver(new ThrustMasterDriver());
             InputManager.AddDriver(new WiiDriver());
-            InputManager.AddDriver(new XInputDriver());
+            //InputManager.AddDriver(new XInputDriver());
 
 #endif
 
