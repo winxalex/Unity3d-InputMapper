@@ -51,6 +51,7 @@ namespace ws.winx.platform.web
 
         public void Enumerate ()
 		{
+		
 			webHIDBehaviour.DeviceDisconnectedEvent += new EventHandler<WebMessageArgs<int>>(DeviceDisconnectedEventHandler);
 			webHIDBehaviour.DeviceConnectedEvent += new EventHandler<WebMessageArgs<GenericHIDDevice>>(DeviceConnectedEventHandler);
 			webHIDBehaviour.GamePadEventsSupportEvent += new EventHandler<WebMessageArgs<bool>>(GamePadEventsSupportHandler);

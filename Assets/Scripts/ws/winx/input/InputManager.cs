@@ -47,18 +47,19 @@ namespace ws.winx.input
 
 
 
-	 static JoystickDevicesCollection _joysticks;
+	 static ControllerDevicesCollection _devices;
 
 
 		internal static IDeviceCollection Devices
 		{
 			
 			get {  
-
-				return _joysticks; }
+				if(_devices==null) _devices = new ControllerDevicesCollection(); 
+				return _devices; 
+			}
 			
 		}
-      
+
 
 	
 
@@ -87,14 +88,19 @@ namespace ws.winx.input
                           __hidInterface=new ws.winx.platform.android.AndroidHIDInterface(__drivers);
                 #endif
 
+					//register events
+					__hidInterface.DeviceDisconnectEvent+=new EventHandler<DeviceEventArgs<int>>(onRemoveDevice);
+					__hidInterface.DeviceConnectEvent+=new EventHandler<DeviceEventArgs<IDevice>>(onAddDevice);
+
+
+
                         Debug.Log(__hidInterface.GetType()+" is Initialized");
 				}
 
 
-				if(_joysticks==null) _joysticks = new JoystickDevicesCollection(); 
+			//	if(_joysticks==null) _joysticks = new JoystickDevicesCollection(); 
 				
-				__hidInterface.DeviceDisconnectEvent+=new EventHandler<DeviceEventArgs<int>>(onRemoveDevice);
-				__hidInterface.DeviceConnectEvent+=new EventHandler<DeviceEventArgs<IDevice>>(onAddDevice);
+
 
 				return __hidInterface; }
 		}
@@ -102,17 +108,17 @@ namespace ws.winx.input
 
 	   internal static void onRemoveDevice(object sender,DeviceEventArgs<int> args){
 
-			if (_joysticks.ContainsIndex(args.data)) 
+			if (Devices.ContainsIndex(args.data)) 
 					
-				_joysticks.Remove(args.data);
+				_devices.Remove(args.data);
 					
 				}
 
 		internal static void onAddDevice(object sender,DeviceEventArgs<IDevice> args){
 					//do not allow duplicates
-					if (_joysticks.ContainsPID(args.data.PID)) return;
+					if (Devices.ContainsPID(args.data.PID)) return;
 
-					_joysticks[args.data.PID] = args.data;
+					_devices[args.data.PID] = args.data;
 
 		}
 
@@ -126,7 +132,7 @@ namespace ws.winx.input
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static List<T> GetJoysticks<T>()
+        public static List<T> GetDevices<T>()
         {
             IDeviceCollection devices = InputManager.Devices;
 
@@ -1060,12 +1066,12 @@ namespace ws.winx.input
 	
 		
 		
-		#region JoystickDevicesCollection
+		#region ControllerDevicesCollection
 		
 		/// <summary>
-		/// Defines a collection of JoystickAxes.
+		/// Defines a collection of ControllerAxes.
 		/// </summary>
-		public sealed class JoystickDevicesCollection : IDeviceCollection
+		public sealed class ControllerDevicesCollection : IDeviceCollection
 		{
 			#region Fields
 			readonly Dictionary<int, IDevice> PIDToDevice;
@@ -1080,7 +1086,7 @@ namespace ws.winx.input
 			
 			#region Constructors
 			
-			internal JoystickDevicesCollection()
+			internal ControllerDevicesCollection()
 			{
 				PIDToDevice = new Dictionary<int, IDevice>();
 				
@@ -1215,15 +1221,24 @@ namespace ws.winx.input
 
         public static void Dispose(){
 
+			Debug.Log ("InputManager Dispose");
 
             if (__hidInterface != null)
             {
-                __hidInterface.Dispose();
+
+				__hidInterface.DeviceDisconnectEvent-=new EventHandler<DeviceEventArgs<int>>(onRemoveDevice);
+
+
+				__hidInterface.DeviceConnectEvent-=new EventHandler<DeviceEventArgs<IDevice>>(onAddDevice);
+
+				__hidInterface.Dispose();
                 __hidInterface = null;
             }
 
-			if(_joysticks!=null)
-			_joysticks.Clear();
+
+
+			if(_devices!=null)
+			_devices.Clear();
 
         }
 

@@ -22,12 +22,15 @@ namespace ws.winx.platform.android
       
         GameObject _container;
 
+		bool hidCallbacksRegistered;
+
         //link towards Browser
         internal readonly AndroidHIDBehaviour droidHIDBehaviour;
         private Dictionary<int, HIDDevice> __Generics;
 
 		public event EventHandler<DeviceEventArgs<int>> DeviceDisconnectEvent;
 		public event EventHandler<DeviceEventArgs<IDevice>> DeviceConnectEvent;
+
 
 
 
@@ -50,9 +53,11 @@ namespace ws.winx.platform.android
 
 		public void Enumerate(){
 
+			if(!hidCallbacksRegistered){
 			droidHIDBehaviour.DeviceDisconnectedEvent += new EventHandler<AndroidMessageArgs<int>>(DeviceDisconnectedEventHandler);
 			droidHIDBehaviour.DeviceConnectedEvent += new EventHandler<AndroidMessageArgs<AndroidJavaObject>>(DeviceConnectedEventHandler);
-			
+				hidCallbacksRegistered=true;
+			}
 
 			droidHIDBehaviour.Enumerate();
 		}

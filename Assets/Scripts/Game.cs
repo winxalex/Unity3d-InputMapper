@@ -341,7 +341,7 @@ namespace ws.winx
 
 
 						//take all devices of type WiimoteDevice
-						List<WiimoteDevice> wiimoteDevices = InputManager.GetJoysticks<WiimoteDevice> ();
+						List<WiimoteDevice> wiimoteDevices = InputManager.GetDevices<WiimoteDevice> ();
 
 						if (wiimoteDevices.Count > 0) {
 								WiimoteDevice device = wiimoteDevices [0];
@@ -548,6 +548,8 @@ namespace ws.winx
 				{
 						if (TTFFDDevice != null)
 								TTFFDDevice.StopMotor ();
+
+
 						InputManager.Dispose ();
 				}
 		}

@@ -57,6 +57,7 @@ namespace ws.winx.platform.osx
      
 
         bool disposed;
+		bool hidCallbacksRegistered;
 
 
         private List<IDriver> __drivers = new List<IDriver>();
@@ -85,11 +86,25 @@ namespace ws.winx.platform.osx
 
 			if (hidmanager != IntPtr.Zero) {	
 				
-				
+				if (__Generics != null) {
+
+					foreach (KeyValuePair<int, HIDDevice> entry in __Generics) {
+						entry.Value.Dispose ();
+					}
+					
+					
+					__Generics.Clear ();
+
+				}else
 				__Generics = new Dictionary<int, HIDDevice>();
-				
-				//Register add/remove device handlers
-				RegisterHIDCallbacks(hidmanager);
+
+
+				if(!hidCallbacksRegistered){
+					//Register add/remove device handlers
+					RegisterHIDCallbacks(hidmanager);
+
+
+				}
 				
 				
 			}else
@@ -194,9 +209,7 @@ namespace ws.winx.platform.osx
 		
 
 
-			dictionaries[0] = CreateDeviceMatchingDictionary((uint)Native.HIDPage.GenericDesktop,(uint)Native.HIDUsageGD.Joystick);
-			
-			
+			dictionaries[0] = CreateDeviceMatchingDictionary((uint)Native.HIDPage.GenericDesktop,(uint)Native.HIDUsageGD.Joystick);			
 			
 			dictionaries[1] = CreateDeviceMatchingDictionary((uint)Native.HIDPage.GenericDesktop,(uint)Native.HIDUsageGD.GamePad);
 
@@ -255,8 +268,7 @@ namespace ws.winx.platform.osx
                 hidmanager, HandleDeviceAdded, IntPtr.Zero);
             Native.IOHIDManagerRegisterDeviceRemovalCallback(
                 hidmanager, HandleDeviceRemoved, IntPtr.Zero);
-            Native.IOHIDManagerScheduleWithRunLoop(hidmanager,
-                                                          RunLoop, InputLoopMode);
+            Native.IOHIDManagerScheduleWithRunLoop(hidmanager,RunLoop, InputLoopMode);
 
             //Native.IOHIDManagerSetDeviceMatching(hidmanager, DeviceTypes.Ref);
             Native.IOHIDManagerSetDeviceMatchingMultiple(hidmanager, DeviceTypes.typeRef);
@@ -268,9 +280,13 @@ namespace ws.winx.platform.osx
 
 				if(result==IOReturn.kIOReturnSuccess){
 					Native.CFRunLoopRunInMode(InputLoopMode, 0.0, true);
+
+					hidCallbacksRegistered=true;
 				}else{
 					UnityEngine.Debug.LogError("OSXHIDInterface can't open hidmanager! Error:"+result);
 				}
+
+
 
             
 
@@ -459,7 +475,7 @@ namespace ws.winx.platform.osx
 
 
 
-			if (Generics != null) {
+						if (Generics != null) {
 								foreach (KeyValuePair<int, HIDDevice> entry in Generics) {
 										entry.Value.Dispose ();
 								}

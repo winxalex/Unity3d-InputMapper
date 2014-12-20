@@ -21,151 +21,184 @@ using System.IO;
 using System.Linq;
 using Mono.TextTemplating;
 
-namespace ws.winx.editor{
-public class InputMapper : EditorWindow
+namespace ws.winx.editor
 {
+		public class InputMapper : EditorWindow
+		{
 
 
 	
 		
-		protected static Dictionary<int,InputState> _stateInputCombinations = InputManager.Settings.stateInputs; //new Dictionary<int,InputState> ();
-		protected static bool _settingsLoaded = false;
-		protected UnityEngine.Object _lastController;
-		protected TextAsset _lastSettingsXML;
-		protected int _selectedStateHash = 0;
-		protected int _deleteStateWithHash = 0;
-		protected string _warrningAddStateLabel;
-		protected int _isPrimary = 0;
-		protected string _currentInputString;
+				protected static Dictionary<int,InputState> _stateInputCombinations = InputManager.Settings.stateInputs; //new Dictionary<int,InputState> ();
+				protected static bool _settingsLoaded = false;
+				protected UnityEngine.Object _lastController;
+				protected TextAsset _lastSettingsXML;
+				protected int _selectedStateHash = 0;
+				protected int _deleteStateWithHash = 0;
+				protected string _warrningAddStateLabel;
+				protected int _isPrimary = 0;
+				protected string _currentInputString;
 
-		//new state
-		protected string _newCustomStateName;
-		protected string _prevNewCustomStateName;
-
-		
-		//protected string _className="MyEnumClass";
-		protected string _namespace = "ws.winx.input.states";
-		protected string _enumName = "States";
-		protected string _enumFileName = "States.cs";
-		protected bool _enumSettingsFoldout;
+				//new state
+				protected string _newCustomStateName;
+				protected string _prevNewCustomStateName;
 
 		
-		//styles
-		protected GUILayoutOption[] _inputLabelStyle = new GUILayoutOption[]{ GUILayout.Width (200)};
-		protected GUILayoutOption[] _stateNameLabelStyle = new GUILayoutOption[]{ GUILayout.Width (100)};
-		protected GUILayoutOption[]  _settingsStyle = new GUILayoutOption[]{GUILayout.Width (200)};
-		protected GUILayoutOption[]  _addRemoveButtonStyle = new GUILayoutOption[]{GUILayout.Width (40)};
-		protected Rect _buttonRect = new Rect (0, 0, 100, 15);
-		protected Rect _layerLabelRect = new Rect (0, 0, 100, 15);
+				//protected string _className="MyEnumClass";
+				protected string _namespace = "ws.winx.input.states";
+				protected string _enumName = "States";
+				protected string _enumFileName = "States.cs";
+				protected bool _enumSettingsFoldout;
 
-		// protected GUILayoutOption[] _warrningAddStateLabelStryle=new GUILayoutOption[]{GUILayout.
-		protected InputAction _action;
-		protected InputCombination _previousStateInput = null;
-
-		//settings
-		protected float _singleClickSensitivity = InputManager.Settings.singleClickSensitivity;
-		protected float _doubleClickSensitivity = InputManager.Settings.doubleClickSensitivity;
-		protected float _longClickSensitivity = InputManager.Settings.longClickSensitivity;
-		protected float _combosClickSensitivity = InputManager.Settings.combinationsClickSensitivity;
-		protected string _longClickDesignator = InputManager.Settings.longDesignator;
-		protected string _doubleClickDesignator = InputManager.Settings.doubleDesignator;
-		protected string _spaceDesignator = InputManager.Settings.spaceDesignator;
-		protected char _prevSpaceDesinator = InputManager.Settings.spaceDesignator [0];
-		protected string _prevlongClickDesignator = InputManager.Settings.longDesignator;
-		protected string _prevdoubleClickDesignator = InputManager.Settings.doubleDesignator;
-		protected bool[] _showLayer;
-
-
-		//PUBLIC
-		public Vector2 scrollPosition = Vector2.zero;
-		public Vector2 scrollPosition2 = Vector2.zero;
-		public int maxCombosNum = 3;
-		public TextAsset settingsXML;
-		public AnimatorController controller;
 		
-	    
+				//styles
+				protected GUILayoutOption[] _inputLabelStyle = new GUILayoutOption[]{ GUILayout.Width (200)};
+				protected GUILayoutOption[] _stateNameLabelStyle = new GUILayoutOption[]{ GUILayout.Width (100)};
+				protected GUILayoutOption[]  _settingsStyle = new GUILayoutOption[]{GUILayout.Width (200)};
+				protected GUILayoutOption[]  _addRemoveButtonStyle = new GUILayoutOption[]{GUILayout.Width (40)};
+				protected Rect _buttonRect = new Rect (0, 0, 100, 15);
+				protected Rect _layerLabelRect = new Rect (0, 0, 100, 15);
+
+				// protected GUILayoutOption[] _warrningAddStateLabelStryle=new GUILayoutOption[]{GUILayout.
+				protected InputAction _action;
+				protected InputCombination _previousStateInput = null;
+
+				//settings
+				protected float _singleClickSensitivity = InputManager.Settings.singleClickSensitivity;
+				protected float _doubleClickSensitivity = InputManager.Settings.doubleClickSensitivity;
+				protected float _longClickSensitivity = InputManager.Settings.longClickSensitivity;
+				protected float _combosClickSensitivity = InputManager.Settings.combinationsClickSensitivity;
+				protected string _longClickDesignator = InputManager.Settings.longDesignator;
+				protected string _doubleClickDesignator = InputManager.Settings.doubleDesignator;
+				protected string _spaceDesignator = InputManager.Settings.spaceDesignator;
+				protected char _prevSpaceDesinator = InputManager.Settings.spaceDesignator [0];
+				protected string _prevlongClickDesignator = InputManager.Settings.longDesignator;
+				protected string _prevdoubleClickDesignator = InputManager.Settings.doubleDesignator;
+				protected bool[] _showLayer;
+
+				private static bool __wereDevicesEnumerated=false;
 
 
+				//PUBLIC
+				public Vector2 scrollPosition = Vector2.zero;
+				public Vector2 scrollPosition2 = Vector2.zero;
+				public int maxCombosNum = 3;
+				public TextAsset settingsXML;
+				public AnimatorController controller;
 	    
-	    
+				void Awake ()
+				{
+
+						Debug.Log ("Awake");
+
+
+//			#if (UNITY_STANDALONE_WIN)
+//			InputManager.AddDriver(new ThrustMasterDriver());
+//			InputManager.AddDriver(new WiiDriver());
+//			InputManager.AddDriver(new XInputDriver());
+//			
+//			#endif
+//			
+//			#if (UNITY_STANDALONE_OSX)
+//			InputManager.AddDriver(new ThrustMasterDriver());
+//			//InputManager.AddDriver(new XInputDriver());
+//			#endif
+//			
+//			#if (UNITY_STANDALONE_ANDROID)
+//			InputManager.AddDriver(new ThrustMasterDriver());
+//			#endif
+
+						if (!Application.isPlaying) {
+								InputManager.hidInterface.Enumerate ();
+								__wereDevicesEnumerated=true;
+						}
+			   
+				}
+
+				void Enable ()
+				{
+
+						Debug.Log ("Enable");
+
+				}
 
 		
 
 
 	
-		// Add menu named "Input Mapper" to the Window menu
-		[MenuItem ("Window/Input Mapper")]
-		static void Init ()
-		{
-				if (_stateInputCombinations != null && _stateInputCombinations.Count > 0)
-						_stateInputCombinations = new Dictionary<int, InputState> ();
-
-
-
-
-				InputManager.hidInterface.Enumerate ();
-
-				// Get existing open window or if none, make a new one:
-				EditorWindow.GetWindow (typeof(InputMapper));
+				// Add menu named "Input Mapper" to the Window menu
+				[MenuItem ("Window/Input Mapper")]
+				static void ShowEditor ()
+				{
+						if (_stateInputCombinations != null && _stateInputCombinations.Count > 0)
+								_stateInputCombinations = new Dictionary<int, InputState> ();
 
 
 
 
 
-		}
+
+						// Get existing open window or if none, make a new one:
+						EditorWindow.GetWindow (typeof(InputMapper));
+
+
+
+
+
+				}
 		
-		static void generateCSharpStatesEnum (string namespaceName, string enumName, string fileName, StringBuilder statesStringBuilder)
-		{
+				static void generateCSharpStatesEnum (string namespaceName, string enumName, string fileName, StringBuilder statesStringBuilder)
+				{
 
-				//Create template generator
-				TemplateGenerator generator = new TemplateGenerator ();
-				generator.Session.Add ("Namespace", namespaceName);
-				//generator.Session.Add ("ClassName", controller.name.Replace (" ", "") + "Class");
-				generator.Session.Add ("EnumName", enumName);		
-				generator.Session.Add ("Values", statesStringBuilder.ToString ());
+						//Create template generator
+						TemplateGenerator generator = new TemplateGenerator ();
+						generator.Session.Add ("Namespace", namespaceName);
+						//generator.Session.Add ("ClassName", controller.name.Replace (" ", "") + "Class");
+						generator.Session.Add ("EnumName", enumName);		
+						generator.Session.Add ("Values", statesStringBuilder.ToString ());
 		
-				string generatedFileName = fileName;
+						string generatedFileName = fileName;
 
-				string generated;
+						string generated;
 
-				//split ws.winx.input.states
-				string[] namespacePath = namespaceName.Split ('.');
-				int i = 0;
-				generated = Application.dataPath;
+						//split ws.winx.input.states
+						string[] namespacePath = namespaceName.Split ('.');
+						int i = 0;
+						generated = Application.dataPath;
 
-				//search for directory
-				string[] directoriesFound = Directory.GetDirectories (generated, namespacePath [0], SearchOption.AllDirectories);
+						//search for directory
+						string[] directoriesFound = Directory.GetDirectories (generated, namespacePath [0], SearchOption.AllDirectories);
 				
-				//find if file already exist
-				if (directoriesFound.Length > 0) {
-						if (directoriesFound.Length > 1)
-								UnityEngine.Debug.LogWarning ("Only first found " + generatedFileName + " will be used");
+						//find if file already exist
+						if (directoriesFound.Length > 0) {
+								if (directoriesFound.Length > 1)
+										UnityEngine.Debug.LogWarning ("Only first found " + generatedFileName + " will be used");
 					
-						generated = directoriesFound [0];
-						i = 1;
+								generated = directoriesFound [0];
+								i = 1;
 					
-				} else {
-						generated = Path.Combine (Application.dataPath, "Scripts");
+						} else {
+								generated = Path.Combine (Application.dataPath, "Scripts");
 							
-						//if Scripts doesn't exist
-						if (!Directory.Exists (generated))
-								Directory.CreateDirectory (generated);
-				}
+								//if Scripts doesn't exist
+								if (!Directory.Exists (generated))
+										Directory.CreateDirectory (generated);
+						}
 		
 		
 		
-				//generate subdirs
-				for (; i<namespacePath.Length; i++) {
-						generated = Path.Combine (generated, namespacePath [i]);
+						//generate subdirs
+						for (; i<namespacePath.Length; i++) {
+								generated = Path.Combine (generated, namespacePath [i]);
 
-						if (!Directory.Exists (generated))
-								Directory.CreateDirectory (generated);
-				}
+								if (!Directory.Exists (generated))
+										Directory.CreateDirectory (generated);
+						}
 		
 
 			
 			
-				generated = Path.GetFullPath (Path.Combine (generated, generatedFileName));
+						generated = Path.GetFullPath (Path.Combine (generated, generatedFileName));
 
 				
 
@@ -173,242 +206,246 @@ public class InputMapper : EditorWindow
 
 
 		
-				try {
+						try {
 
-						///!!! OSX: error happen here cos of unity bug
-						/// Error running gmcs: Cannot find the specified file
-						/// workaround is (check your version mine was 2.10.11) typing this command line in terminal
-						/// sudo ln -s /Applications/Unity/MonoDevelop.app/Contents/Frameworks/Mono.framework/Versions/2.10.2/bin/gmcs /usr/bin
+								///!!! OSX: error happen here cos of unity bug
+								/// Error running gmcs: Cannot find the specified file
+								/// workaround is (check your version mine was 2.10.11) typing this command line in terminal
+								/// sudo ln -s /Applications/Unity/MonoDevelop.app/Contents/Frameworks/Mono.framework/Versions/2.10.2/bin/gmcs /usr/bin
 						
-						generator.ProcessTemplate (Path.Combine (Path.Combine (Application.dataPath, "Editor"), "StatesEnumTemplate.tpl"), generated);
+								generator.ProcessTemplate (Path.Combine (Path.Combine (Application.dataPath, "Editor"), "StatesEnumTemplate.tpl"), generated);
 			
-						UnityEngine.Debug.Log ("Generated States Enum at:" + generated);
-				} catch (Exception e) {
-						UnityEngine.Debug.LogError (e.Message);
-				}
-		
-				AssetDatabase.Refresh ();
-
-		}
-
-		void loadTextAsset (string path)
-		{
-				Uri fullPath = new Uri (path, UriKind.Absolute);
-				Uri relRoot = new Uri (Application.dataPath, UriKind.Absolute);
-
-		AssetDatabase.ImportAsset(relRoot.MakeRelativeUri(fullPath).ToString(),ImportAssetOptions.ForceUpdate);
-
-				
-				_lastSettingsXML = settingsXML = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri(fullPath).ToString(), typeof(TextAsset)) as TextAsset;
-
-                if (_lastSettingsXML != null)
-                    loadInputSettings(_lastSettingsXML.text);
-
-		//_lastSettingsXML = settingsXML = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri(fullPath).ToString(), typeof(TextAsset)) as TextAsset;
-		//Debug.Log ("Loading Text asset"+settingsXML.name+" from "+path+" full path:"+ fullPath+" rell:"+relRoot+"relativePath:"+relRoot.MakeRelativeUri(fullPath).ToString());
-
-	
-	}
-	
-	
-		///////////////////////////////        LOAD INPUT SETTINGS          //////////////////////
-		/// <summary>
-		/// Loads the input settings 
-		/// </summary>
-		void loadInputSettings (string text)
-		{
-
-				if (text != null && text.Length > 1) {
-
-						Debug.Log ("Loading..." + _stateInputCombinations);
-
-						//clone
-						_stateInputCombinations = new Dictionary<int,InputState> (_stateInputCombinations);
-						//Debug.Log ("Clone..." + _stateInputCombinations.Count);		
-						
-						//load
-                        InputManager.loadSettingsFromText(text,false);
-						//InputManager.loadSettings (path);
-
-						//assign settings
-						_doubleClickDesignator = InputManager.Settings.doubleDesignator;
-						_doubleClickSensitivity = InputManager.Settings.doubleClickSensitivity;
-						_combosClickSensitivity = InputManager.Settings.combinationsClickSensitivity;
-						_singleClickSensitivity = InputManager.Settings.singleClickSensitivity;
-						_longClickDesignator = InputManager.Settings.longDesignator;
-						_longClickSensitivity = InputManager.Settings.longClickSensitivity;
-						_spaceDesignator = InputManager.Settings.spaceDesignator;
-						
-						var stateInputs = InputManager.Settings.stateInputs;
-						
-						//concat//concate with priority of keys/items loaded from .xml
-						foreach (var KeyValuePair in _stateInputCombinations) {
-								if (!stateInputs.ContainsKey (KeyValuePair.Key))
-										InputManager.Settings.stateInputs.Add (KeyValuePair.Key, KeyValuePair.Value);
-							
-							
+								UnityEngine.Debug.Log ("Generated States Enum at:" + generated);
+						} catch (Exception e) {
+								UnityEngine.Debug.LogError (e.Message);
 						}
+		
+						AssetDatabase.Refresh ();
+
+				}
+
+				void loadTextAsset (string path)
+				{
+						Uri fullPath = new Uri (path, UriKind.Absolute);
+						Uri relRoot = new Uri (Application.dataPath, UriKind.Absolute);
+
+						AssetDatabase.ImportAsset (relRoot.MakeRelativeUri (fullPath).ToString (), ImportAssetOptions.ForceUpdate);
+
+				
+						_lastSettingsXML = settingsXML = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri (fullPath).ToString (), typeof(TextAsset)) as TextAsset;
+
+						if (_lastSettingsXML != null)
+								loadInputSettings (_lastSettingsXML.text);
+
+						//_lastSettingsXML = settingsXML = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri(fullPath).ToString(), typeof(TextAsset)) as TextAsset;
+						//Debug.Log ("Loading Text asset"+settingsXML.name+" from "+path+" full path:"+ fullPath+" rell:"+relRoot+"relativePath:"+relRoot.MakeRelativeUri(fullPath).ToString());
+
+	
+				}
+	
+	
+				///////////////////////////////        LOAD INPUT SETTINGS          //////////////////////
+				/// <summary>
+				/// Loads the input settings 
+				/// </summary>
+				void loadInputSettings (string text)
+				{
+
+						if (text != null && text.Length > 1) {
+
+								Debug.Log ("Loading..." + _stateInputCombinations);
+
+								//clone
+								_stateInputCombinations = new Dictionary<int,InputState> (_stateInputCombinations);
+								//Debug.Log ("Clone..." + _stateInputCombinations.Count);		
+						
+								//load
+								InputManager.loadSettingsFromText (text, false);
+								//InputManager.loadSettings (path);
+
+								//assign settings
+								_doubleClickDesignator = InputManager.Settings.doubleDesignator;
+								_doubleClickSensitivity = InputManager.Settings.doubleClickSensitivity;
+								_combosClickSensitivity = InputManager.Settings.combinationsClickSensitivity;
+								_singleClickSensitivity = InputManager.Settings.singleClickSensitivity;
+								_longClickDesignator = InputManager.Settings.longDesignator;
+								_longClickSensitivity = InputManager.Settings.longClickSensitivity;
+								_spaceDesignator = InputManager.Settings.spaceDesignator;
+						
+								var stateInputs = InputManager.Settings.stateInputs;
+						
+								//concat//concate with priority of keys/items loaded from .xml
+								foreach (var KeyValuePair in _stateInputCombinations) {
+										if (!stateInputs.ContainsKey (KeyValuePair.Key))
+												InputManager.Settings.stateInputs.Add (KeyValuePair.Key, KeyValuePair.Value);
+							
+							
+								}
 
 						
-						_stateInputCombinations = InputManager.Settings.stateInputs;
-						//Debug.Log ("Concat..." + _stateInputCombinations.Count);	
+								_stateInputCombinations = InputManager.Settings.stateInputs;
+								//Debug.Log ("Concat..." + _stateInputCombinations.Count);	
 			
 						
-				}
+						}
 		    
-		}
+				}
 		
 
 
-		///////////////////////////////////////  SAVE INPUT SETTINGS /////////////////////////////////////
-		/// <summary>
-		/// Saves the input settings.
-		/// </summary>
-		void saveInputSettings (string path)
-		{
+				///////////////////////////////////////  SAVE INPUT SETTINGS /////////////////////////////////////
+				/// <summary>
+				/// Saves the input settings.
+				/// </summary>
+				void saveInputSettings (string path)
+				{
 				
 
-				if (path != null && path.Length > 1) {
-						//Debug.Log ("Before..." + _stateInputCombinations.Count+" inputmngr "+InputManager.Settings.stateInputs.Count);
-						generateCSharpStatesEnum (_namespace, _enumName, _enumFileName, filterInputStates ());
+						if (path != null && path.Length > 1) {
+								//Debug.Log ("Before..." + _stateInputCombinations.Count+" inputmngr "+InputManager.Settings.stateInputs.Count);
+								generateCSharpStatesEnum (_namespace, _enumName, _enumFileName, filterInputStates ());
 						
 			          	
-						InputManager.saveSettings (path);
+								InputManager.saveSettings (path);
 
-						//Debug.Log ("AfterSave..." + _stateInputCombinations.Count+" inputmngr "+InputManager.Settings.stateInputs.Count+"to path:"+path);
+								//Debug.Log ("AfterSave..." + _stateInputCombinations.Count+" inputmngr "+InputManager.Settings.stateInputs.Count+"to path:"+path);
 						
 
-						loadTextAsset (path);
-						
-				}
-		}
-
-
-		/// <summary>
-		/// Filters the input states.
-		/// </summary>
-		/// <returns>The input states.</returns>
-		StringBuilder filterInputStates ()
-		{
-				Dictionary<int,InputState> stateInputs;
-				List<int> keysToBeRemovedList;
-				stateInputs = InputMapper._stateInputCombinations;
-				keysToBeRemovedList = new List<int> ();
-				StringBuilder statesStringBuilder = new StringBuilder ();
-		
-				//Filter
-				foreach (var KeyValuePair in stateInputs) {
-						InputCombination combos = KeyValuePair.Value.combinations [0];
-					
-						if (combos != null && combos.GetActionAt (0).code == (int)KeyCode.None) {
-								combos.Clear ();
-								//stateInputs.Remove(KeyCombinationStringPair.Key);
-								keysToBeRemovedList.Add (KeyValuePair.Key);
-						}
-					
-					
-						combos = KeyValuePair.Value.combinations [1];
-					
-						if (combos != null && combos.GetActionAt (0).code == (int)KeyCode.None) {
-								combos.Clear ();
-								KeyValuePair.Value.combinations [1] = null;
+								loadTextAsset (path);
 						
 						}
-
-
-
-
-						statesStringBuilder.Append ("\t" + KeyValuePair.Value.name.Replace (" ", "_") + "=" + KeyValuePair.Key + ",\n\r");
-						
-					
-			
-			
-			
 				}
 
 
-				//remove those with "None" as Primary combinaiton
-				foreach (var key in keysToBeRemovedList) {
-						stateInputs.Remove (key);
-				}
-
-
-
-				return statesStringBuilder;
-
-		}	
-
-
-
-
-		/// <summary>
-		/// Replaces the designator.
-		/// </summary>
-		/// <param name="oldValue">Old value.</param>
-		/// <param name="newValue">New value.</param>
-		void replaceDesignator (string oldValue, string newValue)
-		{
-				foreach (var KeyCombinationStringPair in InputMapper._stateInputCombinations) {
-						InputCombination combos = KeyCombinationStringPair.Value.combinations [0];
-
-						
-						if (combos != null)
-								combos.combinationString = combos.combinationString.Replace (oldValue, newValue);
-
-						combos = KeyCombinationStringPair.Value.combinations [1];
-
-						if (combos != null)
-								combos.combinationString = combos.combinationString.Replace (oldValue, newValue);
-
-				}
-		}
-
-
-
-
+				/// <summary>
+				/// Filters the input states.
+				/// </summary>
+				/// <returns>The input states.</returns>
+				StringBuilder filterInputStates ()
+				{
+						Dictionary<int,InputState> stateInputs;
+						List<int> keysToBeRemovedList;
+						stateInputs = InputMapper._stateInputCombinations;
+						keysToBeRemovedList = new List<int> ();
+						StringBuilder statesStringBuilder = new StringBuilder ();
 		
-
-		/// <summary>
-		/// Exists the in controller.
-		/// </summary>
-		/// <returns><c>true</c>, if in controller was existed, <c>false</c> otherwise.</returns>
-		/// <param name="key">Key.</param>
-		bool existInController (int key)
-		{
-
-
-				if (controller != null) {
-
-						int numLayers, numStates, i = 0, j = 0;
-						AnimatorControllerLayer layer;
-						StateMachine stateMachine;	
-
-
-
-						AnimatorController ac = controller as AnimatorController;
-						numLayers = ac.layerCount;
-			
-						for (; i<numLayers; i++) {
-								layer = ac.GetLayer (i);
-				
-
-								stateMachine = layer.stateMachine;
-				
-								numStates = stateMachine.stateCount;
-				
-
-				
-								for (j=0; j<numStates; j++) {
-
-										if (stateMachine.GetState (j).uniqueNameHash == key)
-												return true;
-						
-
+						//Filter
+						foreach (var KeyValuePair in stateInputs) {
+								InputCombination combos = KeyValuePair.Value.combinations [0];
 					
+								if (combos != null && combos.GetActionAt (0).code == (int)KeyCode.None) {
+										combos.Clear ();
+										//stateInputs.Remove(KeyCombinationStringPair.Key);
+										keysToBeRemovedList.Add (KeyValuePair.Key);
 								}
+					
+					
+								combos = KeyValuePair.Value.combinations [1];
+					
+								if (combos != null && combos.GetActionAt (0).code == (int)KeyCode.None) {
+										combos.Clear ();
+										KeyValuePair.Value.combinations [1] = null;
+						
+								}
+
+
+
+
+								statesStringBuilder.Append ("\t" + KeyValuePair.Value.name.Replace (" ", "_") + "=" + KeyValuePair.Key + ",\n\r");
+						
+					
+			
+			
+			
+						}
+
+
+						//remove those with "None" as Primary combinaiton
+						foreach (var key in keysToBeRemovedList) {
+								stateInputs.Remove (key);
+						}
+
+
+
+						return statesStringBuilder;
+
+				}	
+
+
+
+
+				/// <summary>
+				/// Replaces the designator.
+				/// </summary>
+				/// <param name="oldValue">Old value.</param>
+				/// <param name="newValue">New value.</param>
+				void replaceDesignator (string oldValue, string newValue)
+				{
+						foreach (var KeyCombinationStringPair in InputMapper._stateInputCombinations) {
+								InputCombination combos = KeyCombinationStringPair.Value.combinations [0];
+
+						
+								if (combos != null)
+										combos.combinationString = combos.combinationString.Replace (oldValue, newValue);
+
+								combos = KeyCombinationStringPair.Value.combinations [1];
+
+								if (combos != null)
+										combos.combinationString = combos.combinationString.Replace (oldValue, newValue);
+
+						}
+				}
+
+
+
+
+		
+
+				/// <summary>
+				/// Exists the in controller.
+				/// </summary>
+				/// <returns><c>true</c>, if in controller was existed, <c>false</c> otherwise.</returns>
+				/// <param name="key">Key.</param>
+				bool existInController (int key)
+				{
+
+
+						if (controller != null) {
+
+								int numLayers, numStates, i = 0, j = 0;
+								AnimatorControllerLayer layer;
+								StateMachine stateMachine;	
+
+
+
+								AnimatorController ac = controller as AnimatorController;
+								numLayers = ac.layerCount;
+			
+								for (; i<numLayers; i++) {
+										layer = ac.GetLayer (i);
+				
+
+										stateMachine = layer.stateMachine;
+				
+										numStates = stateMachine.stateCount;
 				
 
 				
+										for (j=0; j<numStates; j++) {
+
+												if (stateMachine.GetState (j).uniqueNameHash == key)
+														return true;
+						
+
+					
+										}
+				
+
+				
+								}
+
+
+								return false;
 						}
 
 
@@ -416,365 +453,363 @@ public class InputMapper : EditorWindow
 				}
 
 
-				return false;
-		}
 
-
-
-		/// <summary>
-		/// Resolves empty or None input or restricts input to max num of combinaition(maxCombosNum)
-		/// </summary>
-		/// <param name="combos">Combos. ex. w+Mouse1(x2)+Joystick1Button3(-)</param>
-		/// <param name="input">Input.</param>
-		void toInputCombination (InputCombination combos, InputAction input)
-		{
+				/// <summary>
+				/// Resolves empty or None input or restricts input to max num of combinaition(maxCombosNum)
+				/// </summary>
+				/// <param name="combos">Combos. ex. w+Mouse1(x2)+Joystick1Button3(-)</param>
+				/// <param name="input">Input.</param>
+				void toInputCombination (InputCombination combos, InputAction input)
+				{
 				
-				if (combos.numActions + 1 > maxCombosNum || (combos.numActions == 1 && combos.GetActionAt (0).code == 0))
-						combos.Clear ();
+						if (combos.numActions + 1 > maxCombosNum || (combos.numActions == 1 && combos.GetActionAt (0).code == 0))
+								combos.Clear ();
 				
-				combos.Add (input);
+						combos.Add (input);
 
-				//Debug.Log(input);
+						//Debug.Log(input);
 
-		}
-
-
-		/////////////////////////                  UPDATE              /////////////////////////
-		/// <summary>
-		/// Update this instance.
-		/// </summary>
-		void Update ()
-		{
-				InputState state;
-                if (_selectedStateHash != 0)
-                {
-                    _action = InputEx.GetInput();
-
-                    if (_action != null && (_action.code ^ (int)KeyCode.Escape) != 0 && (_action.code ^ (int)KeyCode.Return) != 0)
-                    {
+				}
 
 
+				/////////////////////////                  UPDATE              /////////////////////////
+				/// <summary>
+				/// Update this instance.
+				/// </summary>
+				void Update ()
+				{
+						InputState state;
+						if (_selectedStateHash != 0) {
 
-                        if ((_action.code ^ (int)KeyCode.Backspace) == 0)
-                        {
-                            state = _stateInputCombinations[_selectedStateHash];
-                            state.combinations[_isPrimary].Clear();
-                            state.combinations[_isPrimary].Add(new InputAction(KeyCode.None));
-
-                        }
-                        else
-                        {
-
-                            toInputCombination(_stateInputCombinations[_selectedStateHash].combinations[_isPrimary], _action);
-                        }
+								if(!Application.isPlaying && !__wereDevicesEnumerated){
+									InputManager.hidInterface.Enumerate();
+									__wereDevicesEnumerated=true;
+								}
 
 
 
-                        //								Debug.Log ("Action:" + _action + " " + _action.code);
-                    }
+								_action = InputEx.GetInput ();
+
+								if (_action != null && (_action.code ^ (int)KeyCode.Escape) != 0 && (_action.code ^ (int)KeyCode.Return) != 0) {
 
 
-                    //Debug.Log ("Action:"+action);
-                }
+
+										if ((_action.code ^ (int)KeyCode.Backspace) == 0) {
+												state = _stateInputCombinations [_selectedStateHash];
+												state.combinations [_isPrimary].Clear ();
+												state.combinations [_isPrimary].Add (new InputAction (KeyCode.None));
+
+										} else {
+
+												toInputCombination (_stateInputCombinations [_selectedStateHash].combinations [_isPrimary], _action);
+										}
+
+
+
+										//								Debug.Log ("Action:" + _action + " " + _action.code);
+								}
+
+
+								//Debug.Log ("Action:"+action);
+						}
                
 
 				
 
-		}
+				}
 
 
 
-		///////////////////////////             OnGUI                ////////////////////////
-		/// <summary>
-		/// Raises the GU event.
-		/// </summary>
-		void OnGUI ()
-		{
+				///////////////////////////             OnGUI                ////////////////////////
+				/// <summary>
+				/// Raises the GU event.
+				/// </summary>
+				void OnGUI ()
+				{
 
 				
-				int numLayers;
-				int numStates;
-				int i = 0;
-				int j = 0;		
-				StateMachine stateMachine;
-				UnityEditorInternal.State state;
-				AnimatorControllerLayer layer;
-				AnimatorController ac;
+						int numLayers;
+						int numStates;
+						int i = 0;
+						int j = 0;		
+						StateMachine stateMachine;
+						UnityEditorInternal.State state;
+						AnimatorControllerLayer layer;
+						AnimatorController ac;
 
 
-				if (_deleteStateWithHash != 0) {
-						_stateInputCombinations.Remove (_deleteStateWithHash);
-						_deleteStateWithHash = 0;
-				}
+						if (_deleteStateWithHash != 0) {
+								_stateInputCombinations.Remove (_deleteStateWithHash);
+								_deleteStateWithHash = 0;
+						}
 					
 
 		
-				if (_spaceDesignator != null) {
+						if (_spaceDesignator != null) {
 
-						EditorGUILayout.LabelField ("Settings");
-						EditorGUILayout.Separator ();
+								EditorGUILayout.LabelField ("Settings");
+								EditorGUILayout.Separator ();
 
-						////// MAX NUM COMBOS  ///// 
-						maxCombosNum = EditorGUILayout.IntField ("Combos per input:", maxCombosNum, _settingsStyle);
+								////// MAX NUM COMBOS  ///// 
+								maxCombosNum = EditorGUILayout.IntField ("Combos per input:", maxCombosNum, _settingsStyle);
 
-						EditorGUILayout.Separator ();
+								EditorGUILayout.Separator ();
 
-						////// DESIGNATORS /////
-						EditorGUILayout.LabelField ("Click Designators");
+								////// DESIGNATORS /////
+								EditorGUILayout.LabelField ("Click Designators");
 
-						///////// DOUBLE ////////////
-						_doubleClickDesignator = EditorGUILayout.TextField ("Double click designator", _doubleClickDesignator, _settingsStyle);
-						InputManager.Settings.doubleDesignator = _doubleClickDesignator.Length > 0 ? _doubleClickDesignator : _prevlongClickDesignator;
+								///////// DOUBLE ////////////
+								_doubleClickDesignator = EditorGUILayout.TextField ("Double click designator", _doubleClickDesignator, _settingsStyle);
+								InputManager.Settings.doubleDesignator = _doubleClickDesignator.Length > 0 ? _doubleClickDesignator : _prevlongClickDesignator;
 						
 						
 
-						if (_prevdoubleClickDesignator != null && _doubleClickDesignator.Length > 0 && _prevdoubleClickDesignator != _doubleClickDesignator) {
-								replaceDesignator (_prevdoubleClickDesignator, _doubleClickDesignator);
-						}
-						_prevdoubleClickDesignator = _doubleClickDesignator;
+								if (_prevdoubleClickDesignator != null && _doubleClickDesignator.Length > 0 && _prevdoubleClickDesignator != _doubleClickDesignator) {
+										replaceDesignator (_prevdoubleClickDesignator, _doubleClickDesignator);
+								}
+								_prevdoubleClickDesignator = _doubleClickDesignator;
 
-						//////////////  LONG //////////
-						_longClickDesignator = EditorGUILayout.TextField ("Long click designator", _longClickDesignator, _settingsStyle);
+								//////////////  LONG //////////
+								_longClickDesignator = EditorGUILayout.TextField ("Long click designator", _longClickDesignator, _settingsStyle);
 
-						InputManager.Settings.longDesignator = _longClickDesignator.Length > 0 ? _longClickDesignator : _prevlongClickDesignator;
+								InputManager.Settings.longDesignator = _longClickDesignator.Length > 0 ? _longClickDesignator : _prevlongClickDesignator;
 						
-						if (_prevlongClickDesignator != null && _longClickDesignator.Length > 0 && _prevlongClickDesignator != _longClickDesignator) {
-								replaceDesignator (_prevlongClickDesignator, _longClickDesignator);
-						}
-						_prevlongClickDesignator = _longClickDesignator;
+								if (_prevlongClickDesignator != null && _longClickDesignator.Length > 0 && _prevlongClickDesignator != _longClickDesignator) {
+										replaceDesignator (_prevlongClickDesignator, _longClickDesignator);
+								}
+								_prevlongClickDesignator = _longClickDesignator;
 
-						///////////// SPACE /////////////
-						_spaceDesignator = EditorGUILayout.TextField ("Combination separator", _spaceDesignator, _settingsStyle);
-						if (_spaceDesignator.Length > 1)
-								_spaceDesignator = _spaceDesignator [0].ToString ();//restrict to 1 char
+								///////////// SPACE /////////////
+								_spaceDesignator = EditorGUILayout.TextField ("Combination separator", _spaceDesignator, _settingsStyle);
+								if (_spaceDesignator.Length > 1)
+										_spaceDesignator = _spaceDesignator [0].ToString ();//restrict to 1 char
 
-						InputManager.Settings.spaceDesignator = _spaceDesignator.Length > 0 ? _spaceDesignator : _prevSpaceDesinator.ToString ();
+								InputManager.Settings.spaceDesignator = _spaceDesignator.Length > 0 ? _spaceDesignator : _prevSpaceDesinator.ToString ();
 			
-						if (_spaceDesignator.Length > 0 && _prevSpaceDesinator != _spaceDesignator [0]) {
-								replaceDesignator (_prevSpaceDesinator.ToString (), _spaceDesignator [0].ToString ());
-						}
+								if (_spaceDesignator.Length > 0 && _prevSpaceDesinator != _spaceDesignator [0]) {
+										replaceDesignator (_prevSpaceDesinator.ToString (), _spaceDesignator [0].ToString ());
+								}
 
-						_prevSpaceDesinator = _spaceDesignator [0];
+								_prevSpaceDesinator = _spaceDesignator [0];
 						
 				
-						EditorGUILayout.Separator ();
+								EditorGUILayout.Separator ();
 
-						/////  SENSITIVITY  ////
-						EditorGUILayout.LabelField ("Sensitivity");
-						InputManager.Settings.singleClickSensitivity = _singleClickSensitivity = EditorGUILayout.FloatField ("Single click sensitivity", _singleClickSensitivity, _settingsStyle);
-						InputManager.Settings.doubleClickSensitivity = _doubleClickSensitivity = EditorGUILayout.FloatField ("Double click sensitivity", _doubleClickSensitivity, _settingsStyle);
-						InputManager.Settings.longClickSensitivity = _longClickSensitivity = EditorGUILayout.FloatField ("Long click sensitivity", _longClickSensitivity, _settingsStyle);
-						InputManager.Settings.combinationsClickSensitivity = _combosClickSensitivity = EditorGUILayout.FloatField ("Combos click sensitivity", _combosClickSensitivity, _settingsStyle);
-						EditorGUILayout.Separator ();
+								/////  SENSITIVITY  ////
+								EditorGUILayout.LabelField ("Sensitivity");
+								InputManager.Settings.singleClickSensitivity = _singleClickSensitivity = EditorGUILayout.FloatField ("Single click sensitivity", _singleClickSensitivity, _settingsStyle);
+								InputManager.Settings.doubleClickSensitivity = _doubleClickSensitivity = EditorGUILayout.FloatField ("Double click sensitivity", _doubleClickSensitivity, _settingsStyle);
+								InputManager.Settings.longClickSensitivity = _longClickSensitivity = EditorGUILayout.FloatField ("Long click sensitivity", _longClickSensitivity, _settingsStyle);
+								InputManager.Settings.combinationsClickSensitivity = _combosClickSensitivity = EditorGUILayout.FloatField ("Combos click sensitivity", _combosClickSensitivity, _settingsStyle);
+								EditorGUILayout.Separator ();
 
-				}
+						}
 				
 
-				/////////////// GENERATING ENUM SETTINGS  ///////////
-				_enumSettingsFoldout = EditorGUILayout.Foldout (_enumSettingsFoldout, "States Enum Properties");
+						/////////////// GENERATING ENUM SETTINGS  ///////////
+						_enumSettingsFoldout = EditorGUILayout.Foldout (_enumSettingsFoldout, "States Enum Properties");
 
-				if (_enumSettingsFoldout) {
-						EditorGUILayout.BeginVertical ();
+						if (_enumSettingsFoldout) {
+								EditorGUILayout.BeginVertical ();
 
-						//settingsXML = EditorGUILayout.ObjectField (settingsXML, typeof(TextAsset), true) as TextAsset;
-						_namespace = EditorGUILayout.TextField ("Namespace:", _namespace);
-						_enumName = EditorGUILayout.TextField ("Enum:", _enumName);
-						_enumFileName = EditorGUILayout.TextField ("File name:", _enumFileName);
-						EditorGUILayout.EndVertical ();
-				}
+								//settingsXML = EditorGUILayout.ObjectField (settingsXML, typeof(TextAsset), true) as TextAsset;
+								_namespace = EditorGUILayout.TextField ("Namespace:", _namespace);
+								_enumName = EditorGUILayout.TextField ("Enum:", _enumName);
+								_enumFileName = EditorGUILayout.TextField ("File name:", _enumFileName);
+								EditorGUILayout.EndVertical ();
+						}
 
-				EditorGUILayout.Separator ();
+						EditorGUILayout.Separator ();
 
-				/////////////////   XML  ////////////////////
-				EditorGUILayout.LabelField ("Input XML");
-				EditorGUILayout.BeginHorizontal ();
-				settingsXML = EditorGUILayout.ObjectField (settingsXML, typeof(TextAsset), true) as TextAsset;
+						/////////////////   XML  ////////////////////
+						EditorGUILayout.LabelField ("Input XML");
+						EditorGUILayout.BeginHorizontal ();
+						settingsXML = EditorGUILayout.ObjectField (settingsXML, typeof(TextAsset), true) as TextAsset;
 
-				//reload if xml changed
-				if (_lastSettingsXML != settingsXML)
-						_settingsLoaded = false;
+						//reload if xml changed
+						if (_lastSettingsXML != settingsXML)
+								_settingsLoaded = false;
 
-				_lastSettingsXML = settingsXML;
+						_lastSettingsXML = settingsXML;
 
 
-				if (_selectedStateHash == 0 && GUILayout.Button ("Open")) {
-						string path = EditorUtility.OpenFilePanel ("Open XML Input Settings file", "", "xml");
+						if (_selectedStateHash == 0 && GUILayout.Button ("Open")) {
+								string path = EditorUtility.OpenFilePanel ("Open XML Input Settings file", "", "xml");
 
-					if(path.Length>0){
-			  			 //loadInputSettings (path);
+								if (path.Length > 0) {
+										//loadInputSettings (path);
 
-						loadTextAsset (path);
+										loadTextAsset (path);
 				
-						_settingsLoaded = true;
-					}
+										_settingsLoaded = true;
+								}
 
 
-						return;
-				}
+								return;
+						}
 
 
-				///////////////   SAVE ////////////////////
+						///////////////   SAVE ////////////////////
 					
-				if (_selectedStateHash == 0 && GUILayout.Button ("Save")) {
+						if (_selectedStateHash == 0 && GUILayout.Button ("Save")) {
 
-						EditorGUIUtility.keyboardControl = 0;
-						_selectedStateHash = 0;
-
-
-			if(!Directory.Exists(Application.streamingAssetsPath))
-			{
-				Directory.CreateDirectory(Application.streamingAssetsPath);
-			}
-
-						if (settingsXML != null)
-								saveInputSettings (Path.Combine(Application.streamingAssetsPath,settingsXML.name+".xml"));
-						else
-								saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", Application.streamingAssetsPath, "InputSettings", "xml"));
-
-						return;
-
-				}
-
-				/////////// RELOAD ////////////////
-				if (GUILayout.Button ("Reload")) { 
-						_settingsLoaded = false;
-				}
-				EditorGUILayout.EndHorizontal ();
+								EditorGUIUtility.keyboardControl = 0;
+								_selectedStateHash = 0;
 
 
-				EditorGUILayout.Separator ();
+								if (!Directory.Exists (Application.streamingAssetsPath)) {
+										Directory.CreateDirectory (Application.streamingAssetsPath);
+								}
 
-				//loadingSettings 
-				if ((!_settingsLoaded && settingsXML != null)) { 
-						//loadInputSettings (AssetDatabase.GetAssetPath (settingsXML));
-                         loadInputSettings(settingsXML.text);
-						_settingsLoaded = true;
-				}
+								if (settingsXML != null)
+										saveInputSettings (Path.Combine (Application.streamingAssetsPath, settingsXML.name + ".xml"));
+								else
+										saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", Application.streamingAssetsPath, "InputSettings", "xml"));
+
+								return;
+
+						}
+
+						/////////// RELOAD ////////////////
+						if (GUILayout.Button ("Reload")) { 
+								_settingsLoaded = false;
+						}
+						EditorGUILayout.EndHorizontal ();
+
+
+						EditorGUILayout.Separator ();
+
+						//loadingSettings 
+						if ((!_settingsLoaded && settingsXML != null)) { 
+								//loadInputSettings (AssetDatabase.GetAssetPath (settingsXML));
+								loadInputSettings (settingsXML.text);
+								_settingsLoaded = true;
+						}
 
 
 
 				
-				/////////  ANIMATOR CONTROLER //////////
-				_lastController = controller;
+						/////////  ANIMATOR CONTROLER //////////
+						_lastController = controller;
 			
 				
-				EditorGUILayout.LabelField ("Animator Controller States");
+						EditorGUILayout.LabelField ("Animator Controller States");
 
-				EditorGUILayout.BeginHorizontal ();
-				controller = EditorGUILayout.ObjectField (controller, typeof(AnimatorController), true) as AnimatorController;
-
-				
-				EditorGUILayout.EndHorizontal ();
-
-
-
-				EditorGUILayout.Separator ();
-
+						EditorGUILayout.BeginHorizontal ();
+						controller = EditorGUILayout.ObjectField (controller, typeof(AnimatorController), true) as AnimatorController;
 
 				
+						EditorGUILayout.EndHorizontal ();
+
+
+
+						EditorGUILayout.Separator ();
 
 
 				
-				/////////  Create AnimaitonController states GUI //////////
-				if (controller != null) {
+
+
+				
+						/////////  Create AnimaitonController states GUI //////////
+						if (controller != null) {
 		
-						ac = controller as AnimatorController;
+								ac = controller as AnimatorController;
 						
 
-						numLayers = ac.layerCount;
+								numLayers = ac.layerCount;
 
-			if(_showLayer==null || _showLayer.Length!=numLayers)
-				_showLayer = new bool[controller.layerCount];
+								if (_showLayer == null || _showLayer.Length != numLayers)
+										_showLayer = new bool[controller.layerCount];
 					   
 				
-						for (; i<numLayers; i++) {
-								layer = ac.GetLayer (i);
+								for (; i<numLayers; i++) {
+										layer = ac.GetLayer (i);
 
 								
 
-								_showLayer [i] = EditorGUILayout.Foldout (_showLayer [i], layer.name);
+										_showLayer [i] = EditorGUILayout.Foldout (_showLayer [i], layer.name);
 
-								if (_showLayer [i]) {
-										stateMachine = layer.stateMachine;
+										if (_showLayer [i]) {
+												stateMachine = layer.stateMachine;
 					
-										numStates = stateMachine.stateCount;
+												numStates = stateMachine.stateCount;
 					
-										scrollPosition = GUILayout.BeginScrollView (scrollPosition, false, false);
+												scrollPosition = GUILayout.BeginScrollView (scrollPosition, false, false);
 				
-										for (j=0; j<numStates; j++) {
-												state = stateMachine.GetState (j);
+												for (j=0; j<numStates; j++) {
+														state = stateMachine.GetState (j);
 						
-												createStateGUI (state.name, state.uniqueNameHash);
+														createStateGUI (state.name, state.uniqueNameHash);
 							
+												}
+
+												GUILayout.EndScrollView ();
 										}
 
-										GUILayout.EndScrollView ();
 								}
+
+
+								EditorGUILayout.Separator ();
 
 						}
 
-
-						EditorGUILayout.Separator ();
-
-				}
-
-				///////////////////// NEW CUSTOM STATE STATE //////////////////////
-				EditorGUILayout.LabelField ("Custom States");
+						///////////////////// NEW CUSTOM STATE STATE //////////////////////
+						EditorGUILayout.LabelField ("Custom States");
 
 				
-				EditorGUILayout.BeginHorizontal ();
-				EditorGUILayout.LabelField ("New state name:", _stateNameLabelStyle);
-				_newCustomStateName = EditorGUILayout.TextField (_newCustomStateName, _stateNameLabelStyle);
+						EditorGUILayout.BeginHorizontal ();
+						EditorGUILayout.LabelField ("New state name:", _stateNameLabelStyle);
+						_newCustomStateName = EditorGUILayout.TextField (_newCustomStateName, _stateNameLabelStyle);
 				
-				if (_newCustomStateName != _prevNewCustomStateName)
-						_warrningAddStateLabel = "";
+						if (_newCustomStateName != _prevNewCustomStateName)
+								_warrningAddStateLabel = "";
 
-				_prevNewCustomStateName = _newCustomStateName;
+						_prevNewCustomStateName = _newCustomStateName;
 
-				if (GUILayout.Button ("+", _addRemoveButtonStyle)) {
+						if (GUILayout.Button ("+", _addRemoveButtonStyle)) {
 			
-						EditorGUIUtility.keyboardControl = 0;
+								EditorGUIUtility.keyboardControl = 0;
 
-						if (_newCustomStateName != null && _newCustomStateName.Length > 0) {
-								int hash = Animator.StringToHash (_newCustomStateName);
-								if (!_stateInputCombinations.ContainsKey (hash)) {//not already there
-										_stateInputCombinations [hash] = new InputState (_newCustomStateName, hash);// string[]{"None","None"};
-										_stateInputCombinations [hash].Add (new InputCombination ("None"));
-										_stateInputCombinations [hash].Add (new InputCombination ("None"));
+								if (_newCustomStateName != null && _newCustomStateName.Length > 0) {
+										int hash = Animator.StringToHash (_newCustomStateName);
+										if (!_stateInputCombinations.ContainsKey (hash)) {//not already there
+												_stateInputCombinations [hash] = new InputState (_newCustomStateName, hash);// string[]{"None","None"};
+												_stateInputCombinations [hash].Add (new InputCombination ("None"));
+												_stateInputCombinations [hash].Add (new InputCombination ("None"));
 					
 					
-										_newCustomStateName = "";//reset
-								} else
-										_warrningAddStateLabel = "Already exist!";
-						} else {
+												_newCustomStateName = "";//reset
+										} else
+												_warrningAddStateLabel = "Already exist!";
+								} else {
 
-								_warrningAddStateLabel = "Empty state name!";
+										_warrningAddStateLabel = "Empty state name!";
 						
+								}
 						}
-				}
 
 
-				GUI.color = Color.red;
-				EditorGUILayout.LabelField (_warrningAddStateLabel);
-				EditorGUILayout.EndHorizontal ();
-				GUI.color = Color.white;
+						GUI.color = Color.red;
+						EditorGUILayout.LabelField (_warrningAddStateLabel);
+						EditorGUILayout.EndHorizontal ();
+						GUI.color = Color.white;
 
 				
-				EditorGUILayout.BeginHorizontal ();
-				scrollPosition2 = EditorGUILayout.BeginScrollView (scrollPosition2, false, false);
-				//Debug.Log ("Loop..." + _stateInputCombinations.Count+" inputmngr "+InputManager.Settings.stateInputs.Count);
-				if (_stateInputCombinations != null)
-						foreach (var KeyValuePair in _stateInputCombinations) {
-								if (!existInController (KeyValuePair.Key)) {
-										createStateGUI (KeyValuePair.Value.name, KeyValuePair.Key);
+						EditorGUILayout.BeginHorizontal ();
+						scrollPosition2 = EditorGUILayout.BeginScrollView (scrollPosition2, false, false);
+						//Debug.Log ("Loop..." + _stateInputCombinations.Count+" inputmngr "+InputManager.Settings.stateInputs.Count);
+						if (_stateInputCombinations != null)
+								foreach (var KeyValuePair in _stateInputCombinations) {
+										if (!existInController (KeyValuePair.Key)) {
+												createStateGUI (KeyValuePair.Value.name, KeyValuePair.Key);
+										}
+
+
 								}
-
-
-						}
-				GUILayout.EndScrollView ();	
-				EditorGUILayout.EndHorizontal ();
+						GUILayout.EndScrollView ();	
+						EditorGUILayout.EndHorizontal ();
 		      
-				//}
+						//}
 
 
 
@@ -783,25 +818,25 @@ public class InputMapper : EditorWindow
 
 				
 
-				//if event is of key or mouse
-				if (Event.current.isKey) {
+						//if event is of key or mouse
+						if (Event.current.isKey) {
 
-						if (Event.current.keyCode == KeyCode.Return) {
-								_selectedStateHash = 0;
-								_previousStateInput = null;
-								this.Repaint ();
-						} else
-						if (Event.current.keyCode == KeyCode.Escape) {
-								if (_selectedStateHash != 0) {
-										_stateInputCombinations [_selectedStateHash].combinations [_isPrimary] = _previousStateInput;
-										_previousStateInput = null;
+								if (Event.current.keyCode == KeyCode.Return) {
 										_selectedStateHash = 0;
-								}
-						}		
-				}
+										_previousStateInput = null;
+										this.Repaint ();
+								} else
+						if (Event.current.keyCode == KeyCode.Escape) {
+										if (_selectedStateHash != 0) {
+												_stateInputCombinations [_selectedStateHash].combinations [_isPrimary] = _previousStateInput;
+												_previousStateInput = null;
+												_selectedStateHash = 0;
+										}
+								}		
+						}
 			
-				if (_selectedStateHash != 0)
-						InputEx.processGUIEvent (Event.current);//process input from keyboard & mouses
+						if (_selectedStateHash != 0)
+								InputEx.processGUIEvent (Event.current);//process input from keyboard & mouses
 		
 		
 
@@ -809,131 +844,132 @@ public class InputMapper : EditorWindow
 
 				
 
-		}
+				}
 
 
 
 
-		//////////////////////               CREATE STATE GUI             ///////////////////////
-		/// <summary>
-		/// Creates GUI for AnimaitonState.
-		/// </summary>
-		/// <param name="state">State.</param>
-		void createStateGUI (string name, int hash)
-		{
-				InputCombination[] combinations;
-				string currentCombinationString;
+				//////////////////////               CREATE STATE GUI             ///////////////////////
+				/// <summary>
+				/// Creates GUI for AnimaitonState.
+				/// </summary>
+				/// <param name="state">State.</param>
+				void createStateGUI (string name, int hash)
+				{
+						InputCombination[] combinations;
+						string currentCombinationString;
 		
-				GUILayout.BeginHorizontal ();
-		
-		
-				GUILayout.Label (name, _stateNameLabelStyle);
+						GUILayout.BeginHorizontal ();
 		
 		
-				if (_selectedStateHash != hash) {
+						GUILayout.Label (name, _stateNameLabelStyle);
+		
+		
+						if (_selectedStateHash != hash) {
 			
-						if (InputMapper._stateInputCombinations.ContainsKey (hash)) {
+								if (InputMapper._stateInputCombinations.ContainsKey (hash)) {
 				
 				
-								combinations = InputMapper._stateInputCombinations [hash].combinations;
+										combinations = InputMapper._stateInputCombinations [hash].combinations;
 				
 				
-								if (combinations [0] == null)
-										combinations [0] = new InputCombination ("None");
-								if (GUILayout.Button (combinations [0].combinationString)) {
-										_selectedStateHash = hash;
-										_previousStateInput = null;
-										_isPrimary = 0;
-										EditorGUIUtility.keyboardControl = 0;
-								}
+										if (combinations [0] == null)
+												combinations [0] = new InputCombination ("None");
+										if (GUILayout.Button (combinations [0].combinationString)) {
+												_selectedStateHash = hash;
+												_previousStateInput = null;
+												_isPrimary = 0;
+												EditorGUIUtility.keyboardControl = 0;
+										}
 				
-								if (combinations [1] == null)
-										combinations [1] = new InputCombination ("None");
-								if (GUILayout.Button (combinations [1].combinationString)) {
-										_selectedStateHash = hash;
-										_previousStateInput = null;
-										_isPrimary = 1;
-										EditorGUIUtility.keyboardControl = 0;
-								}
+										if (combinations [1] == null)
+												combinations [1] = new InputCombination ("None");
+										if (GUILayout.Button (combinations [1].combinationString)) {
+												_selectedStateHash = hash;
+												_previousStateInput = null;
+												_isPrimary = 1;
+												EditorGUIUtility.keyboardControl = 0;
+										}
 				
-								//DELETE
-								if (GUILayout.Button ("-", _addRemoveButtonStyle)) {
-										//delete 
-										_deleteStateWithHash = hash;
-										//this.Repaint();
-								}
-						} else {
-								if (GUILayout.Button ("None")) {
+										//DELETE
+										if (GUILayout.Button ("-", _addRemoveButtonStyle)) {
+												//delete 
+												_deleteStateWithHash = hash;
+												//this.Repaint();
+										}
+								} else {
+										if (GUILayout.Button ("None")) {
 
-										InputState state = _stateInputCombinations [hash] = new InputState (name, hash);
-										state.Add (new InputCombination ((int)KeyCode.None), 0);
+												InputState state = _stateInputCombinations [hash] = new InputState (name, hash);
+												state.Add (new InputCombination ((int)KeyCode.None), 0);
 						
 
 										
-										_selectedStateHash = hash;
-										_previousStateInput = null;
-										_isPrimary = 0;
-										EditorGUIUtility.keyboardControl = 0;
-								}
+												_selectedStateHash = hash;
+												_previousStateInput = null;
+												_isPrimary = 0;
+												EditorGUIUtility.keyboardControl = 0;
+										}
 				
 				
-								if (GUILayout.Button ("None")) {
+										if (GUILayout.Button ("None")) {
 
-										InputState state = _stateInputCombinations [hash] = new InputState (name, hash);
-										state.Add (new InputCombination ((int)KeyCode.None), 1);
+												InputState state = _stateInputCombinations [hash] = new InputState (name, hash);
+												state.Add (new InputCombination ((int)KeyCode.None), 1);
 					
 										
-										_selectedStateHash = hash;
-										_previousStateInput = null;
-										_isPrimary = 1;
-										EditorGUIUtility.keyboardControl = 0;
-								}
+												_selectedStateHash = hash;
+												_previousStateInput = null;
+												_isPrimary = 1;
+												EditorGUIUtility.keyboardControl = 0;
+										}
 				
-						}
-			
-			
-				} else {
-
-						if (InputMapper._stateInputCombinations.ContainsKey (hash)) {
-								combinations = InputMapper._stateInputCombinations [hash].combinations;
-			
-								currentCombinationString = combinations [_isPrimary].combinationString;
-
-								if (_previousStateInput == null) {
-										_previousStateInput = combinations [_isPrimary].Clone ();
 								}
-						
-						
-						} else {
-								currentCombinationString = "None";
-						}
-
-
-						GUILayout.Label (currentCombinationString);//, _inputLabelStyle);
 			
-						this.Repaint ();
+			
+						} else {
+
+								if (InputMapper._stateInputCombinations.ContainsKey (hash)) {
+										combinations = InputMapper._stateInputCombinations [hash].combinations;
+			
+										currentCombinationString = combinations [_isPrimary].combinationString;
+
+										if (_previousStateInput == null) {
+												_previousStateInput = combinations [_isPrimary].Clone ();
+										}
+						
+						
+								} else {
+										currentCombinationString = "None";
+								}
+
+
+								GUILayout.Label (currentCombinationString);//, _inputLabelStyle);
+			
+								this.Repaint ();
+						}
+		
+						//			
+		
+		
+						GUILayout.EndHorizontal ();
+		
+		
+		
+						EditorGUILayout.Separator ();
 				}
-		
-				//			
-		
-		
-				GUILayout.EndHorizontal ();
-		
-		
-		
-				EditorGUILayout.Separator ();
+
+
+				///////////////////     ON DESTROY     ////////////////
+				void OnDestroy ()
+				{
+
+						if (!Application.isPlaying) {
+								
+
+								InputManager.Dispose ();
+								
+						}
+				}
 		}
-
-
-       ///////////////////     ON DESTROY     ////////////////
-        void OnDestroy()
-        {
-			Debug.Log ("InputMapper OnDestroy");
-
-            if(_stateInputCombinations!=null)
-            _stateInputCombinations.Clear();
-
-            InputManager.Dispose();
-        }
-}
 }

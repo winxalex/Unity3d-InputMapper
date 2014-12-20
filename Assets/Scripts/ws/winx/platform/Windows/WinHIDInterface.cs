@@ -157,10 +157,7 @@ namespace ws.winx.platform.windows
             __Generics = new Dictionary<int, HIDDevice>();
 
       
-            receiverWindowHandle = CreateReceiverWnd();
-
-            if (receiverWindowHandle != IntPtr.Zero)
-                RegisterHIDDeviceNotification(receiverWindowHandle);
+          
         }
         #endregion
 
@@ -397,6 +394,14 @@ namespace ws.winx.platform.windows
 
         public void Enumerate()
         {
+
+						if (receiverWindowHandle != IntPtr.Zero){
+
+								receiverWindowHandle = CreateReceiverWnd ();
+			
+							if (receiverWindowHandle != IntPtr.Zero)
+									RegisterHIDDeviceNotification (receiverWindowHandle);
+						}
 
 
             uint deviceCount = 0;
