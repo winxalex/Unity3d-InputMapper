@@ -204,7 +204,7 @@ namespace ws.winx.drivers
 				value=(short)(buff[8] | (buff[9] << 8));
 				// UnityEngine.Debug.Log("raw valueX=" + value);
 				axisDetails = device.Axis[JoystickAxis.AxisY];
-				axisDetails.value = -NormalizeAxis(value, -32727, 32727, 0.1f);
+				axisDetails.value = NormalizeAxis(value, -32727, 32727, 0.1f);
 
 				value=(short)(buff[6] | (buff[7] << 8));
 				// UnityEngine.Debug.Log("raw valueX=" + value);
@@ -221,7 +221,7 @@ namespace ws.winx.drivers
 				value=(short)(buff[12] | (buff[13] << 8));
 				// UnityEngine.Debug.Log("raw valueX=" + value);
 				axisDetails = device.Axis[JoystickAxis.AxisR];
-				axisDetails.value = -NormalizeAxis(value, -32727, 32727, 0.1f);
+				axisDetails.value = NormalizeAxis(value, -32727, 32727, 0.1f);
 
 				//byte 9,10??? (triggerL 80->FF  and triggerR 80->00)
 				value=buff[4];
@@ -830,7 +830,7 @@ namespace ws.winx.drivers
 					if (value == -1 || value==1)
 					{
 						if (_buttonState == ButtonState.None)
-						    //|| _buttonState == ButtonState.Up)
+							//|| _buttonState == ButtonState.PosToUp || _buttonState==ButtonState.NegToUp)
 						{
 							
 							_buttonState = ButtonState.Down;

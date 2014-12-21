@@ -156,8 +156,8 @@ namespace ws.winx.platform.osx
 							//odd axes are inverted (are they inverted in all devices???)
 							//inverted meaning that Forward push gives Negative values
 							//opposite to establish rull Forward axis to be + 
-							if(axisIndex % 2 != 0)
-								analogValue=-analogValue;
+							//if(axisIndex % 2 != 0)
+								//analogValue=-analogValue;
 
 						
 

@@ -744,8 +744,19 @@ namespace ws.winx.platform.windows
 
             if (receiverWindowHandle != IntPtr.Zero)
             {
-                UnityEngine.Debug.Log("Destroy Receiver" + Native.DestroyWindow(receiverWindowHandle));
-                receiverWindowHandle = IntPtr.Zero;
+				try{
+               			 UnityEngine.Debug.Log("Destroy Receiver" + Native.DestroyWindow(receiverWindowHandle));
+
+					//TODO test with this (issue when open  close InputMapper in Editor twice
+					//Native.PostMessage(new HandleRef(this,this.receiverWindowHandle),Native.WM_CLOSE,IntPtr.Zero,IntPtr.Zero);
+               			 receiverWindowHandle = IntPtr.Zero;
+
+
+				}catch(Exception ex){
+
+					//UnityEngine.Debug.LogException(ex);
+					UnityEngine.Debug.LogError(Native.GetLastError());
+				}
 
                 //
             }

@@ -233,10 +233,25 @@ namespace ws.winx.devices
 						JoystickAxis axis = InputCode.toAxis (code);
 						int data = InputCode.toData (code);
                     
-						if (axis == JoystickAxis.None)
-								return button_collection [data].buttonState == ButtonState.Up;
-								
-						IAxisDetails axisDetails = axis_collection [axis];
+						if (axis == JoystickAxis.None) {
+
+								//previous mapping might be to device with less or more buttons
+								//at same device index
+								if (button_collection.Count > data)
+										return button_collection [data].buttonState == ButtonState.Up;
+								else
+										return false;
+						}
+
+			//previous mapping might be to device with less or more axess
+			//at same device index
+			if (axis_collection.Count <= (int)axis)
+								return false;
+
+			IAxisDetails axisDetails= axis_collection [axis];
+
+			if (axisDetails == null)
+								return false;
 
 						if (axis == JoystickAxis.AxisPovX) {
 								if ((data + 1) * 9000 == (int)JoystickPovPosition.Left && axisDetails.buttonState == ButtonState.NegToUp)
@@ -287,16 +302,29 @@ namespace ws.winx.devices
 							
 						if (axis == JoystickAxis.None) {   //MO data for axis => buttons data
 								//UnityEngine.Debug.Log("Button state>" + button_collection[data].buttonState);
-								
-								return button_collection [data].buttonState == buttonState;
+
+								//previous mapping might be to device with less or more buttons
+								//at same device index
+								if(button_collection.Count>data)
+									return button_collection [data].buttonState == buttonState;
+								else
+									return false;
 								
 						}
 
 						
 
-						IAxisDetails axisDetails = axis_collection [axis];
+			//previous mapping might be to device with less or more axess
+			//at same device index
+			if (axis_collection.Count <= (int)axis)
+				return false;
+			
+			IAxisDetails axisDetails= axis_collection [axis];
 
-						bool isEqualToButtonState = axisDetails.buttonState == buttonState;
+			if (axisDetails == null)
+				return false;
+			
+			bool isEqualToButtonState = axisDetails.buttonState == buttonState;
 							
 							
 							

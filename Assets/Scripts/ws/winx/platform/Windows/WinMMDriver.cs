@@ -221,6 +221,7 @@ namespace ws.winx.platform.windows
                         axisDetails.max = caps.XMax;
                         axisDetails.min = caps.XMin;
                         joystick.Axis[axis] = axisDetails;
+						if(axisDetails.min==0) axisDetails.isTrigger=true;
                         axis++;
                     }
                     if (axis < num_axes)
@@ -228,6 +229,7 @@ namespace ws.winx.platform.windows
                         axisDetails = new AxisDetails();
                         axisDetails.max = caps.YMax;
                         axisDetails.min = caps.YMin;
+						if(axisDetails.min==0) axisDetails.isTrigger=true;
                         joystick.Axis[axis] = axisDetails;
 
                        
@@ -241,6 +243,7 @@ namespace ws.winx.platform.windows
                         axisDetails = new AxisDetails();
                         axisDetails.max = caps.ZMax;
                         axisDetails.min = caps.ZMin;
+						if(axisDetails.min==0) axisDetails.isTrigger=true;
                         joystick.Axis[axis] = axisDetails;
                       
                         axis++;
@@ -251,6 +254,7 @@ namespace ws.winx.platform.windows
                         axisDetails = new AxisDetails();
                         axisDetails.min = caps.RMin;
                         axisDetails.max = caps.RMax;
+						if(axisDetails.min==0) axisDetails.isTrigger=true;
                         joystick.Axis[axis] = axisDetails;
                       
                         axis++;
@@ -261,6 +265,7 @@ namespace ws.winx.platform.windows
                         axisDetails = new AxisDetails();
                         axisDetails.min = caps.UMin;
                         axisDetails.max = caps.UMax;
+						if(axisDetails.min==0) axisDetails.isTrigger=true;
                         joystick.Axis[axis] = axisDetails;
                         axis++;
                     }
@@ -270,6 +275,7 @@ namespace ws.winx.platform.windows
                         axisDetails = new AxisDetails();
                         axisDetails.max = caps.VMax;
                         axisDetails.min = caps.VMin;
+						if(axisDetails.min==0) axisDetails.isTrigger=true;
                         joystick.Axis[axis] = axisDetails;
                         axis++;
                     }
@@ -641,7 +647,7 @@ namespace ws.winx.platform.windows
 						{
 							
 							//if previous value was >0 => PosToUp
-							if (_value>1)
+							if (_value>0)
 								_buttonState = ButtonState.PosToUp;
 							else
 								_buttonState = ButtonState.NegToUp;

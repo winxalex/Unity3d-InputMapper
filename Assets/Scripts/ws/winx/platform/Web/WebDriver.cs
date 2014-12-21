@@ -478,7 +478,7 @@ namespace ws.winx.platform.web
 						{
 							
 							//if previous value was >0 => PosToUp
-							if (_value>1)
+							if (_value>0)
 								_buttonState = ButtonState.PosToUp;
 							else
 								_buttonState = ButtonState.NegToUp;

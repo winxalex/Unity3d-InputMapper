@@ -44,7 +44,7 @@ namespace ws.winx.platform.windows
         internal const int WAIT_INFINITE = 0xffff;
         internal const int WAIT_ABANDONED = 0x80;
 
-
+		internal const UInt32 WM_CLOSE          = 0x0010;
 
         #region NativeStructures
 
@@ -218,7 +218,9 @@ namespace ws.winx.platform.windows
           int samDesired,
           out UIntPtr hkResult);
 
-
+		[return: MarshalAs(UnmanagedType.Bool)]
+		[DllImport("user32.dll", SetLastError = true)]
+		public static extern bool PostMessage(HandleRef hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
         [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
         public static extern System.UInt16 RegisterClassW(
