@@ -151,7 +151,7 @@ namespace ws.winx.platform.osx
 							float analogValue=0f;
 
 							//if trigger
-							if(axisDetails.min==0)
+							if(axisDetails.isTrigger)
 								analogValue=(float)value/axisDetails.max;
 							else
 								analogValue=(value - axisDetails.min) / (float)(axisDetails.max - axisDetails.min) * 2.0f - 1.0f;
@@ -375,7 +375,7 @@ namespace ws.winx.platform.osx
 
 
 													}else{
-
+							if(axisDetails.min==0) axisDetails.isTrigger=true;
 							axisDetailsList.Add(axisDetails);
 
 						}

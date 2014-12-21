@@ -124,20 +124,34 @@ namespace ws.winx.platform.windows
                     int y = 0;
 
 
-                    //	UnityEngine.Debug.Log("Pov is"+povPos);
-					JoystickPovPosition povPos=(JoystickPovPosition)BitConverter.ToUInt16(report.Data,4);
+										ushort povPos=BitConverter.ToUInt16(report.Data,4);
+					
+					                    if (povPos != 0xFFFF)
+					                    {
+					                        if (povPos > 27000 || povPos < 9000)
+					                        { y = 1; }
+					                        if ((povPos > 0) && (povPos < 18000))
+					                        { x = 1; }
+					                        if ((povPos > 9000) && (povPos < 27000))
+					                        { y = -1; }
+					                        if (povPos > 18000)
+					                        { x = -1; }
+					                    }
 
-                    if (povPos != JoystickPovPosition.Centered)
-                    {
-                        if (povPos > JoystickPovPosition.Left || povPos < JoystickPovPosition.Right)
-                        { y = 1; }
-                        if ((povPos > 0) && (povPos < JoystickPovPosition.Backward))
-                        { x = 1; }
-                        if ((povPos > JoystickPovPosition.Right) && (povPos < JoystickPovPosition.Left))
-                        { y = -1; }
-                        if (povPos > JoystickPovPosition.Backward)
-                        { x = -1; }
-                    }
+                    //	UnityEngine.Debug.Log("Pov is"+povPos);
+//					JoystickPovPosition povPos=(JoystickPovPosition)BitConverter.ToUInt16(report.Data,4);
+//
+//                    if (povPos != JoystickPovPosition.Centered)
+//                    {
+//                        if (povPos > JoystickPovPosition.Left || povPos < JoystickPovPosition.Right)
+//                        { y = 1; }
+//                        if ((povPos > 0) && (povPos < JoystickPovPosition.Backward))
+//                        { x = 1; }
+//                        if ((povPos > JoystickPovPosition.Right) && (povPos < JoystickPovPosition.Left))
+//                        { y = -1; }
+//                        if (povPos > JoystickPovPosition.Backward)
+//                        { x = -1; }
+//                    }
 
                     //UnityEngine.Debug.Log(x+" "+y);
 

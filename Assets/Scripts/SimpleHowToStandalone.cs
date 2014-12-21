@@ -80,7 +80,7 @@ namespace ws.winx
   //          			InputManager.AddDriver(new ThrustMasterDriver());
   //          			InputManager.AddDriver(new XInputDriver());
 			//change default driver
-			InputManager.hidInterface.defaultDriver=new UnityDriver();
+			//InputManager.hidInterface.defaultDriver=new UnityDriver();
 
 			#endif
 	
