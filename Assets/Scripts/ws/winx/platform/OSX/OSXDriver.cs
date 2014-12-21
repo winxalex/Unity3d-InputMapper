@@ -95,7 +95,7 @@ namespace ws.winx.platform.osx
 
 					//UnityEngine.Debug.Log ("OSXDriver>>DeviceValueReceived axisDetails="+axisDetails.uid);
 
-					if (axisDetails!=null) 
+					if (axisDetails!=null){ 
 
 					   if(axisDetails.uid== uid) {
 
@@ -121,10 +121,14 @@ namespace ws.winx.platform.osx
 							if(value<15)
 							hatValueToXY(value,(axisDetails.max - axisDetails.min)+1,out outX,out outY);
 
-							device.Axis[JoystickAxis.AxisPovX].value=outX;
-							device.Axis[JoystickAxis.AxisPovY].value=outY;
+						
+							device.Axis[axisIndex].value=outX;
+							device.Axis[++axisIndex].value=outY;
 
-							UnityEngine.Debug.Log("POVX:"+device.Axis[JoystickAxis.AxisPovX].value+" POVY:"+device.Axis[JoystickAxis.AxisPovY].value);	
+							//UnityEngine.Debug.Log("POVX:"+device.Axis[JoystickAxis.AxisPovX].value+" POVY:"+device.Axis[JoystickAxis.AxisPovY].value);	
+							
+							
+
 						
 						}else{
 //							if(axisIndex==2){
@@ -146,27 +150,14 @@ namespace ws.winx.platform.osx
 							//Calculate the -1 to 1 float from the min and max possible values.
 							float analogValue=0f;
 
-							//if trigger
-							if(axisDetails.min==0)
+							//if triggers (can go from 0 to 255 counts or 255 to 0)
+							if(axisDetails.isTrigger){
+
 								analogValue=(float)value/axisDetails.max;
+								//Debug.Log(analogValue+"counts:"+value+" min:"+axisDetails.min+"max:"+axisDetails.max);
+							}
 							else
 								analogValue=(value - axisDetails.min) / (float)(axisDetails.max - axisDetails.min) * 2.0f - 1.0f;
-
-
-							//odd axes are inverted (are they inverted in all devices???)
-							//inverted meaning that Forward push gives Negative values
-							//opposite to establish rull Forward axis to be + 
-							//if(axisIndex % 2 != 0)
-								//analogValue=-analogValue;
-
-						
-
-//							//round
-//							if (analogValue < dreadZone && analogValue > -dreadZone)
-//								analogValue=0f;
-////
-//							else if(analogValue>0  && analogValue> 1-dreadZone  ) analogValue=1f;
-//							if(analogValue<0  && analogValue< -1+dreadZone ) analogValue=-1f;
 
 
 
@@ -186,6 +177,7 @@ namespace ws.winx.platform.osx
 
 						axisDetails.value=axisDetails.value;
 					}
+				}//axisDetails!=null
 
 //					if(axisIndex==1){
 //						//UnityEngine.Debug.Log("Axis"+axisIndex+" Counts:"+ value+" min:"+axisDetails.min+" max:"+axisDetails.max);
@@ -352,6 +344,7 @@ namespace ws.winx.platform.osx
 										            
 													if(Native.IOHIDElementGetUsage(element)==(uint)Native.HIDUsageGD.Hatswitch){
 													numPov++;
+													numAxis++;
 													}
 
 										          
@@ -364,8 +357,8 @@ namespace ws.winx.platform.osx
 						}
 
 
-			if (numPov > 0)
-			numAxis = Math.Max (8, numAxis);
+//			if (numPov > 0)
+//			numAxis = Math.Max (8, numAxis);
 
 
 			joystick=new JoystickDevice(hidDevice.index,hidDevice.PID,hidDevice.VID,numAxis,numButtons,this);
@@ -405,8 +398,8 @@ namespace ws.winx.platform.osx
 						axisDetails.isHat=true;
 						
 
-							joystick.Axis[JoystickAxis.AxisPovY]=axisDetails;
-						
+							joystick.Axis[axisIndex]=axisDetails;
+							axisDetails.isHatFirstAxis=true;
 							
 							axisDetails=new AxisDetails();
 							
@@ -415,18 +408,25 @@ namespace ws.winx.platform.osx
 							axisDetails.max=(int)Native.IOHIDElementGetLogicalMax(element);
 							axisDetails.isNullable=Native.IOHIDElementHasNullState(element);
 							axisDetails.isHat=true;
-							joystick.Axis[JoystickAxis.AxisPovX]=axisDetails;
+							joystick.Axis[++axisIndex]=axisDetails;
+
+						
 						
 						
 						
 					}else{
 						
 						
-						
+						if(axisDetails.min==0) axisDetails.isTrigger=true;
 						joystick.Axis[(JoystickAxis)axisIndex]=axisDetails;
+
+						
 						
 					}
-					axisIndex++;
+
+
+						axisIndex++;
+						
 					
 					
 				} else if (type == IOHIDElementType.kIOHIDElementTypeInput_Button) {
@@ -564,21 +564,34 @@ namespace ws.winx.platform.osx
 			uint _uid;
 			int _min;
 			int _max;
+			bool _isHatFirstAxis;
 			ButtonState _buttonState;
 			bool _isNullable;
 			bool _isHat;
 			float sensitivityOffset=0.3f;
-			
-#region IAxisDetails implementation
+			bool _isTrigger;
+
+			#region IAxisDetails implementation
+
+			public bool isHatFirstAxis {
+				get {
+					return _isHatFirstAxis;
+				}
+				set {
+					_isHatFirstAxis=value;
+				}
+			}
+
+
 				
 				
 				
 				public bool isTrigger {
 					get {
-						throw new NotImplementedException ();
+					return _isTrigger;
 					}
 					set {
-						throw new NotImplementedException ();
+					_isTrigger=value;
 					}
 				}
 
@@ -663,13 +676,14 @@ namespace ws.winx.platform.osx
 							
 							_buttonState = ButtonState.Down;
 							
-							//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
+							Debug.Log("val:"+value+"_buttonState:"+_buttonState);
 							//Debug.Log("_buttonState:"+_buttonState);
 						}
 						else
 						{
 							_buttonState = ButtonState.Hold;
 
+							//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
 							//Debug.Log("_buttonState:"+_buttonState);
 						}
 						

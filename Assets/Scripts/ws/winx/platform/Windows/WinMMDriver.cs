@@ -143,6 +143,7 @@ namespace ws.winx.platform.windows
 
 
                     device.Axis[JoystickAxis.AxisPovX].value = x;
+				
                     device.Axis[JoystickAxis.AxisPovY].value = y;
 
 
@@ -282,9 +283,16 @@ namespace ws.winx.platform.windows
 
                     if ((caps.Capabilities & Native.JoystCapsFlags.HasPov) != 0)
                     {
-                        joystick.Axis[JoystickAxis.AxisPovX] = new AxisDetails();
-                        joystick.Axis[JoystickAxis.AxisPovY] = new AxisDetails();
+						axisDetails=new AxisDetails();
+						axisDetails.isHat=true;
+						axisDetails.isHatFirstAxis=true;
+						joystick.Axis[JoystickAxis.AxisPovX] = axisDetails;
 
+						axisDetails=new AxisDetails();
+						joystick.Axis[JoystickAxis.AxisPovY] = axisDetails;
+						axisDetails.isHat=true;
+
+					
 
                         joystick.numPOV = 1;
 
@@ -523,7 +531,18 @@ namespace ws.winx.platform.windows
             bool _isTrigger;
 
 
-            #region IAxisDetails implementation
+			bool _isHatFirstAxis;
+			
+			#region IAxisDetails implementation
+			
+			public bool isHatFirstAxis {
+				get {
+					return _isHatFirstAxis;
+				}
+				set {
+					_isHatFirstAxis=value;
+				}
+			}
 
             public bool isTrigger
             {
@@ -590,10 +609,7 @@ namespace ws.winx.platform.windows
             }
 
 
-            #endregion
-
-
-            #region IDeviceDetails implementation
+          
 
 
             public uint uid

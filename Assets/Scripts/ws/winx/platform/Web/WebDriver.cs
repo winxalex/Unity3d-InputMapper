@@ -352,9 +352,19 @@ namespace ws.winx.platform.web
             bool _isNullable;
             bool _isHat;
             bool _isTrigger;
+			bool _isHatFirstAxis;
 
 
 #region IAxisDetails implementation
+
+			public bool isHatFirstAxis {
+				get {
+					return _isHatFirstAxis;
+				}
+				set {
+					_isHatFirstAxis=value;
+				}
+			}
 
             public bool isTrigger
             {

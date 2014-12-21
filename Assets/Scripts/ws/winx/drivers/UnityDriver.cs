@@ -186,8 +186,18 @@ namespace ws.winx.drivers
 						bool _isTrigger;
 
 
-            #region IAxisDetails implementation
-
+			bool _isHatFirstAxis;
+			
+			#region IAxisDetails implementation
+			
+			public bool isHatFirstAxis {
+				get {
+					return _isHatFirstAxis;
+				}
+				set {
+					_isHatFirstAxis=value;
+				}
+			}
 						public bool isTrigger {
 								get {
 										return _isTrigger;

@@ -45,6 +45,9 @@ namespace ws.winx.drivers
 
                 }
 
+				joystick.Axis[6].isHat=true;
+				joystick.Axis[6].isHatFirstAxis=true;
+				joystick.Axis[7].isHat=true;
 
            
 
@@ -500,8 +503,19 @@ namespace ws.winx.drivers
         bool _isHat;
         bool _isTrigger;
 
+		bool _isHatFirstAxis;
 
         #region IAxisDetails implementation
+
+		public bool isHatFirstAxis {
+			get {
+				return _isHatFirstAxis;
+			}
+			set {
+				_isHatFirstAxis=value;
+			}
+		}
+
 
         public bool isTrigger
         {

@@ -353,7 +353,9 @@ namespace ws.winx.drivers
                 //POV
                 axisDetails = new AxisDetails();
                 axisDetails.isHat = true;
+				axisDetails.isHatFirstAxis=true;
                 device.Axis[JoystickAxis.AxisPovX] = axisDetails;
+
                 axisDetails = new AxisDetails();
                 axisDetails.isHat = true;
                 device.Axis[JoystickAxis.AxisPovY] = axisDetails;
@@ -2456,10 +2458,18 @@ float value;
             bool _isHat;
             bool _isTrigger;
 
-
-            #region IAxisDetails implementation
-
-
+			bool _isHatFirstAxis;
+			
+			#region IAxisDetails implementation
+			
+			public bool isHatFirstAxis {
+				get {
+					return _isHatFirstAxis;
+				}
+				set {
+					_isHatFirstAxis=value;
+				}
+			}
 
             public bool isTrigger
             {
