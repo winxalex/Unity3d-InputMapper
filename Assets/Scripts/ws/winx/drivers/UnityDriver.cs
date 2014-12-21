@@ -53,7 +53,7 @@ namespace ws.winx.drivers
 						int index = device.Index;
 
 						// Debug.Log("axis value raw:" + Input.GetAxisRaw("10") + " " + Input.GetAxis("11"));
-						//Debug.Log("axis value raw:" + );
+						//Debug.Log("axis value raw:" +);
 						//   joystick.Axis[0].value=Input.GetAxis("00");//index-of joystick, i-ord number of axis
 						// Debug.Log("axis value:" + joystick.Axis[0].value + " state:" + joystick.Axis[0].buttonState);
 

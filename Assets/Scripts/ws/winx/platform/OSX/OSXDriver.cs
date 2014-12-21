@@ -9,6 +9,8 @@
 //------------------------------------------------------------------------------
 using System.Runtime.InteropServices;
 using UnityEngine;
+using System.Collections.Generic;
+using ws.winx.utils;
 
 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
 using System;
@@ -124,7 +126,9 @@ namespace ws.winx.platform.osx
 							device.Axis[JoystickAxis.AxisPovX].value=outX;
 							device.Axis[JoystickAxis.AxisPovY].value=outY;
 
-							UnityEngine.Debug.Log("POVX:"+device.Axis[JoystickAxis.AxisPovX].value+" POVY:"+device.Axis[JoystickAxis.AxisPovY].value);	
+							axisIndex++;//cos 2 axis are handled
+
+//							UnityEngine.Debug.Log("POVX:"+device.Axis[JoystickAxis.AxisPovX].value+" POVY:"+device.Axis[JoystickAxis.AxisPovY].value);	
 						
 						}else{
 //							if(axisIndex==2){
@@ -153,20 +157,6 @@ namespace ws.winx.platform.osx
 								analogValue=(value - axisDetails.min) / (float)(axisDetails.max - axisDetails.min) * 2.0f - 1.0f;
 
 
-							//odd axes are inverted (are they inverted in all devices???)
-							//inverted meaning that Forward push gives Negative values
-							//opposite to establish rull Forward axis to be + 
-							//if(axisIndex % 2 != 0)
-								//analogValue=-analogValue;
-
-						
-
-//							//round
-//							if (analogValue < dreadZone && analogValue > -dreadZone)
-//								analogValue=0f;
-////
-//							else if(analogValue>0  && analogValue> 1-dreadZone  ) analogValue=1f;
-//							if(analogValue<0  && analogValue< -1+dreadZone ) analogValue=-1f;
 
 
 
@@ -309,7 +299,6 @@ namespace ws.winx.platform.osx
 		/// <param name="info">Info.</param>
 		/// <param name="hidDevice">Hid device.</param>
 		public IDevice ResolveDevice (IHIDDevice hidDevice)
-		
 		{
 	
 			this._hidInterface = hidDevice.hidInterface;
@@ -328,12 +317,18 @@ namespace ws.winx.platform.osx
 			elements.typeRef=Native.IOHIDDeviceCopyMatchingElements(device, IntPtr.Zero,(int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone );
 			
 			int numButtons=0;
-			int numAxis=0;
+		
+			int numPov=0;
 
 			int numElements=elements.Length;
 			int HIDElementType=Native.IOHIDElementGetTypeID();
-			int numPov = 0;
+			IAxisDetails axisDetailsPovX=null;
+			IAxisDetails axisDetailsPovY=null;
 
+			List<IAxisDetails> axisDetailsList = new List <IAxisDetails>();
+		
+
+			IAxisDetails axisDetails;
 			
 							for (int elementIndex = 0; elementIndex < numElements; elementIndex++){
 
@@ -348,11 +343,42 @@ namespace ws.winx.platform.osx
 												// All of the axis elements I've ever detected have been kIOHIDElementTypeInput_Misc. kIOHIDElementTypeInput_Axis is only included for good faith...
 												if (type == IOHIDElementType.kIOHIDElementTypeInput_Misc ||
 												    type == IOHIDElementType.kIOHIDElementTypeInput_Axis) {
-													numAxis++;
+												
+
+
+													axisDetails=new AxisDetails();
+													
+													axisDetails.uid=Native.IOHIDElementGetCookie(element);
+													axisDetails.min=(int)Native.IOHIDElementGetLogicalMin(element);
+													axisDetails.max=(int)Native.IOHIDElementGetLogicalMax(element);
+													axisDetails.isNullable=Native.IOHIDElementHasNullState(element);
+
+													
+
+					
+
 										            
 													if(Native.IOHIDElementGetUsage(element)==(uint)Native.HIDUsageGD.Hatswitch){
-													numPov++;
-													}
+												
+														axisDetails.isHat=true;
+														axisDetailsPovX=axisDetails;
+		
+														axisDetailsPovY=new AxisDetails();
+														
+														axisDetailsPovY.uid=Native.IOHIDElementGetCookie(element);
+														axisDetailsPovY.min=(int)Native.IOHIDElementGetLogicalMin(element);
+														axisDetailsPovY.max=(int)Native.IOHIDElementGetLogicalMax(element);
+														axisDetailsPovY.isNullable=Native.IOHIDElementHasNullState(element);
+														axisDetailsPovY.isHat=true;
+
+							numPov++;
+
+
+													}else{
+
+							axisDetailsList.Add(axisDetails);
+
+						}
 
 										          
 											
@@ -364,80 +390,63 @@ namespace ws.winx.platform.osx
 						}
 
 
-			if (numPov > 0)
-			numAxis = Math.Max (8, numAxis);
+			if (axisDetailsPovX != null) {
+				int diff;
+
+				diff=axisDetailsList.Count -8;
+				//need 2 slots for Pov X,Y
+				if(diff>=0){
+					//just insert them
+					axisDetailsList.Insert((int)JoystickAxis.AxisPovX,axisDetailsPovX);
+					axisDetailsList.Insert((int)JoystickAxis.AxisPovY,axisDetailsPovY);
+				}else if(diff<-1){
+					diff=diff+2;
+					while(diff<0){
+						axisDetailsList.Add(null);
+						diff+=1;
+					}
+
+					axisDetailsList.Add(axisDetailsPovX);
+					axisDetailsList.Add(axisDetailsPovY);
+
+				}else{//=-1
+					axisDetailsList.Resize (9);
+					axisDetailsList[(int)JoystickAxis.AxisPovX]=axisDetailsPovX;
+					axisDetailsList[(int)JoystickAxis.AxisPovY]=axisDetailsPovY;
+				}
+
+								
+								
+			}
 
 
-			joystick=new JoystickDevice(hidDevice.index,hidDevice.PID,hidDevice.VID,numAxis,numButtons,this);
+			joystick=new JoystickDevice(hidDevice.index,hidDevice.PID,hidDevice.VID,axisDetailsList.Count,numButtons,this);
 			joystick.numPOV = numPov;
 
+			for(;axisIndex<joystick.Axis.Count;axisIndex++)
+			{
+				
+				joystick.Axis[(JoystickAxis)axisIndex]=axisDetailsList[axisIndex];
+			}
 			
-			AxisDetails axisDetails;
 
-
+			
+			
+			
 			for (int elementIndex = 0; elementIndex < numElements; elementIndex++){
 				element = elements[elementIndex].typeRef;
 
 				if(element!=IntPtr.Zero && Native.CFGetTypeID(element) == HIDElementType){
 				type = Native.IOHIDElementGetType(element);
-				
-				
-
-				
-				// All of the axis elements I've ever detected have been kIOHIDElementTypeInput_Misc. kIOHIDElementTypeInput_Axis is only included for good faith...
-				if (type == IOHIDElementType.kIOHIDElementTypeInput_Misc ||
-				    type == IOHIDElementType.kIOHIDElementTypeInput_Axis) {
-					
-					
-
-					axisDetails=new AxisDetails();
-
-					axisDetails.uid=Native.IOHIDElementGetCookie(element);
-					axisDetails.min=(int)Native.IOHIDElementGetLogicalMin(element);
-					axisDetails.max=(int)Native.IOHIDElementGetLogicalMax(element);
-					axisDetails.isNullable=Native.IOHIDElementHasNullState(element);
-					
-					
-					
-					if(Native.IOHIDElementGetUsage(element)==(uint)Native.HIDUsageGD.Hatswitch){
-
-						
-						axisDetails.isHat=true;
-						
-
-							joystick.Axis[JoystickAxis.AxisPovY]=axisDetails;
-						
+				 if (type == IOHIDElementType.kIOHIDElementTypeInput_Button) {
+								//
+								joystick.Buttons[buttonIndex]=new ButtonDetails(Native.IOHIDElementGetCookie(element));  
+							buttonIndex++;
 							
-							axisDetails=new AxisDetails();
-							
-							axisDetails.uid=Native.IOHIDElementGetCookie(element);
-							axisDetails.min=(int)Native.IOHIDElementGetLogicalMin(element);
-							axisDetails.max=(int)Native.IOHIDElementGetLogicalMax(element);
-							axisDetails.isNullable=Native.IOHIDElementHasNullState(element);
-							axisDetails.isHat=true;
-							joystick.Axis[JoystickAxis.AxisPovX]=axisDetails;
-						
-						
-						
-					}else{
-						
-						
-						
-						joystick.Axis[(JoystickAxis)axisIndex]=axisDetails;
-						
-					}
-					axisIndex++;
-					
-					
-				} else if (type == IOHIDElementType.kIOHIDElementTypeInput_Button) {
-						//
-						joystick.Buttons[buttonIndex]=new ButtonDetails(Native.IOHIDElementGetCookie(element));  
-					buttonIndex++;
-					
 				}
-				}
-				
 			}
+				
+		}
 
 
 

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using ws.winx.drivers;
+using ws.winx.utils;
 
 
 namespace ws.winx
@@ -30,9 +31,36 @@ namespace ws.winx
 		void Start()
 		{
 
+
+
+			List<int> initializers = new List <int>();
+
+			initializers.Add(0);
+			initializers.Add(1);
+			initializers.Add(2);
+			initializers.Add(3);
+			initializers.Add(4);
+			initializers.Add(5);
+			initializers.Add(6);
+//			initializers.Add(7);
+//			initializers.Add(8);
+//			initializers.Add(9);
+
+			int count = initializers.Count;
+			initializers.Resize (Math.Max (8,count));
+
+			if (count == 6) {
+				initializers[6]= 11;
+				initializers[7]= 12;
+						} else {
+								initializers.Insert (6, 11);
+								initializers.Insert (7, 12);
+						}
 			
+
+
 			
-		
+		//
 		
 
 			
@@ -49,10 +77,10 @@ namespace ws.winx
 //			#endif
 //			
 			#if (UNITY_STANDALONE_OSX)
-            			InputManager.AddDriver(new ThrustMasterDriver());
-            			InputManager.AddDriver(new XInputDriver());
+  //          			InputManager.AddDriver(new ThrustMasterDriver());
+  //          			InputManager.AddDriver(new XInputDriver());
 			//change default driver
-			//InputManager.hidInterface.defaultDriver=new UnityDriver();
+			InputManager.hidInterface.defaultDriver=new UnityDriver();
 
 			#endif
 	
