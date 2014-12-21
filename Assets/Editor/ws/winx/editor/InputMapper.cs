@@ -965,7 +965,10 @@ namespace ws.winx.editor
 				{
 
 						if (!Application.isPlaying) {
-								
+
+                            _selectedStateHash = 0;
+                            _deleteStateWithHash = 0;
+                            this.Repaint();
 
 								InputManager.Dispose ();
 								

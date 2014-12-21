@@ -400,7 +400,7 @@ namespace ws.winx.platform.windows
         public void Enumerate()
         {
 
-						if (receiverWindowHandle != IntPtr.Zero){
+						if (receiverWindowHandle == IntPtr.Zero){
 
 								receiverWindowHandle = CreateReceiverWnd ();
 			
@@ -547,9 +547,10 @@ namespace ws.winx.platform.windows
 
 
 
-                string name = ReadRegKey(Native.HKEY_CURRENT_USER, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + DeviceInstanceId, Native.REGSTR_VAL_JOYOEMNAME);
+               // string name = ReadRegKey(Native.HKEY_CURRENT_USER, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + DeviceInstanceId, Native.REGSTR_VAL_JOYOEMNAME);
 
-
+                string name = ReadRegKey(Native.HKEY_CURRENT_USER, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + VID_PID_Parts[0] + "&"+ VID_PID_Parts[1], Native.REGSTR_VAL_JOYOEMNAME);
+		
 
 
 
