@@ -46,6 +46,11 @@ namespace ws.winx.drivers
 
 				public void Update (devices.IDevice device)
 				{
+
+					if (device == null)
+								return;
+
+
 						int i = 0;
 						int numAxis = device.Axis.Count;
 						int numButtons = device.Buttons.Count;

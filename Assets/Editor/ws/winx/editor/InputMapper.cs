@@ -964,11 +964,12 @@ namespace ws.winx.editor
 				void OnDestroy ()
 				{
 
+						_selectedStateHash = 0;
+						_deleteStateWithHash = 0;
+
 						if (!Application.isPlaying) {
 
-                            _selectedStateHash = 0;
-                            _deleteStateWithHash = 0;
-                            this.Repaint();
+                         
 
 								InputManager.Dispose ();
 								

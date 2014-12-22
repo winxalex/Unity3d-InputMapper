@@ -205,7 +205,7 @@ namespace ws.winx.devices
 						}
 						
 						
-						if (data == (int)JoystickPosition.Both)
+						if (data == (int)JoystickPosition.FULL)
 								return axisValue;
 						
 						if (data == (int)JoystickPosition.Negative && axisValue < 0)
@@ -705,7 +705,7 @@ namespace ws.winx.devices
 		{
 				Negative = 0,
 				Positive = 1,
-				Both = 2
+				FULL = 2
 
 		}
 

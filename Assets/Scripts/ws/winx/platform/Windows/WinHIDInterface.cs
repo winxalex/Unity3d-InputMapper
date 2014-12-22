@@ -27,7 +27,7 @@ namespace ws.winx.platform.windows
 
 
         #region Fields
-        private List<IDriver> __drivers;// = new List<IJoystickDriver>();
+		private List<IDriver> __drivers;//
 
 
         private IDriver __defaultJoystickDriver;
@@ -67,6 +67,20 @@ namespace ws.winx.platform.windows
 
 
         #region IHIDInterface implementation
+
+	
+
+		public void AddDriver (IDriver driver)
+		{
+			__drivers.Add (driver);
+		}
+
+
+
+		public bool Contains (int pid)
+		{
+			return __Generics != null && __Generics.ContainsKey (pid);
+		}
 
 
 		public HIDReport ReadDefault(int pid){
@@ -155,9 +169,9 @@ namespace ws.winx.platform.windows
 
 
         #region Constructor
-        public WinHIDInterface(List<IDriver> drivers)
+        public WinHIDInterface()
         {
-            __drivers = drivers;
+			__drivers = new List<IDriver>();
            
             __Generics = new Dictionary<int, HIDDevice>();
 
@@ -745,36 +759,42 @@ namespace ws.winx.platform.windows
             if (receiverWindowHandle != IntPtr.Zero)
             {
 				try{
-               			 UnityEngine.Debug.Log("Destroy Receiver" + Native.DestroyWindow(receiverWindowHandle));
+
+
+						UnityEngine.Debug.Log("Try to destroy plug&play Notificaiton window");
+
+					     Native.DestroyWindow(receiverWindowHandle);
 
 					//TODO test with this (issue when open  close InputMapper in Editor twice
+					//maybe use bellow code
 					//Native.PostMessage(new HandleRef(this,this.receiverWindowHandle),Native.WM_CLOSE,IntPtr.Zero,IntPtr.Zero);
                			 receiverWindowHandle = IntPtr.Zero;
 
 
 				}catch(Exception ex){
 
-					//UnityEngine.Debug.LogException(ex);
+
 					UnityEngine.Debug.LogError(Native.GetLastError());
+					UnityEngine.Debug.LogException(ex);
 				}
 
                 //
             }
 
-           
+			UnityEngine.Debug.Log("Try to clean Genrics");
+
+           if (__Generics != null) {
+								foreach (KeyValuePair<int, HIDDevice> entry in __Generics) {
+										entry.Value.Dispose ();
+								}
+
+								__Generics.Clear ();
+						}
+
+			Debug.Log ("Try to remove Drivers");
+			if(__drivers!=null) __drivers.Clear();
 
            
-            foreach (KeyValuePair<int, HIDDevice> entry in Generics)
-            {
-                entry.Value.Dispose();
-            }
-
-            Generics.Clear();
-
-            if(__drivers!=null)
-            __drivers.Clear();
-
-            UnityEngine.Debug.Log("Dispose WinHIDInterface");
         }
 
 

@@ -55,69 +55,81 @@ namespace ws.winx.input
 				public static int CODE_ID_SHIFT = CODE_DATA_SHIFT + CODE_AXIS_SHIFT;//Default 9;
 				public readonly static int MAX_KEY_CODE = (int)KeyCode.Joystick4Button19 + 1;
 
-				public static InputActionFactory JoystickAxisX { get { return InputActionFactory.Instance.Create (Joysticks.Joystick, JoystickAxis.AxisX, JoystickPosition.Both); } }
+		public static InputAction JoystickAxisX { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick, JoystickAxis.AxisX, JoystickPosition.FULL); } }
 
-				public static InputActionFactory JoystickAxisY { get { return InputActionFactory.Instance.Create (Joysticks.Joystick, JoystickAxis.AxisY, JoystickPosition.Both); } }
+		public static InputAction JoystickAxisY { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick, JoystickAxis.AxisY, JoystickPosition.FULL); } }
 
-				public static InputActionFactory JoystickAxisZ { get { return InputActionFactory.Instance.Create (Joysticks.Joystick, JoystickAxis.AxisZ, JoystickPosition.Both); } }
+		public static InputAction JoystickAxisZ { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick, JoystickAxis.AxisZ, JoystickPosition.FULL); } }
 
-				public static InputActionFactory JoystickAxisR { get { return InputActionFactory.Instance.Create (Joysticks.Joystick, JoystickAxis.AxisR, JoystickPosition.Both); } }
+		public static InputAction JoystickAxisR { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick, JoystickAxis.AxisR, JoystickPosition.FULL); } }
 
-				public static InputActionFactory JoystickAxisU { get { return InputActionFactory.Instance.Create (Joysticks.Joystick, JoystickAxis.AxisU, JoystickPosition.Both); } }
+		public static InputAction JoystickAxisU { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick, JoystickAxis.AxisU, JoystickPosition.FULL); } }
 
-				public static InputActionFactory JoystickAxisV { get { return InputActionFactory.Instance.Create (Joysticks.Joystick, JoystickAxis.AxisV, JoystickPosition.Both); } }
-
-
+		public static InputAction JoystickAxisV { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick, JoystickAxis.AxisV, JoystickPosition.FULL); } }
 
 
-		public static InputActionFactory Joystick1AxisX { get { return InputActionFactory.Instance.Create (Joysticks.Joystick1, JoystickAxis.AxisX, JoystickPosition.Both); } }
+
+		public static InputAction Joystick0AxisX { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick0, JoystickAxis.AxisX, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick1AxisY { get { return InputActionFactory.Instance.Create (Joysticks.Joystick1, JoystickAxis.AxisY, JoystickPosition.Both); } }
+		public static InputAction Joystick0AxisY { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick0, JoystickAxis.AxisY, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick1AxisZ { get { return InputActionFactory.Instance.Create (Joysticks.Joystick1, JoystickAxis.AxisZ, JoystickPosition.Both); } }
+		public static InputAction Joystick0AxisZ { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick0, JoystickAxis.AxisZ, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick1AxisR { get { return InputActionFactory.Instance.Create (Joysticks.Joystick1, JoystickAxis.AxisR, JoystickPosition.Both); } }
+		public static InputAction Joystick0AxisR { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick0, JoystickAxis.AxisR, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick1AxisU { get { return InputActionFactory.Instance.Create (Joysticks.Joystick1, JoystickAxis.AxisU, JoystickPosition.Both); } }
+		public static InputAction Joystick0AxisU { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick0, JoystickAxis.AxisU, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick1AxisV { get { return InputActionFactory.Instance.Create (Joysticks.Joystick, JoystickAxis.AxisV, JoystickPosition.Both); } }
+		public static InputAction Joystick0AxisV { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick, JoystickAxis.AxisV, JoystickPosition.FULL); } }
 
 
-		public static InputActionFactory Joystick2AxisX { get { return InputActionFactory.Instance.Create (Joysticks.Joystick2, JoystickAxis.AxisX, JoystickPosition.Both); } }
+		public static InputAction Joystick1AxisX { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick1, JoystickAxis.AxisX, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick2AxisY { get { return InputActionFactory.Instance.Create (Joysticks.Joystick2, JoystickAxis.AxisY, JoystickPosition.Both); } }
+		public static InputAction Joystick1AxisY { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick1, JoystickAxis.AxisY, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick2AxisZ { get { return InputActionFactory.Instance.Create (Joysticks.Joystick2, JoystickAxis.AxisZ, JoystickPosition.Both); } }
+		public static InputAction Joystick1AxisZ { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick1, JoystickAxis.AxisZ, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick2AxisR { get { return InputActionFactory.Instance.Create (Joysticks.Joystick2, JoystickAxis.AxisR, JoystickPosition.Both); } }
+		public static InputAction Joystick1AxisR { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick1, JoystickAxis.AxisR, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick2AxisU { get { return InputActionFactory.Instance.Create (Joysticks.Joystick2, JoystickAxis.AxisU, JoystickPosition.Both); } }
+		public static InputAction Joystick1AxisU { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick1, JoystickAxis.AxisU, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick2AxisV { get { return InputActionFactory.Instance.Create (Joysticks.Joystick, JoystickAxis.AxisV, JoystickPosition.Both); } }
+		public static InputAction Joystick1AxisV { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick, JoystickAxis.AxisV, JoystickPosition.FULL); } }
 
-		public static InputActionFactory Joystick3AxisX { get { return InputActionFactory.Instance.Create (Joysticks.Joystick3, JoystickAxis.AxisX, JoystickPosition.Both); } }
+
+		public static InputAction Joystick2AxisX { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick2, JoystickAxis.AxisX, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick3AxisY { get { return InputActionFactory.Instance.Create (Joysticks.Joystick3, JoystickAxis.AxisY, JoystickPosition.Both); } }
+		public static InputAction Joystick2AxisY { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick2, JoystickAxis.AxisY, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick3AxisZ { get { return InputActionFactory.Instance.Create (Joysticks.Joystick3, JoystickAxis.AxisZ, JoystickPosition.Both); } }
+		public static InputAction Joystick2AxisZ { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick2, JoystickAxis.AxisZ, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick3AxisR { get { return InputActionFactory.Instance.Create (Joysticks.Joystick3, JoystickAxis.AxisR, JoystickPosition.Both); } }
+		public static InputAction Joystick2AxisR { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick2, JoystickAxis.AxisR, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick3AxisU { get { return InputActionFactory.Instance.Create (Joysticks.Joystick3, JoystickAxis.AxisU, JoystickPosition.Both); } }
+		public static InputAction Joystick2AxisU { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick2, JoystickAxis.AxisU, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick3AxisV { get { return InputActionFactory.Instance.Create (Joysticks.Joystick, JoystickAxis.AxisV, JoystickPosition.Both); } }
+		public static InputAction Joystick2AxisV { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick, JoystickAxis.AxisV, JoystickPosition.FULL); } }
+
+		public static InputAction Joystick3AxisX { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick3, JoystickAxis.AxisX, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick4AxisX { get { return InputActionFactory.Instance.Create (Joysticks.Joystick4, JoystickAxis.AxisX, JoystickPosition.Both); } }
+		public static InputAction Joystick3AxisY { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick3, JoystickAxis.AxisY, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick4AxisY { get { return InputActionFactory.Instance.Create (Joysticks.Joystick4, JoystickAxis.AxisY, JoystickPosition.Both); } }
+		public static InputAction Joystick3AxisZ { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick3, JoystickAxis.AxisZ, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick4AxisZ { get { return InputActionFactory.Instance.Create (Joysticks.Joystick4, JoystickAxis.AxisZ, JoystickPosition.Both); } }
+		public static InputAction Joystick3AxisR { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick3, JoystickAxis.AxisR, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick4AxisR { get { return InputActionFactory.Instance.Create (Joysticks.Joystick4, JoystickAxis.AxisR, JoystickPosition.Both); } }
+		public static InputAction Joystick3AxisU { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick3, JoystickAxis.AxisU, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick4AxisU { get { return InputActionFactory.Instance.Create (Joysticks.Joystick4, JoystickAxis.AxisU, JoystickPosition.Both); } }
+		public static InputAction Joystick3AxisV { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick, JoystickAxis.AxisV, JoystickPosition.FULL); } }
 		
-		public static InputActionFactory Joystick4AxisV { get { return InputActionFactory.Instance.Create (Joysticks.Joystick, JoystickAxis.AxisV, JoystickPosition.Both); } }
+		public static InputAction Joystick4AxisX { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick4, JoystickAxis.AxisX, JoystickPosition.FULL); } }
+		
+		public static InputAction Joystick4AxisY { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick4, JoystickAxis.AxisY, JoystickPosition.FULL); } }
+		
+		public static InputAction Joystick4AxisZ { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick4, JoystickAxis.AxisZ, JoystickPosition.FULL); } }
+		
+		public static InputAction Joystick4AxisR { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick4, JoystickAxis.AxisR, JoystickPosition.FULL); } }
+		
+		public static InputAction Joystick4AxisU { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick4, JoystickAxis.AxisU, JoystickPosition.FULL); } }
+		
+		public static InputAction Joystick4AxisV { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick, JoystickAxis.AxisV, JoystickPosition.FULL); } }
 		
 
 
@@ -815,6 +827,13 @@ namespace ws.winx.input
 								__factoryConstructor = (type) => new InputAction (InputCode.toCode (joystick, joystickAxis, joystickPosition), type);
 								return instance;
 						}
+
+							public InputAction CreateSimpleAction(Joysticks joystick, JoystickAxis joystickAxis, JoystickPosition joystickPosition)
+							{
+								
+								return new InputAction (InputCode.toCode (joystick, joystickAxis, joystickPosition),InputActionType.SINGLE);
+								
+							}
 
 						public InputActionFactory Create (int code)
 						{

@@ -276,17 +276,20 @@ namespace ws.winx.platform.osx
 		/// Update the specified device.
 		/// </summary>
 		/// <param name="device">Joystick.</param>
-         public void Update(IDevice device)	
+        public void Update(IDevice device)	
 		{
+			if (device != null && _hidInterface != null && _hidInterface.Contains(device.PID)) {
+								
+				HIDReport report = _hidInterface.ReadDefault (device.PID);
 
-			HIDReport report = _hidInterface.ReadDefault(device.PID);
+								//Debug.Log (report.Status);
 
-			//Debug.Log (report.Status);
+								if (report.Status == HIDReport.ReadStatus.Success || report.Status == HIDReport.ReadStatus.Buffered) {
 
-			if (report.Status == HIDReport.ReadStatus.Success || report.Status == HIDReport.ReadStatus.Buffered) {
+										//Debug.Log ("update value");
+										DeviceValueReceived (device, (Native.IOHIDElementType)BitConverter.ToUInt32 (report.Data, 0), BitConverter.ToUInt32 (report.Data, 4), BitConverter.ToInt32 (report.Data, 8));
+								}
 
-				//Debug.Log ("update value");
-				DeviceValueReceived(device,(Native.IOHIDElementType)BitConverter.ToUInt32(report.Data,0),BitConverter.ToUInt32(report.Data,4),BitConverter.ToInt32(report.Data,8));
 			}
 
 
@@ -577,6 +580,7 @@ namespace ws.winx.platform.osx
 			bool _isNullable;
 			bool _isHat;
 			float sensitivityOffset=0.3f;
+			bool _isTrigger;
 			
 #region IAxisDetails implementation
 				
@@ -584,10 +588,10 @@ namespace ws.winx.platform.osx
 				
 				public bool isTrigger {
 					get {
-						throw new NotImplementedException ();
+						return _isTrigger;
 					}
 					set {
-						throw new NotImplementedException ();
+						_isTrigger=true;
 					}
 				}
 

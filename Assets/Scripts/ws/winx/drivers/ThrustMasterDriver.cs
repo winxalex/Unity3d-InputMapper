@@ -15,9 +15,9 @@ namespace ws.winx.drivers
 	{
 
         private IHIDInterface __hidInterface;
-       
-     
-      
+
+		
+		
 
         public IDevice ResolveDevice(IHIDDevice hidDevice)
         {
@@ -60,9 +60,9 @@ namespace ws.winx.drivers
         public void Update(IDevice device)
         {
 
-            if (__hidInterface.Generics.ContainsKey(device.PID))
+            if (device!=null && __hidInterface!=null && __hidInterface.Contains(device.PID))
             {
-              
+               
               //  Debug.Log("Update Joy"+device.Index);
                 HIDReport data = __hidInterface.ReadBuffered(device.PID);
                 onRead(data);

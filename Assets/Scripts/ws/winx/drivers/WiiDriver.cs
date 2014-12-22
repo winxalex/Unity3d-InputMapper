@@ -104,7 +104,7 @@ namespace ws.winx.drivers
 
             //Add states
 
-            if(wDevice!=null){
+            if(wDevice!=null && _hidInterface!=null && _hidInterface.Contains(wDevice.PID)){
 
                 if (wDevice.isReady && !wDevice.isAccCalibrated)
                 {

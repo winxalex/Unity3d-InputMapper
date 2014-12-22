@@ -119,7 +119,7 @@ namespace ws.winx.drivers
 		 {
 
 
-            if (_hidInterface.Generics.ContainsKey(device.PID))
+            if (device!=null && _hidInterface!=null && _hidInterface.Generics!=null && _hidInterface.Generics.ContainsKey(device.PID))
             {
 
                 //  Debug.Log("Update Joy"+device.Index);

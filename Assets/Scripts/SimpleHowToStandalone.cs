@@ -33,29 +33,7 @@ namespace ws.winx
 
 
 
-			List<int> initializers = new List <int>();
 
-			initializers.Add(0);
-			initializers.Add(1);
-			initializers.Add(2);
-			initializers.Add(3);
-			initializers.Add(4);
-			initializers.Add(5);
-			initializers.Add(6);
-//			initializers.Add(7);
-//			initializers.Add(8);
-//			initializers.Add(9);
-
-			int count = initializers.Count;
-			initializers.Resize (Math.Max (8,count));
-
-			if (count == 6) {
-				initializers[6]= 11;
-				initializers[7]= 12;
-						} else {
-								initializers.Insert (6, 11);
-								initializers.Insert (7, 12);
-						}
 			
 
 
@@ -77,7 +55,7 @@ namespace ws.winx
 //			#endif
 //			
 			#if (UNITY_STANDALONE_OSX)
-  //          			InputManager.AddDriver(new ThrustMasterDriver());
+           			InputManager.AddDriver(new ThrustMasterDriver());
   //          			InputManager.AddDriver(new XInputDriver());
 			//change default driver
 			//InputManager.hidInterface.defaultDriver=new UnityDriver();
@@ -162,14 +140,14 @@ namespace ws.winx
 			
 			
 			////easiest way to map state to combination (ex.of single W and C click)
-			if (!InputManager.HasInputState("ManualAddedSTATE"))
-				InputManager.MapStateToInput("ManualAddedSTATE", InputCode.W.SINGLE, InputCode.C.SINGLE);
+			if (!InputManager.HasInputState ("ManualAddedSTATE1"))
+								InputManager.MapStateToInput ("ManualAddedSTATE1", InputCode.Joystick0AxisX);// InputCode.W.SINGLE, InputCode.C.SINGLE);
 			
 			UnityEngine.Debug.Log("Log:" + InputManager.Log());
 			
 			
 			////Event Based input handling
-			InputEvent ev = new InputEvent("ManualAddedSTATE");
+			InputEvent ev = new InputEvent("ManualAddedSTATE1");
 			//InputEvent ev = new InputEvent((int)States.SomeState);
 			
 	
@@ -255,7 +233,8 @@ namespace ws.winx
 			//Debug.Log (analogVal2);
 			
 			
-			
+			float analogVal2= InputManager.GetInput (Animator.StringToHash ("ManualAddedSTATE1"));
+			Debug.Log (analogVal2);
 			
 		}
 		

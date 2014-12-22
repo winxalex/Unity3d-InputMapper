@@ -18,8 +18,12 @@ namespace ws.winx.platform
 		{
 			event EventHandler<DeviceEventArgs<int>> DeviceDisconnectEvent;
 			event EventHandler<DeviceEventArgs<IDevice>> DeviceConnectEvent;
+			
+
+
 			IDriver defaultDriver{get;set;}
             Dictionary<int, HIDDevice> Generics{get;}
+
             /// <summary>
             /// Reading by use of OS default driver (Win-WINMMDriver, Osx-OSXDriver...
             /// </summary>
@@ -32,6 +36,8 @@ namespace ws.winx.platform
             void Write(object data, int device, HIDDevice.WriteCallback callback, int timeout);
             void Write(object data, int device,HIDDevice.WriteCallback callback);
             void Write(object data, int device);
+			bool Contains(int pid);
+			void AddDriver(IDriver driver);
 			void Update();
 			void Enumerate();
 		    

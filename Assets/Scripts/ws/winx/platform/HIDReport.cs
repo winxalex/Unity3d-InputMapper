@@ -31,6 +31,8 @@ namespace ws.winx.platform
             {
                 Data = new byte[] { };
                 Status = status;
+
+
             }
 
             /// <summary>
