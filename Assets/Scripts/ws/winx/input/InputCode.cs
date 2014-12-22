@@ -937,7 +937,7 @@ namespace ws.winx.input
 								return ((Joysticks)(code >> CODE_ID_SHIFT)).ToString () + "Button" + (code & CODE_DATA_MASK);
 			
 						if (axis == JoystickAxis.AxisPovX || axis == JoystickAxis.AxisPovY) {
-								data = ((JoystickPovPosition)(((code & CODE_DATA_MASK) + 1) * ((int)JoystickPovPosition.Right))).ToString ();
+								data = ((JoystickPovPosition)(((code & CODE_DATA_MASK)))).ToString ();
 						} else {
 								data = ((JoystickPosition)(code & CODE_DATA_MASK)).ToString ();
 						}
@@ -1037,7 +1037,7 @@ namespace ws.winx.input
 						} else if ((inx = code.IndexOf ("Pov")) > -1) {//found POV
 								return toCode ((Joysticks)Enum.Parse (typeof(Joysticks), code.Substring (0, inx - 4)),
 				               (JoystickAxis)Enum.Parse (typeof(JoystickAxis), code.Substring (inx - 4, 8)),
-				               ((int)(JoystickPovPosition)Enum.Parse (typeof(JoystickPovPosition), code.Substring (inx + 4, code.Length - (inx + 4)))) / (int)JoystickPovPosition.Right - 1);
+				               ((int)(JoystickPovPosition)Enum.Parse (typeof(JoystickPovPosition), code.Substring (inx + 4, code.Length - (inx + 4)))));
 						} else if ((inx = code.IndexOf ("A")) > -1) {//found Axis
 								return toCode ((Joysticks)Enum.Parse (typeof(Joysticks), code.Substring (0, inx)),
 				               (JoystickAxis)Enum.Parse (typeof(JoystickAxis), code.Substring (inx, 5)),
