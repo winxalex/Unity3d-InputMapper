@@ -15,7 +15,7 @@ namespace ws.winx.platform.web
     public class WebHIDInterface : IHIDInterface
     {
         #region Fields
-        private List<IDriver> __drivers;// = new List<IJoystickDriver>();
+        private List<IDriver> __drivers;
        
         private IDriver __defaultJoystickDriver;
       
@@ -32,9 +32,9 @@ namespace ws.winx.platform.web
         #endregion
 
 #region Constructors
-        public WebHIDInterface(List<IDriver> drivers)
+        public WebHIDInterface()
         {
-            __drivers = drivers;
+            __drivers = new List<IDriver>();
            
             __Generics=new Dictionary<int,HIDDevice>();
 
@@ -48,6 +48,15 @@ namespace ws.winx.platform.web
         #endregion
 
         #region IHIDInterface implementation
+		public void AddDriver (IDriver driver)
+		{
+			__drivers.Add (driver);
+		}
+
+		public bool Contains (int pid)
+		{
+			return __Generics != null && __Generics.ContainsKey (pid);
+		}
 
         public void Enumerate ()
 		{
@@ -247,7 +256,18 @@ namespace ws.winx.platform.web
 
         public void Dispose()
         {
-            this.__Generics.Clear();
+			
+			if (Generics != null) {
+				foreach (KeyValuePair<int, HIDDevice> entry in Generics) {
+					entry.Value.Dispose ();
+				}
+				
+				
+				Generics.Clear ();
+			}
+
+			Debug.Log ("Try to remove Drivers");
+			if(__drivers!=null) __drivers.Clear();
            
         }
 

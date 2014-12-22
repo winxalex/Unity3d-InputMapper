@@ -34,7 +34,9 @@ namespace ws.winx.input
 		private static InputCombination[] __inputCombinations;
 		private static InputSettings __settings;//=new InputSettings();
 		private static IHIDInterface __hidInterface;//=new ws.winx.platform.windows.WinHIDInterface();
-        private static List<IDriver> __drivers;
+       
+
+		private static readonly object syncRoot = new object();
 
 
         /// <summary>
@@ -43,7 +45,15 @@ namespace ws.winx.input
         /// </summary>
         public static bool EditMode = false;
 
+		public enum InputManagerMode:ushort{
 
+			Ready= 0x1,
+			Edit= 0x2,
+			Disposing= 0x4
+
+
+
+		}
 
 
 
@@ -52,12 +62,12 @@ namespace ws.winx.input
 
 		internal static IDeviceCollection Devices
 		{
-			
+
 			get {  
 				if(_devices==null) _devices = new ControllerDevicesCollection(); 
 				return _devices; 
 			}
-			
+
 		}
 
 
@@ -71,21 +81,21 @@ namespace ws.winx.input
 					//if((Application.platform & (RuntimePlatform.WindowsPlayer | RuntimePlatform.WindowsEditor))!=0){
 
                         #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-                        __hidInterface = new ws.winx.platform.windows.WinHIDInterface(__drivers);
+                        __hidInterface = new ws.winx.platform.windows.WinHIDInterface();
                          #endif
                         
 
 					 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
-						__hidInterface=new ws.winx.platform.osx.OSXHIDInterface(__drivers);
+						__hidInterface=new ws.winx.platform.osx.OSXHIDInterface();
                      #endif
 
 
 					#if UNITY_WEBPLAYER && !UNITY_EDITOR
-						__hidInterface=new ws.winx.platform.web.WebHIDInterface(__drivers);
+						__hidInterface=new ws.winx.platform.web.WebHIDInterface();
                     #endif
 
                 #if UNITY_ANDROID && !UNITY_EDITOR
-                          __hidInterface=new ws.winx.platform.android.AndroidHIDInterface(__drivers);
+                          __hidInterface=new ws.winx.platform.android.AndroidHIDInterface();
                 #endif
 
 					//register events
@@ -108,17 +118,23 @@ namespace ws.winx.input
 
 	   internal static void onRemoveDevice(object sender,DeviceEventArgs<int> args){
 
-			if (Devices.ContainsIndex(args.data)) 
+						lock (syncRoot) {
+								if (Devices.ContainsPID (args.data)) 
 					
-				_devices.Remove(args.data);
+										_devices.Remove (args.data);
 					
+						}
 				}
 
 		internal static void onAddDevice(object sender,DeviceEventArgs<IDevice> args){
-					//do not allow duplicates
-					if (Devices.ContainsPID(args.data.PID)) return;
 
-					_devices[args.data.PID] = args.data;
+			        lock (syncRoot) {
+						//do not allow duplicates
+						if (Devices.ContainsPID (args.data.PID))
+								return;
+
+						_devices[args.data.PID] = args.data;
+					}
 
 		}
 
@@ -134,21 +150,24 @@ namespace ws.winx.input
         /// <returns></returns>
         public static List<T> GetDevices<T>()
         {
-            IDeviceCollection devices = InputManager.Devices;
 
-            List<T> Result = new List<T>();
+			lock (syncRoot) {
+								IDeviceCollection devices = InputManager.Devices;
 
-            foreach (IDevice device in devices)
-            {
-                if (device.GetType() == typeof(T))
-                {
-                    Result.Add((T)device);
+								List<T> Result = new List<T> ();
 
-                }
+								foreach (IDevice device in devices) {
+										if (device.GetType () == typeof(T)) {
+												Result.Add ((T)device);
+
+										}
                 
-            }
+								}
+						
 
-            return Result;
+
+								return Result;
+					}
         }
 
         /// <summary>
@@ -156,8 +175,8 @@ namespace ws.winx.input
         /// </summary>
         /// <param name="driver"></param>
 		public static void AddDriver(IDriver driver){
-            if(__drivers==null) __drivers= new List<IDriver>();
-            __drivers.Add(driver);
+			hidInterface.AddDriver (driver);
+
 		}
 
 
@@ -954,6 +973,7 @@ namespace ws.winx.input
             __inputCombinations=__settings.stateInputs[stateNameHash].combinations;
 
 
+
             return __inputCombinations[0].GetGenericAnalogValue(sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetGenericAnalogValue(sensitivity, dreadzone, gravity) : 0);
 
 		}
@@ -1112,7 +1132,7 @@ namespace ws.winx.input
 			{
 				IndexToPID.Remove((byte)PIDToDevice[PID].Index);
 				PIDToDevice.Remove(PID);
-				
+
 				_isEnumeratorDirty = true;
 			}
 			
@@ -1123,6 +1143,8 @@ namespace ws.winx.input
 			public void Remove(byte index)
 			{
 				int pid = IndexToPID[index];
+
+				//PIDToDevice[pid].
 				IndexToPID.Remove(index);
 				PIDToDevice.Remove(pid);
 				
@@ -1165,12 +1187,23 @@ namespace ws.winx.input
 				}
 			}
 			
-			
+			/// <summary>
+			/// Containses the key of device index (0-15) Joystick0,1..15.
+			/// </summary>
+			/// <returns>true</returns>
+			/// <c>false</c>
+			/// <param name="index">Index.</param>
 			public bool ContainsIndex(int index)
 			{
 				return IndexToPID.ContainsKey((byte)index);
 			}
-			
+
+			/// <summary>
+			/// Containses the key of device with PID
+			/// </summary>
+			/// <returns>true</returns>
+			/// <c>false</c>
+			/// <param name="pid">Pid.</param>
 			public bool ContainsPID(int pid)
 			{
 				return PIDToDevice.ContainsKey(pid);
@@ -1225,11 +1258,12 @@ namespace ws.winx.input
 
             if (__hidInterface != null)
             {
-
+				Debug.Log ("Try to remove HidInterface events");
 				__hidInterface.DeviceDisconnectEvent-=new EventHandler<DeviceEventArgs<int>>(onRemoveDevice);
 
 
 				__hidInterface.DeviceConnectEvent-=new EventHandler<DeviceEventArgs<IDevice>>(onAddDevice);
+
 
 				__hidInterface.Dispose();
                 __hidInterface = null;
@@ -1237,9 +1271,17 @@ namespace ws.winx.input
 
 
 
-			if(_devices!=null)
-			_devices.Clear();
+			if (_devices != null) {
+				Debug.Log ("Try to remove devices");
+				_devices.Clear ();
+				_devices=null;
+			}
 
+			Debug.Log ("Try to remove states");
+		if (InputManager.Settings.stateInputs != null)
+								InputManager.Settings.stateInputs.Clear ();
+			
+			Debug.Log ("Dispose Finished");
         }
 
 

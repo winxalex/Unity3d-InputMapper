@@ -30,8 +30,8 @@ namespace ws.winx.input
 
 		public class InputEx
 		{
-
-
+		private static readonly object syncRoot = new object();	
+		
 				public event EventHandler<InputExArgs> InputProcessed;
 
 				public static int MAX_NUM_JOYSTICK_BUTTONS = 20;
@@ -235,13 +235,15 @@ namespace ws.winx.input
 				/// <returns></returns>
 				static bool anyKeyDownOnAny ()
 				{
-						IDeviceCollection devices = InputManager.Devices;
+						lock (syncRoot) {
+								IDeviceCollection devices = InputManager.Devices;
 
-						foreach (IDevice device in devices)
-								if (device.GetAnyInputDown ())
-										return true;
+								foreach (IDevice device in devices)
+										if (device.GetAnyInputDown ())
+												return true;
 
-						return false;
+								return false;
+						}
 				}
 
 				public int numMouseButtons {
@@ -269,23 +271,24 @@ namespace ws.winx.input
 				{
 						int code = action.code;
 
+						lock (syncRoot) {
+								if (action.fromAny) {//first device that have value not equal 0 or return 0
+										IDeviceCollection devices = InputManager.Devices;
+										float axisValue;
 
-						if (action.fromAny) {//first device that have value not equal 0 or return 0
-								IDeviceCollection devices = InputManager.Devices;
-								float axisValue;
+										foreach (IDevice device in devices)
+												if ((axisValue = device.GetInput (code)) != 0)
+														return axisValue;
 
-								foreach (IDevice device in devices)
-										if ((axisValue = device.GetInput (code)) != 0)
-												return axisValue;
-
-								return 0;
-
-						} else {
-								int index = InputCode.toJoystickID (code);
-								if (InputManager.Devices.ContainsIndex (index))
-										return InputManager.Devices.GetDeviceAt (index).GetInput (code);
-								else
 										return 0;
+
+								} else {
+										int index = InputCode.toJoystickID (code);
+										if (InputManager.Devices.ContainsIndex (index))
+												return InputManager.Devices.GetDeviceAt (index).GetInput (code);
+										else
+												return 0;
+								}
 						}
 				}
 
@@ -349,24 +352,25 @@ namespace ws.winx.input
 								return keycodeInputHandlerCallback ((KeyCode)code);
 						} else {
 					
-					
-								if (fromAny) {
-										IDeviceCollection devices = InputManager.Devices;
-										foreach (IDevice device in devices)
-												if (device.GetInputBase (code, buttonState))
-														return true;
-						
-										return false;
-						
-								} else {
-										int index = InputCode.toJoystickID (code);
-										if (InputManager.Devices.ContainsIndex (index))
+								lock(syncRoot){
+									if (fromAny) {
+											IDeviceCollection devices = InputManager.Devices;
+											foreach (IDevice device in devices)
+													if (device.GetInputBase (code, buttonState))
+															return true;
 							
-												return InputManager.Devices.GetDeviceAt (index).GetInputBase (code, buttonState);
-										else
-												return false;
-						
-						
+											return false;
+							
+									} else {
+											int index = InputCode.toJoystickID (code);
+											if (InputManager.Devices.ContainsIndex (index))
+								
+													return InputManager.Devices.GetDeviceAt (index).GetInputBase (code, buttonState);
+											else
+													return false;
+							
+							
+									}
 								}
 						}
 

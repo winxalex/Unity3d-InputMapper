@@ -16,7 +16,7 @@ namespace ws.winx.platform.android
 
         public const string TAG = "AndroidHIDInterface";
 
-        private List<IDriver> __drivers;// = new List<IJoystickDriver>();
+        private List<IDriver> __drivers;
 
         private IDriver __defaultJoystickDriver = new UnityDriver();
       
@@ -37,10 +37,10 @@ namespace ws.winx.platform.android
         #endregion
 
 
-        public AndroidHIDInterface(List<IDriver> drivers)
+        public AndroidHIDInterface()
         {
             UnityEngine.Debug.Log("AndroidHIDInterface");
-            __drivers = drivers;
+            __drivers = new List<IDriver>();
            
             __Generics = new Dictionary<int, HIDDevice>();
 
@@ -51,17 +51,7 @@ namespace ws.winx.platform.android
            // 
         }
 
-		public void Enumerate(){
-
-			if(!hidCallbacksRegistered){
-			droidHIDBehaviour.DeviceDisconnectedEvent += new EventHandler<AndroidMessageArgs<int>>(DeviceDisconnectedEventHandler);
-			droidHIDBehaviour.DeviceConnectedEvent += new EventHandler<AndroidMessageArgs<AndroidJavaObject>>(DeviceConnectedEventHandler);
-				hidCallbacksRegistered=true;
-			}
-
-			droidHIDBehaviour.Enumerate();
-		}
-
+	
         public void DeviceConnectedEventHandler(object sender, AndroidMessageArgs<AndroidJavaObject> args)
         {
             AndroidJavaObject device = args.data;
@@ -178,6 +168,30 @@ namespace ws.winx.platform.android
 
 		#region IHIDInterface implementation
 
+		public void AddDriver (IDriver driver)
+		{
+			__drivers.Add (driver);
+		}
+
+		public bool Contains (int pid)
+		{
+			return __Generics != null && __Generics.ContainsKey (pid);
+		}
+
+
+
+		public void Enumerate(){
+			
+			if(!hidCallbacksRegistered){
+				droidHIDBehaviour.DeviceDisconnectedEvent += new EventHandler<AndroidMessageArgs<int>>(DeviceDisconnectedEventHandler);
+				droidHIDBehaviour.DeviceConnectedEvent += new EventHandler<AndroidMessageArgs<AndroidJavaObject>>(DeviceConnectedEventHandler);
+				hidCallbacksRegistered=true;
+			}
+			
+			droidHIDBehaviour.Enumerate();
+		}
+
+
 		public void Write (object data, int device, HIDDevice.WriteCallback callback)
 		{
 			throw new NotImplementedException ();
@@ -230,12 +244,20 @@ namespace ws.winx.platform.android
 
         public void Dispose()
         {
-            foreach (KeyValuePair<int, HIDDevice> entry in Generics)
-            {
-                entry.Value.Dispose();
-            }
+			if(__Generics!=null){
+	            foreach (KeyValuePair<int, HIDDevice> entry in __Generics)
+	            {
+	                entry.Value.Dispose();
+	            }
 
-            Generics.Clear();
+	            __Generics.Clear();
+			}
+
+
+			Debug.Log ("Try to remove Drivers");
+			if(__drivers!=null) __drivers.Clear();
+
+
         }
     }
 }

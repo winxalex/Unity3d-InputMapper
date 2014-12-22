@@ -178,7 +178,7 @@ namespace ws.winx.platform.windows
             CloseDeviceIO(ReadAsyncHandle);
             CloseDeviceIO(WriteAsyncHandle);
 
-            UnityEngine.Debug.Log("Clossing device handles");
+            UnityEngine.Debug.Log("Device closed successfully");
 
                 ReadHandle=IntPtr.Zero;
                  WriteHandle=IntPtr.Zero;

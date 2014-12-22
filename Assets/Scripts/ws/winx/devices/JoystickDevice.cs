@@ -186,9 +186,9 @@ namespace ws.winx.devices
 
 						// axis_collection [axis].isHat
 						if (axis == JoystickAxis.AxisPovX) {
-								if ((data + 1) * 9000 == (int)JoystickPovPosition.Left && axisValue < 0)
+								if (data == (int)JoystickPovPosition.Left && axisValue < 0)
 										return axisValue;
-								if ((data + 1) * 9000 == (int)JoystickPovPosition.Right && axisValue > 0)
+								if (data == (int)JoystickPovPosition.Right && axisValue > 0)
 										return axisValue;
 							
 								return 0;
@@ -197,14 +197,16 @@ namespace ws.winx.devices
 						
 						
 						if (axis == JoystickAxis.AxisPovY) {
-								if ((data + 1) * 9000 == (int)JoystickPovPosition.Backward && axisValue < 0)
+								if (data == (int)JoystickPovPosition.Backward && axisValue < 0)
 										return axisValue;
-								if ((data + 1) * 9000 == (int)JoystickPovPosition.Forward && axisValue > 0)
+								if (data == (int)JoystickPovPosition.Forward && axisValue > 0)
 										return axisValue;
 								return 0;
 						}
 						
 						
+						if (data == (int)JoystickPosition.FULL)
+								return axisValue;
 						
 						if (data == (int)JoystickPosition.Negative && axisValue < 0)
 								return axisValue;
@@ -233,23 +235,38 @@ namespace ws.winx.devices
 						JoystickAxis axis = InputCode.toAxis (code);
 						int data = InputCode.toData (code);
                     
-						if (axis == JoystickAxis.None)
-								return button_collection [data].buttonState == ButtonState.Up;
-								
-						IAxisDetails axisDetails = axis_collection [axis];
+						if (axis == JoystickAxis.None) {
+
+								//previous mapping might be to device with less or more buttons
+								//at same device index
+								if (button_collection.Count > data)
+										return button_collection [data].buttonState == ButtonState.Up;
+								else
+										return false;
+						}
+
+			//previous mapping might be to device with less or more axess
+			//at same device index
+			if (axis_collection.Count <= (int)axis)
+								return false;
+
+			IAxisDetails axisDetails= axis_collection [axis];
+
+			if (axisDetails == null)
+								return false;
 
 						if (axis == JoystickAxis.AxisPovX) {
-								if ((data + 1) * 9000 == (int)JoystickPovPosition.Left && axisDetails.buttonState == ButtonState.NegToUp)
+								if (data == (int)JoystickPovPosition.Left && axisDetails.buttonState == ButtonState.NegToUp)
 										return true;
-								if ((data + 1) * 9000 == (int)JoystickPovPosition.Right && axisDetails.buttonState == ButtonState.PosToUp)
+								if (data == (int)JoystickPovPosition.Right && axisDetails.buttonState == ButtonState.PosToUp)
 										return true;
 								return false;
 						}
 
 						if (axis == JoystickAxis.AxisPovY) {
-								if ((data + 1) * 9000 == (int)JoystickPovPosition.Backward && axisDetails.buttonState == ButtonState.NegToUp)
+								if (data == (int)JoystickPovPosition.Backward && axisDetails.buttonState == ButtonState.NegToUp)
 										return true;
-								if ((data + 1) * 9000 == (int)JoystickPovPosition.Forward && axisDetails.buttonState == ButtonState.PosToUp)
+								if (data == (int)JoystickPovPosition.Forward && axisDetails.buttonState == ButtonState.PosToUp)
 										return true;
 								return false;
 						}
@@ -287,25 +304,38 @@ namespace ws.winx.devices
 							
 						if (axis == JoystickAxis.None) {   //MO data for axis => buttons data
 								//UnityEngine.Debug.Log("Button state>" + button_collection[data].buttonState);
-								
-								return button_collection [data].buttonState == buttonState;
+
+								//previous mapping might be to device with less or more buttons
+								//at same device index
+								if(button_collection.Count>data)
+									return button_collection [data].buttonState == buttonState;
+								else
+									return false;
 								
 						}
 
 						
 
-						IAxisDetails axisDetails = axis_collection [axis];
+			//previous mapping might be to device with less or more axess
+			//at same device index
+			if (axis_collection.Count <= (int)axis)
+				return false;
+			
+			IAxisDetails axisDetails= axis_collection [axis];
 
-						bool isEqualToButtonState = axisDetails.buttonState == buttonState;
+			if (axisDetails == null)
+				return false;
+			
+			bool isEqualToButtonState = axisDetails.buttonState == buttonState;
 							
 							
 							
 						if (axis == JoystickAxis.AxisPovX) {
 
 
-								if ((data + 1) * 9000 == (int)JoystickPovPosition.Left && isEqualToButtonState && axisDetails.value < 0)
+								if (data == (int)JoystickPovPosition.Left && isEqualToButtonState && axisDetails.value < 0)
 										return true;
-								if ((data + 1) * 9000 == (int)JoystickPovPosition.Right && isEqualToButtonState && axisDetails.value > 0)
+								if (data == (int)JoystickPovPosition.Right && isEqualToButtonState && axisDetails.value > 0)
 										return true;
 								
 								return false;
@@ -314,9 +344,9 @@ namespace ws.winx.devices
 							
 							
 						if (axis == JoystickAxis.AxisPovY) {
-								if ((data + 1) * 9000 == (int)JoystickPovPosition.Backward && isEqualToButtonState && axisDetails.value < 0)
+								if (data == (int)JoystickPovPosition.Backward && isEqualToButtonState && axisDetails.value < 0)
 										return true;
-								if ((data + 1) * 9000 == (int)JoystickPovPosition.Forward && isEqualToButtonState && axisDetails.value > 0)
+								if (data == (int)JoystickPovPosition.Forward && isEqualToButtonState && axisDetails.value > 0)
 										return true;
 								
 								return false;
@@ -674,7 +704,8 @@ namespace ws.winx.devices
 		public enum JoystickPosition : ushort
 		{
 				Negative = 0,
-				Positive = 1
+				Positive = 1,
+				FULL = 2
 
 		}
 
@@ -683,11 +714,11 @@ namespace ws.winx.devices
 
 		public enum JoystickPovPosition : ushort
 		{
-				Centered = 0xFFFF,/* x */
-				Forward = 36000,/* 3 */
-				Right = 9000,/* 0 */
-				Backward = 18000,/* 1 */
-				Left = 27000/* 2 */
+				//Centered = 0xFFFF,/* x *///0xFF
+				Forward = 3,//36000,/* 3 *///0x
+				Right = 0,//9000,/* 0 */ // 0x04
+				Backward =1,// 18000,/* 1 *///0x08
+				Left = 2//27000/* 2 */ //0x40
 		}
 
     #endregion

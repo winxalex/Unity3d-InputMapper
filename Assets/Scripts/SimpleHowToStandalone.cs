@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using ws.winx.drivers;
+using ws.winx.utils;
 
 
 namespace ws.winx
@@ -30,9 +31,14 @@ namespace ws.winx
 		void Start()
 		{
 
+
+
+
 			
+
+
 			
-		
+		//
 		
 
 			
@@ -48,13 +54,13 @@ namespace ws.winx
 //			
 //			#endif
 //			
-//			#if (UNITY_STANDALONE_OSX)
-            //			InputManager.AddDriver(new ThrustMasterDriver());
-            //			InputManager.AddDriver(new XInputDriver());
+			#if (UNITY_STANDALONE_OSX)
+           			InputManager.AddDriver(new ThrustMasterDriver());
+  //          			InputManager.AddDriver(new XInputDriver());
 			//change default driver
 			//InputManager.hidInterface.defaultDriver=new UnityDriver();
 
-//			#endif
+			#endif
 	
 		
 			InputManager.hidInterface.Enumerate();
@@ -134,14 +140,14 @@ namespace ws.winx
 			
 			
 			////easiest way to map state to combination (ex.of single W and C click)
-			if (!InputManager.HasInputState("ManualAddedSTATE"))
-				InputManager.MapStateToInput("ManualAddedSTATE", InputCode.W.SINGLE, InputCode.C.SINGLE);
+			if (!InputManager.HasInputState ("ManualAddedSTATE1"))
+								InputManager.MapStateToInput ("ManualAddedSTATE1", InputCode.Joystick0AxisX);// InputCode.W.SINGLE, InputCode.C.SINGLE);
 			
 			UnityEngine.Debug.Log("Log:" + InputManager.Log());
 			
 			
 			////Event Based input handling
-			InputEvent ev = new InputEvent("ManualAddedSTATE");
+			InputEvent ev = new InputEvent("ManualAddedSTATE1");
 			//InputEvent ev = new InputEvent((int)States.SomeState);
 			
 	
@@ -227,7 +233,8 @@ namespace ws.winx
 			//Debug.Log (analogVal2);
 			
 			
-			
+			float analogVal2= InputManager.GetInput (Animator.StringToHash ("ManualAddedSTATE1"));
+			Debug.Log (analogVal2);
 			
 		}
 		

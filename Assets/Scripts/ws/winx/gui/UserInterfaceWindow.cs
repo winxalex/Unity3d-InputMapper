@@ -377,5 +377,21 @@ namespace ws.winx.gui
 				}
 
 
+
+		
+					/// <summary>
+					/// DONT FORGET TO CLEAN AFTER YOURSELF
+					/// </summary>
+					void OnDestroy ()
+					{
+						Debug.Log ("onDestroy UserInterfaceWindow");
+						
+						_selectedStateHash = 0;
+
+						Debug.Log ("onDestroy End UserInterfaceWindow");
+					}
+
+
+
 		}
 }

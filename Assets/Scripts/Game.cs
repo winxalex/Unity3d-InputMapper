@@ -71,7 +71,7 @@ namespace ws.winx
 #endif
 
 #if (UNITY_STANDALONE_OSX)
-			InputManager.AddDriver(new ThrustMasterDriver());
+			//InputManager.AddDriver(new ThrustMasterDriver());
 			//InputManager.AddDriver(new XInputDriver());
 
 			InputManager.hidInterface.defaultDriver=new UnityDriver();

@@ -46,6 +46,11 @@ namespace ws.winx.drivers
 
 				public void Update (devices.IDevice device)
 				{
+
+					if (device == null)
+								return;
+
+
 						int i = 0;
 						int numAxis = device.Axis.Count;
 						int numButtons = device.Buttons.Count;
@@ -53,7 +58,7 @@ namespace ws.winx.drivers
 						int index = device.Index;
 
 						// Debug.Log("axis value raw:" + Input.GetAxisRaw("10") + " " + Input.GetAxis("11"));
-						//Debug.Log("axis value raw:" + );
+						//Debug.Log("axis value raw:" +);
 						//   joystick.Axis[0].value=Input.GetAxis("00");//index-of joystick, i-ord number of axis
 						// Debug.Log("axis value:" + joystick.Axis[0].value + " state:" + joystick.Axis[0].buttonState);
 
@@ -262,7 +267,9 @@ namespace ws.winx.drivers
 					
 										if (value == -1 || value == 1) {
 												if (_buttonState == ButtonState.None
-														|| _buttonState == ButtonState.Up) {
+						    //|| _buttonState == ButtonState.PosToUp || _buttonState==ButtonState.NegToUp)
+						    )
+						{
 							
 														_buttonState = ButtonState.Down;
 							

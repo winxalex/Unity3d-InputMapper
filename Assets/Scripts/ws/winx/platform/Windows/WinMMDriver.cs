@@ -51,109 +51,125 @@ namespace ws.winx.platform.windows
 
         public void Update(IDevice device)
         {
-			HIDReport report = _hidInterface.ReadDefault (device.PID);
+
+			if (device != null && _hidInterface != null && _hidInterface.Contains (device.PID)) {
+								HIDReport report = _hidInterface.ReadDefault (device.PID);
 
             
-            //return;
+								//return;
 
-            if (report.Status==HIDReport.ReadStatus.Success)
-            {
+								if (report.Status == HIDReport.ReadStatus.Success) {
 
-                //while buttons
-                int buttonInx = 0;
-                var numButtons = device.Buttons.Count;
+										//while buttons
+										int buttonInx = 0;
+										var numButtons = device.Buttons.Count;
 
-				uint ButtonsFlag=BitConverter.ToUInt32(report.Data,0);
+										uint ButtonsFlag = BitConverter.ToUInt32 (report.Data, 0);
 
-                //UnityEngine.Debug.Log(BitConverter.ToString(report.Data,0,4));
-
-
-                while (buttonInx < numButtons)
-                {
-                    //stick.SetButton (buttonInx, (info.Buttons & (1 << buttonInx)) != 0);
-                    device.Buttons[buttonInx].value = ButtonsFlag & (1 << buttonInx);
-                    buttonInx++;
-                }
+										//UnityEngine.Debug.Log(BitConverter.ToString(report.Data,0,4));
 
 
-                //set analog axis
-                IAxisDetails axisDetails;
+										while (buttonInx < numButtons) {
+												//stick.SetButton (buttonInx, (info.Buttons & (1 << buttonInx)) != 0);
+												device.Buttons [buttonInx].value = ButtonsFlag & (1 << buttonInx);
+												buttonInx++;
+										}
 
-                int axisIndex = 0;
-                int numAxis = device.Axis.Count - device.numPOV * 2;//minus POV axes
+
+										//set analog axis
+										IAxisDetails axisDetails;
+
+										int axisIndex = 0;
+										int numAxis = device.Axis.Count - device.numPOV * 2;//minus POV axes
 
              
 
-                // UnityEngine.Debug.Log("XPos:"+info.XPos+" YPos:" + info.YPos + " ZPos:" + info.ZPos+" RPos:"+info.RPos+" UPos:"+info.UPos);
+										// UnityEngine.Debug.Log("XPos:"+info.XPos+" YPos:" + info.YPos + " ZPos:" + info.ZPos+" RPos:"+info.RPos+" UPos:"+info.UPos);
 
 
-                //	axisDetails = joystick.Axis[0];
+										//	axisDetails = joystick.Axis[0];
 
-                //axisDetails.value = CalculateOffset((float)joyPositions[0], axisDetails.min, axisDetails.max);
+										//axisDetails.value = CalculateOffset((float)joyPositions[0], axisDetails.min, axisDetails.max);
 
-                //axisDetails = joystick.Axis[1];
+										//axisDetails = joystick.Axis[1];
 
-                //axisDetails.value = CalculateOffset((float)joyPositions[1], axisDetails.min, axisDetails.max);
+										//axisDetails.value = CalculateOffset((float)joyPositions[1], axisDetails.min, axisDetails.max);
 
-				float value;
+										float value;
 
-                while (axisIndex < numAxis)
-                {
-                    axisDetails = device.Axis[axisIndex];
-                    if (axisDetails != null){
+										while (axisIndex < numAxis) {
+												axisDetails = device.Axis [axisIndex];
+												if (axisDetails != null) {
 
-						value=BitConverter.ToInt32(report.Data,axisIndex*4+6);
+														value = BitConverter.ToInt32 (report.Data, axisIndex * 4 + 6);
 
-                        if (axisDetails.isTrigger)
-                            axisDetails.value = NormalizeTrigger(value, axisDetails.min, axisDetails.max);
-                        else
-                            axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max);
-					}
+														if (axisDetails.isTrigger)
+																axisDetails.value = NormalizeTrigger (value, axisDetails.min, axisDetails.max);
+														else
+																axisDetails.value = NormalizeAxis (value, axisDetails.min, axisDetails.max);
+												}
 
-                    axisIndex++;
-                }
-
-
-                //UnityEngine.Debug.Log("YPos: "+info.YPos+"Joy:"+joystick.ID+" vle"+joystick.Axis[JoystickAxis.AxisY].value);
-
-                //set Point of View(Hat) if exist
-                if ((device.numPOV) > 0)
-                {
-
-                    int x = 0;
-                    int y = 0;
+												axisIndex++;
+										}
 
 
-                    //	UnityEngine.Debug.Log("Pov is"+povPos);
-					JoystickPovPosition povPos=(JoystickPovPosition)BitConverter.ToUInt16(report.Data,4);
+										//UnityEngine.Debug.Log("YPos: "+info.YPos+"Joy:"+joystick.ID+" vle"+joystick.Axis[JoystickAxis.AxisY].value);
 
-                    if (povPos != JoystickPovPosition.Centered)
-                    {
-                        if (povPos > JoystickPovPosition.Left || povPos < JoystickPovPosition.Right)
-                        { y = 1; }
-                        if ((povPos > 0) && (povPos < JoystickPovPosition.Backward))
-                        { x = 1; }
-                        if ((povPos > JoystickPovPosition.Right) && (povPos < JoystickPovPosition.Left))
-                        { y = -1; }
-                        if (povPos > JoystickPovPosition.Backward)
-                        { x = -1; }
-                    }
+										//set Point of View(Hat) if exist
+										if ((device.numPOV) > 0) {
 
-                    //UnityEngine.Debug.Log(x+" "+y);
+												int x = 0;
+												int y = 0;
 
 
-                    device.Axis[JoystickAxis.AxisPovX].value = x;
-                    device.Axis[JoystickAxis.AxisPovY].value = y;
+												ushort povPos = BitConverter.ToUInt16 (report.Data, 4);
+					
+												if (povPos != 0xFFFF) {
+														if (povPos > 27000 || povPos < 9000) {
+																y = 1;
+														}
+														if ((povPos > 0) && (povPos < 18000)) {
+																x = 1;
+														}
+														if ((povPos > 9000) && (povPos < 27000)) {
+																y = -1;
+														}
+														if (povPos > 18000) {
+																x = -1;
+														}
+												}
+
+												//	UnityEngine.Debug.Log("Pov is"+povPos);
+//					JoystickPovPosition povPos=(JoystickPovPosition)BitConverter.ToUInt16(report.Data,4);
+//
+//                    if (povPos != JoystickPovPosition.Centered)
+//                    {
+//                        if (povPos > JoystickPovPosition.Left || povPos < JoystickPovPosition.Right)
+//                        { y = 1; }
+//                        if ((povPos > 0) && (povPos < JoystickPovPosition.Backward))
+//                        { x = 1; }
+//                        if ((povPos > JoystickPovPosition.Right) && (povPos < JoystickPovPosition.Left))
+//                        { y = -1; }
+//                        if (povPos > JoystickPovPosition.Backward)
+//                        { x = -1; }
+//                    }
+
+												//UnityEngine.Debug.Log(x+" "+y);
+
+
+												device.Axis [JoystickAxis.AxisPovX].value = x;
+												device.Axis [JoystickAxis.AxisPovY].value = y;
 
 
 
-                }
+										}
 
 
 
 
 
-            }
+								}
+						}
           
         }
 
@@ -221,6 +237,7 @@ namespace ws.winx.platform.windows
                         axisDetails.max = caps.XMax;
                         axisDetails.min = caps.XMin;
                         joystick.Axis[axis] = axisDetails;
+						if(axisDetails.min==0) axisDetails.isTrigger=true;
                         axis++;
                     }
                     if (axis < num_axes)
@@ -228,6 +245,7 @@ namespace ws.winx.platform.windows
                         axisDetails = new AxisDetails();
                         axisDetails.max = caps.YMax;
                         axisDetails.min = caps.YMin;
+						if(axisDetails.min==0) axisDetails.isTrigger=true;
                         joystick.Axis[axis] = axisDetails;
 
                        
@@ -241,6 +259,7 @@ namespace ws.winx.platform.windows
                         axisDetails = new AxisDetails();
                         axisDetails.max = caps.ZMax;
                         axisDetails.min = caps.ZMin;
+						if(axisDetails.min==0) axisDetails.isTrigger=true;
                         joystick.Axis[axis] = axisDetails;
                       
                         axis++;
@@ -251,6 +270,7 @@ namespace ws.winx.platform.windows
                         axisDetails = new AxisDetails();
                         axisDetails.min = caps.RMin;
                         axisDetails.max = caps.RMax;
+						if(axisDetails.min==0) axisDetails.isTrigger=true;
                         joystick.Axis[axis] = axisDetails;
                       
                         axis++;
@@ -261,6 +281,7 @@ namespace ws.winx.platform.windows
                         axisDetails = new AxisDetails();
                         axisDetails.min = caps.UMin;
                         axisDetails.max = caps.UMax;
+						if(axisDetails.min==0) axisDetails.isTrigger=true;
                         joystick.Axis[axis] = axisDetails;
                         axis++;
                     }
@@ -270,6 +291,7 @@ namespace ws.winx.platform.windows
                         axisDetails = new AxisDetails();
                         axisDetails.max = caps.VMax;
                         axisDetails.min = caps.VMin;
+						if(axisDetails.min==0) axisDetails.isTrigger=true;
                         joystick.Axis[axis] = axisDetails;
                         axis++;
                     }
@@ -641,7 +663,7 @@ namespace ws.winx.platform.windows
 						{
 							
 							//if previous value was >0 => PosToUp
-							if (_value>1)
+							if (_value>0)
 								_buttonState = ButtonState.PosToUp;
 							else
 								_buttonState = ButtonState.NegToUp;

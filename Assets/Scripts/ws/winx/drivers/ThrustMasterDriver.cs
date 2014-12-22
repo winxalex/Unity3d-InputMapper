@@ -15,9 +15,9 @@ namespace ws.winx.drivers
 	{
 
         private IHIDInterface __hidInterface;
-       
-     
-      
+
+		
+		
 
         public IDevice ResolveDevice(IHIDDevice hidDevice)
         {
@@ -60,9 +60,9 @@ namespace ws.winx.drivers
         public void Update(IDevice device)
         {
 
-            if (__hidInterface.Generics.ContainsKey(device.PID))
+            if (device!=null && __hidInterface!=null && __hidInterface.Contains(device.PID))
             {
-              
+               
               //  Debug.Log("Update Joy"+device.Index);
                 HIDReport data = __hidInterface.ReadBuffered(device.PID);
                 onRead(data);
@@ -603,7 +603,8 @@ namespace ws.winx.drivers
 				if (value == -1 || value==1)
 				{
 					if (_buttonState == ButtonState.None
-					    || _buttonState == ButtonState.Up)
+					     //|| _buttonState == ButtonState.PosToUp || _buttonState==ButtonState.NegToUp)
+					    )
 					{
 						
 						_buttonState = ButtonState.Down;
@@ -626,7 +627,7 @@ namespace ws.winx.drivers
 					{
 						
 						//if previous value was >0 => PosToUp
-						if (_value>1)
+						if (_value>0)
 							_buttonState = ButtonState.PosToUp;
 						else
 							_buttonState = ButtonState.NegToUp;

@@ -52,15 +52,16 @@ namespace ws.winx.platform.osx
 		readonly IntPtr InputLoopMode = Native.RunLoopModeDefault;
         readonly Native.CFArray DeviceTypes;
 
-        Native.IOHIDDeviceCallback HandleDeviceAdded;
-        Native.IOHIDDeviceCallback HandleDeviceRemoved;
+        Native.IOHIDDeviceCallback HandleHIDDeviceAdded;
+        Native.IOHIDDeviceCallback HandleHIDDeviceRemoved;
+		Native.IOHIDCallback HandleDeviceRemoved;
      
 
         bool disposed;
 		bool hidCallbacksRegistered;
 
-
-        private List<IDriver> __drivers = new List<IDriver>();
+		private static readonly object syncRoot = new object();
+		private List<IDriver> __drivers;
 
 
 
@@ -79,7 +80,81 @@ namespace ws.winx.platform.osx
 
         #endregion
 
+
+		
+		
+		#region Contsructor
+		
+		public OSXHIDInterface()
+		{
+			__drivers = new List<IDriver>();
+			
+			
+			HandleHIDDeviceAdded = HidDeviceAdded;
+			HandleHIDDeviceRemoved = HidDeviceRemoved;
+			HandleDeviceRemoved = DeviceRemoved;
+			
+			CFDictionaryRef[] dictionaries;
+			
+			
+			
+			
+			
+			
+			dictionaries = new CFDictionaryRef[3];
+			
+			//create 3 search patterns by Joystick,GamePad and MulitAxisController
+			
+			// base.typeRef = CFLibrary.CFDictionaryCreate(IntPtr.Zero,keyz,values,keys.Length,ref kcall,ref vcall); 
+			
+			
+			
+			
+			dictionaries[0] = CreateDeviceMatchingDictionary((uint)Native.HIDPage.GenericDesktop,(uint)Native.HIDUsageGD.Joystick);			
+			
+			dictionaries[1] = CreateDeviceMatchingDictionary((uint)Native.HIDPage.GenericDesktop,(uint)Native.HIDUsageGD.GamePad);
+			
+			dictionaries[2] = CreateDeviceMatchingDictionary((uint)Native.HIDPage.GenericDesktop,(uint)Native.HIDUsageGD.MultiAxisController);
+			
+			
+			
+			
+			
+			
+			DeviceTypes= new Native.CFArray (dictionaries);
+			
+			
+			//create Hid manager	
+			hidmanager = Native.IOHIDManagerCreate(IntPtr.Zero,(int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone);
+			
+			
+			
+			
+			
+			
+			
+		}
+		#endregion
+
 #region IHIDInterface implementation
+
+
+
+		public void AddDriver (IDriver driver)
+		{
+			__drivers.Add (driver);
+		}
+
+
+
+
+
+		public bool Contains (int pid)
+		{
+			return __Generics != null && __Generics.ContainsKey (pid);
+		}
+
+
 
 		public void Enumerate(){
 
@@ -187,58 +262,6 @@ namespace ws.winx.platform.osx
 
 
 
-#region Contsructor
-
-        public OSXHIDInterface(List<IDriver> drivers)
-        {
-            __drivers = drivers;
-
-
-            HandleDeviceAdded = DeviceAdded;
-            HandleDeviceRemoved = DeviceRemoved;
-          
-            CFDictionaryRef[] dictionaries;
-           
-
-
-		
-
-            
-            dictionaries = new CFDictionaryRef[3];
-
-            //create 3 search patterns by Joystick,GamePad and MulitAxisController
-
-			// base.typeRef = CFLibrary.CFDictionaryCreate(IntPtr.Zero,keyz,values,keys.Length,ref kcall,ref vcall); 
-
-		
-
-
-			dictionaries[0] = CreateDeviceMatchingDictionary((uint)Native.HIDPage.GenericDesktop,(uint)Native.HIDUsageGD.Joystick);			
-			
-			dictionaries[1] = CreateDeviceMatchingDictionary((uint)Native.HIDPage.GenericDesktop,(uint)Native.HIDUsageGD.GamePad);
-
-			dictionaries[2] = CreateDeviceMatchingDictionary((uint)Native.HIDPage.GenericDesktop,(uint)Native.HIDUsageGD.MultiAxisController);
-
-
-
-
-
-			
-			DeviceTypes= new Native.CFArray (dictionaries);
-
-
-            //create Hid manager	
-            hidmanager = Native.IOHIDManagerCreate(IntPtr.Zero,(int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone);
-
-
-
-
-
-
-
-        }
-#endregion
-
 
 
 
@@ -251,8 +274,8 @@ namespace ws.winx.platform.osx
 				IntPtr usageCFNumberRef = (new Native.CFNumber ((int)inUsage)).typeRef;
 				CFStringRef[] keys;
 				keys = new IntPtr[2];
-				keys [0] = Native.CFSTR (Native.IOHIDDeviceUsagePageKey);//new Native.CFString(Native.IOHIDDeviceUsagePageKey);
-				keys [1] = Native.CFSTR (Native.IOHIDDeviceUsageKey);//new Native.CFString(Native.IOHIDDeviceUsageKey);
+				keys [0] = Native.CFSTR (Native.kIOHIDDeviceUsagePageKey);//new Native.CFString(Native.IOHIDDeviceUsagePageKey);
+				keys [1] = Native.CFSTR (Native.kIOHIDDeviceUsageKey);//new Native.CFString(Native.IOHIDDeviceUsageKey);
 
 				Native.CFDictionary dict = new Native.CFDictionary (keys, new IntPtr[] { 
 				pageCFNumberRef,usageCFNumberRef});
@@ -269,9 +292,9 @@ namespace ws.winx.platform.osx
 				UnityEngine.Debug.Log("OSXHIDInterface> RegisterHIDCallbacks");
 
 				Native.IOHIDManagerRegisterDeviceMatchingCallback(
-                hidmanager, HandleDeviceAdded, IntPtr.Zero);
+                hidmanager, HandleHIDDeviceAdded, IntPtr.Zero);
             Native.IOHIDManagerRegisterDeviceRemovalCallback(
-                hidmanager, HandleDeviceRemoved, IntPtr.Zero);
+                hidmanager, HandleHIDDeviceRemoved, IntPtr.Zero);
             Native.IOHIDManagerScheduleWithRunLoop(hidmanager,RunLoop, InputLoopMode);
 
             //Native.IOHIDManagerSetDeviceMatching(hidmanager, DeviceTypes.Ref);
@@ -308,20 +331,27 @@ namespace ws.winx.platform.osx
         /// <param name="res">Res.</param>
         /// <param name="sender">Sender.</param>
         /// <param name="device">Device.</param>
-        void DeviceAdded(IntPtr context, IOReturn res, IntPtr sender, IOHIDDeviceRef device)
+        void HidDeviceAdded(IntPtr context, IOReturn res, IntPtr sender, IOHIDDeviceRef deviceRef)
         {
 			//IOReturn success = Native.IOHIDDeviceOpen (device, (int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone);
 
-				int product_id = (int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(device, Native.CFSTR(Native.IOHIDProductIDKey)))).ToInteger();
+			if (deviceRef == IntPtr.Zero) {
+				Debug.LogWarning("IOHIDeviceRef of Added Device equal to IntPtr.Zero");
+				return;
+			}
+
+
+				int product_id = (int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.kIOHIDProductIDKey)))).ToInteger();
 
 				if(Generics.ContainsKey(product_id)) return;
 
-				int vendor_id =(int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(device, Native.CFSTR(Native.IOHIDVendorIDKey)))).ToInteger();
+				int vendor_id =(int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.kIOHIDVendorIDKey)))).ToInteger();
 
-				string description = (new Native.CFString(Native.IOHIDDeviceGetProperty(device, Native.CFSTR(Native.IOHIDProductKey)))).ToString();
+				string manufacturer=(new Native.CFString(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.kIOHIDManufacturerKey)))).ToString();
+				string description =manufacturer+" "+(new Native.CFString(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.kIOHIDProductKey)))).ToString();
 
-				int location=(int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(device, Native.CFSTR(Native.IOHIDLocationIDKey)))).ToInteger();
-				string transport=(new Native.CFString(Native.IOHIDDeviceGetProperty(device, Native.CFSTR(Native.IOHIDTransportKey)))).ToString();
+				int location=(int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.kIOHIDLocationIDKey)))).ToInteger();
+				string transport=(new Native.CFString(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.kIOHIDTransportKey)))).ToString();
 
 				string path=String.Format("{0:s}_{1,4:X}_{2,4:X}_{3:X}",
 				                          transport, vendor_id, product_id, location);//"%s_%04hx_%04hx_%x"
@@ -333,23 +363,24 @@ namespace ws.winx.platform.osx
                // IDevice<IAxisDetails, IButtonDetails, IDeviceExtension> joyDevice = null;
 
 
-				///loop thru drivers and attach the driver to device if compatible
+				///loop thru specific drivers and attach the driver to device if compatible
 				if (__drivers != null)
 					foreach (var driver in __drivers)
                 {
 
-					hidDevice=new GenericHIDDevice(__Generics.Count,vendor_id, product_id, device, this,path,description);
+					hidDevice=new GenericHIDDevice(__Generics.Count,vendor_id, product_id, deviceRef, this,path,description);
 
                     if ((joyDevice = driver.ResolveDevice(hidDevice)) != null)
 					{
 
-						this.DeviceConnectEvent(this,new DeviceEventArgs<IDevice>(joyDevice));
+						
+						lock(syncRoot){
+							__Generics[hidDevice.PID] = hidDevice;
+						}
+					
+					Native.IOHIDDeviceRegisterRemovalCallback(deviceRef,HandleDeviceRemoved,context);
 
-						__Generics[hidDevice.PID] = hidDevice;
-
-
-
-						Debug.Log("Device PID:" + joyDevice.PID + " VID:" + joyDevice.VID + " attached to " + driver.GetType().ToString());
+					Debug.Log("Device PID:" + joyDevice.PID + " VID:" + joyDevice.VID +  "["+joyDevice.Name+"] attached to " + driver.GetType().ToString());
 
                         break;
                     }
@@ -358,36 +389,46 @@ namespace ws.winx.platform.osx
                 if (joyDevice == null)
                 {//set default driver as resolver if no custom driver match device
 
-					hidDevice=new GenericHIDDevice(__Generics.Count,vendor_id, product_id, device, this,path,description);
+					hidDevice=new GenericHIDDevice(__Generics.Count,vendor_id, product_id, deviceRef, this,path,description);
 
 
 					if ((joyDevice = defaultDriver.ResolveDevice(hidDevice)) != null)
                     {
                        
-						this.DeviceConnectEvent(this,new DeviceEventArgs<IDevice>(joyDevice));
+						lock(syncRoot){
 						__Generics[hidDevice.PID] = hidDevice;
+						}
 						
-						
+						Debug.Log("Device PID:" + joyDevice.PID + " VID:" + joyDevice.VID + "["+joyDevice.Name+"] attached to " + defaultDriver.GetType().ToString());
+
                        
                     }
-                        else
+                    else
 				    {
-                        Debug.LogWarning("Device PID:" + product_id.ToString() + " VID:" + product_id.ToString() + " not found compatible driver on the system.Removed!");
+                        Debug.LogWarning("Device PID:" + product_id.ToString() + " VID:" + vendor_id.ToString() + " not found compatible driver on the system.Removed!");
                     
                     }
 
 
-					Debug.Log("Device PID:" + joyDevice.PID + " VID:" + joyDevice.VID + " attached to " + defaultDriver.GetType().ToString());
-
+			
 
 
 
                 }
 
+			if(joyDevice!=null)
+			this.DeviceConnectEvent(this,new DeviceEventArgs<IDevice>(joyDevice));
+
 
 
             
         }
+
+
+		void DeviceRemoved(IntPtr inContext, IOReturn result, IntPtr sender)
+		{
+						RemoveDevice (sender);
+		}
 
 
         /// <summary>
@@ -397,35 +438,51 @@ namespace ws.winx.platform.osx
         /// <param name="res">Res.</param>
         /// <param name="sender">Sender.</param>
         /// <param name="device">Device.</param>
-        void DeviceRemoved(IntPtr context, IOReturn res, IntPtr sender, IOHIDDeviceRef deviceRef)
+        void HidDeviceRemoved(IntPtr context, IOReturn res, IntPtr sender, IOHIDDeviceRef deviceRef)
         {
            
-
-				int product_id = (int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.IOHIDProductIDKey)))).ToInteger();
-
-
-				if( !__Generics.ContainsKey(product_id)) return;
-
-				HIDDevice hidDevice = __Generics [product_id];
-				
-			
-
-				this.DeviceDisconnectEvent(this,new DeviceEventArgs<int>(product_id));
-
-				Generics.Remove(product_id);
-
-				 Native.IOHIDDeviceUnscheduleFromRunLoop(deviceRef, RunLoop, InputLoopMode);
-				Native.IOHIDDeviceRegisterInputValueCallback(deviceRef,IntPtr.Zero,IntPtr.Zero);
-
-				Native.IOHIDDeviceClose (deviceRef,(int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone);
-				
-				Debug.Log ("Device "+hidDevice.index+" PID:" + hidDevice.PID + " VID:" + hidDevice.VID + " Disconnected");
-
-
-
+			            
+						RemoveDevice (deviceRef);
 		    
           
         }
+
+
+		void RemoveDevice(IOHIDDeviceRef deviceRef){
+
+						if (deviceRef == IntPtr.Zero) {
+							Debug.LogWarning("IOHIDeviceRef equal to IntPtr.Zero");
+							return;
+						}
+						
+						int product_id = (int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.kIOHIDProductIDKey)))).ToInteger();
+						
+						lock (syncRoot) {
+						if (!__Generics.ContainsKey (product_id))
+								return;
+						
+						HIDDevice hidDevice = __Generics [product_id];
+		
+						
+						Generics.Remove (product_id);
+
+						Debug.Log ("Device "+hidDevice.index+" PID:" + hidDevice.PID + " VID:" + hidDevice.VID + " Disconnected");
+
+						}
+
+
+						Debug.Log ("Try to unshedule,unregister and close device");
+						Native.IOHIDDeviceUnscheduleFromRunLoop(deviceRef, RunLoop, InputLoopMode);
+						Native.IOHIDDeviceRegisterInputValueCallback(deviceRef,IntPtr.Zero,IntPtr.Zero);
+						Native.IOHIDDeviceRegisterRemovalCallback (deviceRef, null, IntPtr.Zero);
+						
+						Native.IOHIDDeviceClose (deviceRef,(int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone);
+						
+						
+
+						this.DeviceDisconnectEvent(this,new DeviceEventArgs<int>(product_id));
+
+		}
 
 
 #endregion
@@ -452,11 +509,16 @@ namespace ws.winx.platform.osx
 //				if(RunLoop!=IntPtr.Zero && InputLoopMode!=IntPtr.Zero)
 //				Native.IOHIDDeviceUnscheduleWithRunLoop(hidmanager,
 //				                                        RunLoop, InputLoopMode);
+
+
+				Debug.Log ("Try to remove OSXHIDInterface registers");
+
 				Native.IOHIDManagerRegisterDeviceMatchingCallback(
 					hidmanager, IntPtr.Zero, IntPtr.Zero);
 				Native.IOHIDManagerRegisterDeviceRemovalCallback(
 					hidmanager, IntPtr.Zero, IntPtr.Zero);
 
+				Debug.Log ("Try to release HIDManager");
 				Native.CFRelease(hidmanager);
 			}
 
@@ -472,11 +534,12 @@ namespace ws.winx.platform.osx
 						}
 
 
+			Debug.Log ("Try to remove Drivers");
+			if(__drivers!=null) __drivers.Clear();
 
 
 
-
-				        if(__drivers!=null) __drivers.Clear();
+				      
         }
     }
 }

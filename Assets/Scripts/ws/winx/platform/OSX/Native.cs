@@ -67,19 +67,19 @@ namespace ws.winx.platform.osx
 		const string coreFoundationLibrary = "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation";
 
 
-		public static readonly String IOHIDLocationIDKey="LocationID";
-		public static readonly String IOHIDTransportKey="Transport";
-		public static readonly String IOHIDVendorIDKey = "VendorID";
-		public static readonly String IOHIDVendorIDSourceKey = "VendorIDSource";
-		public static readonly String IOHIDProductIDKey = "ProductID";
-		public static readonly String IOHIDVersionNumberKey = "VersionNumber";
-		public static readonly String IOHIDManufacturerKey = "Manufacturer";
-		public static readonly String IOHIDProductKey = "Product";
-		public static readonly String IOHIDDeviceUsageKey = "DeviceUsage";
-		public static readonly String IOHIDDeviceUsagePageKey = "DeviceUsagePage";
-		public static readonly String IOHIDDeviceUsagePairsKey = "DeviceUsagePairs";
-		public static readonly String IOHIDMaxInputReportSizeKey= "MaxInputReportSize";
-		public static readonly String IOHIDDeviceKey ="IOHIDDevice";
+		public static readonly String kIOHIDLocationIDKey="LocationID";
+		public static readonly String kIOHIDTransportKey="Transport";
+		public static readonly String kIOHIDVendorIDKey = "VendorID";
+		public static readonly String kIOHIDVendorIDSourceKey = "VendorIDSource";
+		public static readonly String kIOHIDProductIDKey = "ProductID";
+		public static readonly String kIOHIDVersionNumberKey = "VersionNumber";
+		public static readonly String kIOHIDManufacturerKey = "Manufacturer";
+		public static readonly String kIOHIDProductKey = "Product";
+		public static readonly String kIOHIDDeviceUsageKey = "DeviceUsage";
+		public static readonly String kIOHIDDeviceUsagePageKey = "DeviceUsagePage";
+		public static readonly String kIOHIDDeviceUsagePairsKey = "DeviceUsagePairs";
+		public static readonly String kIOHIDMaxInputReportSizeKey= "MaxInputReportSize";
+		public static readonly String kIOHIDDeviceKey ="IOHIDDevice";
 
 
 		public static readonly IntPtr kIOCFPlugInInterfaceID=Native.CFUUIDGetConstantUUIDWithBytes(IntPtr.Zero,	
@@ -372,6 +372,12 @@ namespace ws.winx.platform.osx
 			IOHIDManagerRef inIOHIDManagerRef,
 			IOHIDDeviceCallback inIOHIDDeviceCallback,
 			IntPtr inContext);
+
+		[DllImport(hid)]
+		public static extern void IOHIDDeviceRegisterRemovalCallback(
+		  IOHIDDeviceRef device,
+			IOHIDCallback callback,
+			IntPtr context);
 		
 		[DllImport(hid)]
 		public static extern void IOHIDManagerRegisterDeviceRemovalCallback(
@@ -552,7 +558,7 @@ namespace ws.winx.platform.osx
 								// matchingDict is consumed below( in IOServiceGetMatchingService )
 								// so we have no leak here.
 								//CFMutableDictionaryRef matchingDict = IOServiceMatching(kIOHIDDeviceKey);
-				byte[] utf8Bytes = Encoding.UTF8.GetBytes(Native.IOHIDDeviceKey);
+				byte[] utf8Bytes = Encoding.UTF8.GetBytes(Native.kIOHIDDeviceKey);
 				//char[] charArr=Native.IOHIDDeviceKey.ToCharArray(
 				IntPtr bufferIntPtr = Marshal.AllocHGlobal(utf8Bytes.Length);
 				Marshal.Copy(utf8Bytes, 0, bufferIntPtr, utf8Bytes.Length);
@@ -560,7 +566,7 @@ namespace ws.winx.platform.osx
 
 
 				IntPtr matchingDictRef = Native.IOServiceMatching (bufferIntPtr);
-								matchingDictRef = Native.IOServiceMatching (Native.CFSTR(Native.IOHIDDeviceKey));
+								matchingDictRef = Native.IOServiceMatching (Native.CFSTR(Native.kIOHIDDeviceKey));
 				Marshal.FreeHGlobal(bufferIntPtr);
 								
 				                
@@ -573,11 +579,11 @@ namespace ws.winx.platform.osx
 										// IOHIDDevices, so we will only look for a device attached to that particular port
 										// on the machine.
 
-										IntPtr tCFTypeRef = Native.IOHIDDeviceGetProperty (inIOHIDDeviceRef, Native.CFSTR (Native.IOHIDLocationIDKey));
+										IntPtr tCFTypeRef = Native.IOHIDDeviceGetProperty (inIOHIDDeviceRef, Native.CFSTR (Native.kIOHIDLocationIDKey));
 
 										if (tCFTypeRef != IntPtr.Zero) {
 
-												dict[Native.IOHIDLocationIDKey]=tCFTypeRef;
+												dict[Native.kIOHIDLocationIDKey]=tCFTypeRef;
 
 
 
@@ -629,6 +635,8 @@ namespace ws.winx.platform.osx
 
 		public delegate void IOHIDDeviceCallback(IntPtr ctx, IOReturn res, IntPtr sender, IOHIDDeviceRef device);
 		public delegate void IOHIDValueCallback(IntPtr ctx, IOReturn res, IntPtr sender, IOHIDValueRef val);
+		public delegate void IOHIDCallback(IntPtr inContext,IOReturn inResult,IntPtr sender);
+
 
 
 		internal enum IOHIDReportType{
