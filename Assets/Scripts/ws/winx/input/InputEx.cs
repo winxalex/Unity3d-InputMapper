@@ -678,7 +678,7 @@ namespace ws.winx.input
 
 										//If 
 										if ((_code = device.GetInputCode ()) != 0) {
-												Debug.Log ("Get Input Joy" + device.Index + " " + InputCode.toEnumString (_code) + "frame:" + Time.frameCount);
+												Debug.Log ("Get Input Joy" + device.Index + " " + InputCode.toEnumString (_code) + " frame: " + Time.frameCount);
 												return processInput (_code, time);
 										}
 								}

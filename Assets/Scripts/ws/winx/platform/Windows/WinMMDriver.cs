@@ -123,6 +123,10 @@ namespace ws.winx.platform.windows
 
 
 												ushort povPos = BitConverter.ToUInt16 (report.Data, 4);
+
+
+                                            //TODO driver returns also half values 4500,12500...
+                                                UnityEngine.Debug.Log(povPos);
 					
 												if (povPos != 0xFFFF) {
 														if (povPos > 27000 || povPos < 9000) {
@@ -154,7 +158,7 @@ namespace ws.winx.platform.windows
 //                        { x = -1; }
 //                    }
 
-												//UnityEngine.Debug.Log(x+" "+y);
+												UnityEngine.Debug.Log(x+" "+y);
 
 
 												device.Axis [JoystickAxis.AxisPovX].value = x;

@@ -619,7 +619,7 @@ namespace ws.winx.devices
 
 		public enum Joysticks
 		{
-				//Joystick=-1,
+				
 				Joystick0=0,
 				Joystick1,
 				Joystick2,
@@ -635,7 +635,7 @@ namespace ws.winx.devices
 				Joystick12,
 				Joystick13,
 				Joystick14,
-				Joystick15,
+				//Joystick15,
 				Joystick
 		}
 

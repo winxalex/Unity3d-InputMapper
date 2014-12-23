@@ -35,6 +35,9 @@ namespace ws.winx.editor
 				protected TextAsset _lastSettingsXML;
 				protected int _selectedStateHash = 0;
 				protected int _deleteStateWithHash = 0;
+              
+                protected bool _isDeviceAny;
+                private bool _isDeviceAxisPositionFull;
 				protected string _warrningAddStateLabel;
 				protected int _isPrimary = 0;
 				protected string _currentInputString;
@@ -85,6 +88,7 @@ namespace ws.winx.editor
 				public int maxCombosNum = 3;
 				public TextAsset settingsXML;
 				public AnimatorController controller;
+              
 	    
 				void Awake ()
 				{
@@ -506,6 +510,18 @@ namespace ws.winx.editor
 
 										} else {
 
+                                            if (_isDeviceAny)
+                                            {
+                                                _action.code = InputCode.toCodeAnyDevice(_action.code);
+                                                _action.type = InputActionType.SINGLE;
+                                            }
+
+                                            if (_isDeviceAxisPositionFull)
+                                            {
+                                                _action.code = InputCode.toCodeAxisFull(_action.code);
+                                                _action.type = InputActionType.SINGLE;
+                                            }
+
 												toInputCombination (_stateInputCombinations [_selectedStateHash].combinations [_isPrimary], _action);
 										}
 
@@ -607,6 +623,14 @@ namespace ws.winx.editor
 								InputManager.Settings.longClickSensitivity = _longClickSensitivity = EditorGUILayout.FloatField ("Long click sensitivity", _longClickSensitivity, _settingsStyle);
 								InputManager.Settings.combinationsClickSensitivity = _combosClickSensitivity = EditorGUILayout.FloatField ("Combos click sensitivity", _combosClickSensitivity, _settingsStyle);
 								EditorGUILayout.Separator ();
+
+                                //////////  ANY/FULL AXIS Checkers ///////
+                                EditorGUILayout.BeginHorizontal();
+                                _isDeviceAny = GUILayout.Toggle(_isDeviceAny, "Any");
+                                _isDeviceAxisPositionFull = GUILayout.Toggle(_isDeviceAxisPositionFull, "Full Axis");
+                                EditorGUILayout.EndHorizontal();
+
+                                EditorGUILayout.Separator();
 
 						}
 				
@@ -895,6 +919,9 @@ namespace ws.winx.editor
 												_isPrimary = 1;
 												EditorGUIUtility.keyboardControl = 0;
 										}
+
+
+                                  
 				
 										//DELETE
 										if (GUILayout.Button ("-", _addRemoveButtonStyle)) {
@@ -950,6 +977,8 @@ namespace ws.winx.editor
 
 
 								GUILayout.Label (currentCombinationString);//, _inputLabelStyle);
+
+
 			
 								this.Repaint ();
 						}

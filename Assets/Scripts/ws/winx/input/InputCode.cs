@@ -52,7 +52,9 @@ namespace ws.winx.input
 				public static int CODE_AXIS_MASK = 0x1E0;
 				public static int CODE_AXIS_SHIFT = 4;
 				public static int CODE_DATA_MASK = 0x1F;
+               
 				public static int CODE_ID_SHIFT = CODE_DATA_SHIFT + CODE_AXIS_SHIFT;//Default 9;
+                public static int CODE_ID_MASK = 0x1F << CODE_ID_SHIFT;
 				public readonly static int MAX_KEY_CODE = (int)KeyCode.Joystick4Button19 + 1;
 
 		public static InputAction JoystickAxisX { get { return InputActionFactory.Instance.CreateSimpleAction (Joysticks.Joystick, JoystickAxis.AxisX, JoystickPosition.FULL); } }
@@ -1076,7 +1078,77 @@ namespace ws.winx.input
 				}
 
 
+                /// <summary>
+                /// Convert code.
+                /// <example>
+                /// int code=InputCode.toCodeAnyDevice(Joystick3AxisYPositive.DOUBLE.code);
+                /// //returns code of JoystickAxisYPositive (ord num 3 is removed)
+                /// </example>
+                /// </summary>
+                /// <param name="code"></param>
+                /// <returns></returns>
+                public static int toCodeAnyDevice(int code)
+                {
+                    //if it is key or button just return same code
+                    if (code < InputCode.MAX_KEY_CODE) return code;
 
+                    JoystickAxis axis=InputCode.toAxis(code);
+                    if (axis == JoystickAxis.None || axis == JoystickAxis.AxisPovX || axis == JoystickAxis.AxisPovX) return code;
+
+                        
+                       
+
+
+                    code -= InputCode.MAX_KEY_CODE;
+
+                    //preserv axis and data
+                    int mask=CODE_AXIS_MASK | CODE_DATA_MASK;
+
+                     //preserv axis and data
+                    code=code & mask;
+
+
+
+                    return InputCode.MAX_KEY_CODE+(code | ((int)Joysticks.Joystick << CODE_ID_SHIFT));
+
+                }
+
+
+
+
+
+                /// <summary>
+                /// Convert Axis positive or negative position to full position
+                /// </summary>
+                /// <example>
+                /// int code=InputCode.toCodeFullPosition(Joystick3AxisYPositive.DOUBLE.code);
+                /// //returns code of Joystick3AxisYFULL 
+                /// </example>
+                /// <param name="code"></param>
+                /// <returns></returns>
+                public static int toCodeAxisFull(int code)
+                {
+                    //if it is key or button just return same code
+                    if (code < InputCode.MAX_KEY_CODE) return code;
+
+                    JoystickAxis axis = InputCode.toAxis(code);
+                    if (axis == JoystickAxis.None || axis == JoystickAxis.AxisPovX || axis == JoystickAxis.AxisPovX) return code;
+
+
+                    code -= InputCode.MAX_KEY_CODE;
+
+                    int mask = CODE_ID_MASK | CODE_AXIS_MASK;
+                   
+                    //preserve Joystick ord num and axis
+                    code = code & mask;
+
+                    //inject new full axis
+
+                    return InputCode.MAX_KEY_CODE+(code |   (int)JoystickPosition.FULL);
+
+
+
+                }
 		                          
 		}
 }
