@@ -118,47 +118,23 @@ namespace ws.winx.platform.windows
 										//set Point of View(Hat) if exist
 										if ((device.numPOV) > 0) {
 
-												int x = 0;
-												int y = 0;
+												float x = 0;
+												float y = 0;
 
 
 												ushort povPos = BitConverter.ToUInt16 (report.Data, 4);
 
+                                                if (povPos != 0xFFFF)
+                                                {
+                                                    
+                                                        hatValueToXY(povPos / 4500, 8, out x, out y);
 
-                                            //TODO driver returns also half values 4500,12500...
-                                                UnityEngine.Debug.Log(povPos);
-					
-												if (povPos != 0xFFFF) {
-														if (povPos > 27000 || povPos < 9000) {
-																y = 1;
-														}
-														if ((povPos > 0) && (povPos < 18000)) {
-																x = 1;
-														}
-														if ((povPos > 9000) && (povPos < 27000)) {
-																y = -1;
-														}
-														if (povPos > 18000) {
-																x = -1;
-														}
-												}
 
-												//	UnityEngine.Debug.Log("Pov is"+povPos);
-//					JoystickPovPosition povPos=(JoystickPovPosition)BitConverter.ToUInt16(report.Data,4);
-//
-//                    if (povPos != JoystickPovPosition.Centered)
-//                    {
-//                        if (povPos > JoystickPovPosition.Left || povPos < JoystickPovPosition.Right)
-//                        { y = 1; }
-//                        if ((povPos > 0) && (povPos < JoystickPovPosition.Backward))
-//                        { x = 1; }
-//                        if ((povPos > JoystickPovPosition.Right) && (povPos < JoystickPovPosition.Left))
-//                        { y = -1; }
-//                        if (povPos > JoystickPovPosition.Backward)
-//                        { x = -1; }
-//                    }
 
-												UnityEngine.Debug.Log(x+" "+y);
+                                                }
+                             
+
+												//UnityEngine.Debug.Log("povPos:"+povPos+":"+x+" "+y);
 
 
 												device.Axis [JoystickAxis.AxisPovX].value = x;
@@ -179,7 +155,48 @@ namespace ws.winx.platform.windows
 
 
 
+        //				  7    0     1            
+        //				   \   |   /
+        //				6 _____|______2
+        // 					  /|\
+        //					/  |  \
+        //				   5   4    3
 
+        /// <summary>
+        /// Hats the value to X.
+        /// </summary>
+        /// <param name="value">Value.</param>
+        /// <param name="range">Range.</param>
+        /// <param name="outX">Out x.</param>
+        /// <param name="outY">Out y.</param>
+        void hatValueToXY(int value, int range, out float outX, out float outY)
+        {
+
+            outX = outY = 0f;
+            int rangeHalf = range >> 1;
+            int rangeQuat = range >> 2;
+
+            if (value > 0 && value < rangeHalf)
+            {
+                outX = 1f;
+
+            }
+            else if (value > rangeHalf)
+            {
+                outX = -1f;
+            }
+
+            if (value > rangeQuat * 3 || value < rangeQuat)
+            {
+                outY = 1f;
+
+            }
+            else if (value > rangeQuat && value < rangeQuat * 3)
+            {
+                outY = -1f;
+            }
+
+        }
 
 
 
