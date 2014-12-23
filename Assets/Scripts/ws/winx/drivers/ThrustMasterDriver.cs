@@ -65,6 +65,8 @@ namespace ws.winx.drivers
                
               //  Debug.Log("Update Joy"+device.Index);
                 HIDReport data = __hidInterface.ReadBuffered(device.PID);
+
+                if(data!=null)
                 onRead(data);
                 
             }

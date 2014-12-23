@@ -119,11 +119,13 @@ namespace ws.winx.drivers
 		 {
 
 
-            if (device!=null && _hidInterface!=null && _hidInterface.Generics!=null && _hidInterface.Generics.ContainsKey(device.PID))
+            if (device!=null && _hidInterface!=null && _hidInterface.Contains(device.PID))
             {
 
                 //  Debug.Log("Update Joy"+device.Index);
                 HIDReport data = _hidInterface.ReadBuffered(device.PID);
+
+                if(data!=null)
                 onRead(data);
 
             }
@@ -373,7 +375,7 @@ namespace ws.winx.drivers
             axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max, 0.1f);
           //  UnityEngine.Debug.Log("valueX=" + axisDetails.value);
 
-            value = axisDetails.max-(buff[3] | (buff[4] << 8));
+            value = (buff[3] | (buff[4] << 8));
          //   UnityEngine.Debug.Log("valueY=" + value);
             axisDetails = device.Axis[JoystickAxis.AxisY];
             axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max, 0.1f);
@@ -385,7 +387,7 @@ namespace ws.winx.drivers
             axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max, 0.1f);
           //  UnityEngine.Debug.Log("valueZ=" + axisDetails.value);
 
-            value = axisDetails.max-(buff[7] | (buff[8] << 8));
+            value = (buff[7] | (buff[8] << 8));
             axisDetails = device.Axis[JoystickAxis.AxisR];
             axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max,0.1f);
          //   UnityEngine.Debug.Log("valueR=" + axisDetails.value);

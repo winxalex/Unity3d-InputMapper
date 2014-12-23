@@ -126,6 +126,7 @@ namespace ws.winx.drivers
 
                     HIDReport report = _hidInterface.ReadBuffered(wDevice.PID);
 
+                    if(report!=null && (report.Status==HIDReport.ReadStatus.Success || report.Status==HIDReport.ReadStatus.Buffered))
                     ParseInputReport(report);
                 }
            

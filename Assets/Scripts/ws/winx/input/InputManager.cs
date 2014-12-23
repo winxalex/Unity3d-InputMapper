@@ -1269,6 +1269,10 @@ namespace ws.winx.input
                 __hidInterface = null;
             }
 
+            int error = Marshal.GetLastWin32Error();
+            if (error > 0)
+
+                UnityEngine.Debug.Log(" NotificationHandle Erorr" + error);
 
 
 			if (_devices != null) {
@@ -1282,6 +1286,11 @@ namespace ws.winx.input
 								InputManager.Settings.stateInputs.Clear ();
 			
 			Debug.Log ("Dispose Finished");
+
+          
+            if (error > 0)
+
+                UnityEngine.Debug.Log(" NotificationHandle Erorr" + error);
         }
 
 

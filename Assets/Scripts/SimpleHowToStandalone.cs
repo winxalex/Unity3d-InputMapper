@@ -47,7 +47,7 @@ namespace ws.winx
 //			#if (UNITY_STANDALONE_WIN)
             //			InputManager.AddDriver(new ThrustMasterDriver());
             //			InputManager.AddDriver(new WiiDriver());
-            //			InputManager.AddDriver(new XInputDriver());
+            			InputManager.AddDriver(new XInputDriver());
 			//change default driver
 			//InputManager.hidInterface.defaultDriver=new UnityDriver();
 
@@ -233,8 +233,8 @@ namespace ws.winx
 			//Debug.Log (analogVal2);
 			
 			
-			float analogVal2= InputManager.GetInput (Animator.StringToHash ("ManualAddedSTATE1"));
-			Debug.Log (analogVal2);
+//			float analogVal2= InputManager.GetInput (Animator.StringToHash ("ManualAddedSTATE1"));
+//			Debug.Log (analogVal2);
 			
 		}
 		

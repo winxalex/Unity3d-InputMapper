@@ -479,9 +479,14 @@ namespace ws.winx.editor
 				void Update ()
 				{
 						InputState state;
-						if (_selectedStateHash != 0) {
 
-								if(!Application.isPlaying && !__wereDevicesEnumerated){
+
+
+
+                        if (!Application.isPlaying && _selectedStateHash != 0)
+                        {
+
+								if(!__wereDevicesEnumerated){
 									InputManager.hidInterface.Enumerate();
 									__wereDevicesEnumerated=true;
 								}

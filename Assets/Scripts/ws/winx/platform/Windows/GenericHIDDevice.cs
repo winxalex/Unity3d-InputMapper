@@ -62,6 +62,7 @@ namespace ws.winx.platform.windows
 
 
         public bool IsOpen { get; private set; }
+        public bool IsConnected { get; private set; }
         volatile bool IsReadInProgress = false;
 
    
@@ -117,6 +118,8 @@ namespace ws.winx.platform.windows
                 var hidHandle = OpenDeviceIO(this.DevicePath,Native.ACCESS_NONE);
               
                 CloseDeviceIO(hidHandle);
+
+                IsConnected = true;
 
 				info = new Native.JoyInfoEx();
 				info.Size = Native.JoyInfoEx.SizeInBytes;
@@ -190,6 +193,8 @@ namespace ws.winx.platform.windows
 
         public override HIDReport ReadDefault()
 		{
+            if (!IsConnected) return null; 
+
 			//thru to get joystick info
 			Native.JoystickError result = Native.joyGetPosEx(ord, ref info);
 
@@ -233,6 +238,8 @@ namespace ws.winx.platform.windows
 		
 		override public void Read(ReadCallback callback)
 		{
+            if (!IsConnected) return;
+
 			Read(callback, 0);
 		}
 
@@ -240,6 +247,8 @@ namespace ws.winx.platform.windows
 
         override public HIDReport ReadBuffered()
         {
+            if (!IsConnected) return null;
+
             if (IsReadInProgress)
             {
                 __lastHIDReport.Status = HIDReport.ReadStatus.Buffered;
@@ -272,6 +281,9 @@ namespace ws.winx.platform.windows
 		
 		override public void Read(ReadCallback callback,int timeout)
 		{
+            if (!IsConnected) return;
+
+
 			if (IsReadInProgress)
 			{
 				//UnityEngine.Debug.Log("Clone paket");
@@ -297,7 +309,8 @@ namespace ws.winx.platform.windows
 		
 		protected HIDReport Read(int timeout)
 		{
-			
+            if (!IsConnected) return null;
+
 			if (IsOpen == false) OpenDevice();
 			try
 			{
@@ -314,6 +327,8 @@ namespace ws.winx.platform.windows
 
         public override void Write(object data, HIDDevice.WriteCallback callback,int timeout)
         {
+            if (!IsConnected) return;
+            if (IsOpen == false) OpenDevice();
 
             var writeDelegate = new WriteDelegate(Write);
             var asyncState = new HidAsyncState(writeDelegate, callback);
@@ -323,6 +338,8 @@ namespace ws.winx.platform.windows
 
         public override void Write(object data, HIDDevice.WriteCallback callback)
         {
+            if (!IsConnected) return;
+            if (IsOpen == false) OpenDevice();
             this.Write((byte[])data,callback, 0);
         }
 
@@ -333,6 +350,9 @@ namespace ws.winx.platform.windows
         /// <param name="timeout"></param>
         public override void Write(object data,int timeout)
         {
+            if (!IsConnected) return;
+            if (IsOpen == false) OpenDevice();
+
             this.WriteData((byte[])data, timeout);
         }
 
@@ -342,6 +362,7 @@ namespace ws.winx.platform.windows
         /// <param name="data"></param>
         public override void Write(object data)
         {
+            if (!IsConnected) return;
 			if (IsOpen == false) OpenDevice();
 
             this.WriteData((byte[])data,0);
@@ -352,8 +373,11 @@ namespace ws.winx.platform.windows
 
         protected bool Write(byte[] data, int timeout)
         {
-            
-                if (IsOpen == false) OpenDevice();
+
+            if (!IsConnected) return false;
+
+            if (IsOpen == false) OpenDevice();
+
                 try
                 {
                     return WriteData(data, timeout);
@@ -464,6 +488,7 @@ namespace ws.winx.platform.windows
 
             var buffer = CreateOutputBuffer();
             uint bytesWritten = 0;
+            int error = 0;
 
             Array.Copy(data, 0, buffer, 0, Math.Min(data.Length, OutputReportByteLength));
 
@@ -491,15 +516,13 @@ namespace ws.winx.platform.windows
                     success = Native.WriteFile(WriteAsyncHandle, buffer, (uint)buffer.Length, out bytesWritten, ref overlapped);
                     UnityEngine.Debug.Log("WriteFile happend " + success + " " + bytesWritten);
 
-                    if (Marshal.GetLastWin32Error() > 0)
-                    {
-                        UnityEngine.Debug.LogWarning("Error during Write Data"+Marshal.GetLastWin32Error());
-                    }
+                    error=Marshal.GetLastWin32Error();
+                  
               
                // UnityEngine.Debug.LogError(Marshal.GetLastWin32Error());
 
 
-                if (!success && Marshal.GetLastWin32Error() == Native.ERROR_IO_PENDING)
+                if (!success && error == Native.ERROR_IO_PENDING)
                 {
                     var result = Native.WaitForSingleObject(overlapped.EventHandle, overlapTimeout);
 
@@ -521,6 +544,12 @@ namespace ws.winx.platform.windows
                         default:
                             return false;
                     }
+                }
+
+                if (error > 0)
+                {
+                    UnityEngine.Debug.LogWarning("Error during Write Data " + error);
+                    //return false;
                 }
 
                 return success;
@@ -578,14 +607,11 @@ namespace ws.winx.platform.windows
                     {
                        success=Native.ReadFile(ReadAsyncHandle, buffer, (uint)buffer.Length, out bytesRead, ref overlapped);
 
-                       UnityEngine.Debug.Log("Read happend " + success + " " + bytesRead);
+                      // UnityEngine.Debug.Log("Read happend " + success + " " + bytesRead);
 
                         error=Marshal.GetLastWin32Error();
 
-                       if (error > 0)
-                       {
-                           UnityEngine.Debug.LogWarning("Error during Read Data" + error);
-                       }
+                       
 
 
 
@@ -626,7 +652,27 @@ namespace ws.winx.platform.windows
                        }
                        else
                        {
-                           status = HIDReport.ReadStatus.Success;
+                           if (error > 0)
+                           {
+
+
+
+                               if (error == 1167)
+                               {
+                                   IsConnected = false;
+                                   status = HIDReport.ReadStatus.NotConnected;
+                               }
+                               else
+                               {
+                                   status = HIDReport.ReadStatus.ReadError;
+                                   UnityEngine.Debug.LogWarning("Error during Read Data:" + error);
+                               }
+                                
+                           }
+                           else
+                           {
+                               status = HIDReport.ReadStatus.Success;
+                           }
                        }
 
                        
@@ -648,8 +694,18 @@ namespace ws.winx.platform.windows
 
                         if (error > 0)
                         {
-                            status = HIDReport.ReadStatus.ReadError;
-                            UnityEngine.Debug.LogWarning("Error during Read Data" + error);
+
+
+                            if (error == 1167)
+                            {
+                                IsConnected = false;
+                                status = HIDReport.ReadStatus.NotConnected;
+                            }
+                            else
+                            {
+                                status = HIDReport.ReadStatus.ReadError;
+                                UnityEngine.Debug.LogWarning("Error during Read Data_" + error);
+                            }
                         }
 
                        

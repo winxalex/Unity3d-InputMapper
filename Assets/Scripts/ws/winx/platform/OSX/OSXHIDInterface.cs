@@ -522,7 +522,7 @@ namespace ws.winx.platform.osx
 				Native.CFRelease(hidmanager);
 			}
 
-
+            lock(syncRoot){
 
 						if (Generics != null) {
 								foreach (KeyValuePair<int, HIDDevice> entry in Generics) {
@@ -536,7 +536,7 @@ namespace ws.winx.platform.osx
 
 			Debug.Log ("Try to remove Drivers");
 			if(__drivers!=null) __drivers.Clear();
-
+        }
 
 
 				      
