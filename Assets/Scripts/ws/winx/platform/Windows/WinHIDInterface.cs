@@ -136,7 +136,7 @@ namespace ws.winx.platform.windows
                 __defaultJoystickDriver = value;
                 if (value is ws.winx.drivers.UnityDriver)
                 {
-                    Debug.LogWarning("UnityDriver set as default driver.\n Warring:Unity doesn't make distinction between triggers/axis/pow and axes happen to be mapped on different Joysticks#, doesn't support plug&play and often return weired raw results");
+                    Debug.LogWarning("UnityDriver set as default driver.\n Warring:Unity doesn't make distinction between triggers/axis/poitOfView and axes happen to be mapped on different Joysticks#, often return weired raw results");
                 }
 
             }
@@ -736,7 +736,10 @@ namespace ws.winx.platform.windows
 
 
 
-                        Debug.Log("Device" + hidDevice.index + " PID:" + hidDevice.PID + " VID:" + hidDevice.VID + "[" + hidDevice.Name + "] attached to " + driver.GetType().ToString());
+                        Debug.Log("Device" + hidDevice.index + " PID:" + hidDevice.PID + " VID:" + hidDevice.VID + "[" + hidDevice.Name + "] attached to " + driver.GetType().ToString()
+                            
+                          // +hidDevice.DevicePath 
+                            );
 
                         break;
                     }

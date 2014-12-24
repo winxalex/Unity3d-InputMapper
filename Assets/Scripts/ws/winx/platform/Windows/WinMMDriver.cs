@@ -58,7 +58,7 @@ namespace ws.winx.platform.windows
             
 								//return;
 
-								if (report!=null && report.Status == HIDReport.ReadStatus.Success) {
+								if (report!=null && (report.Status == HIDReport.ReadStatus.Success || report.Status==HIDReport.ReadStatus.Buffered)) {
 
 										//while buttons
 										int buttonInx = 0;
@@ -134,7 +134,7 @@ namespace ws.winx.platform.windows
                                                 }
                              
 
-												//UnityEngine.Debug.Log("povPos:"+povPos+":"+x+" "+y);
+											//	UnityEngine.Debug.Log("povPos:"+povPos+":"+x+" "+y);
 
 
 												device.Axis [JoystickAxis.AxisPovX].value = x;
@@ -660,8 +660,8 @@ namespace ws.winx.platform.windows
 					
 					if (value == -1 || value==1)
 					{
-						if (_buttonState == ButtonState.None
-						    || _buttonState == ButtonState.Up)
+						if (_buttonState == ButtonState.None)
+						  //  || _buttonState == ButtonState.Up)
 						{
 							
 							_buttonState = ButtonState.Down;

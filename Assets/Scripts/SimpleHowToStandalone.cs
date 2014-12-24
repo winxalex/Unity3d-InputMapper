@@ -44,15 +44,15 @@ namespace ws.winx
 			
 			//supporting devices with custom drivers
 			//When you add them add specialized first then XInputDriver  then wide range supporting drivers UnityDriver
-//			#if (UNITY_STANDALONE_WIN)
-            //			InputManager.AddDriver(new ThrustMasterDriver());
+			#if (UNITY_STANDALONE_WIN)
+            			InputManager.AddDriver(new ThrustMasterDriver());
             //			InputManager.AddDriver(new WiiDriver());
             	//		InputManager.AddDriver(new XInputDriver());
 			//change default driver
-			//InputManager.hidInterface.defaultDriver=new UnityDriver();
+		InputManager.hidInterface.defaultDriver=new UnityDriver();
 
 //			
-//			#endif
+			#endif
 //			
 			#if (UNITY_STANDALONE_OSX)
            			InputManager.AddDriver(new ThrustMasterDriver());
@@ -164,8 +164,12 @@ namespace ws.winx
 		// Update is called once per frame
 		void Update()
 		{
-			
-			
+
+            string[] names = Input.GetJoystickNames();
+
+            Debug.Log("Num Joy :" + names.Length);
+
+            Debug.Log(String.Join(",", names));
 			
 			//Use is mapping states so no quering keys during gameplay
 			if (InputManager.EditMode || !_settingsLoaded) return;

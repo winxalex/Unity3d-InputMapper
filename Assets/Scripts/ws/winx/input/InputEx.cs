@@ -676,7 +676,8 @@ namespace ws.winx.input
 						{
 								foreach (IDevice device in devices) {
 
-										//If 
+                                    //test only
+									//	if(device.Index==3)
 										if ((_code = device.GetInputCode ()) != 0) {
 												Debug.Log ("Get Input Joy" + device.Index + " " + InputCode.toEnumString (_code) + " frame: " + Time.frameCount);
 												return processInput (_code, time);
