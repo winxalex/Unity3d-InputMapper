@@ -396,9 +396,22 @@ namespace ws.winx.drivers
 
         float _value;
         uint _uid;
+        string _name;
         ButtonState _buttonState;
 
         #region IDeviceDetails implementation
+
+        public string name
+        {
+            get
+            {
+                return _name;
+            }
+            set
+            {
+                _name = value;
+            }
+        }
 
 
         public uint uid
@@ -484,6 +497,9 @@ namespace ws.winx.drivers
 
 
 
+
+
+       
     }
 
     #endregion
@@ -497,6 +513,7 @@ namespace ws.winx.drivers
         int _uid;
         int _min;
         int _max;
+        string _name;
         ButtonState _buttonState = ButtonState.None;
         bool _isNullable;
         bool _isHat;
@@ -591,6 +608,18 @@ namespace ws.winx.drivers
 
         #endregion
 
+        public string name
+        {
+            get
+            {
+                return _name;
+            }
+            set
+            {
+                _name = value;
+            }
+        }
+
         public ButtonState buttonState
         {
             get { return _buttonState; }
@@ -656,6 +685,9 @@ namespace ws.winx.drivers
 
         #endregion
 
+
+
+     
     }
 
     #endregion

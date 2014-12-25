@@ -33,7 +33,7 @@ namespace ws.winx.devices
 
 		void Update();
 
-		string ProfileInputCode (int code);
+		
 		int GetInputCode();
 		bool GetInputBase(int code,ButtonState buttonState);
 		float GetInput (int code);

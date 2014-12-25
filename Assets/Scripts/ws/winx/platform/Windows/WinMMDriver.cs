@@ -453,8 +453,20 @@ namespace ws.winx.platform.windows
             float _value;
             uint _uid;
             ButtonState _buttonState;
+            string _name;
 
             #region IDeviceDetails implementation
+            public string name
+            {
+                get
+                {
+                    return _name;
+                }
+                set
+                {
+                    _name = value;
+                }
+            }
 
 
             public uint uid
@@ -559,7 +571,7 @@ namespace ws.winx.platform.windows
             bool _isNullable;
             bool _isHat;
             bool _isTrigger;
-
+            string _name;
 
             #region IAxisDetails implementation
 
@@ -632,7 +644,17 @@ namespace ws.winx.platform.windows
 
 
             #region IDeviceDetails implementation
-
+            public string name
+            {
+                get
+                {
+                    return _name;
+                }
+                set
+                {
+                    _name = value;
+                }
+            }
 
             public uint uid
             {

@@ -13,7 +13,7 @@ namespace ws.winx.drivers
 
 				public UnityDriver(){
 
-			      
+			         
 				}
 
 
@@ -30,6 +30,12 @@ namespace ws.winx.drivers
                         if (inx < 0) return null;
 
                         if (inx > 3) { Debug.LogWarning("Unity supports up to 4 Joysticks"); return null; }
+
+
+
+                        
+                           
+                        
 
 						JoystickDevice device = new JoystickDevice (inx, info.PID, info.VID, 12, 20, this);
 
@@ -107,9 +113,20 @@ namespace ws.winx.drivers
 						float _value;
 						uint _uid;
 						ButtonState _buttonState;
+                        string _name;
 
             #region IDeviceDetails implementation
-
+                        public string name
+                        {
+                            get
+                            {
+                                return _name;
+                            }
+                            set
+                            {
+                                _name = value;
+                            }
+                        }
 
 						public uint uid {
 								get {
@@ -195,7 +212,7 @@ namespace ws.winx.drivers
 						bool _isNullable;
 						bool _isHat;
 						bool _isTrigger;
-
+                        string _name;
 
             #region IAxisDetails implementation
 
@@ -249,7 +266,17 @@ namespace ws.winx.drivers
 
 
             #region IDeviceDetails implementation
-
+                        public string name
+                        {
+                            get
+                            {
+                                return _name;
+                            }
+                            set
+                            {
+                                _name = value;
+                            }
+                        }
 
 						public uint uid {
 								get {

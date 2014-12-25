@@ -925,9 +925,20 @@ namespace ws.winx.input
 						float _value;
 						uint _uid;
 						ButtonState _buttonState;
+                        string _name;
 			
 			#region IDeviceDetails implementation
-			
+                        public string name
+                        {
+                            get
+                            {
+                                return _name;
+                            }
+                            set
+                            {
+                                _name = value;
+                            }
+                        }
 			
 						public uint uid {
 								get {

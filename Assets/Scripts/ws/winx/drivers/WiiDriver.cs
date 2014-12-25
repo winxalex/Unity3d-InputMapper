@@ -2456,6 +2456,7 @@ float value;
             bool _isNullable;
             bool _isHat;
             bool _isTrigger;
+            string _name;
 
 
             #region IAxisDetails implementation
@@ -2547,6 +2548,18 @@ float value;
 
 
             #region IDeviceDetails implementation
+
+            public string name
+            {
+                get
+                {
+                    return _name;
+                }
+                set
+                {
+                    _name = value;
+                }
+            }
 
 
             public uint uid
@@ -2640,13 +2653,23 @@ float value;
         {
 
             #region Fields
-
+            string _name;
             float _value;
             uint _uid;
             ButtonState _buttonState;
 
             #region IDeviceDetails implementation
-
+            public string name
+            {
+                get
+                {
+                    return _name;
+                }
+                set
+                {
+                    _name = value;
+                }
+            }
 
             public uint uid
             {

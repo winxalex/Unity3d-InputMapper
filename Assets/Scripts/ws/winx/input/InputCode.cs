@@ -928,24 +928,26 @@ namespace ws.winx.input
 				
 					InputAction[] actions = combination.actions;
 					int len = actions.Length;
-					string profiledString = String.Empty;
+					string profiledString=String.Empty;
 
 						for (int i=0; i<len; i++) {
 
-							profiledString+=InputCode.toProfiled(actions[i]);
+							profiledString+=InputCode.toProfiled(actions[i])+InputAction.SPACE_DESIGNATOR;
 						}
 
+                        if (String.IsNullOrEmpty(profiledString))
+                            throw new Exception("InputCombination profiled to empty string");
 
-					return profiledString;
+					return profiledString.Substring(0,profiledString.Length-1);//remove last space desig
 
 				}
 
 
 
-		public string toProfiled(InputAction action){
+		public static string toProfiled(InputAction action){
 
 			int code = action.code;
-			int joyInx = InputCode.toJoystickInx ();
+			int joyInx = InputCode.toJoystickInx (code);
 			JoystickAxis axis = InputCode.toAxis (code);
 			int data = InputCode.toData (code);
 			IDeviceDetails details;
@@ -960,15 +962,15 @@ namespace ws.winx.input
 					//previous mapping might be to device with less or more buttons
 					//at same device index
 					
-					if(device.Buttons.Count>data && String.IsNullOrEmpty(details==device.Buttons[data].name))
+					if(device.Buttons.Count>data && String.IsNullOrEmpty((details=device.Buttons[data]).name))
 						return details.name+action.type.ToDesignatorString();
 					else
 						return InputCode.toEnumString (code);
 					
 				}
 				
-				if (device.Axis.Count > axis && 
-				    String.IsNullOrEmpty (details == device.Axis [data].name)
+				if (device.Axis.Count > (int)axis && 
+				    String.IsNullOrEmpty ((details = device.Axis [data]).name)
 				    )
 					return details.name+action.type.ToDesignatorString();
 				else
@@ -988,20 +990,7 @@ namespace ws.winx.input
 		}
 
 
-		public string ProfileInputCode (int code)
-		{
-			
-			
-
-			
-			
-
-			
-			
-			
-			
-			
-		}
+	
 		
 		public static string toEnumString (int code)
 				{

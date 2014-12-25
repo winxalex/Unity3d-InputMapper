@@ -623,8 +623,21 @@ namespace ws.winx.drivers
             float _value;
             uint _uid;
             ButtonState _buttonState;
+            string _name;
 
             #region IDeviceDetails implementation
+
+            public string name
+            {
+                get
+                {
+                    return _name;
+                }
+                set
+                {
+                    _name = value;
+                }
+            }
 
 
             public uint uid
@@ -726,10 +739,21 @@ namespace ws.winx.drivers
             bool _isNullable;
             bool _isHat;
             bool _isTrigger;
+            string _name;
 
 
             #region IAxisDetails implementation
-
+            public string name
+            {
+                get
+                {
+                    return _name;
+                }
+                set
+                {
+                    _name = value;
+                }
+            }
 
 
             public bool isTrigger
