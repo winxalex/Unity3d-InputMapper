@@ -912,7 +912,7 @@ namespace ws.winx.input
 						return (JoystickAxis)((code & CODE_AXIS_MASK) >> CODE_DATA_SHIFT);
 				}
 				
-				public static int toJoystickID (int code)
+				public static int toJoystickInx (int code)
 				{
 						code -= InputCode.MAX_KEY_CODE;
 						return code >> CODE_ID_SHIFT;
@@ -924,7 +924,86 @@ namespace ws.winx.input
 						return code & CODE_DATA_MASK;
 				}
 
-				public static string toEnumString (int code)
+				public static string toProfiled(InputCombination combination){
+				
+					InputAction[] actions = combination.actions;
+					int len = actions.Length;
+					string profiledString = String.Empty;
+
+						for (int i=0; i<len; i++) {
+
+							profiledString+=InputCode.toProfiled(actions[i]);
+						}
+
+
+					return profiledString;
+
+				}
+
+
+
+		public string toProfiled(InputAction action){
+
+			int code = action.code;
+			int joyInx = InputCode.toJoystickInx ();
+			JoystickAxis axis = InputCode.toAxis (code);
+			int data = InputCode.toData (code);
+			IDeviceDetails details;
+
+			IDevice device;
+			if (InputManager.Devices.ContainsIndex (joyInx)) {
+				device=InputManager.Devices.GetDeviceAt(joyInx);
+
+				if (axis == JoystickAxis.None) {   //MO data for axis => buttons data
+					//UnityEngine.Debug.Log("Button state>" + button_collection[data].buttonState);
+					
+					//previous mapping might be to device with less or more buttons
+					//at same device index
+					
+					if(device.Buttons.Count>data && String.IsNullOrEmpty(details==device.Buttons[data].name))
+						return details.name+action.type.ToDesignatorString();
+					else
+						return InputCode.toEnumString (code);
+					
+				}
+				
+				if (device.Axis.Count > axis && 
+				    String.IsNullOrEmpty (details == device.Axis [data].name)
+				    )
+					return details.name+action.type.ToDesignatorString();
+				else
+					return InputCode.toEnumString (code);
+
+
+
+
+
+
+
+
+
+			}
+
+			return null;
+		}
+
+
+		public string ProfileInputCode (int code)
+		{
+			
+			
+
+			
+			
+
+			
+			
+			
+			
+			
+		}
+		
+		public static string toEnumString (int code)
 				{
 						if (code < InputCode.MAX_KEY_CODE) {
 								return ((KeyCode)code).ToString ();

@@ -1,0 +1,2 @@
+A|B|X|Y|Left Bumper|Right Bumper
+Left Stick X|Left Stick Y|Right Stick X|Right Stick X|Left Trigger|Right Trigger

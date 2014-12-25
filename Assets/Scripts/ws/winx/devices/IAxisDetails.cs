@@ -17,6 +17,7 @@ namespace ws.winx.devices
 			bool isNullable{get;set;}
 			bool isHat{get;set;}
 			bool isTrigger{get;set;}
+		   
 		}
 }
 

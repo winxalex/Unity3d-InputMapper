@@ -87,6 +87,8 @@ namespace ws.winx.gui
 
                 _action = InputEx.GetInput();
 
+
+
                 if (_action != null && (_action.code ^ (int)KeyCode.Escape) != 0 && (_action.code ^ (int)KeyCode.Return) != 0)
                 {
 
@@ -103,7 +105,7 @@ namespace ws.winx.gui
 
 
 
-                    Debug.Log("Action:" + _action + " " + _action.code);
+                   // Debug.Log("Action:" + _action + " " + _action.code);
                 }
 
 
