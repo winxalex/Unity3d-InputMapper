@@ -114,7 +114,7 @@ namespace ws.winx.input
 
 			}
 
-				if(InputCode.toJoystickID(code)==(int)Joysticks.Joystick) _fromAny=true;
+				if(InputCode.toJoystickInx(code)==(int)Joysticks.Joystick) _fromAny=true;
 
 
 			//Debug.Log("From Any:"+_fromAny);
@@ -136,7 +136,7 @@ namespace ws.winx.input
 
 			__defaultType=_type=type;
 
-			if(InputCode.toJoystickID(_code)==(int)Joysticks.Joystick) _fromAny=true;
+			if(InputCode.toJoystickInx(_code)==(int)Joysticks.Joystick) _fromAny=true;
 			Debug.Log("From Any:"+_fromAny);
 
 			_codeString=ToString();
@@ -242,7 +242,7 @@ namespace ws.winx.input
 					_code=InputCode.toCode(code);
 
 
-					if(InputCode.toJoystickID(_code)==(int)Joysticks.Joystick) _fromAny=true;
+					if(InputCode.toJoystickInx(_code)==(int)Joysticks.Joystick) _fromAny=true;
 
 
 			}

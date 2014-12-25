@@ -13,6 +13,7 @@ namespace ws.winx.devices
 		public interface IDeviceDetails
 		{
 			uint uid{get;set;}
+			string name{ get; set;}
 			float value{get;set;}
 			ButtonState buttonState{get;}
 

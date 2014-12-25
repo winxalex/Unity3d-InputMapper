@@ -11,6 +11,11 @@ namespace ws.winx.drivers
 		public class UnityDriver:IDriver
 		{
 
+				public UnityDriver(){
+
+			      
+				}
+
 
 				public devices.IDevice ResolveDevice (IHIDDevice info)
 				{
