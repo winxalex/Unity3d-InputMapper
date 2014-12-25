@@ -35,7 +35,7 @@ namespace ws.winx.devices
 				int _PID;
 				bool _isReady = true;
 				int _lastFrameNum = -1;
-				int axisDominantPrevInx = -1;
+				//int axisDominantPrevInx = -1;
 
 				public int LastFrameNum {
 						get { return _lastFrameNum; }

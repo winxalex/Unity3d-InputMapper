@@ -19,7 +19,8 @@ namespace ws.winx.drivers
                         int inx;
                     
                         //find device match based on "names"
-                        inx = Array.IndexOf(Input.GetJoystickNames(), info.Name);
+                        string[] names=Input.GetJoystickNames();
+                        inx = Array.IndexOf(names, info.Name);
 
                         if (inx < 0) return null;
 

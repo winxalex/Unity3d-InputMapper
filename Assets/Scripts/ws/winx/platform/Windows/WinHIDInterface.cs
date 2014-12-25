@@ -44,7 +44,7 @@ namespace ws.winx.platform.windows
         //GUID_DEVINTERFACE_HID	Class GUID{4D1E55B2-F16F-11CF-88CB-001111000030}
         private static readonly Guid GUID_DEVINTERFACE_HID = new Guid("4D1E55B2-F16F-11CF-88CB-001111000030"); // HID devices
 
-        public IntPtr receiverWindowHandle;
+        public IntPtr hidDeviceNotificationReceiverWindowHandle;
 
 
 
@@ -428,13 +428,20 @@ namespace ws.winx.platform.windows
         public void Enumerate()
         {
 
-            if (receiverWindowHandle == IntPtr.Zero)
+            if (Application.isPlaying)
             {
+                if (hidDeviceNotificationReceiverWindowHandle == IntPtr.Zero)
+                {
 
-                receiverWindowHandle = CreateReceiverWnd();
+                    hidDeviceNotificationReceiverWindowHandle = CreateReceiverWnd();
 
-                if (receiverWindowHandle != IntPtr.Zero)
-                    RegisterHIDDeviceNotification(receiverWindowHandle);
+                    if (hidDeviceNotificationReceiverWindowHandle != IntPtr.Zero)
+                        RegisterHIDDeviceNotification(hidDeviceNotificationReceiverWindowHandle);
+                }
+            }
+            else
+            {
+                UnityEngine.Debug.Log("Plug&play isn't support in InputMapper Editor until I found way to destroy safely add/remove notification handle");
             }
 
 
@@ -578,7 +585,7 @@ namespace ws.winx.platform.windows
 
                 // string name = ReadRegKey(Native.HKEY_CURRENT_USER, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + DeviceInstanceId, Native.REGSTR_VAL_JOYOEMNAME);
 
-                string name = ReadRegKey(Native.HKEY_CURRENT_USER, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + VID_PID_Parts[0] + "&" + VID_PID_Parts[1], Native.REGSTR_VAL_JOYOEMNAME);
+                string name = ReadRegKey(Native.HKEY_LOCAL_MACHINE, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + VID_PID_Parts[0] + "&" + VID_PID_Parts[1], Native.REGSTR_VAL_JOYOEMNAME);
 
 
 
@@ -606,7 +613,7 @@ namespace ws.winx.platform.windows
 
             string devicePath = GetDevicePath(rawInputDeviceList.DeviceHandle);
 
-            string name = ReadRegKey(Native.HKEY_CURRENT_USER, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + "VID_" + deviceInfo.HIDInfo.VendorID.ToString("X4") + "&PID_" + deviceInfo.HIDInfo.ProductID.ToString("X4"), Native.REGSTR_VAL_JOYOEMNAME);
+            string name = ReadRegKey(Native.HKEY_LOCAL_MACHINE, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + "VID_" + deviceInfo.HIDInfo.VendorID.ToString("X4") + "&PID_" + deviceInfo.HIDInfo.ProductID.ToString("X4"), Native.REGSTR_VAL_JOYOEMNAME);
 
 
 
@@ -767,7 +774,7 @@ namespace ws.winx.platform.windows
 
 
 
-                    Debug.Log("Device" + hidDevice.index + "  PID:" + hidDevice.PID + " VID:" + hidDevice.VID + "[" + hidDevice.Name + " attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + hidDevice.DevicePath + " Name:" + joyDevice.Name);
+                    Debug.Log("Device" + hidDevice.index + "  PID:" + hidDevice.PID + " VID:" + hidDevice.VID + "[" + hidDevice.Name + "] attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + hidDevice.DevicePath);
 
                 }
                 else
@@ -811,7 +818,7 @@ namespace ws.winx.platform.windows
             UnityEngine.Debug.Log("Try to dispose receiverWindowHandle");
 
 
-            if (receiverWindowHandle != IntPtr.Zero)
+            if (hidDeviceNotificationReceiverWindowHandle != IntPtr.Zero)
             {
                 try
                 {
@@ -824,13 +831,13 @@ namespace ws.winx.platform.windows
                     //TODO test with this (issue when open  close InputMapper in Editor twice
                     //maybe use bellow code
                     if(Application.isPlaying)
-                   Native.PostMessage(new HandleRef(this,this.receiverWindowHandle),Native.WM_CLOSE,IntPtr.Zero,IntPtr.Zero);
+                   Native.PostMessage(new HandleRef(this,this.hidDeviceNotificationReceiverWindowHandle),Native.WM_CLOSE,IntPtr.Zero,IntPtr.Zero);
                    error = Marshal.GetLastWin32Error();
                     if (error > 0)
 
                        UnityEngine.Debug.Log(" Destroy Erorr" + error);
                     
-                    receiverWindowHandle = IntPtr.Zero;
+                    hidDeviceNotificationReceiverWindowHandle = IntPtr.Zero;
 
 
                 }

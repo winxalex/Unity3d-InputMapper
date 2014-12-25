@@ -211,6 +211,8 @@ namespace ws.winx.platform.windows
 								CompactDeviceData.Add (BitConverter.GetBytes (info.UPos));
 								CompactDeviceData.Add( BitConverter.GetBytes (info.VPos));
 
+
+
 								byte[] compactByteArray = new byte[ 30 ];
 								int inx = 0;
 								int len;
