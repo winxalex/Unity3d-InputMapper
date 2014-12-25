@@ -132,7 +132,7 @@ namespace ws.winx
 			//   UnityEngine.Debug.Log(InputManager.Log());
 			
 			//		adding input-states pairs manually
-			//			InputManager.MapStateToInput("My State1",new InputCombination(KeyCodeExtension.toCode(Joysticks.Joystick1,JoystickAxis.AxisPovX,JoystickPovPosition.Forward),(int)KeyCode.Joystick4Button9,(int)KeyCode.P,(int)KeyCode.JoystickButton0));
+			//			InputManager.MapStateToInput("My State1",new InputCombination(InputCode.toCode(Joysticks.Joystick1,JoystickAxis.AxisPovX,JoystickPovPosition.Forward),(int)KeyCode.Joystick4Button9,(int)KeyCode.P,(int)KeyCode.JoystickButton0));
 			//			InputManager.MapStateToInput("My State2",new InputCombination(KeyCode.Joystick4Button9,KeyCode.P,KeyCode.JoystickButton0));
 			//			InputManager.MapStateToInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
 			//			InputManager.MapStateToInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
@@ -140,14 +140,22 @@ namespace ws.winx
 			
 			
 			////easiest way to map state to combination (ex.of single W and C click)
-			if (!InputManager.HasInputState ("ManualAddedSTATE1"))
-								InputManager.MapStateToInput ("ManualAddedSTATE1", InputCode.Joystick0AxisX);// InputCode.W.SINGLE, InputCode.C.SINGLE);
-			
+			if (!InputManager.HasInputState ("ManualFullAxisMap"))
+								InputManager.MapStateToInput ("ManualFullAxisMap", InputCode.Joystick0AxisX);// InputCode.W.SINGLE, InputCode.C.SINGLE);
+
+
+//			InputManager.MapStateToInput ("WalkForward", InputCode.W.SINGLE);
+//			InputManager.MapStateToInput ("WalkForward", 1, InputCode.Joystick1AxisXPositive.SINGLE);
+//			
+//			
+//			InputManager.MapStateToInput ("WalkBackward", InputCode.S.SINGLE);
+//			InputManager.MapStateToInput ("WalkBackward", 1, InputCode.Joystick1AxisYNegative.SINGLE);
+
 			UnityEngine.Debug.Log("Log:" + InputManager.Log());
 			
 			
 			////Event Based input handling
-			InputEvent ev = new InputEvent("ManualAddedSTATE1");
+			InputEvent ev = new InputEvent("ManualFullAxisMap");
 			//InputEvent ev = new InputEvent((int)States.SomeState);
 			
 	
@@ -157,7 +165,8 @@ namespace ws.winx
 			_settingsLoaded = true;
 			
 			
-			
+			string test=InputCode.toEnumString (InputCode.toCode ("Joystick0AxisX"));
+			Debug.Log ("Test:"+test);
 		}
 		
 		
@@ -165,11 +174,7 @@ namespace ws.winx
 		void Update()
 		{
 
-            string[] names = Input.GetJoystickNames();
-
-            Debug.Log("Num Joy :" + names.Length);
-
-            Debug.Log(String.Join(",", names));
+          
 			
 			//Use is mapping states so no quering keys during gameplay
 			if (InputManager.EditMode || !_settingsLoaded) return;
@@ -210,34 +215,29 @@ namespace ws.winx
 			//
 			////
 			
-			//Bind Axis as one part
+
 			
-			//						InputManager.MapStateToInput ("WalkForward", KeyCodeExtension.W.SINGLE);
-			//						InputManager.MapStateToInput ("WalkForward", 1, KeyCodeExtension.Joystick1AxisXPositive.SINGLE);
-			//
-			//
-			//						InputManager.MapStateToInput ("WalkBackward", KeyCodeExtension.S.SINGLE);
-			//						InputManager.MapStateToInput ("WalkBackward", 1, KeyCodeExtension.Joystick1AxisYNegative.SINGLE);
-			//
-			//						
+									
 			
-			//			float axisPos = InputManager.GetInput (Animator.StringToHash ("WalkForward"), 0.3f, 0.1f, 0.2f);
-			//
-			//			float axisNeg= InputManager.GetInput (Animator.StringToHash ("WalkBackward"),  0.3f, 0.1f, 0.1f);
-			//
-			//			float analogVal=axisPos - axisNeg;
+									
+						//Generated value from 0 to 1f
+//						float axisPos = InputManager.GetInput (Animator.StringToHash ("WalkForward"), 0.3f, 0.1f, 0.2f);
+//			
+//						float axisNeg= InputManager.GetInput (Animator.StringToHash ("WalkBackward"),  0.3f, 0.1f, 0.1f);
+//			
+//						float analogVal=axisPos - axisNeg;
 			
 			//Debug.Log (analogVal);//would go from  -1 to 1
 			
 			
 			
 			
-			// Hardware normalized value in range of -1f to 1f (keys,mouse would return 0f or 1f, triggers 0f to 1f)
+			// Hardware normalized value in range of -1f to 1f (keys,mice would return 0f or 1f, triggers 0f to 1f)
 			//float analogVal2= InputManager.GetInput (Animator.StringToHash ("WalkBackward"));
 			//Debug.Log (analogVal2);
 			
 			
-//			float analogVal2= InputManager.GetInput (Animator.StringToHash ("ManualAddedSTATE1"));
+//			float analogVal2= InputManager.GetInput (Animator.StringToHash ("ManualFullAxisMap"));
 //			Debug.Log (analogVal2);
 			
 		}

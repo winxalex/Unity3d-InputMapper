@@ -35,7 +35,7 @@ namespace ws.winx.devices
 				int _PID;
 				bool _isReady = true;
 				int _lastFrameNum = -1;
-				int axisDominantPrevInx = -1;
+				//int axisDominantPrevInx = -1;
 
 				public int LastFrameNum {
 						get { return _lastFrameNum; }
@@ -206,7 +206,7 @@ namespace ws.winx.devices
 						}
 						
 						
-						if (data == (int)JoystickPosition.FULL)
+						if (data == (int)JoystickPosition.Full)
 								return axisValue;
 						
 						if (data == (int)JoystickPosition.Negative && axisValue < 0)
@@ -696,9 +696,10 @@ namespace ws.winx.devices
 
 		public enum JoystickPosition : ushort
 		{
-				Negative = 0,
-				Positive = 1,
-				FULL = 2
+				Full = 0,
+				Negative = 1,
+				Positive = 2,
+				
 
 		}
 
