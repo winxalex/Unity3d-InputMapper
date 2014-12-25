@@ -482,8 +482,20 @@ namespace ws.winx.platform.osx
 			float _value;
 			uint _uid;
 			ButtonState _buttonState;
+			string _name;
 
 #region IDeviceDetails implementation
+
+
+
+			public string name {
+				get {
+					return _name;
+				}
+				set {
+					_name=value;
+				}
+			}
 
 
 			public uint uid {
@@ -581,8 +593,18 @@ namespace ws.winx.platform.osx
 			bool _isHat;
 			float sensitivityOffset=0.3f;
 			bool _isTrigger;
+			string _name;
 			
 #region IAxisDetails implementation
+
+			public string name {
+				get {
+					return _name;
+				}
+				set {
+					_name=value;
+				}
+			}
 				
 				
 				
