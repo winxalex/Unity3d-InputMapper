@@ -20,7 +20,7 @@ namespace ws.winx.drivers
 
 				}
 			
-				public devices.IDevice ResolveDevice (IHIDDevice info)
+				public devices.IDevice ResolveDevice (IHIDDevice hidDevice)
 				{
 						int i = 0;
 
@@ -28,7 +28,7 @@ namespace ws.winx.drivers
                     
 						//find device match based on "names"
 						string[] names = Input.GetJoystickNames ();
-						inx = Array.IndexOf (names, info.Name);
+						inx = Array.IndexOf (names, hidDevice.Name);
 
 						if (inx < 0)
 								return null;
@@ -40,17 +40,17 @@ namespace ws.winx.drivers
 
 						DeviceProfile profile = null;
 
-						if (info.hidInterface.Profiles.ContainsKey (info.Name)) {
+						if (hidDevice.hidInterface.Profiles.ContainsKey (hidDevice.Name)) {
 
 
 					
-								profile = info.hidInterface.LoadProfile (info.hidInterface.Profiles [info.Name]);
+								profile = hidDevice.hidInterface.LoadProfile (hidDevice.hidInterface.Profiles [hidDevice.Name]);
 						}
                            
                         
 
-						JoystickDevice device = new JoystickDevice (inx, info.PID, info.VID, 12, 20, this);
-						device.Name = info.Name;
+						JoystickDevice device = new JoystickDevice (inx, hidDevice.PID, hidDevice.VID, 12, 20, this);
+						device.Name = hidDevice.Name;
 
 						int numAxis = device.Axis.Count;
 						int numButtons = device.Buttons.Count;

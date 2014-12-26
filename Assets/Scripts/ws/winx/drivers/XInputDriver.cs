@@ -156,18 +156,27 @@ namespace ws.winx.drivers
 				byte[] buff=report.Data;
 
 
-
+				//|||||Forward|Backward|Left|Right|Start|Back|||Left Bumper|Right Bumper|xbox|A|B|X|Y|
+				//	Left Stick X|Left Stick Y|Right Stick X|Right Stick X|Left Trigger|Right Trigger
 
 				////byte 11
 				///////////////////////////////////// BUTTONS ////////////////////////////////////////
-				device.Buttons[0].value = (buff[2] & 0x10) != 0 ? 1f : 0f;//Start
-				device.Buttons[1].value = (buff[2] & 0x20) != 0 ? 1f : 0f;//Back
-				device.Buttons[2].value = (buff[3] & 0x02) != 0 ? 1f : 0f;//LEFT_SHOULDER
-				device.Buttons[3].value = (buff[3] & 0x01) != 0 ? 1f : 0f;//RIGHT_SHOULDER
-				device.Buttons[4].value = (buff[3] & 0x10) != 0 ? 1f : 0f;//A
-				device.Buttons[5].value = (buff[3] & 0x20) != 0 ? 1f : 0f;//B
-				device.Buttons[6].value = (buff[3] & 0x40) != 0 ? 1f : 0f;//X
-				device.Buttons[7].value = (buff[3] & 0x80) != 0 ? 1f : 0f;//Y
+	
+				device.Buttons[9].value = (buff[2] & 0x10) != 0 ? 1f : 0f;//Start
+
+				device.Buttons[10].value = (buff[2] & 0x20) != 0 ? 1f : 0f;//Back
+
+				device.Buttons[13].value = (buff[3] & 0x02) != 0 ? 1f : 0f;//Left Bumper
+
+				device.Buttons[14].value = (buff[3] & 0x01) != 0 ? 1f : 0f;//Right Bumper
+
+				device.Buttons[16].value = (buff[3] & 0x10) != 0 ? 1f : 0f;//A
+
+				device.Buttons[17].value = (buff[3] & 0x20) != 0 ? 1f : 0f;//B
+
+				device.Buttons[18].value = (buff[3] & 0x40) != 0 ? 1f : 0f;//X
+
+				device.Buttons[19].value = (buff[3] & 0x80) != 0 ? 1f : 0f;//Y
 
 
 
@@ -207,6 +216,7 @@ namespace ws.winx.drivers
 				// UnityEngine.Debug.Log("raw valueX=" + value);
 				axisDetails = device.Axis[JoystickAxis.AxisY];
 				axisDetails.value = NormalizeAxis(value, -32727, 32727, 0.1f);
+
 
 				value=(short)(buff[6] | (buff[7] << 8));
 				// UnityEngine.Debug.Log("raw valueX=" + value);
@@ -250,7 +260,7 @@ namespace ws.winx.drivers
 		#endif
 		
 		
-		#if !UNITY_STANDALONE_OSX
+		#if UNITY_STANDALONE_WIN
 		void onRead(object data)
 		{
 			
@@ -284,14 +294,14 @@ namespace ws.winx.drivers
 
              ////byte 11
             ///////////////////////////////////// BUTTONS ////////////////////////////////////////
-                device.Buttons[0].value = (buff[11] & 0x80) != 0 ? 1f : 0f;//Start
-                device.Buttons[1].value =  (buff[11] & 0x40) != 0 ? 1f : 0f;//Back
-                device.Buttons[2].value = (buff[11] & 0x10) != 0 ? 1f : 0f;//LEFT_SHOULDER
-                device.Buttons[3].value = (buff[11] & 0x20) != 0 ? 1f : 0f;//RIGHT_SHOULDER
-                device.Buttons[4].value = (buff[11] & 0x01) != 0 ? 1f : 0f;//A
-                device.Buttons[5].value = (buff[11] & 0x02) != 0 ? 1f : 0f;//B
-                device.Buttons[6].value = (buff[11] & 0x04) != 0 ? 1f : 0f;//X
-                device.Buttons[7].value = (buff[11] & 0x08) != 0 ? 1f : 0f;//Y
+                device.Buttons[9].value = (buff[11] & 0x80) != 0 ? 1f : 0f;//Start
+                device.Buttons[10].value =  (buff[11] & 0x40) != 0 ? 1f : 0f;//Back
+                device.Buttons[13].value = (buff[11] & 0x10) != 0 ? 1f : 0f;//Left Bumper
+                device.Buttons[14].value = (buff[11] & 0x20) != 0 ? 1f : 0f;//Right Bumper
+                device.Buttons[16].value = (buff[11] & 0x01) != 0 ? 1f : 0f;//A
+                device.Buttons[17].value = (buff[11] & 0x02) != 0 ? 1f : 0f;//B
+                device.Buttons[18].value = (buff[11] & 0x04) != 0 ? 1f : 0f;//X
+                device.Buttons[19].value = (buff[11] & 0x08) != 0 ? 1f : 0f;//Y
 
           
 				//00-13-00-00-00-00-62-F2-27-FF-59-03-45-FE-00
@@ -434,11 +444,11 @@ namespace ws.winx.drivers
         {
             int type = -1;
             int len = XPAD_DEVICE.Length;
-            for (int i = 0; i < len; i += 3)
+            for (int inx = 0; inx < len; inx += 3)
             {
-                if (hidDevice.VID == XPAD_DEVICE[i] && hidDevice.PID == XPAD_DEVICE[i + 1])
+                if (hidDevice.VID == XPAD_DEVICE[inx] && hidDevice.PID == XPAD_DEVICE[inx + 1])
                 {
-                    type = XPAD_DEVICE[i + 2];
+                    type = XPAD_DEVICE[inx + 2];
                     break;
                 }
             }
@@ -446,30 +456,46 @@ namespace ws.winx.drivers
             if (type < 0) return null;
 
             XInputDevice device;
-            int inx = 0;
+            int i = 0;
 
            _hidInterface = hidDevice.hidInterface;
            
 
 
-            device = new XInputDevice(hidDevice.index, hidDevice.PID, hidDevice.VID, 8, 10, this, type);
+            device = new XInputDevice(hidDevice.index, hidDevice.PID, hidDevice.VID, 8, 20, this, type);
+			device.Name = hidDevice.Name;
 
+			DeviceProfile profile = null;
+			
+			if (hidDevice.hidInterface.Profiles.ContainsKey (hidDevice.Name)) {
+				
+				
+				
+				profile = hidDevice.hidInterface.LoadProfile (hidDevice.hidInterface.Profiles [hidDevice.Name]);
+			}
 
-            //inti button structure
-            for (; inx < 10; inx++)
+			
+			
+			//inti button structure
+            for (; i < 20; i++)
             {
-                device.Buttons[inx] = new ButtonDetails();
-            }
+                device.Buttons[i] = new ButtonDetails();
 
-
-
-            AxisDetails axisDetails;
+				if (profile != null && profile.buttonNaming.Length > i) {
+					device.Buttons [i].name = profile.buttonNaming [i];
+				}
+			}
+			
+			
+			
+			AxisDetails axisDetails;
 
             //LX
             axisDetails = new AxisDetails();
             axisDetails.max = 65535;
             axisDetails.min = 0;
             device.Axis[JoystickAxis.AxisX] = axisDetails;
+
 
             //LY
             axisDetails = new AxisDetails();
@@ -513,9 +539,19 @@ namespace ws.winx.drivers
             ((HIDDevice)hidDevice).InputReportByteLength = 15;
             ((HIDDevice)hidDevice).OutputReportByteLength = 12;
 
-           
-            return device;
-            //return (IDevice<AxisDetails, ButtonDetails, XInputExtension>)joystick;
+			int numAxis=device.Axis.Count;
+			for (i=0; i < numAxis; i++) {
+
+				if (profile != null && profile.axisNaming.Length > i) {
+					device.Axis [i].name = profile.axisNaming [i];
+					
+				}
+				
+			}
+			
+			
+			return device;
+			//return (IDevice<AxisDetails, ButtonDetails, XInputExtension>)joystick;
         }
         #endregion
 
