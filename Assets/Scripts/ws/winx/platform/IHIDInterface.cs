@@ -23,6 +23,7 @@ namespace ws.winx.platform
 
 			IDriver defaultDriver{get;set;}
             Dictionary<int, HIDDevice> Generics{get;}
+			Dictionary<string,string> Profiles{get;}
 
             /// <summary>
             /// Reading by use of OS default driver (Win-WINMMDriver, Osx-OSXDriver...
@@ -40,6 +41,8 @@ namespace ws.winx.platform
 			void AddDriver(IDriver driver);
 			void Update();
 			void Enumerate();
+			void LoadProfiles();
+			DeviceProfile LoadProfile(string fileBase);
 		    
 
 		}

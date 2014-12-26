@@ -337,8 +337,8 @@ namespace ws.winx.gui
             {
 
 
-
-                if (GUILayout.Button(combinations[0].combinationString, _inputButtonStyle))
+				if (GUILayout.Button(InputCode.toProfiled(combinations[0]), _inputButtonStyle))
+               // if (GUILayout.Button(combinations[0].combinationString, _inputButtonStyle))
                 {
                     _selectedStateHash = hash;
                     _previousStateInput = null;
@@ -346,7 +346,8 @@ namespace ws.winx.gui
                 }
 
                 if (combinations.Length > 1 && combinations[1] != null)
-                    if (GUILayout.Button(combinations[1].combinationString, _inputButtonStyle))
+					if (GUILayout.Button(InputCode.toProfiled(combinations[1]), _inputButtonStyle))
+                    //if (GUILayout.Button(combinations[1].combinationString, _inputButtonStyle))
                     {
                         _selectedStateHash = hash;
                         _previousStateInput = null;
@@ -362,8 +363,8 @@ namespace ws.winx.gui
 
 
 
-
-                currentCombinationString = combinations[_isPrimary].combinationString;
+				currentCombinationString = InputCode.toProfiled(combinations[_isPrimary]);
+                //currentCombinationString = combinations[_isPrimary].combinationString;
 
                 if (_previousStateInput == null)
                 {

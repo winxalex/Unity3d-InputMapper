@@ -7,6 +7,9 @@
 //     the code is regenerated.
 // </auto-generated>
 //------------------------------------------------------------------------------
+using System.IO;
+
+
 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
 using System;
 using System.Collections.Generic;
@@ -62,6 +65,7 @@ namespace ws.winx.platform.osx
 
 		private static readonly object syncRoot = new object();
 		private List<IDriver> __drivers;
+		private Dictionary<string,string> __profiles;
 
 
 
@@ -88,6 +92,7 @@ namespace ws.winx.platform.osx
 		public OSXHIDInterface()
 		{
 			__drivers = new List<IDriver>();
+			__profiles = new Dictionary<string,string> ();
 			
 			
 			HandleHIDDeviceAdded = HidDeviceAdded;
@@ -128,7 +133,7 @@ namespace ws.winx.platform.osx
 			hidmanager = Native.IOHIDManagerCreate(IntPtr.Zero,(int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone);
 			
 			
-			
+			LoadProfiles ();
 			
 			
 			
@@ -138,6 +143,98 @@ namespace ws.winx.platform.osx
 
 #region IHIDInterface implementation
 
+		public void LoadProfiles ()
+		{
+			//cos UNITY_WEBPLAYER: Application.dataPath  = "http://localhost/appfolder/"
+			#if (UNITY_WEBPLAYER || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_STANDALONE
+			throw new Exception("UnityWebPlayer loading profiles option not yet implemented");
+			
+			WebClient client = new WebClient();
+			Stream stream = client.OpenRead(strURL);
+			StreamReader reader = new StreamReader(stream);
+			string[] deviceNameProfilePair;
+			char splitChar='|';
+			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, "profiles.txt"))){
+				
+				
+				while(!reader.EndOfStream){
+					
+					deviceNameProfilePair=reader.ReadLine().Split(splitChar);
+					__profiles[deviceNameProfilePair[0]]=deviceNameProfilePair[1];
+				}
+				
+			}
+			#else
+			string[] deviceNameProfilePair;
+			char splitChar='|';
+
+			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, "profiles.txt"))){
+
+
+				while(!reader.EndOfStream){
+
+					deviceNameProfilePair=reader.ReadLine().Split(splitChar);
+					__profiles[deviceNameProfilePair[0]]=deviceNameProfilePair[1];
+				}
+
+			}
+
+		
+
+			#endif
+		}
+
+		public DeviceProfile LoadProfile(string fileBase){
+
+			DeviceProfile profile=new DeviceProfile();
+
+
+
+			//cos UNITY_WEBPLAYER: Application.dataPath  = "http://localhost/appfolder/"
+			#if (UNITY_WEBPLAYER || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_STANDALONE
+			throw new Exception("UnityWebPlayer loading profiles option not yet implemented");
+			
+			WebClient client = new WebClient();
+			Stream stream = client.OpenRead(strURL);
+			StreamReader reader = new StreamReader(stream);
+
+			char splitChar='|';
+			
+			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileBase+"_osx.txt"))){
+				
+				
+				if(!reader.EndOfStream)
+					profile.buttonNaming =reader.ReadLine().Split(splitChar);
+				
+				if(!reader.EndOfStream)
+					profile.axisNaming =reader.ReadLine().Split(splitChar);
+				
+				//rest in future
+				
+			}
+		
+			#else
+		
+			char splitChar='|';
+			
+			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileBase+"_osx.txt"))){
+				
+					if(!reader.EndOfStream)
+					profile.buttonNaming =reader.ReadLine().Split(splitChar);
+				
+					if(!reader.EndOfStream)
+					profile.axisNaming =reader.ReadLine().Split(splitChar);
+
+				//rest in future
+
+
+				
+			}
+
+			#endif
+
+			return profile;
+		}
 
 
 		public void AddDriver (IDriver driver)
@@ -224,7 +321,11 @@ namespace ws.winx.platform.osx
 
 
 
-
+		public Dictionary<string, string> Profiles {
+			get {
+				return __profiles;
+			}
+		}
 
 
 		public Dictionary<int, HIDDevice> Generics {

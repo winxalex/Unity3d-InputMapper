@@ -32,6 +32,8 @@ namespace ws.winx.platform.windows
 
         private IDriver __defaultJoystickDriver;
 
+		private Dictionary<string,string> __profiles;
+
 
         private static readonly object syncRoot = new object();
 
@@ -67,6 +69,29 @@ namespace ws.winx.platform.windows
 
 
         #region IHIDInterface implementation
+
+
+		public DeviceProfile LoadProfile (string fileBase)
+		{
+			throw new NotImplementedException ();
+		}
+
+
+
+	
+
+		public void LoadProfiles ()
+		{
+			throw new NotImplementedException ();
+		}
+
+		public Dictionary<string, string> Profiles {
+			get {
+				return __profiles;
+			}
+		}
+
+
 
 
 
@@ -180,7 +205,7 @@ namespace ws.winx.platform.windows
 
             __Generics = new Dictionary<int, HIDDevice>();
 
-
+			__profiles = new Dictionary<string,string> ();
 
         }
         #endregion

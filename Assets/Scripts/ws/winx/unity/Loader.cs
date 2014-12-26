@@ -31,6 +31,7 @@ namespace ws.winx.unity
 
 
         protected bool _isRunning=false;
+		protected GameObject _holder;
 
         private static List<WWW> _wwwList;
         private static List<WWW> _queueList;
@@ -44,12 +45,17 @@ namespace ws.winx.unity
             get{ if(_wwwList==null) _wwwList=new List<WWW>(); return _wwwList; }
         }
 
-        private static MonoBehaviour _behaviour;
+        private MonoBehaviour _behaviour;
 
 
-        protected static MonoBehaviour behaviour
+        protected  MonoBehaviour behaviour
         {
-            get { if (_behaviour == null) { _behaviour = (new GameObject("WWWRequest")).AddComponent<MonoBehaviour>(); } return _behaviour; }
+            get { if (_behaviour == null) { 
+					_holder=new GameObject();
+					_behaviour = _holder.AddComponent<MonoBehaviour>(); 
+
+				} 
+				return _behaviour; }
         }
 
         public void load()
@@ -178,13 +184,24 @@ namespace ws.winx.unity
             foreach (Delegate d in delegates)
                 ((EventHandler<LoaderEvtArgs<T>>)d).BeginInvoke(this, args, EndAsyncEvent<T>, null);
         }
-	
-public void  Dispose()
-{
-    if(_queueList!=null) _queueList.Clear();
-    if(_wwwList!=null) _wwwList.Clear();
 
- 	
-}
+		public void Destroy(){
+
+		
+
+			if (_holder != null) {
+							if(_behaviour!=null) GameObject.Destroy(_behaviour);
+								GameObject.Destroy (_holder);
+						}
+
+		}
+	
+		public void  Dispose()
+		{
+		    if(_queueList!=null) _queueList.Clear();
+		    if(_wwwList!=null) _wwwList.Clear();
+
+		 	
+		}
 }
 }

@@ -962,17 +962,28 @@ namespace ws.winx.input
 					//previous mapping might be to device with less or more buttons
 					//at same device index
 					
-					if(device.Buttons.Count>data && String.IsNullOrEmpty((details=device.Buttons[data]).name))
-						return details.name+action.type.ToDesignatorString();
+					if(device.Buttons.Count>data && !String.IsNullOrEmpty((details=device.Buttons[data]).name)){
+
+					
+
+						return joyInx.ToString()+"_"+details.name+action.type.ToDesignatorString();
+					}
 					else
 						return InputCode.toEnumString (code);
 					
 				}
 				
 				if (device.Axis.Count > (int)axis && 
-				    String.IsNullOrEmpty ((details = device.Axis [data]).name)
-				    )
-					return details.name+action.type.ToDesignatorString();
+				    !String.IsNullOrEmpty ((details = device.Axis[axis]).name)
+				    ){
+					string direction;
+					
+					if(axis==JoystickAxis.AxisPovX || axis==JoystickAxis.AxisPovY){
+						direction=((JoystickPovPosition) data).ToString();
+					}else
+						direction=((JoystickPosition) data).ToString().Replace("Full","");
+
+					return joyInx.ToString()+"_"+details.name+direction+action.type.ToDesignatorString();}
 				else
 					return InputCode.toEnumString (code);
 
@@ -986,7 +997,7 @@ namespace ws.winx.input
 
 			}
 
-			return null;
+			return toEnumString(code);
 		}
 
 

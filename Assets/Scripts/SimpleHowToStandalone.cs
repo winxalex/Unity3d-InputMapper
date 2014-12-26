@@ -58,7 +58,7 @@ namespace ws.winx
            			InputManager.AddDriver(new ThrustMasterDriver());
   //          			InputManager.AddDriver(new XInputDriver());
 			//change default driver
-			//InputManager.hidInterface.defaultDriver=new UnityDriver();
+			InputManager.hidInterface.defaultDriver=new UnityDriver();
 
 			#endif
 	
@@ -165,8 +165,7 @@ namespace ws.winx
 			_settingsLoaded = true;
 			
 			
-			string test=InputCode.toEnumString (InputCode.toCode ("Joystick0AxisX"));
-			Debug.Log ("Test:"+test);
+
 		}
 		
 		

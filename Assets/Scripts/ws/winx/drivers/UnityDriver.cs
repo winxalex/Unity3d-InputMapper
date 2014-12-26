@@ -5,53 +5,73 @@ using System.Text;
 using ws.winx.platform;
 using UnityEngine;
 using ws.winx.devices;
+using ws.winx.unity;
+using System.IO;
 
 namespace ws.winx.drivers
 {
 		public class UnityDriver:IDriver
 		{
 
-				public UnityDriver(){
 
-			         
+
+				public UnityDriver ()
+				{
+
 				}
-
-
+			
 				public devices.IDevice ResolveDevice (IHIDDevice info)
 				{
 						int i = 0;
 
-                        int inx;
+						int inx;
                     
-                        //find device match based on "names"
-                        string[] names=Input.GetJoystickNames();
-                        inx = Array.IndexOf(names, info.Name);
+						//find device match based on "names"
+						string[] names = Input.GetJoystickNames ();
+						inx = Array.IndexOf (names, info.Name);
 
-                        if (inx < 0) return null;
+						if (inx < 0)
+								return null;
 
-                        if (inx > 3) { Debug.LogWarning("Unity supports up to 4 Joysticks"); return null; }
+						if (inx > 3) {
+								Debug.LogWarning ("Unity supports up to 4 Joysticks");
+								return null;
+						}
+
+						DeviceProfile profile = null;
+
+						if (info.hidInterface.Profiles.ContainsKey (info.Name)) {
 
 
-
-                        
+					
+								profile = info.hidInterface.LoadProfile (info.hidInterface.Profiles [info.Name]);
+						}
                            
                         
 
 						JoystickDevice device = new JoystickDevice (inx, info.PID, info.VID, 12, 20, this);
+						device.Name = info.Name;
 
 						int numAxis = device.Axis.Count;
 						int numButtons = device.Buttons.Count;
 
 						for (; i < numAxis; i++) {
 								device.Axis [i] = new AxisDetails ();
+								if (profile != null && profile.axisNaming.Length > i) {
+										device.Axis [i].name = profile.axisNaming [i];
+
+								}
                 
 						}
 
 						for (i=0; i < numButtons; i++) {
 								device.Buttons [i] = new ButtonDetails ();
+								if (profile != null && profile.buttonNaming.Length > i) {
+										device.Buttons [i].name = profile.buttonNaming [i];
+								}
 						}
-
-
+				
+				
 
 						return device;
 				}
@@ -59,7 +79,7 @@ namespace ws.winx.drivers
 				public void Update (devices.IDevice device)
 				{
 
-					if (device == null)
+						if (device == null)
 								return;
 
 
@@ -75,10 +95,10 @@ namespace ws.winx.drivers
 						// Debug.Log("axis value:" + joystick.Axis[0].value + " state:" + joystick.Axis[0].buttonState);
 
 
-						float axisValue=0f;
+						float axisValue = 0f;
 						for (; i < numAxis; i++) {
 
-								axisValue=Input.GetAxisRaw (index.ToString () + i.ToString ());
+								axisValue = Input.GetAxisRaw (index.ToString () + i.ToString ());
 								device.Axis [i].value = axisValue;
 								//(Input.GetAxis (index.ToString () + i.ToString ()) + 1f) * 0.5f;//index-of joystick, i-ord number of axis
 
@@ -113,20 +133,17 @@ namespace ws.winx.drivers
 						float _value;
 						uint _uid;
 						ButtonState _buttonState;
-                        string _name;
+						string _name;
 
             #region IDeviceDetails implementation
-                        public string name
-                        {
-                            get
-                            {
-                                return _name;
-                            }
-                            set
-                            {
-                                _name = value;
-                            }
-                        }
+						public string name {
+								get {
+										return _name;
+								}
+								set {
+										_name = value;
+								}
+						}
 
 						public uint uid {
 								get {
@@ -212,7 +229,7 @@ namespace ws.winx.drivers
 						bool _isNullable;
 						bool _isHat;
 						bool _isTrigger;
-                        string _name;
+						string _name;
 
             #region IAxisDetails implementation
 
@@ -266,17 +283,14 @@ namespace ws.winx.drivers
 
 
             #region IDeviceDetails implementation
-                        public string name
-                        {
-                            get
-                            {
-                                return _name;
-                            }
-                            set
-                            {
-                                _name = value;
-                            }
-                        }
+						public string name {
+								get {
+										return _name;
+								}
+								set {
+										_name = value;
+								}
+						}
 
 						public uint uid {
 								get {
@@ -301,8 +315,7 @@ namespace ws.winx.drivers
 										if (value == -1 || value == 1) {
 												if (_buttonState == ButtonState.None
 						    //|| _buttonState == ButtonState.PosToUp || _buttonState==ButtonState.NegToUp)
-						    )
-						{
+						    ) {
 							
 														_buttonState = ButtonState.Down;
 							

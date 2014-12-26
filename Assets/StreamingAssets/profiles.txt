@@ -1,14 +1,15 @@
-Controller (Afterglow Gamepad for Xbox 360) xbox360
-Controller (Batarang wired controller (XBOX)) xbox360
-Controller (Gamepad for Xbox 360) xbox360
-Controller (Infinity Controller 360) xbox360
-Controller (Mad Catz FPS Pro GamePad) xbox360
-Controller (MadCatz Call of Duty GamePad) xbox360
-Controller (MadCatz GamePad) xbox360
-Controller (MLG GamePad for Xbox 360) xbox360
-Controller (Razer Sabertooth Elite) xbox360
-Controller (Rock Candy Gamepad for Xbox 360) xbox360
-Controller (Xbox 360 For Windows) xbox360
-Controller (Xbox 360 Wireless Receiver for Windows) xbox360
-XBOX 360 For Windows (Controller) xbox360
-Controller (XEOX Gamepad) xbox360
+Controller (Afterglow Gamepad for Xbox 360)|xbox360
+Controller (Batarang wired controller (XBOX))|xbox360
+Controller (Gamepad for Xbox 360)|xbox360
+Controller (Infinity Controller 360)|xbox360
+Controller (Mad Catz FPS Pro GamePad)|xbox360
+Controller (MadCatz Call of Duty GamePad)|xbox360
+Controller (MadCatz GamePad)|xbox360
+Controller (MLG GamePad for Xbox 360)|xbox360
+Controller (Razer Sabertooth Elite)|xbox360
+Controller (Rock Candy Gamepad for Xbox 360)|xbox360
+Controller (Xbox 360 For Windows)|xbox360
+Controller (Xbox 360 Wireless Receiver for Windows)|xbox360
+XBOX 360 For Windows (Controller)|xbox360
+Controller (XEOX Gamepad)|xbox360
+Microsoft Wireless 360 Controller|xbox360
