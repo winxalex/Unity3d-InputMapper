@@ -959,22 +959,23 @@ namespace ws.winx.input
 		/// <summary>
 		/// Gets the input of generic created values in range 0f to 1f
 		/// in steps defined with "sensitivity" param
-		/// while key, button,axis are HOLD
+		/// while key, button,mouse is HOLD
+		/// If axis(full or part) are mapped normalized values in range 0f to 1f
+		/// are returned without influence of "sensitivity" settings
+		/// 
 		/// </summary>
 		/// <returns> 0f to 1f</returns>
 		/// <param name="stateNameHash">State name hash.</param>
 		/// <param name="sensitivity">Sensitivity of rising value 0f to 1f</param>
 		/// <param name="dreadzone">Dreadzone.If value drop under dreadzone value would be nullify</param>
 		/// <param name="gravity">Gravity. After no signal from input value would drop with step of gravity or immidiately</param>
-		public static float GetInput(int stateNameHash,float sensitivity,float dreadzone=0.1f,float gravity=0.3f){
+		public static float GetInput(int stateNameHash,float sensitivity=0.1f,float dreadzone=0.1f,float gravity=0.3f){
            //Use is mapping states so no quering keys during gameplay
             if (InputManager.EditMode) return 0f;
             
             __inputCombinations=__settings.stateInputs[stateNameHash].combinations;
 
-
-
-            return __inputCombinations[0].GetGenericAnalogValue(sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetGenericAnalogValue(sensitivity, dreadzone, gravity) : 0);
+				return __inputCombinations [0].GetInputNormalized (sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations [1] != null ? __inputCombinations [1].GetInputNormalized (sensitivity, dreadzone, gravity) : 0);
 
 		}
 
@@ -986,15 +987,17 @@ namespace ws.winx.input
 		/// if device mapped is digital would return 0f or 1f 
 		/// if device mapped is analog would return 0f to 1f(positive axis) or 0f to -1f(negative axis) in steps depending of device sensitivity
 		/// </summary>
-		/// <returns>-1f to 1f.</returns>
 		/// <param name="stateNameHash">State name hash.</param>
-		public static float GetInput(int stateNameHash){
+		/// <param name="sensitivity">Sensitivity of rising value 0f to 1f</param>
+		/// <param name="dreadzone">Dreadzone.If value drop under dreadzone value would be nullify</param>
+		/// <param name="gravity">Gravity. After no signal from input value would drop with step of gravity or immidiately</param>
+		public static float GetInputRaw(int stateNameHash,float sensitivity=0.1f,float dreadzone=0.1f,float gravity=0.3f){
 			//Use is mapping states so no quering keys during gameplay
 			if (InputManager.EditMode) return 0f;
 			
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
 
-			return __inputCombinations[0].GetAnalogValue() + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetAnalogValue() : 0f);
+			return __inputCombinations [0].GetAnalogValue (sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetAnalogValue(sensitivity,dreadzone,gravity) : 0f);
 			
 		}
 

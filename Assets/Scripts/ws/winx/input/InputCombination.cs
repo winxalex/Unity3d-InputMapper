@@ -16,18 +16,17 @@ namespace ws.winx.input
 		{
 
 
-		public delegate bool InputDelegate(InputEx.KeyCodeInputResolverCallback keycodeInputHandlerCallback,InputAction action,ButtonState buttonState);
+				public delegate bool InputDelegate (InputEx.KeyCodeInputResolverCallback keycodeInputHandlerCallback,InputAction action,ButtonState buttonState);
 
 				protected List<InputAction> _actionsList;
 				protected InputAction[] _actions;
 				protected String _combinationString;
-			
 				protected float _analogValue = 0f;
 				protected float _timeDelta;
 				protected bool _isActive = false;
-				private InputAction __currentInputAction
-				{
-					get{ return actions[__currentIndex]; }
+
+				private InputAction __currentInputAction {
+						get{ return actions [__currentIndex]; }
 				}
 
 				private int __currentIndex = 0;
@@ -48,21 +47,21 @@ namespace ws.winx.input
 						set {
 								_actionsList = value;
 								_combinationString = ToString (value);
-								__currentIndex=0;
+								__currentIndex = 0;
 
 						}
 				}
 
-				public InputAction[] actions{
-					get { 
+				public InputAction[] actions {
+						get { 
 
-						if(_actions==null || _actions.Length!=_actionsList.Count)
-							_actions=_actionsList.ToArray();
+								if (_actions == null || _actions.Length != _actionsList.Count)
+										_actions = _actionsList.ToArray ();
 
-						return _actions; 
+								return _actions; 
 			
 			
-					}
+						}
 				
 				}
 
@@ -199,49 +198,45 @@ namespace ws.winx.input
 						return _actionsList.Remove (_actionsList.Last ());
 				}
 
-				
-
 				internal bool GetInputHold ()
 				{
-					if (_actionsList.Count > 1 || __currentInputAction.type!=InputActionType.SINGLE)
-					{ /*Debug.LogWarning("You found need of GetInputHold with combos. Fork code on github");*/ return false; }
-
-								else return InputEx.GetInputHold(__currentInputAction);
+						if (_actionsList.Count > 1 || __currentInputAction.type != InputActionType.SINGLE) { /*Debug.LogWarning("You found need of GetInputHold with combos. Fork code on github");*/
+								return false;
+						} else
+								return InputEx.GetInputHold (__currentInputAction);
 								
-					}
-
+				}
 
 				internal bool GetInputUp ()
 				{
-						if (_actionsList.Count > 1 || __currentInputAction.type!=InputActionType.SINGLE)
-						{ 
-							/*Debug.LogWarning("You found need of GetInputUp with combos. Fork code on github");*/ return false; }
-						
-						else return InputEx.GetInputUp(__currentInputAction);
+						if (_actionsList.Count > 1 || __currentInputAction.type != InputActionType.SINGLE) { 
+								/*Debug.LogWarning("You found need of GetInputUp with combos. Fork code on github");*/
+								return false;
+						} else
+								return InputEx.GetInputUp (__currentInputAction);
 				}
 
 				internal bool GetInputDown (bool atOnce=false)
 				{
 						
-					if (__currentInputAction.type == InputActionType.SINGLE && _actionsList.Count == 1) {
+						if (__currentInputAction.type == InputActionType.SINGLE && _actionsList.Count == 1) {
 						
-						return InputEx.GetInputDown(__currentInputAction);				
+								return InputEx.GetInputDown (__currentInputAction);				
 
 						
-					} else {
-						if (atOnce){
-								int len=actions.Length;
+						} else {
+								if (atOnce) {
+										int len = actions.Length;
 
-								for(int i=0;i<len;i++){
-									if(!InputEx.GetInputDown(actions[i]))
-								    return false;
-								}
+										for (int i=0; i<len; i++) {
+												if (!InputEx.GetInputDown (actions [i]))
+														return false;
+										}
 
-							return true;
+										return true;
+								} else // Double,Long are also count as combinations handled by InputEx.GetAction
+										return GetCombinationInput ();
 						}
-						else // Double,Long are also count as combinations handled by InputEx.GetAction
-							return GetCombinationInput ();
-					}
 
 
 				}
@@ -274,15 +269,15 @@ namespace ws.winx.input
 										//get the time when current action of combination happened
 										__actionHappenTime = Time.time;
 
-											__currentIndex++;
+										__currentIndex++;
 
 										//just move to next if possible => combination happend or reset if couldn't
-										if (!(__currentIndex<actions.Length)) {
-												__currentIndex=0;
+										if (!(__currentIndex < actions.Length)) {
+												__currentIndex = 0;
 												return true;
 										}
 								} else {//reset cos time has passed for next action
-										__currentIndex=0;
+										__currentIndex = 0;
 										__actionHappenTime = 0;
 										InputEx.LastCode = 0;
 										//	UnityEngine.Debug.Log ("Reset Time Cos Time Passed (Too late):" + Time.time + " Time Allowed:" + (__actionHappenTime + InputAction.COMBINATION_CLICK_SENSITIVITY));
@@ -301,21 +296,21 @@ namespace ws.winx.input
 						if (__actionHappenTime > 0 && Time.time > __actionHappenTime + InputAction.COMBINATION_CLICK_SENSITIVITY) {
 								//UnityEngine.Debug.Log ("Reset in Idle " + Time.time + " Time Allowed:" + (__actionHappenTime + InputAction.COMBINATION_CLICK_SENSITIVITY));
 
-								__currentIndex=0;
+								__currentIndex = 0;
 								__actionHappenTime = 0;
 								InputEx.LastCode = 0;
 								return false;
 
 						}
 
-			//TODO check current type and time waiting for type of
+						//TODO check current type and time waiting for type of
 
 						// time passed while waiting for double/long action to happen => don't reset we aren't idle
 						if (Time.time > __currentInputAction.startTime + InputAction.COMBINATION_CLICK_SENSITIVITY && InputEx.LastCode == __currentInputAction.code) {// or waiting for double/long action to happen => don't reset we aren't idle
 
 								//UnityEngine.Debug.Log ("Reset in cos time waiting for double/long passed" + Time.time + " Time Allowed:" + (_pointer.Current.startTime + InputAction.COMBINATION_CLICK_SENSITIVITY));
 
-								__currentIndex=0;
+								__currentIndex = 0;
 								__actionHappenTime = 0;
 								InputEx.LastCode = 0;
 
@@ -329,12 +324,12 @@ namespace ws.winx.input
 
 
                
-                        //key happend that isn't expected inbetween combination sequence
+						//key happend that isn't expected inbetween combination sequence
 						if (InputEx.anyKeyDown && InputEx.LastCode != __currentInputAction.code && __actionHappenTime > 0) {
 								// UnityEngine.Debug.Log("Last Code:"+InputEx.LastCode+" current"+_pointer.Current.codeString);
 								//  UnityEngine.Debug.Log("Reset cos some other key is pressed" + InputEx.anyKeyDown + " Unity anykey:" + Input.anyKeyDown);
 
-								__currentIndex=0;
+								__currentIndex = 0;
 								__actionHappenTime = 0;
 								InputEx.LastCode = 0;
 								return false;
@@ -355,17 +350,47 @@ namespace ws.winx.input
 				/// Gets the analog value.
 				/// </summary>
 				/// <returns> for analog input return -1f to 1f and for digital 0f or 1f</returns>
-				internal float GetAnalogValue ()
+				internal float GetAnalogValue (float sensitivity, float dreadzone, float gravity)
 				{
+			Debug.Log ("Norm:" + GetInputNormalized (sensitivity, dreadzone, gravity));
+					return  2f * (GetInputNormalized (sensitivity, dreadzone, gravity) - 0.5f);
+
+				}
+
+				internal float GetInputNormalized (float sensitivity, float dreadzone, float gravity)
+				{
+
 						if (_actionsList.Count > 1)
 								return 0;
 
-						if (__currentInputAction.code < InputCode.MAX_KEY_CODE || InputCode.toAxis (__currentInputAction.code) == JoystickAxis.None) {//if keys are used as axis
-								return InputEx.GetInputDown(__currentInputAction) || InputEx.GetInputHold(__currentInputAction) ? 1f : 0f;
+
+						JoystickAxis axis;
+
+						//if key,mouse 
+						if (__currentInputAction.code < InputCode.MAX_KEY_CODE) {
+								return GetGenericAnalogValue (sensitivity, dreadzone, gravity);
+
+						} else 
+						//or button
+						if ((axis = InputCode.toAxis (__currentInputAction.code)) == JoystickAxis.None) {
+										return GetGenericAnalogValue (sensitivity, dreadzone, gravity);
+						
+						} else {
+
+								int data = InputCode.toData (__currentInputAction.code);
+								if (axis != JoystickAxis.AxisPovX && axis != JoystickAxis.AxisPovY && ((JoystickPosition)data) == JoystickPosition.Full) {
+										//full Axis => normalize in range 0 to 1
+										return 0.5f *(InputEx.GetInput (__currentInputAction) + 1f);
+								} else {
+								
+										return Math.Abs (InputEx.GetInput (__currentInputAction));
+								}
+
+
 						}
 
-          
-						return InputEx.GetInput (__currentInputAction);
+
+
 
 				}
 

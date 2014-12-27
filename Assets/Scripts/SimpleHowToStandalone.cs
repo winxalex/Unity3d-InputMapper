@@ -55,10 +55,10 @@ namespace ws.winx
 			#endif
 //			
 			#if (UNITY_STANDALONE_OSX)
-           			InputManager.AddDriver(new ThrustMasterDriver());
+           			//InputManager.AddDriver(new ThrustMasterDriver());
            			//InputManager.AddDriver(new XInputDriver());
 			//change default driver
-			//InputManager.hidInterface.defaultDriver=new UnityDriver();
+			InputManager.hidInterface.defaultDriver=new UnityDriver();
 
 			#endif
 	
@@ -217,8 +217,9 @@ namespace ws.winx
 
 			
 									
+			//Generated value from -1 to 1f
+			float axisPos = InputManager.GetInputRaw (Animator.StringToHash ("WalkForward"), 0.3f, 0.1f, 0.2f);
 			
-									
 						//Generated value from 0 to 1f
 //						float axisPos = InputManager.GetInput (Animator.StringToHash ("WalkForward"), 0.3f, 0.1f, 0.2f);
 //			
@@ -227,13 +228,11 @@ namespace ws.winx
 //						float analogVal=axisPos - axisNeg;
 			
 			//Debug.Log (analogVal);//would go from  -1 to 1
+			Debug.Log (axisPos);
 			
 			
 			
-			
-			// Hardware normalized value in range of -1f to 1f (keys,mice would return 0f or 1f, triggers 0f to 1f)
-			//float analogVal2= InputManager.GetInput (Animator.StringToHash ("WalkBackward"));
-			//Debug.Log (analogVal2);
+
 			
 			
 //			float analogVal2= InputManager.GetInput (Animator.StringToHash ("ManualFullAxisMap"));
