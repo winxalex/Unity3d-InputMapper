@@ -325,6 +325,19 @@ namespace ws.winx.platform.osx
 
 			int numElements=elements.Length;
 			int HIDElementType=Native.IOHIDElementGetTypeID();
+
+
+			DeviceProfile profile = null;
+			
+			if (hidDevice.hidInterface.Profiles.ContainsKey (hidDevice.Name)) {
+				
+				
+				
+				profile = hidDevice.hidInterface.LoadProfile (hidDevice.hidInterface.Profiles [hidDevice.Name]);
+			}
+			
+
+
 			IAxisDetails axisDetailsPovX=null;
 			IAxisDetails axisDetailsPovY=null;
 
@@ -424,12 +437,18 @@ namespace ws.winx.platform.osx
 
 
 			joystick=new JoystickDevice(hidDevice.index,hidDevice.PID,hidDevice.VID,axisDetailsList.Count,numButtons,this);
+			joystick.Name = hidDevice.Name;
 			joystick.numPOV = numPov;
 
 			for(;axisIndex<joystick.Axis.Count;axisIndex++)
 			{
 				
 				joystick.Axis[(JoystickAxis)axisIndex]=axisDetailsList[axisIndex];
+				if (profile != null && profile.axisNaming.Length > axisIndex && joystick.Axis[axisIndex]!=null) {
+					joystick.Axis[axisIndex].name = profile.axisNaming [axisIndex];
+					
+				}
+
 			}
 			
 
@@ -443,8 +462,13 @@ namespace ws.winx.platform.osx
 				type = Native.IOHIDElementGetType(element);
 				 if (type == IOHIDElementType.kIOHIDElementTypeInput_Button) {
 								//
-								joystick.Buttons[buttonIndex]=new ButtonDetails(Native.IOHIDElementGetCookie(element));  
-							buttonIndex++;
+								joystick.Buttons[buttonIndex]=new ButtonDetails(Native.IOHIDElementGetCookie(element));
+
+
+						if (profile != null && profile.buttonNaming.Length > buttonIndex) {
+							joystick.Buttons[buttonIndex].name = profile.buttonNaming [buttonIndex];
+						}
+						buttonIndex++;
 							
 				}
 			}

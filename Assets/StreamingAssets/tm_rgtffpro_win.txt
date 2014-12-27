@@ -1,0 +1,2 @@
+|||||Forward|Backward|Left|Right|Start|Back|||Left Bumper|Right Bumper|xbox|A|B|X|Y|
+Left Stick X|Left Stick Y|Right Stick X|Right Stick X|Left Trigger|Right Trigger|DPAD_|DPAD_

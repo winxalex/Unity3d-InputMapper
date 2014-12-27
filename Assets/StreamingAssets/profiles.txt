@@ -13,3 +13,5 @@ Controller (Xbox 360 Wireless Receiver for Windows)|xbox360
 XBOX 360 For Windows (Controller)|xbox360
 Controller (XEOX Gamepad)|xbox360
 Microsoft Wireless 360 Controller|xbox360
+Thrustmaster Thrustmaster force feedback wheel|tm_rgtffpro
+Thrustmaster force feedback wheel|tm_rgtffpro

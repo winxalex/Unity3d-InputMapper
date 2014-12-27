@@ -25,16 +25,29 @@ namespace ws.winx.drivers
             {
 
                 JoystickDevice joystick = new ThrustmasterRGTFFDDevice(hidDevice.index, hidDevice.PID, hidDevice.VID, 8, 10, this);
-               
+				joystick.Name=hidDevice.Name;
                 //JoystickDevice joystick = new JoystickDevice(hidDevice.index, hidDevice.PID, hidDevice.VID, 8, 10, this);
 
                 this.__hidInterface = hidDevice.hidInterface;
+
+				DeviceProfile profile = null;
+				
+				if (hidDevice.hidInterface.Profiles.ContainsKey (hidDevice.Name)) {
+					
+					
+					
+					profile = hidDevice.hidInterface.LoadProfile (hidDevice.hidInterface.Profiles [hidDevice.Name]);
+				}
 
 
                 int index=0;
                 for (; index < 10; index++)
                 {
                     joystick.Buttons[index] = new ButtonDetails();
+
+					if (profile != null && profile.buttonNaming.Length > index) {
+						joystick.Buttons[index].name = profile.buttonNaming [index];
+					}
                 }
 
 
@@ -42,6 +55,10 @@ namespace ws.winx.drivers
                 {
 
                     joystick.Axis[index] = new AxisDetails();
+					if (profile != null && profile.axisNaming.Length > index && joystick.Axis[index]!=null) {
+						joystick.Axis[index].name = profile.axisNaming [index];
+						
+					}
 
                 }
 
@@ -144,7 +161,7 @@ namespace ws.winx.drivers
               
                
 
-
+			
 
 
 
