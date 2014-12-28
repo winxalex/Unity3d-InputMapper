@@ -208,11 +208,23 @@ namespace ws.winx.platform.windows
         {
 			_hidInterface = hidDevice.hidInterface;
 				
-				JoystickDevice joystick;
+				JoystickDevice device;
 
             //Get jostick capabilities
             Native.JoyCaps caps;
             Native.JoystickError result = Native.JoystickError.InvalidParameters;
+
+
+
+            DeviceProfile profile = null;
+
+            if (hidDevice.hidInterface.Profiles.ContainsKey(hidDevice.Name))
+            {
+
+
+
+                profile = hidDevice.hidInterface.LoadProfile(hidDevice.hidInterface.Profiles[hidDevice.Name]);
+            }
 
             int i;
             for (i = 0; i < 16; i++)
@@ -240,13 +252,19 @@ namespace ws.winx.platform.windows
                     ((GenericHIDDevice)hidDevice).ord = i;
 
 
-                    joystick = new JoystickDevice(hidDevice.index, hidDevice.PID, hidDevice.VID, 8, caps.NumButtons, this);
-                    joystick.Extension = new WinDefaultExtension();
+                    device = new JoystickDevice(hidDevice.index, hidDevice.PID, hidDevice.VID, 8, caps.NumButtons, this);
+                    device.Extension = new WinDefaultExtension();
+                    device.Name = hidDevice.Name;
 
                     int buttonIndex = 0;
                     for (; buttonIndex < caps.NumButtons; buttonIndex++)
                     {
-                        joystick.Buttons[buttonIndex] = new ButtonDetails();
+                        device.Buttons[buttonIndex] = new ButtonDetails();
+
+                        if (profile != null && profile.buttonNaming.Length > buttonIndex)
+                        {
+                            device.Buttons[buttonIndex].name = profile.buttonNaming[buttonIndex];
+                        }
                     }
 
 
@@ -258,8 +276,15 @@ namespace ws.winx.platform.windows
                         axisDetails = new AxisDetails();
                         axisDetails.max = caps.XMax;
                         axisDetails.min = caps.XMin;
-                        joystick.Axis[axis] = axisDetails;
+                        device.Axis[axis] = axisDetails;
 						//if(axisDetails.min==0 && axisDetails.max==255) axisDetails.isTrigger=true;
+
+                        if (profile != null && profile.axisNaming.Length > axis)
+                        {
+                            axisDetails.name = profile.axisNaming[axis];
+
+                        }
+
                         axis++;
                     }
                     if (axis < num_axes)
@@ -268,10 +293,14 @@ namespace ws.winx.platform.windows
                         axisDetails.max = caps.YMax;
                         axisDetails.min = caps.YMin;
                        // if (axisDetails.min == 0 && axisDetails.max == 32767) axisDetails.isTrigger = true;
-                        joystick.Axis[axis] = axisDetails;
+                        device.Axis[axis] = axisDetails;
 
-                       
 
+                        if (profile != null && profile.axisNaming.Length > axis)
+                        {
+                            axisDetails.name = profile.axisNaming[axis];
+
+                        }
                       
                         //	stick.Details.Min[axis] = caps.YMin; stick.Details.Max[axis] = caps.YMax; 
                         axis++;
@@ -281,8 +310,14 @@ namespace ws.winx.platform.windows
                         axisDetails = new AxisDetails();
                         axisDetails.max = caps.ZMax;
                         axisDetails.min = caps.ZMin;
-						if(axisDetails.min==0) axisDetails.isTrigger=true;
-                        joystick.Axis[axis] = axisDetails;
+						//if(axisDetails.min==0) axisDetails.isTrigger=true;
+                        device.Axis[axis] = axisDetails;
+
+                        if (profile != null && profile.axisNaming.Length > axis)
+                        {
+                            axisDetails.name = profile.axisNaming[axis];
+
+                        }
                       
                         axis++;
                     }
@@ -293,7 +328,13 @@ namespace ws.winx.platform.windows
                         axisDetails.min = caps.RMin;
                         axisDetails.max = caps.RMax;
                     //    if (axisDetails.min == 0 && axisDetails.max == 255) axisDetails.isTrigger = true;
-                        joystick.Axis[axis] = axisDetails;
+                        device.Axis[axis] = axisDetails;
+
+                        if (profile != null && profile.axisNaming.Length > axis)
+                        {
+                            axisDetails.name = profile.axisNaming[axis];
+
+                        }
                       
                         axis++;
                     }
@@ -304,7 +345,12 @@ namespace ws.winx.platform.windows
                         axisDetails.min = caps.UMin;
                         axisDetails.max = caps.UMax;
                    //     if (axisDetails.min == 0 && axisDetails.max == 255) axisDetails.isTrigger = true;
-                        joystick.Axis[axis] = axisDetails;
+                        device.Axis[axis] = axisDetails;
+                        if (profile != null && profile.axisNaming.Length > axis)
+                        {
+                            axisDetails.name = profile.axisNaming[axis];
+
+                        }
                         axis++;
                     }
 
@@ -314,17 +360,35 @@ namespace ws.winx.platform.windows
                         axisDetails.max = caps.VMax;
                         axisDetails.min = caps.VMin;
                    //     if (axisDetails.min == 0 && axisDetails.max == 255) axisDetails.isTrigger = true;
-                        joystick.Axis[axis] = axisDetails;
+                        device.Axis[axis] = axisDetails;
+
+                        if (profile != null && profile.axisNaming.Length > axis)
+                        {
+                            axisDetails.name = profile.axisNaming[axis];
+
+                        }
                         axis++;
                     }
 
                     if ((caps.Capabilities & Native.JoystCapsFlags.HasPov) != 0)
                     {
-                        joystick.Axis[JoystickAxis.AxisPovX] = new AxisDetails();
-                        joystick.Axis[JoystickAxis.AxisPovY] = new AxisDetails();
+                        device.Axis[JoystickAxis.AxisPovX] = new AxisDetails();
+                        device.Axis[JoystickAxis.AxisPovY] = new AxisDetails();
+
+                        if (profile != null && profile.axisNaming.Length > (int)JoystickAxis.AxisPovX)
+                        {
+                            device.Axis[JoystickAxis.AxisPovX].name = profile.axisNaming[(int)JoystickAxis.AxisPovX];
+
+                        }
+
+                        if (profile != null && profile.axisNaming.Length > (int)JoystickAxis.AxisPovY)
+                        {
+                            device.Axis[JoystickAxis.AxisPovY].name = profile.axisNaming[(int)JoystickAxis.AxisPovY];
+
+                        }
 
 
-                        joystick.numPOV = 1;
+                        device.numPOV = 1;
 
 //                        WinDefaultExtension extension = joystick.Extension as WinDefaultExtension;
 //
@@ -341,7 +405,7 @@ namespace ws.winx.platform.windows
 
                     UnityEngine.Debug.Log(" max:" + caps.RMax + " min:" + caps.RMin + " max:" + caps.UMax + " min:" + caps.UMin);
 
-                    return joystick;
+                    return device;
 
 
                 }
