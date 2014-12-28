@@ -15,6 +15,7 @@ using ws.winx.devices;
 using System.Timers;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Text;
 
 
 namespace ws.winx.platform.windows
@@ -94,6 +95,15 @@ namespace ws.winx.platform.windows
                 _OutputReportByteLength = value; }
         }
 
+
+        public string _OEMName;
+
+        public string OEMName{
+            get { return _OEMName; }
+           
+
+    }
+
         internal int ord;
 
 		internal Native.JoyInfoEx info;
@@ -109,13 +119,24 @@ namespace ws.winx.platform.windows
 			}
 		}		
 		
-		public GenericHIDDevice(int index, int VID, int PID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath, string name = ""):base(index,VID,PID,deviceHandle,hidInterface,devicePath,name)
+		public GenericHIDDevice(int index, int VID, int PID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath):base(index,VID,PID,deviceHandle,hidInterface,devicePath,"")
         {
             try
             {
                 //TODO find way to check if real device is connected cos it can be inside HID list but actually not connected
 
                 var hidHandle = OpenDeviceIO(this.DevicePath,Native.ACCESS_NONE);
+
+                byte[] buffer = new byte[256];
+
+                if (Native.HidD_GetProductString(hidHandle, buffer, (ulong)buffer.LongLength))
+                {
+                    this.Name = Native.TruncateZeroTerminatedString(new UnicodeEncoding().GetString(buffer));
+
+                }
+
+                _OEMName= Native.ReadRegKey(Native.HKEY_LOCAL_MACHINE, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + "VID_" + VID.ToString("X4") + "&PID_" + PID.ToString("X4"), Native.REGSTR_VAL_JOYOEMNAME);
+
               
                 CloseDeviceIO(hidHandle);
 
@@ -136,7 +157,7 @@ namespace ws.winx.platform.windows
         }
 
 
-      
+        
 
 
       

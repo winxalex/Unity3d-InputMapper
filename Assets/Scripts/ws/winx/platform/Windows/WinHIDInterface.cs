@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 using System.Text;
+using System.IO;
 
 
 namespace ws.winx.platform.windows
@@ -71,19 +72,102 @@ namespace ws.winx.platform.windows
         #region IHIDInterface implementation
 
 
-		public DeviceProfile LoadProfile (string fileBase)
-		{
-			throw new NotImplementedException ();
-		}
+        public void LoadProfiles()
+        {
+            //cos UNITY_WEBPLAYER: Application.dataPath  = "http://localhost/appfolder/"
+#if (UNITY_WEBPLAYER || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_STANDALONE
+			throw new Exception("UnityWebPlayer loading profiles option not yet implemented");
+			
+			WebClient client = new WebClient();
+			Stream stream = client.OpenRead(strURL);
+			StreamReader reader = new StreamReader(stream);
+			string[] deviceNameProfilePair;
+			char splitChar='|';
+			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, "profiles.txt"))){
+				
+				
+				while(!reader.EndOfStream){
+					
+					deviceNameProfilePair=reader.ReadLine().Split(splitChar);
+					__profiles[deviceNameProfilePair[0]]=deviceNameProfilePair[1];
+				}
+				
+			}
+#else
+            string[] deviceNameProfilePair;
+            char splitChar = '|';
+
+            using (StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, "profiles.txt")))
+            {
+
+
+                while (!reader.EndOfStream)
+                {
+
+                    deviceNameProfilePair = reader.ReadLine().Split(splitChar);
+                    __profiles[deviceNameProfilePair[0]] = deviceNameProfilePair[1];
+                }
+
+            }
 
 
 
-	
+#endif
+        }
 
-		public void LoadProfiles ()
-		{
-			throw new NotImplementedException ();
-		}
+        public DeviceProfile LoadProfile(string fileBase)
+        {
+
+            DeviceProfile profile = new DeviceProfile();
+
+
+
+            //cos UNITY_WEBPLAYER: Application.dataPath  = "http://localhost/appfolder/"
+#if (UNITY_WEBPLAYER || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_STANDALONE
+			throw new Exception("UnityWebPlayer loading profiles option not yet implemented");
+			
+			WebClient client = new WebClient();
+			Stream stream = client.OpenRead(strURL);
+			StreamReader reader = new StreamReader(stream);
+
+			char splitChar='|';
+			
+			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileBase+"_win.txt"))){
+				
+				
+				if(!reader.EndOfStream)
+					profile.buttonNaming =reader.ReadLine().Split(splitChar);
+				
+				if(!reader.EndOfStream)
+					profile.axisNaming =reader.ReadLine().Split(splitChar);
+				
+				//rest in future
+				
+			}
+		
+#else
+
+            char splitChar = '|';
+
+            using (StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileBase + "_win.txt")))
+            {
+
+                if (!reader.EndOfStream)
+                    profile.buttonNaming = reader.ReadLine().Split(splitChar);
+
+                if (!reader.EndOfStream)
+                    profile.axisNaming = reader.ReadLine().Split(splitChar);
+
+                //rest in future
+
+
+
+            }
+
+#endif
+
+            return profile;
+        }
 
 		public Dictionary<string, string> Profiles {
 			get {
@@ -206,6 +290,8 @@ namespace ws.winx.platform.windows
             __Generics = new Dictionary<int, HIDDevice>();
 
 			__profiles = new Dictionary<string,string> ();
+
+            LoadProfiles();
 
         }
         #endregion
@@ -543,34 +629,7 @@ namespace ws.winx.platform.windows
 
 
 
-        /// <summary>
-        /// Get Value of the Registry Key
-        /// </summary>
-        /// <param name="rootKey"></param>
-        /// <param name="keyPath"></param>
-        /// <param name="valueName"></param>
-        /// <returns></returns>
-        private string ReadRegKey(UIntPtr rootKey, string keyPath, string valueName)
-        {
-            UIntPtr hKey;
-
-            if (Native.RegOpenKeyEx(rootKey, keyPath, 0, Native.KEY_READ, out hKey) == 0)
-            {
-                uint size = 1024;
-                uint type;
-                string keyValue = null;
-                StringBuilder keyBuffer = new StringBuilder((int)size);
-
-                if (Native.RegQueryValueEx(hKey, valueName, 0, out type, keyBuffer, ref size) == 0)
-                    keyValue = keyBuffer.ToString();
-
-                Native.RegCloseKey(hKey);
-
-                return (keyValue);
-            }
-
-            return String.Empty;  // Return null if the value could not be read
-        }
+     
 
 
 
@@ -610,14 +669,14 @@ namespace ws.winx.platform.windows
 
                 // string name = ReadRegKey(Native.HKEY_CURRENT_USER, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + DeviceInstanceId, Native.REGSTR_VAL_JOYOEMNAME);
 
-                string name = ReadRegKey(Native.HKEY_LOCAL_MACHINE, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + VID_PID_Parts[0] + "&" + VID_PID_Parts[1], Native.REGSTR_VAL_JOYOEMNAME);
+               // string name = ReadRegKey(Native.HKEY_LOCAL_MACHINE, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + VID_PID_Parts[0] + "&" + VID_PID_Parts[1], Native.REGSTR_VAL_JOYOEMNAME);
 
 
 
 
 
                 //!!! deviceHandle set to IntPtr.Zero (think not needed in widows)
-                return new GenericHIDDevice(__Generics.Count, Convert.ToInt32(VID_PID_Parts[0].Replace("VID_", ""), 16), Convert.ToInt32(VID_PID_Parts[1].Replace("PID_", ""), 16), IntPtr.Zero, this, devicePath, name);
+                return new GenericHIDDevice(__Generics.Count, Convert.ToInt32(VID_PID_Parts[0].Replace("VID_", ""), 16), Convert.ToInt32(VID_PID_Parts[1].Replace("PID_", ""), 16), IntPtr.Zero, this, devicePath);
             }
 
             return null;
@@ -638,11 +697,14 @@ namespace ws.winx.platform.windows
 
             string devicePath = GetDevicePath(rawInputDeviceList.DeviceHandle);
 
-            string name = ReadRegKey(Native.HKEY_LOCAL_MACHINE, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + "VID_" + deviceInfo.HIDInfo.VendorID.ToString("X4") + "&PID_" + deviceInfo.HIDInfo.ProductID.ToString("X4"), Native.REGSTR_VAL_JOYOEMNAME);
+          
+
+
+           // string name = ReadRegKey(Native.HKEY_LOCAL_MACHINE, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + "VID_" + deviceInfo.HIDInfo.VendorID.ToString("X4") + "&PID_" + deviceInfo.HIDInfo.ProductID.ToString("X4"), Native.REGSTR_VAL_JOYOEMNAME);
 
 
 
-            return new GenericHIDDevice(__Generics.Count, Convert.ToInt32(deviceInfo.HIDInfo.VendorID), Convert.ToInt32(deviceInfo.HIDInfo.ProductID), rawInputDeviceList.DeviceHandle, this, devicePath, name);
+            return new GenericHIDDevice(__Generics.Count, Convert.ToInt32(deviceInfo.HIDInfo.VendorID), Convert.ToInt32(deviceInfo.HIDInfo.ProductID), rawInputDeviceList.DeviceHandle, this, devicePath);
 
             //this have problems with   
             // return GetHIDDeviceInfo(GetDevicePath(rawInputDeviceList.DeviceHandle));

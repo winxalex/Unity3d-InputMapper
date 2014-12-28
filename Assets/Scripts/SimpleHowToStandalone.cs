@@ -47,7 +47,7 @@ namespace ws.winx
 			#if (UNITY_STANDALONE_WIN)
             			InputManager.AddDriver(new ThrustMasterDriver());
             //			InputManager.AddDriver(new WiiDriver());
-            	//		InputManager.AddDriver(new XInputDriver());
+            			InputManager.AddDriver(new XInputDriver());
 			//change default driver
 		InputManager.hidInterface.defaultDriver=new UnityDriver();
 

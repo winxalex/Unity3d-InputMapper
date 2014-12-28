@@ -326,6 +326,8 @@ namespace ws.winx.platform.windows
         [DllImport("kernel32.dll")]
         static internal extern bool WriteFile(IntPtr hFile, byte[] lpBuffer, uint nNumberOfBytesToWrite, out uint lpNumberOfBytesWritten, [In] ref System.Threading.NativeOverlapped lpOverlapped);
 
+        [DllImport("hid.dll", SetLastError = true)]
+        public static extern bool HidD_GetProductString(IntPtr HidDeviceObject, byte[] Buffer, ulong BufferLength);
 
 
 
@@ -459,8 +461,47 @@ namespace ws.winx.platform.windows
 			[DllImport("Winmm.dll"), SuppressUnmanagedCodeSecurity]
 			internal static extern int joyGetNumDevs();
 
-		
 
+
+
+            /// <summary>
+            /// Get Value of the Registry Key
+            /// </summary>
+            /// <param name="rootKey"></param>
+            /// <param name="keyPath"></param>
+            /// <param name="valueName"></param>
+            /// <returns></returns>
+            public static string ReadRegKey(UIntPtr rootKey, string keyPath, string valueName)
+            {
+                UIntPtr hKey;
+
+                if (Native.RegOpenKeyEx(rootKey, keyPath, 0, Native.KEY_READ, out hKey) == 0)
+                {
+                    uint size = 1024;
+                    uint type;
+                    string keyValue = null;
+                    StringBuilder keyBuffer = new StringBuilder((int)size);
+
+                    if (Native.RegQueryValueEx(hKey, valueName, 0, out type, keyBuffer, ref size) == 0)
+                        keyValue = keyBuffer.ToString();
+
+                    Native.RegCloseKey(hKey);
+
+                    return (keyValue);
+                }
+
+                return String.Empty;  // Return null if the value could not be read
+            }
+
+
+            public static string TruncateZeroTerminatedString(string input)
+            {
+                if (input == null)
+                {
+                    return null;
+                }
+                return input.Substring(0, input.IndexOf('\0'));
+            }
 
 		
 	}
