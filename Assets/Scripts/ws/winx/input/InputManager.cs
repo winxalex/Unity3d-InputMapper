@@ -975,7 +975,7 @@ namespace ws.winx.input
             
             __inputCombinations=__settings.stateInputs[stateNameHash].combinations;
 
-				return __inputCombinations [0].GetInputNormalized (sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations [1] != null ? __inputCombinations [1].GetInputNormalized (sensitivity, dreadzone, gravity) : 0);
+				return Mathf.Clamp01(__inputCombinations [0].GetInputNormalized (sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations [1] != null ? __inputCombinations [1].GetInputNormalized (sensitivity, dreadzone, gravity) : 0));
 
 		}
 
@@ -997,7 +997,7 @@ namespace ws.winx.input
 			
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
 
-			return __inputCombinations [0].GetAnalogValue (sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetAnalogValue(sensitivity,dreadzone,gravity) : 0f);
+			return Mathf.Clamp(__inputCombinations [0].GetAnalogValue (sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetAnalogValue(sensitivity,dreadzone,gravity) : 0f),-1f,1f);
 			
 		}
 

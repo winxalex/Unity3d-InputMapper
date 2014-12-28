@@ -349,14 +349,31 @@ namespace ws.winx.input
 				/// <summary>
 				/// Gets the analog value.
 				/// </summary>
-				/// <returns> for analog input return -1f to 1f and for digital 0f or 1f</returns>
+				/// <returns> for analog input return values -1f to 1f or inverted depending of device</returns>
 				internal float GetAnalogValue (float sensitivity, float dreadzone, float gravity)
 				{
-			Debug.Log ("Norm:" + GetInputNormalized (sensitivity, dreadzone, gravity));
-					return  2f * (GetInputNormalized (sensitivity, dreadzone, gravity) - 0.5f);
+						//if key,mouse, joy button
+						if (__currentInputAction.code < InputCode.MAX_KEY_CODE || InputCode.toAxis (__currentInputAction.code) == JoystickAxis.None) {
+							if(InputEx.GetInputHold(__currentInputAction) || InputEx.GetInputDown(__currentInputAction))
+							return 2f * (GetGenericAnalogValue (sensitivity, dreadzone, gravity) -0.5f);
+							else
+							return 0f;
+						} else {
+			
+							return InputEx.GetInput (__currentInputAction);
+		
+						}
 
 				}
 
+
+				/// <summary>
+				/// Gets the input normalized.
+				/// </summary>
+				/// <returns>The input normalized.</returns>
+				/// <param name="sensitivity">Sensitivity.</param>
+				/// <param name="dreadzone">Dreadzone.</param>
+				/// <param name="gravity">Gravity.</param>
 				internal float GetInputNormalized (float sensitivity, float dreadzone, float gravity)
 				{
 
@@ -380,7 +397,9 @@ namespace ws.winx.input
 								int data = InputCode.toData (__currentInputAction.code);
 								if (axis != JoystickAxis.AxisPovX && axis != JoystickAxis.AxisPovY && ((JoystickPosition)data) == JoystickPosition.Full) {
 										//full Axis => normalize in range 0 to 1
-										return 0.5f *(InputEx.GetInput (__currentInputAction) + 1f);
+
+										//if(InputEx.GetInput (__currentInputAction)>0 && InputEx.
+										return 0f;
 								} else {
 								
 										return Math.Abs (InputEx.GetInput (__currentInputAction));
