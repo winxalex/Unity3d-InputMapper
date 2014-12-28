@@ -33,7 +33,7 @@ namespace ws.winx.platform.windows
 
         private IDriver __defaultJoystickDriver;
 
-		private Dictionary<string,string> __profiles;
+        private Dictionary<string, string> __profiles;
 
 
         private static readonly object syncRoot = new object();
@@ -120,32 +120,8 @@ namespace ws.winx.platform.windows
 
             DeviceProfile profile = new DeviceProfile();
 
+          
 
-
-            //cos UNITY_WEBPLAYER: Application.dataPath  = "http://localhost/appfolder/"
-#if (UNITY_WEBPLAYER || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_STANDALONE
-			throw new Exception("UnityWebPlayer loading profiles option not yet implemented");
-			
-			WebClient client = new WebClient();
-			Stream stream = client.OpenRead(strURL);
-			StreamReader reader = new StreamReader(stream);
-
-			char splitChar='|';
-			
-			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileBase+"_win.txt"))){
-				
-				
-				if(!reader.EndOfStream)
-					profile.buttonNaming =reader.ReadLine().Split(splitChar);
-				
-				if(!reader.EndOfStream)
-					profile.axisNaming =reader.ReadLine().Split(splitChar);
-				
-				//rest in future
-				
-			}
-		
-#else
 
             char splitChar = '|';
 
@@ -164,16 +140,18 @@ namespace ws.winx.platform.windows
 
             }
 
-#endif
+
 
             return profile;
         }
 
-		public Dictionary<string, string> Profiles {
-			get {
-				return __profiles;
-			}
-		}
+        public Dictionary<string, string> Profiles
+        {
+            get
+            {
+                return __profiles;
+            }
+        }
 
 
 
@@ -289,7 +267,7 @@ namespace ws.winx.platform.windows
 
             __Generics = new Dictionary<int, HIDDevice>();
 
-			__profiles = new Dictionary<string,string> ();
+            __profiles = new Dictionary<string, string>();
 
             LoadProfiles();
 
@@ -435,15 +413,15 @@ namespace ws.winx.platform.windows
 
                                         this.Generics.Remove(hidDevice.PID);
 
-                                       
+
 
                                         UnityEngine.Debug.Log("WinHIDInterface: " + hidDevice.Name + " Removed");
                                     }
 
                                 }
 
-                                if(hidDeviceExisted)
-                                this.DeviceDisconnectEvent(this, new DeviceEventArgs<int>(hidDevice.PID));
+                                if (hidDeviceExisted)
+                                    this.DeviceDisconnectEvent(this, new DeviceEventArgs<int>(hidDevice.PID));
 
 
 
@@ -629,7 +607,7 @@ namespace ws.winx.platform.windows
 
 
 
-     
+
 
 
 
@@ -669,7 +647,7 @@ namespace ws.winx.platform.windows
 
                 // string name = ReadRegKey(Native.HKEY_CURRENT_USER, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + DeviceInstanceId, Native.REGSTR_VAL_JOYOEMNAME);
 
-               // string name = ReadRegKey(Native.HKEY_LOCAL_MACHINE, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + VID_PID_Parts[0] + "&" + VID_PID_Parts[1], Native.REGSTR_VAL_JOYOEMNAME);
+                // string name = ReadRegKey(Native.HKEY_LOCAL_MACHINE, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + VID_PID_Parts[0] + "&" + VID_PID_Parts[1], Native.REGSTR_VAL_JOYOEMNAME);
 
 
 
@@ -697,10 +675,10 @@ namespace ws.winx.platform.windows
 
             string devicePath = GetDevicePath(rawInputDeviceList.DeviceHandle);
 
-          
 
 
-           // string name = ReadRegKey(Native.HKEY_LOCAL_MACHINE, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + "VID_" + deviceInfo.HIDInfo.VendorID.ToString("X4") + "&PID_" + deviceInfo.HIDInfo.ProductID.ToString("X4"), Native.REGSTR_VAL_JOYOEMNAME);
+
+            // string name = ReadRegKey(Native.HKEY_LOCAL_MACHINE, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + "VID_" + deviceInfo.HIDInfo.VendorID.ToString("X4") + "&PID_" + deviceInfo.HIDInfo.ProductID.ToString("X4"), Native.REGSTR_VAL_JOYOEMNAME);
 
 
 
@@ -831,7 +809,7 @@ namespace ws.winx.platform.windows
 
 
                         Debug.Log("Device" + hidDevice.index + " PID:" + hidDevice.PID + " VID:" + hidDevice.VID + "[" + hidDevice.Name + "] attached to " + driver.GetType().ToString()
-                            
+
                           // +hidDevice.DevicePath 
                             );
 
@@ -898,7 +876,7 @@ namespace ws.winx.platform.windows
             UnregisterHIDDeviceNotification();
 
             error = Marshal.GetLastWin32Error();
-            if(error>0)
+            if (error > 0)
 
                 UnityEngine.Debug.Log(" NotificationHandle Erorr" + error);
 
@@ -913,17 +891,17 @@ namespace ws.winx.platform.windows
 
                     UnityEngine.Debug.Log("Try to destroy plug&play Notificaiton window");
 
-                   // Native.DestroyWindow(receiverWindowHandle);
+                    // Native.DestroyWindow(receiverWindowHandle);
 
                     //TODO test with this (issue when open  close InputMapper in Editor twice
                     //maybe use bellow code
-                    if(Application.isPlaying)
-                   Native.PostMessage(new HandleRef(this,this.hidDeviceNotificationReceiverWindowHandle),Native.WM_CLOSE,IntPtr.Zero,IntPtr.Zero);
-                   error = Marshal.GetLastWin32Error();
+                    if (Application.isPlaying)
+                        Native.PostMessage(new HandleRef(this, this.hidDeviceNotificationReceiverWindowHandle), Native.WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
+                    error = Marshal.GetLastWin32Error();
                     if (error > 0)
 
-                       UnityEngine.Debug.Log(" Destroy Erorr" + error);
-                    
+                        UnityEngine.Debug.Log(" Destroy Erorr" + error);
+
                     hidDeviceNotificationReceiverWindowHandle = IntPtr.Zero;
 
 

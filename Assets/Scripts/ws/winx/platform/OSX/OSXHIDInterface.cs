@@ -82,12 +82,12 @@ namespace ws.winx.platform.osx
 
 
 
-        #endregion
+#endregion
 
 
 		
 		
-		#region Contsructor
+#region Contsructor
 		
 		public OSXHIDInterface()
 		{
@@ -139,32 +139,13 @@ namespace ws.winx.platform.osx
 			
 			
 		}
-		#endregion
+        #endregion
 
 #region IHIDInterface implementation
 
 		public void LoadProfiles ()
 		{
-			//cos UNITY_WEBPLAYER: Application.dataPath  = "http://localhost/appfolder/"
-			#if (UNITY_WEBPLAYER || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_STANDALONE
-			throw new Exception("UnityWebPlayer loading profiles option not yet implemented");
 			
-			WebClient client = new WebClient();
-			Stream stream = client.OpenRead(strURL);
-			StreamReader reader = new StreamReader(stream);
-			string[] deviceNameProfilePair;
-			char splitChar='|';
-			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, "profiles.txt"))){
-				
-				
-				while(!reader.EndOfStream){
-					
-					deviceNameProfilePair=reader.ReadLine().Split(splitChar);
-					__profiles[deviceNameProfilePair[0]]=deviceNameProfilePair[1];
-				}
-				
-			}
-			#else
 			string[] deviceNameProfilePair;
 			char splitChar='|';
 
@@ -181,7 +162,7 @@ namespace ws.winx.platform.osx
 
 		
 
-			#endif
+			
 		}
 
 		public DeviceProfile LoadProfile(string fileBase){
@@ -190,30 +171,7 @@ namespace ws.winx.platform.osx
 
 
 
-			//cos UNITY_WEBPLAYER: Application.dataPath  = "http://localhost/appfolder/"
-			#if (UNITY_WEBPLAYER || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_STANDALONE
-			throw new Exception("UnityWebPlayer loading profiles option not yet implemented");
 			
-			WebClient client = new WebClient();
-			Stream stream = client.OpenRead(strURL);
-			StreamReader reader = new StreamReader(stream);
-
-			char splitChar='|';
-			
-			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileBase+"_osx.txt"))){
-				
-				
-				if(!reader.EndOfStream)
-					profile.buttonNaming =reader.ReadLine().Split(splitChar);
-				
-				if(!reader.EndOfStream)
-					profile.axisNaming =reader.ReadLine().Split(splitChar);
-				
-				//rest in future
-				
-			}
-		
-			#else
 		
 			char splitChar='|';
 			
@@ -231,7 +189,7 @@ namespace ws.winx.platform.osx
 				
 			}
 
-			#endif
+			
 
 			return profile;
 		}

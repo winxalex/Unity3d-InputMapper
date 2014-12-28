@@ -14,7 +14,7 @@ namespace ws.winx.platform.web
 {
     public class WebHIDInterface : IHIDInterface
     {
-        #region Fields
+#region Fields
         private List<IDriver> __drivers;
        
         private IDriver __defaultJoystickDriver;
@@ -43,11 +43,78 @@ namespace ws.winx.platform.web
             _container = new GameObject("WebHIDBehaviourGO");
             webHIDBehaviour= _container.AddComponent<WebHIDBehaviour>();
           
+            LoadProfiles();
 
         }
-        #endregion
+#endregion
 
-        #region IHIDInterface implementation
+#region IHIDInterface implementation
+
+
+	public void LoadProfiles ()
+		{
+			//cos UNITY_WEBPLAYER: Application.dataPath  = "http://localhost/appfolder/"
+
+			throw new Exception("UnityWebPlayer loading profiles option not yet tested");
+			
+			WebClient client = new WebClient();
+			Stream stream = client.OpenRead(strURL);
+			StreamReader reader = new StreamReader(stream);
+			string[] deviceNameProfilePair;
+			char splitChar='|';
+			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, "profiles.txt"))){
+				
+				
+				while(!reader.EndOfStream){
+					
+					deviceNameProfilePair=reader.ReadLine().Split(splitChar);
+					__profiles[deviceNameProfilePair[0]]=deviceNameProfilePair[1];
+				}
+				
+			}
+
+		}
+
+		public DeviceProfile LoadProfile(string fileBase){
+
+			DeviceProfile profile=new DeviceProfile();
+
+
+
+			//cos UNITY_WEBPLAYER: Application.dataPath  = "http://localhost/appfolder/"
+
+			throw new Exception("UnityWebPlayer loading profiles option not yet not tested");
+			
+			WebClient client = new WebClient();
+			Stream stream = client.OpenRead(strURL);
+			StreamReader reader = new StreamReader(stream);
+
+			char splitChar='|';
+			
+			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileBase+"_web.txt"))){
+				
+				
+				if(!reader.EndOfStream)
+					profile.buttonNaming =reader.ReadLine().Split(splitChar);
+				
+				if(!reader.EndOfStream)
+					profile.axisNaming =reader.ReadLine().Split(splitChar);
+				
+				//rest in future
+				
+			}
+		
+
+
+			return profile;
+		}
+
+
+
+
+
+
+
 		public void AddDriver (IDriver driver)
 		{
 			__drivers.Add (driver);

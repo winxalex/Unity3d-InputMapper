@@ -48,7 +48,7 @@ namespace ws.winx.platform.android
             droidHIDBehaviour = _container.AddComponent<AndroidHIDBehaviour>();
           
               
-           // 
+          LoadProfiles();
         }
 
 	
@@ -167,6 +167,21 @@ namespace ws.winx.platform.android
         }
 
 		#region IHIDInterface implementation
+
+
+
+
+        public void LoadProfiles()
+        {
+              throw new NotImplementedException();
+        }
+
+        public DeviceProfile LoadProfile(string fileBase)
+        {
+
+
+              throw new NotImplementedException();
+        }
 
 		public void AddDriver (IDriver driver)
 		{
