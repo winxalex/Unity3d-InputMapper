@@ -74,26 +74,7 @@ namespace ws.winx.platform.windows
 
         public void LoadProfiles()
         {
-            //cos UNITY_WEBPLAYER: Application.dataPath  = "http://localhost/appfolder/"
-#if (UNITY_WEBPLAYER || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_STANDALONE
-			throw new Exception("UnityWebPlayer loading profiles option not yet implemented");
-			
-			WebClient client = new WebClient();
-			Stream stream = client.OpenRead(strURL);
-			StreamReader reader = new StreamReader(stream);
-			string[] deviceNameProfilePair;
-			char splitChar='|';
-			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, "profiles.txt"))){
-				
-				
-				while(!reader.EndOfStream){
-					
-					deviceNameProfilePair=reader.ReadLine().Split(splitChar);
-					__profiles[deviceNameProfilePair[0]]=deviceNameProfilePair[1];
-				}
-				
-			}
-#else
+
             string[] deviceNameProfilePair;
             char splitChar = '|';
 
@@ -112,7 +93,7 @@ namespace ws.winx.platform.windows
 
 
 
-#endif
+
         }
 
         public DeviceProfile LoadProfile(string fileBase)
@@ -120,7 +101,7 @@ namespace ws.winx.platform.windows
 
             DeviceProfile profile = new DeviceProfile();
 
-          
+
 
 
             char splitChar = '|';
