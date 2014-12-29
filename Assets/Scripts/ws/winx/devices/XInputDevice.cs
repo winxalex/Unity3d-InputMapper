@@ -48,8 +48,19 @@ namespace ws.winx.devices
         }
 
 
-        public XInputDevice(int id,int pid,int vid,int axes,int buttons,IDriver driver,int type)
-            : base(id,pid,vid, axes, buttons,driver)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ws.winx.devices.XInputDevice"/> class.
+		/// </summary>
+		/// <param name="id">Identifier.</param>
+		/// <param name="pid">Pid.</param>
+		/// <param name="vid">Vid.</param>
+		/// <param name="ID">I.</param>
+		/// <param name="axes">Axes.</param>
+		/// <param name="buttons">Buttons.</param>
+		/// <param name="driver">Driver.</param>
+		/// <param name="type">Type.</param>
+        public XInputDevice(int id,int pid,int vid,string ID,int axes,int buttons,IDriver driver,int type)
+            : base(id,pid,vid,ID, axes, buttons,driver)
         {
             this.Type = type;
         }

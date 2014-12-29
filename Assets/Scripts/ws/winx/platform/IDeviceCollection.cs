@@ -14,7 +14,7 @@ namespace ws.winx.platform
 {
 		public interface IDeviceCollection:IEnumerable
 		{
-			IDevice this [int PID] {get;}
+			IDevice this [string ID] {get;}
 
 		    /// <summary>
 		    /// Gets the <see cref="ws.winx.platform.IDeviceCollection"/> at the specified index.
@@ -27,14 +27,14 @@ namespace ws.winx.platform
 		  
 
 			void Remove (byte index);
-            void Remove(int pid);
+            void Remove(string id);
 
 		    /// <summary>
-		    /// Containses the key of device.PID
+		    /// Containses the key of device.ID
 		    /// </summary>
 		    /// <returns><c>true</c>, if key was containsed, <c>false</c> otherwise.</returns>
-		    /// <param name="pid">Pid.</param>
-			bool ContainsPID(int pid);
+		    /// <param name="id">id.</param>
+			bool ContainsID(string id);
 
 		    /// <summary>
 		    /// Containses the key of device index (0-15).

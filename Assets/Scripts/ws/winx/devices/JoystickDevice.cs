@@ -35,6 +35,12 @@ namespace ws.winx.devices
 				int _PID;
 				bool _isReady = true;
 				int _lastFrameNum = -1;
+
+		string _ID {
+			get;
+			set;
+		}
+
 				//int axisDominantPrevInx = -1;
 
 				public int LastFrameNum {
@@ -46,7 +52,7 @@ namespace ws.winx.devices
 
         #region Constructors
 
-				internal JoystickDevice (int index, int pid, int vid, int axes, int buttons, IDriver driver)
+				internal JoystickDevice (int index, int pid, int vid,string ID, int axes, int buttons, IDriver driver)
 				{
 						if (axes < 0)
 								throw new ArgumentOutOfRangeException ("axes");
@@ -61,7 +67,7 @@ namespace ws.winx.devices
 						_numButtons = buttons;
 
                        
-
+						_ID = ID;
 						_index = index;
 						_VID = vid;
 						_PID = pid;
@@ -77,6 +83,15 @@ namespace ws.winx.devices
         #region Public Members
 
 		#region IDevice implementation
+
+	
+		public string ID {
+			get {
+				return _ID;
+			}
+		}
+
+
 
 
 				public bool isReady {

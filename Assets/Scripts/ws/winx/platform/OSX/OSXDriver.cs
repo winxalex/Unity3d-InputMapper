@@ -278,9 +278,9 @@ namespace ws.winx.platform.osx
 		/// <param name="device">Joystick.</param>
         public void Update(IDevice device)	
 		{
-			if (device != null && _hidInterface != null && _hidInterface.Contains(device.PID)) {
+			if (device != null && _hidInterface != null && _hidInterface.Contains(device.ID)) {
 								
-				HIDReport report = _hidInterface.ReadDefault (device.PID);
+				HIDReport report = _hidInterface.ReadDefault (device.ID);
 
 								//Debug.Log (report.Status);
 
@@ -436,7 +436,7 @@ namespace ws.winx.platform.osx
 			}
 
 
-			joystick=new JoystickDevice(hidDevice.index,hidDevice.PID,hidDevice.VID,axisDetailsList.Count,numButtons,this);
+			joystick=new JoystickDevice(hidDevice.index,hidDevice.PID,hidDevice.VID,hidDevice.ID,axisDetailsList.Count,numButtons,this);
 			joystick.Name = hidDevice.Name;
 			joystick.numPOV = numPov;
 

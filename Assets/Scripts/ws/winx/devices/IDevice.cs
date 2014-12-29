@@ -18,6 +18,7 @@ namespace ws.winx.devices
 	{
 		int VID{get;}
 		int PID{get;}
+		string ID{get;}
 		int Index{get;}
         int numPOV { get; set; }
         bool isReady { get; }

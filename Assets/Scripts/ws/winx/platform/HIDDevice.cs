@@ -28,11 +28,13 @@ namespace ws.winx.platform
 				IHIDInterface _hidInterface;
                 string _name;
                 int _index;
+
+				string _ID;			
                
 
                
 
-				public HIDDevice (int index, int VID, int PID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath,string name=""
+				public HIDDevice (int index, int VID, int PID,string ID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath,string name=""
                    )
 				{
                     
@@ -43,6 +45,7 @@ namespace ws.winx.platform
 						_hidInterface = hidInterface;
 						_devicePath = devicePath;
                         _name = name;
+						_ID = ID;
 				}
 
 
@@ -60,6 +63,17 @@ namespace ws.winx.platform
 
 
 		#region IHIDDeviceInfo implementation
+
+
+		public virtual string ID {
+			get {
+				return _ID;
+			}
+		}
+
+
+
+	
 
 
 

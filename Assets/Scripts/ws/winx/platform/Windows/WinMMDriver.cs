@@ -52,8 +52,8 @@ namespace ws.winx.platform.windows
         public void Update(IDevice device)
         {
 
-			if (device != null && _hidInterface != null && _hidInterface.Contains (device.PID)) {
-								HIDReport report = _hidInterface.ReadDefault (device.PID);
+			if (device != null && _hidInterface != null && _hidInterface.Contains (device.ID)) {
+								HIDReport report = _hidInterface.ReadDefault (device.ID);
 
             
 								//return;
@@ -252,7 +252,7 @@ namespace ws.winx.platform.windows
                     ((GenericHIDDevice)hidDevice).ord = i;
 
 
-                    device = new JoystickDevice(hidDevice.index, hidDevice.PID, hidDevice.VID, 8, caps.NumButtons, this);
+                    device = new JoystickDevice(hidDevice.index, hidDevice.PID, hidDevice.VID,hidDevice.ID, 8, caps.NumButtons, this);
                     device.Extension = new WinDefaultExtension();
                     device.Name = hidDevice.Name;
 

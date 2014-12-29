@@ -19,10 +19,13 @@ namespace ws.winx.platform
             int index { get; }
 			int VID{get;}
 			int PID{get;}
+			string ID{ get; }
+			
 			IntPtr deviceHandle {get;}
 			string DevicePath {get;}
             object Extension { set; get; }
             string Name { get; }
+		    
           
 		}
 }

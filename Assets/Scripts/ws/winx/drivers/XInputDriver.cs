@@ -119,11 +119,11 @@ namespace ws.winx.drivers
 		 {
 
 
-            if (device!=null && _hidInterface!=null && _hidInterface.Contains(device.PID))
+            if (device!=null && _hidInterface!=null && _hidInterface.Contains(device.ID))
             {
 
                 //  Debug.Log("Update Joy"+device.Index);
-                HIDReport data = _hidInterface.ReadBuffered(device.PID);
+                HIDReport data = _hidInterface.ReadBuffered(device.ID);
 
                 if(data!=null)
                 onRead(data);
@@ -462,7 +462,7 @@ namespace ws.winx.drivers
            
 
 
-            device = new XInputDevice(hidDevice.index, hidDevice.PID, hidDevice.VID, 8, 20, this, type);
+            device = new XInputDevice(hidDevice.index, hidDevice.PID, hidDevice.VID,hidDevice.ID, 8, 20, this, type);
 			device.Name = hidDevice.Name;
 
 			DeviceProfile profile = null;
@@ -618,7 +618,7 @@ namespace ws.winx.drivers
         {
            
 
-            _hidInterface.Write(new byte[]{0x1, 0x3, mode},device.PID);
+            _hidInterface.Write(new byte[]{0x1, 0x3, mode},device.ID);
         
         }
 

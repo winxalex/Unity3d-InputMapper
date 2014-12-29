@@ -57,14 +57,14 @@ namespace ws.winx.input
 
 
 
-	 static ControllerDevicesCollection _devices;
+	 static DevicesCollection _devices;
 
 
 		internal static IDeviceCollection Devices
 		{
 
 			get {  
-				if(_devices==null) _devices = new ControllerDevicesCollection(); 
+				if(_devices==null) _devices = new DevicesCollection(); 
 				return _devices; 
 			}
 
@@ -99,7 +99,7 @@ namespace ws.winx.input
                 #endif
 
 					//register events
-					__hidInterface.DeviceDisconnectEvent+=new EventHandler<DeviceEventArgs<int>>(onRemoveDevice);
+					__hidInterface.DeviceDisconnectEvent+=new EventHandler<DeviceEventArgs<string>>(onRemoveDevice);
 					__hidInterface.DeviceConnectEvent+=new EventHandler<DeviceEventArgs<IDevice>>(onAddDevice);
 
 
@@ -116,10 +116,10 @@ namespace ws.winx.input
 		}
 
 
-	   internal static void onRemoveDevice(object sender,DeviceEventArgs<int> args){
+	   internal static void onRemoveDevice(object sender,DeviceEventArgs<string> args){
 
 						lock (syncRoot) {
-								if (Devices.ContainsPID (args.data)) 
+								if (Devices.ContainsID (args.data)) 
 					
 										_devices.Remove (args.data);
 					
@@ -130,10 +130,10 @@ namespace ws.winx.input
 
 			        lock (syncRoot) {
 						//do not allow duplicates
-						if (Devices.ContainsPID (args.data.PID))
+						if (Devices.ContainsID (args.data.ID))
 								return;
 
-						_devices[args.data.PID] = args.data;
+						_devices[args.data.ID] = args.data;
 					}
 
 		}
@@ -1094,12 +1094,12 @@ namespace ws.winx.input
 		/// <summary>
 		/// Defines a collection of ControllerAxes.
 		/// </summary>
-		public sealed class ControllerDevicesCollection : IDeviceCollection
+		public sealed class DevicesCollection : IDeviceCollection
 		{
 			#region Fields
-			readonly Dictionary<int, IDevice> PIDToDevice;
+			readonly Dictionary<string, IDevice> IDToDevice;
 				
-			readonly Dictionary<byte, int> IndexToPID;
+			readonly Dictionary<byte, string> IndexToID;
 			
 			
 			List<IDevice> _iterationCacheList;//
@@ -1109,11 +1109,11 @@ namespace ws.winx.input
 			
 			#region Constructors
 			
-			internal ControllerDevicesCollection()
+			internal DevicesCollection()
 			{
-				PIDToDevice = new Dictionary<int, IDevice>();
+				IDToDevice = new Dictionary<string, IDevice>();
 				
-				IndexToPID = new Dictionary<byte, int>();
+				IndexToID = new Dictionary<byte, string>();
 				
 			}
 			
@@ -1131,10 +1131,10 @@ namespace ws.winx.input
 			/// Remove the specified device with specified PID.
 			/// </summary>
 			/// <param name="PID">PI.</param>
-			public void Remove(int PID)
+			public void Remove(string ID)
 			{
-				IndexToPID.Remove((byte)PIDToDevice[PID].Index);
-				PIDToDevice.Remove(PID);
+				IndexToID.Remove((byte)IDToDevice[ID].Index);
+				IDToDevice.Remove(ID);
 
 				_isEnumeratorDirty = true;
 			}
@@ -1145,11 +1145,11 @@ namespace ws.winx.input
 			/// <param name="index">Index.</param>
 			public void Remove(byte index)
 			{
-				int pid = IndexToPID[index];
+				string id = IndexToID[index];
 
 				//PIDToDevice[pid].
-				IndexToPID.Remove(index);
-				PIDToDevice.Remove(pid);
+				IndexToID.Remove(index);
+				IDToDevice.Remove(id);
 				
 				_isEnumeratorDirty = true;
 			}
@@ -1163,13 +1163,13 @@ namespace ws.winx.input
 			/// <param name="index">Index.</param>
 			public IDevice this[byte index]
 			{
-				get { return PIDToDevice[IndexToPID[index]]; }
+				get { return IDToDevice[IndexToID[index]]; }
 			
 			}
 			
 			
 			public IDevice GetDeviceAt(int index){
-				return PIDToDevice[IndexToPID[(byte)index]];
+				return IDToDevice[IndexToID[(byte)index]];
 			}
 			
 			
@@ -1177,13 +1177,13 @@ namespace ws.winx.input
 			/// Gets or sets the <see cref="ws.winx.input.InputManager+JoystickDevicesCollection"/> with the specified PID.
 			/// </summary>
 			/// <param name="PID">PI.</param>
-			public IDevice this[int PID]
+			public IDevice this[string ID]
 			{
-				get { return PIDToDevice[PID]; }
+				get { return IDToDevice[ID]; }
 				internal set
 				{
-					IndexToPID[(byte)value.Index] = PID;
-					PIDToDevice[PID] = value;
+					IndexToID[(byte)value.Index] = ID;
+					IDToDevice[ID] = value;
 					
 					_isEnumeratorDirty = true;
 					
@@ -1198,7 +1198,7 @@ namespace ws.winx.input
 			/// <param name="index">Index.</param>
 			public bool ContainsIndex(int index)
 			{
-				return IndexToPID.ContainsKey((byte)index);
+				return IndexToID.ContainsKey((byte)index);
 			}
 
 			/// <summary>
@@ -1206,22 +1206,22 @@ namespace ws.winx.input
 			/// </summary>
 			/// <returns>true</returns>
 			/// <c>false</c>
-			/// <param name="pid">Pid.</param>
-			public bool ContainsPID(int pid)
+			/// <param name="id">id.</param>
+			public bool ContainsID(string id)
 			{
-				return PIDToDevice.ContainsKey(pid);
+				return IDToDevice.ContainsKey(id);
 			}
 			
 			public void Clear(){
-				IndexToPID.Clear();
-				PIDToDevice.Clear();
+				IndexToID.Clear();
+				IDToDevice.Clear();
 			}
 			
 			public System.Collections.IEnumerator GetEnumerator()
 			{
 				if (_isEnumeratorDirty)
 				{
-					_iterationCacheList = PIDToDevice.Values.ToList<IDevice>();
+					_iterationCacheList = IDToDevice.Values.ToList<IDevice>();
 					_isEnumeratorDirty = false;
 					
 					
@@ -1237,7 +1237,7 @@ namespace ws.winx.input
 			/// </summary>
 			public int Count
 			{
-				get { return PIDToDevice.Count; }
+				get { return IDToDevice.Count; }
 			}
 			
 			#endregion
@@ -1262,7 +1262,7 @@ namespace ws.winx.input
             if (__hidInterface != null)
             {
 				Debug.Log ("Try to remove HidInterface events");
-				__hidInterface.DeviceDisconnectEvent-=new EventHandler<DeviceEventArgs<int>>(onRemoveDevice);
+				__hidInterface.DeviceDisconnectEvent-=new EventHandler<DeviceEventArgs<string>>(onRemoveDevice);
 
 
 				__hidInterface.DeviceConnectEvent-=new EventHandler<DeviceEventArgs<IDevice>>(onAddDevice);

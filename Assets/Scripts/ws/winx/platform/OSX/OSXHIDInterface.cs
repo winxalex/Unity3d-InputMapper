@@ -70,13 +70,15 @@ namespace ws.winx.platform.osx
 
 
         private IDriver __defaultJoystickDriver;
+
+		private string[] __ports;
 	
 
       
-		private Dictionary<int, HIDDevice> __Generics;
+		private Dictionary<string, HIDDevice> __Generics;
 		
 		
-		public event EventHandler<DeviceEventArgs<int>> DeviceDisconnectEvent;
+		public event EventHandler<DeviceEventArgs<string>> DeviceDisconnectEvent;
 		
 		public event EventHandler<DeviceEventArgs<IDevice>> DeviceConnectEvent;
 
@@ -93,6 +95,8 @@ namespace ws.winx.platform.osx
 		{
 			__drivers = new List<IDriver>();
 			__profiles = new Dictionary<string,string> ();
+			__ports = new string[20];
+
 			
 			
 			HandleHIDDeviceAdded = HidDeviceAdded;
@@ -204,9 +208,9 @@ namespace ws.winx.platform.osx
 
 
 
-		public bool Contains (int pid)
+		public bool Contains (string id)
 		{
-			return __Generics != null && __Generics.ContainsKey (pid);
+			return __Generics != null && __Generics.ContainsKey (id);
 		}
 
 
@@ -218,7 +222,7 @@ namespace ws.winx.platform.osx
 				
 				if (__Generics != null) {
 
-					foreach (KeyValuePair<int, HIDDevice> entry in __Generics) {
+					foreach (KeyValuePair<string, HIDDevice> entry in __Generics) {
 						entry.Value.Dispose ();
 					}
 					
@@ -226,7 +230,7 @@ namespace ws.winx.platform.osx
 					__Generics.Clear ();
 
 				}else
-				__Generics = new Dictionary<int, HIDDevice>();
+				__Generics = new Dictionary<string, HIDDevice>();
 
 
 				if(!hidCallbacksRegistered){
@@ -242,37 +246,37 @@ namespace ws.winx.platform.osx
 
 				}
 
-		public HIDReport ReadDefault(int pid){
-            return Generics[pid].ReadDefault(); 
+		public HIDReport ReadDefault(string id){
+            return Generics[id].ReadDefault(); 
 		}
 
-        public HIDReport ReadBuffered(int pid){
-			return Generics [pid].ReadBuffered ();
+        public HIDReport ReadBuffered(string id){
+			return Generics [id].ReadBuffered ();
 		}
 
-		public void Read (int pid, HIDDevice.ReadCallback callback)
+		public void Read (string id, HIDDevice.ReadCallback callback)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public void Read (int pid, HIDDevice.ReadCallback callback, int timeout)
+		public void Read (string id, HIDDevice.ReadCallback callback, int timeout)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public void Write (object data, int pid, HIDDevice.WriteCallback callback, int timeout)
+		public void Write (object data, string id, HIDDevice.WriteCallback callback, int timeout)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public void Write (object data, int pid, HIDDevice.WriteCallback callback)
+		public void Write (object data, string id, HIDDevice.WriteCallback callback)
 		{
-			__Generics [pid].Write (data, callback);
+			__Generics [id].Write (data, callback);
 		}
 
-		public void Write (object data, int pid)
+		public void Write (object data, string id)
 		{
-				__Generics [pid].Write (data);
+				__Generics [id].Write (data);
 		}
 
 
@@ -286,7 +290,7 @@ namespace ws.winx.platform.osx
 		}
 
 
-		public Dictionary<int, HIDDevice> Generics {
+		public Dictionary<string, HIDDevice> Generics {
 			get {
 				return __Generics;
 			}
@@ -402,7 +406,7 @@ namespace ws.winx.platform.osx
 
 				int product_id = (int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.kIOHIDProductIDKey)))).ToInteger();
 
-				if(Generics.ContainsKey(product_id)) return;
+				
 
 				int vendor_id =(int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.kIOHIDVendorIDKey)))).ToInteger();
 
@@ -415,7 +419,9 @@ namespace ws.winx.platform.osx
 				string path=String.Format("{0:s}_{1,4:X}_{2,4:X}_{3:X}",
 				                          transport, vendor_id, product_id, location);//"%s_%04hx_%04hx_%x"
 					
-				
+			//string serial=(new Native.CFString(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.kIOHIDSerialNumberKey)))).ToString();
+
+			if(Generics.ContainsKey(path)) return;
 
 				GenericHIDDevice hidDevice;
 				IDevice joyDevice = null;
@@ -427,14 +433,15 @@ namespace ws.winx.platform.osx
 					foreach (var driver in __drivers)
                 {
 
-					hidDevice=new GenericHIDDevice(__Generics.Count,vendor_id, product_id, deviceRef, this,path,description);
+					
+
+				hidDevice=new GenericHIDDevice(DeviceAsignPort(path),vendor_id, product_id, path,deviceRef, this,path,description);
 
                     if ((joyDevice = driver.ResolveDevice(hidDevice)) != null)
 					{
 
-						
 						lock(syncRoot){
-							__Generics[hidDevice.PID] = hidDevice;
+							__Generics[path] = hidDevice;
 						}
 					
 					Native.IOHIDDeviceRegisterRemovalCallback(deviceRef,HandleDeviceRemoved,context);
@@ -448,14 +455,16 @@ namespace ws.winx.platform.osx
                 if (joyDevice == null)
                 {//set default driver as resolver if no custom driver match device
 
-					hidDevice=new GenericHIDDevice(__Generics.Count,vendor_id, product_id, deviceRef, this,path,description);
+					
+
+					hidDevice=new GenericHIDDevice(DeviceAsignPort(path),vendor_id, product_id,path, deviceRef, this,path,description);
 
 
 					if ((joyDevice = defaultDriver.ResolveDevice(hidDevice)) != null)
                     {
                        
 						lock(syncRoot){
-						__Generics[hidDevice.PID] = hidDevice;
+						__Generics[path] = hidDevice;
 						}
 						
 						Debug.Log("Device PID:" + joyDevice.PID + " VID:" + joyDevice.VID + "["+joyDevice.Name+"] attached to " + defaultDriver.GetType().ToString());
@@ -483,6 +492,19 @@ namespace ws.winx.platform.osx
             
         }
 
+
+
+		int DeviceAsignPort(string ID){
+			int inx;
+			//find if this device was using same port before (during same app runitime)
+			inx=Array.IndexOf(__ports,ID);
+			
+			if(inx<0)//if not found => use next available(20 ports in total) position
+				inx=Array.IndexOf(__ports,null);
+
+			return inx;
+
+		}
 
 		void DeviceRemoved(IntPtr inContext, IOReturn result, IntPtr sender)
 		{
@@ -514,16 +536,29 @@ namespace ws.winx.platform.osx
 							return;
 						}
 						
-						int product_id = (int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.kIOHIDProductIDKey)))).ToInteger();
-						
+			
+			int product_id = (int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.kIOHIDProductIDKey)))).ToInteger();
+			
+			
+			
+			int vendor_id =(int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.kIOHIDVendorIDKey)))).ToInteger();
+			
+
+			int location=(int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.kIOHIDLocationIDKey)))).ToInteger();
+			string transport=(new Native.CFString(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.kIOHIDTransportKey)))).ToString();
+			
+			string path=String.Format("{0:s}_{1,4:X}_{2,4:X}_{3:X}",
+			                          transport, vendor_id, product_id, location);//"%s_%04hx_%04hx_%x"
+
+
 						lock (syncRoot) {
-						if (!__Generics.ContainsKey (product_id))
+						if (!__Generics.ContainsKey (path))
 								return;
 						
-						HIDDevice hidDevice = __Generics [product_id];
+						HIDDevice hidDevice = __Generics [path];
 		
 						
-						Generics.Remove (product_id);
+						Generics.Remove (path);
 
 						Debug.Log ("Device "+hidDevice.index+" PID:" + hidDevice.PID + " VID:" + hidDevice.VID + " Disconnected");
 
@@ -539,7 +574,7 @@ namespace ws.winx.platform.osx
 						
 						
 
-						this.DeviceDisconnectEvent(this,new DeviceEventArgs<int>(product_id));
+						this.DeviceDisconnectEvent(this,new DeviceEventArgs<string>(path));
 
 		}
 
@@ -584,7 +619,7 @@ namespace ws.winx.platform.osx
             lock(syncRoot){
 
 						if (Generics != null) {
-								foreach (KeyValuePair<int, HIDDevice> entry in Generics) {
+								foreach (KeyValuePair<string, HIDDevice> entry in Generics) {
 										entry.Value.Dispose ();
 								}
 			

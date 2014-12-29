@@ -358,19 +358,20 @@ namespace ws.winx.devices
       
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="pid"></param>
-        /// <param name="vid"></param>
-        /// <param name="axes"></param>
-        /// <param name="buttons"></param>
-        /// <param name="leds"></param>
-        /// <param name="irs"></param>
-        /// <param name="driver"></param>
-        public WiimoteDevice(int id,int pid,int vid, int axes, int buttons,int leds,int irs,IDriver driver)
-            : base(id,pid,vid,axes,buttons,driver)
+      /// <summary>
+      /// Initializes a new instance of the <see cref="ws.winx.devices.WiimoteDevice"/> class.
+      /// </summary>
+      /// <param name="index">Index.</param>
+      /// <param name="pid">Pid.</param>
+      /// <param name="vid">Vid.</param>
+      /// <param name="ID">I.</param>
+      /// <param name="axes">Axes.</param>
+      /// <param name="buttons">Buttons.</param>
+      /// <param name="leds">Leds.</param>
+      /// <param name="irs">Irs.</param>
+      /// <param name="driver">Driver.</param>
+        public WiimoteDevice(int index,int pid,int vid,string ID, int axes, int buttons,int leds,int irs,IDriver driver)
+            : base(index,pid,vid,ID,axes,buttons,driver)
         {
 
             _IR_SENSORS = new IRSensor[irs];

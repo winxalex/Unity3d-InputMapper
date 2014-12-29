@@ -49,7 +49,7 @@ namespace ws.winx.drivers
                            
                         
 
-						JoystickDevice device = new JoystickDevice (inx, hidDevice.PID, hidDevice.VID, 12, 20, this);
+						JoystickDevice device = new JoystickDevice (inx, hidDevice.PID, hidDevice.VID,hidDevice.ID, 12, 20, this);
 						device.Name = hidDevice.Name;
 
 						int numAxis = device.Axis.Count;

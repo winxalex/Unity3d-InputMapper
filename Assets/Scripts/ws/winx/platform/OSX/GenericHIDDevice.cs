@@ -70,6 +70,8 @@ namespace ws.winx.platform.osx
 		private HIDReport __lastHIDReport;
 
 		public bool IsOpen { get; private set; }
+
+
 			
 		private int _InputReportByteLength=16;
 			
@@ -115,8 +117,10 @@ namespace ws.winx.platform.osx
 
 		private IntPtr __deviceHandle;
 
-				public GenericHIDDevice (int index, int VID, int PID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath, 
-		        string name = ""):base(index,VID,PID,deviceHandle,hidInterface,devicePath,name)
+
+		#region Constructor
+				public GenericHIDDevice (int index, int VID, int PID,string ID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath, 
+		        string name = ""):base(index,VID,PID,ID,deviceHandle,hidInterface,devicePath,name)
 				{
 					__deviceHandle = deviceHandle;
 
@@ -137,7 +141,7 @@ namespace ws.winx.platform.osx
 					
 				}
 
-
+		#endregion
 
 		private byte[] CreateInputBuffer()
 		{

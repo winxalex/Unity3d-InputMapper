@@ -33,6 +33,10 @@ namespace ws.winx.platform.windows
 
         private IDriver __defaultJoystickDriver;
 
+
+
+		private string[] __ports;
+
         private Dictionary<string, string> __profiles;
 
 
@@ -56,11 +60,11 @@ namespace ws.winx.platform.windows
 
 
         private static IntPtr notificationHandle;
-        private Dictionary<int, HIDDevice> __Generics;
+        private Dictionary<string, HIDDevice> __Generics;
 
 
 
-        public event EventHandler<DeviceEventArgs<int>> DeviceDisconnectEvent;
+        public event EventHandler<DeviceEventArgs<string>> DeviceDisconnectEvent;
         public event EventHandler<DeviceEventArgs<IDevice>> DeviceConnectEvent;
 
 
@@ -145,51 +149,51 @@ namespace ws.winx.platform.windows
 
 
 
-        public bool Contains(int pid)
+        public bool Contains(string id)
         {
-            return __Generics != null && __Generics.ContainsKey(pid);
+            return __Generics != null && __Generics.ContainsKey(id);
         }
 
 
-        public HIDReport ReadDefault(int pid)
+        public HIDReport ReadDefault(string id)
         {
 
-            return this.__Generics[pid].ReadDefault();
+            return this.__Generics[id].ReadDefault();
         }
 
-        public HIDReport ReadBuffered(int pid)
+        public HIDReport ReadBuffered(string id)
         {
-            return __Generics[pid].ReadBuffered();
+            return __Generics[id].ReadBuffered();
         }
 
-        public void Read(int pid, HIDDevice.ReadCallback callback, int timeout)
+        public void Read(string id, HIDDevice.ReadCallback callback, int timeout)
         {
-            this.__Generics[pid].Read(callback, timeout);
-
-        }
-
-
-
-
-        public void Read(int pid, HIDDevice.ReadCallback callback)
-        {
-            this.__Generics[pid].Read(callback, 0);
+            this.__Generics[id].Read(callback, timeout);
 
         }
 
-        public void Write(object data, int pid)
+
+
+
+        public void Read(string id, HIDDevice.ReadCallback callback)
         {
-            this.__Generics[pid].Write(data);
+            this.__Generics[id].Read(callback, 0);
+
         }
 
-        public void Write(object data, int pid, HIDDevice.WriteCallback callback)
+        public void Write(object data, string id)
         {
-            this.__Generics[pid].Write(data, callback, 0);
+            this.__Generics[id].Write(data);
         }
 
-        public void Write(object data, int pid, HIDDevice.WriteCallback callback, int timeout)
+        public void Write(object data, string id, HIDDevice.WriteCallback callback)
         {
-            this.__Generics[pid].Write(data, callback, timeout);
+            this.__Generics[id].Write(data, callback, 0);
+        }
+
+        public void Write(object data, string id, HIDDevice.WriteCallback callback, int timeout)
+        {
+            this.__Generics[id].Write(data, callback, timeout);
         }
 
 
@@ -216,7 +220,7 @@ namespace ws.winx.platform.windows
 
 
 
-        public Dictionary<int, HIDDevice> Generics
+        public Dictionary<string, HIDDevice> Generics
         {
             get { return __Generics; }
         }
@@ -246,9 +250,12 @@ namespace ws.winx.platform.windows
         {
             __drivers = new List<IDriver>();
 
-            __Generics = new Dictionary<int, HIDDevice>();
+            __Generics = new Dictionary<string, HIDDevice>();
 
             __profiles = new Dictionary<string, string>();
+
+			__ports = new string[20];
+
 
             LoadProfiles();
 
@@ -285,6 +292,7 @@ namespace ws.winx.platform.windows
             };
 
 
+			
 
 
             dbi.dbcc_size = Marshal.SizeOf(dbi);
@@ -386,13 +394,13 @@ namespace ws.winx.platform.windows
 
                                 lock (syncRoot)
                                 {
-                                    hidDeviceExisted = this.Generics.ContainsKey(hidDevice.PID);
+                                    hidDeviceExisted = this.Generics.ContainsKey(hidDevice.ID);
 
                                     if (hidDeviceExisted)
                                     {
 
 
-                                        this.Generics.Remove(hidDevice.PID);
+                                        this.Generics.Remove(hidDevice.ID);
 
 
 
@@ -402,7 +410,7 @@ namespace ws.winx.platform.windows
                                 }
 
                                 if (hidDeviceExisted)
-                                    this.DeviceDisconnectEvent(this, new DeviceEventArgs<int>(hidDevice.PID));
+                                    this.DeviceDisconnectEvent(this, new DeviceEventArgs<string>(hidDevice.ID));
 
 
 
@@ -430,7 +438,7 @@ namespace ws.winx.platform.windows
 
                                 HIDDevice hidDevice = CreateHIDDeviceFrom(PointerToDevicePath(lParam));
 
-                                if (!Generics.ContainsKey(hidDevice.PID))
+                                if (!Generics.ContainsKey(hidDevice.ID))
                                 {
                                     // string name = ReadRegKey(Native.HKEY_CURRENT_USER, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_" + hidDevice.VID.ToString("X4") + "&PID_" + hidDevice.PID.ToString("X4"), Native.REGSTR_VAL_JOYOEMNAME);
 
@@ -481,7 +489,8 @@ namespace ws.winx.platform.windows
         /// Unregisters the window for USB device notifications
         /// </summary>
         public static void UnregisterHIDDeviceNotification()
-        {
+		{	
+			
             if (notificationHandle != IntPtr.Zero)
                 Native.UnregisterDeviceNotification(notificationHandle);
 
@@ -575,7 +584,7 @@ namespace ws.winx.platform.windows
                     {
                         HIDDevice hidDevice = CreateHIDDeviceFrom(rawInputDeviceList);
 
-                        if (!__Generics.ContainsKey(hidDevice.PID))
+                        if (!__Generics.ContainsKey(hidDevice.ID))
                             ResolveDevice(hidDevice);
                     }
 
@@ -622,20 +631,9 @@ namespace ws.winx.platform.windows
 
                 //return ReadRegKey(HKEY_LOCAL_MACHINE, RegPath, "FriendlyName")+ReadRegKey(HKEY_LOCAL_MACHINE, RegPath, "DeviceDesc");
 
-
-
-
-
-                // string name = ReadRegKey(Native.HKEY_CURRENT_USER, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + DeviceInstanceId, Native.REGSTR_VAL_JOYOEMNAME);
-
-                // string name = ReadRegKey(Native.HKEY_LOCAL_MACHINE, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + VID_PID_Parts[0] + "&" + VID_PID_Parts[1], Native.REGSTR_VAL_JOYOEMNAME);
-
-
-
-
-
+				//devicePath is used as ID
                 //!!! deviceHandle set to IntPtr.Zero (think not needed in widows)
-                return new GenericHIDDevice(__Generics.Count, Convert.ToInt32(VID_PID_Parts[0].Replace("VID_", ""), 16), Convert.ToInt32(VID_PID_Parts[1].Replace("PID_", ""), 16), IntPtr.Zero, this, devicePath);
+                return new GenericHIDDevice(DeviceAsignPort(devicePath), Convert.ToInt32(VID_PID_Parts[0].Replace("VID_", ""), 16), Convert.ToInt32(VID_PID_Parts[1].Replace("PID_", ""), 16),devicePath, IntPtr.Zero, this, devicePath);
             }
 
             return null;
@@ -662,8 +660,8 @@ namespace ws.winx.platform.windows
             // string name = ReadRegKey(Native.HKEY_LOCAL_MACHINE, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\" + "VID_" + deviceInfo.HIDInfo.VendorID.ToString("X4") + "&PID_" + deviceInfo.HIDInfo.ProductID.ToString("X4"), Native.REGSTR_VAL_JOYOEMNAME);
 
 
-
-            return new GenericHIDDevice(__Generics.Count, Convert.ToInt32(deviceInfo.HIDInfo.VendorID), Convert.ToInt32(deviceInfo.HIDInfo.ProductID), rawInputDeviceList.DeviceHandle, this, devicePath);
+			//devicePath used as ID
+			return new GenericHIDDevice(DeviceAsignPort(devicePath), Convert.ToInt32(deviceInfo.HIDInfo.VendorID), Convert.ToInt32(deviceInfo.HIDInfo.ProductID),devicePath, rawInputDeviceList.DeviceHandle, this, devicePath);
 
             //this have problems with   
             // return GetHIDDeviceInfo(GetDevicePath(rawInputDeviceList.DeviceHandle));
@@ -756,6 +754,17 @@ namespace ws.winx.platform.windows
         }
 
 
+		int DeviceAsignPort(string ID){
+			int inx;
+			//find if this device was using same port before (during same app runitime)
+			inx=Array.IndexOf(__ports,ID);
+			
+			if(inx<0)//if not found => use next available(20 ports in total) position
+				inx=Array.IndexOf(__ports,null);
+			
+			return inx;
+			
+		}
 
 
         /// <summary>
@@ -783,7 +792,7 @@ namespace ws.winx.platform.windows
 
                         lock (syncRoot)
                         {
-                            Generics[hidDevice.PID] = hidDevice;
+                            Generics[hidDevice.ID] = hidDevice;
                         }
 
 
@@ -812,7 +821,7 @@ namespace ws.winx.platform.windows
 
                     lock (syncRoot)
                     {
-                        Generics[hidDevice.PID] = hidDevice;
+                        Generics[hidDevice.ID] = hidDevice;
                     }
 
 
@@ -904,7 +913,7 @@ namespace ws.winx.platform.windows
             {
                 if (__Generics != null)
                 {
-                    foreach (KeyValuePair<int, HIDDevice> entry in __Generics)
+                    foreach (KeyValuePair<string, HIDDevice> entry in __Generics)
                     {
                         entry.Value.Dispose();
                     }

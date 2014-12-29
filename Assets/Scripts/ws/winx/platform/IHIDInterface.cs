@@ -16,13 +16,13 @@ namespace ws.winx.platform
 {
 		public interface IHIDInterface:IDisposable
 		{
-			event EventHandler<DeviceEventArgs<int>> DeviceDisconnectEvent;
+			event EventHandler<DeviceEventArgs<string>> DeviceDisconnectEvent;
 			event EventHandler<DeviceEventArgs<IDevice>> DeviceConnectEvent;
 			
 
 
 			IDriver defaultDriver{get;set;}
-            Dictionary<int, HIDDevice> Generics{get;}
+            Dictionary<string, HIDDevice> Generics{get;}
 			Dictionary<string,string> Profiles{get;}
 
             /// <summary>
@@ -30,14 +30,14 @@ namespace ws.winx.platform
             /// </summary>
             /// <param name="pid"></param>
             /// <returns></returns>
-			HIDReport ReadDefault(int pid);
-            HIDReport ReadBuffered(int pid);
-            void Read(int pid,HIDDevice.ReadCallback callback);
-            void Read(int pid, HIDDevice.ReadCallback callback,int timeout);
-            void Write(object data, int device, HIDDevice.WriteCallback callback, int timeout);
-            void Write(object data, int device,HIDDevice.WriteCallback callback);
-            void Write(object data, int device);
-			bool Contains(int pid);
+			HIDReport ReadDefault(string id);
+            HIDReport ReadBuffered(string id);
+            void Read(string id,HIDDevice.ReadCallback callback);
+            void Read(string id, HIDDevice.ReadCallback callback,int timeout);
+            void Write(object data, string id, HIDDevice.WriteCallback callback, int timeout);
+            void Write(object data, string id,HIDDevice.WriteCallback callback);
+            void Write(object data, string id);
+			bool Contains(string id);
 			void AddDriver(IDriver driver);
 			void Update();
 			void Enumerate();

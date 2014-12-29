@@ -80,6 +80,7 @@ namespace ws.winx.platform.osx
 		public static readonly String kIOHIDDeviceUsagePairsKey = "DeviceUsagePairs";
 		public static readonly String kIOHIDMaxInputReportSizeKey= "MaxInputReportSize";
 		public static readonly String kIOHIDDeviceKey ="IOHIDDevice";
+		public static readonly String kIOHIDSerialNumberKey = "SerialNumber";
 
 
 		public static readonly IntPtr kIOCFPlugInInterfaceID=Native.CFUUIDGetConstantUUIDWithBytes(IntPtr.Zero,	

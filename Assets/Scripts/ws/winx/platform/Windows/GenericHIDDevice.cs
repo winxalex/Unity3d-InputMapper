@@ -119,7 +119,7 @@ namespace ws.winx.platform.windows
 			}
 		}		
 		
-		public GenericHIDDevice(int index, int VID, int PID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath):base(index,VID,PID,deviceHandle,hidInterface,devicePath,"")
+		public GenericHIDDevice(int index, int VID, int PID,string ID, IntPtr deviceHandle, IHIDInterface hidInterface, string devicePath):base(index,VID,PID,ID,deviceHandle,hidInterface,devicePath,"")
         {
             try
             {
