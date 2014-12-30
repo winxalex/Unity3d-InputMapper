@@ -33,8 +33,8 @@ namespace ws.winx.editor
 				protected static bool _settingsLoaded = false;
 				protected UnityEngine.Object _lastController;
 				protected TextAsset _lastSettingsXML;
-				protected int _selectedStateHash = 0;
-				protected int _deleteStateWithHash = 0;
+				protected static int _selectedStateHash = 0;
+				protected static int _deleteStateWithHash = 0;
               
                 protected bool _isDeviceAny;
                 private bool _isDeviceAxisPositionFull;
@@ -134,13 +134,13 @@ namespace ws.winx.editor
 				[MenuItem ("Window/Input Mapper")]
 				static void ShowEditor ()
 				{
-						if (_stateInputCombinations != null && _stateInputCombinations.Count > 0)
-								_stateInputCombinations = new Dictionary<int, InputState> ();
+						//if (_stateInputCombinations != null && _stateInputCombinations.Count > 0)
+						//		_stateInputCombinations = new Dictionary<int, InputState> ();
 
 
 
-
-
+						//deselect if some state is selected for editing
+						_selectedStateHash = 0;
 
 						// Get existing open window or if none, make a new one:
 						EditorWindow.GetWindow (typeof(InputMapper));

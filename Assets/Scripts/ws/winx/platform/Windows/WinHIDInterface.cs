@@ -633,7 +633,7 @@ namespace ws.winx.platform.windows
 
 				//devicePath is used as ID
                 //!!! deviceHandle set to IntPtr.Zero (think not needed in widows)
-                return new GenericHIDDevice(DeviceAsignPort(devicePath), Convert.ToInt32(VID_PID_Parts[0].Replace("VID_", ""), 16), Convert.ToInt32(VID_PID_Parts[1].Replace("PID_", ""), 16),devicePath, IntPtr.Zero, this, devicePath);
+                return new GenericHIDDevice(GetIndexForDeviceWithID(devicePath), Convert.ToInt32(VID_PID_Parts[0].Replace("VID_", ""), 16), Convert.ToInt32(VID_PID_Parts[1].Replace("PID_", ""), 16),devicePath, IntPtr.Zero, this, devicePath);
             }
 
             return null;
@@ -661,7 +661,7 @@ namespace ws.winx.platform.windows
 
 
 			//devicePath used as ID
-			return new GenericHIDDevice(DeviceAsignPort(devicePath), Convert.ToInt32(deviceInfo.HIDInfo.VendorID), Convert.ToInt32(deviceInfo.HIDInfo.ProductID),devicePath, rawInputDeviceList.DeviceHandle, this, devicePath);
+			return new GenericHIDDevice(GetIndexForDeviceWithID(devicePath), Convert.ToInt32(deviceInfo.HIDInfo.VendorID), Convert.ToInt32(deviceInfo.HIDInfo.ProductID),devicePath, rawInputDeviceList.DeviceHandle, this, devicePath);
 
             //this have problems with   
             // return GetHIDDeviceInfo(GetDevicePath(rawInputDeviceList.DeviceHandle));
@@ -754,13 +754,20 @@ namespace ws.winx.platform.windows
         }
 
 
-		int DeviceAsignPort(string ID){
+		/// <summary>
+		/// Gets the index for device with ID.
+		/// </summary>
+		/// <returns>Old index for device after reconnection or new if first connection.</returns>
+		/// <param name="ID">I.</param>
+		int GetIndexForDeviceWithID(string ID){
 			int inx;
 			//find if this device was using same port before (during same app runitime)
 			inx=Array.IndexOf(__ports,ID);
 			
 			if(inx<0)//if not found => use next available(20 ports in total) position
 				inx=Array.IndexOf(__ports,null);
+
+			__ports [inx] = ID;
 			
 			return inx;
 			

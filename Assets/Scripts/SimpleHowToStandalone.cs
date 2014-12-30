@@ -228,7 +228,7 @@ namespace ws.winx
 //						float analogVal=axisPos - axisNeg;
 			
 			//Debug.Log (analogVal);//would go from  -1 to 1
-			Debug.Log (axisPos);
+//			Debug.Log (axisPos);
 			
 			
 			

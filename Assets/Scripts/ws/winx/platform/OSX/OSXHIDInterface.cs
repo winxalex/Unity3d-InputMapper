@@ -435,7 +435,7 @@ namespace ws.winx.platform.osx
 
 					
 
-				hidDevice=new GenericHIDDevice(DeviceAsignPort(path),vendor_id, product_id, path,deviceRef, this,path,description);
+				hidDevice=new GenericHIDDevice(GetIndexForDeviceWithID(path),vendor_id, product_id, path,deviceRef, this,path,description);
 
                     if ((joyDevice = driver.ResolveDevice(hidDevice)) != null)
 					{
@@ -457,7 +457,7 @@ namespace ws.winx.platform.osx
 
 					
 
-					hidDevice=new GenericHIDDevice(DeviceAsignPort(path),vendor_id, product_id,path, deviceRef, this,path,description);
+					hidDevice=new GenericHIDDevice(GetIndexForDeviceWithID(path),vendor_id, product_id,path, deviceRef, this,path,description);
 
 
 					if ((joyDevice = defaultDriver.ResolveDevice(hidDevice)) != null)
@@ -493,14 +493,20 @@ namespace ws.winx.platform.osx
         }
 
 
-
-		int DeviceAsignPort(string ID){
+		/// <summary>
+		/// Gets the index for device with ID.
+		/// </summary>
+		/// <returns>Old index for device after reconnection or new if first connection.</returns>
+		/// <param name="ID">ID(probably devicePath)</param>
+		int GetIndexForDeviceWithID(string ID){
 			int inx;
 			//find if this device was using same port before (during same app runitime)
 			inx=Array.IndexOf(__ports,ID);
 			
 			if(inx<0)//if not found => use next available(20 ports in total) position
 				inx=Array.IndexOf(__ports,null);
+
+			__ports [inx] = ID;
 
 			return inx;
 

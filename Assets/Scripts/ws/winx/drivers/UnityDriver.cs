@@ -25,10 +25,19 @@ namespace ws.winx.drivers
 						int i = 0;
 
 						int inx;
+
+						//Give Unity Update(Input works only in Update on Main single thread
+						//and this funciton is happen on Event on other thread)
+						//to be done so GetJoysticksNames return something
+						//!!! Not tested yet on WIN
+						System.Threading.Thread.Sleep (300);//sleep this Event add device thread
                     
 						//find device match based on "names"
 						string[] names = Input.GetJoystickNames ();
 						inx = Array.IndexOf (names, hidDevice.Name);
+
+
+						Debug.Log(String.Join(",",names));
 
 						if (inx < 0)
 								return null;
