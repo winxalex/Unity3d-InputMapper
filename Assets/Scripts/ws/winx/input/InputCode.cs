@@ -902,7 +902,7 @@ namespace ws.winx.input
 						return (JoystickAxis)((code & CODE_AXIS_MASK) >> CODE_DATA_SHIFT);
 				}
 				
-				public static int toJoystickInx (int code)
+				public static int toDeviceInx(int code)
 				{
 						code -= InputCode.MAX_KEY_CODE;
 						return code >> CODE_ID_SHIFT;
@@ -937,7 +937,7 @@ namespace ws.winx.input
 				{
 
 						int code = action.code;
-						int joyInx = InputCode.toJoystickInx (code);
+						int joyInx = InputCode.toDeviceInx (code);
 						JoystickAxis axis = InputCode.toAxis (code);
 						int data = InputCode.toData (code);
 						IDeviceDetails details;

@@ -283,7 +283,7 @@ namespace ws.winx.input
 										return 0;
 
 								} else {
-										int index = InputCode.toJoystickInx (code);
+										int index = InputCode.toDeviceInx (code);
 										if (InputManager.Devices.ContainsIndex (index))
 												return InputManager.Devices.GetDeviceAt (index).GetInput (code);
 										else
@@ -362,7 +362,7 @@ namespace ws.winx.input
 											return false;
 							
 									} else {
-											int index = InputCode.toJoystickInx (code);
+											int index = InputCode.toDeviceInx (code);
 											if (InputManager.Devices.ContainsIndex (index))
 								
 													return InputManager.Devices.GetDeviceAt (index).GetInputBase (code, buttonState);

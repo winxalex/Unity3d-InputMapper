@@ -1047,6 +1047,7 @@ namespace ws.winx.input
 			//Use is mapping states so no quering keys during gameplay
 			if (InputManager.EditMode) return false;
 
+			//__settings.Players[InputManager.currentPlayerInx].GetStateInputBasedOnControllerMappedToPlayer
 
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
 
@@ -1372,7 +1373,25 @@ namespace ws.winx.input
 			}
 
 			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
-			[DataMember(Name="StateInputs",Order=8)]
+			[DataMember(Name="Players",Order=8)]
+			#endif
+			protected InputPlayer[] _players;
+			
+			public InputPlayer[] Players{
+				get {return _players;}
+				set { _players = value;}
+			}
+
+
+
+
+
+
+
+
+
+			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+			[DataMember(Name="StateInputs",Order=9)]
 			#endif
 			protected Dictionary<int,InputState> _stateInputs;
 			

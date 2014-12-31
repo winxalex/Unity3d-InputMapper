@@ -42,6 +42,20 @@ namespace ws.winx.editor
 				protected int _isPrimary = 0;
 				protected string _currentInputString;
 
+				//Players
+				protected int _numPlayers=1;
+				protected int[] _playersIndices;
+				protected int _playerIndexSelected=0;
+				protected string[] _playerDisplayOptions;
+
+				//Profiles
+				TextAsset _profilesTextAsset;
+				int _profileSelectedIndex;
+				string[] _profilesSelectedDisplayOptions;
+				
+				
+	
+
 				//new state
 				protected string _newCustomStateName;
 				protected string _prevNewCustomStateName;
@@ -624,6 +638,61 @@ namespace ws.winx.editor
 								InputManager.Settings.combinationsClickSensitivity = _combosClickSensitivity = EditorGUILayout.FloatField ("Combos click sensitivity", _combosClickSensitivity, _settingsStyle);
 								EditorGUILayout.Separator ();
 
+
+								//////////// PLAYERS //////////////
+								EditorGUILayout.BeginHorizontal();
+								_numPlayers = EditorGUILayout.IntField("Number of Players",_numPlayers);
+								
+
+								
+								if(_playersIndices==null || _numPlayers!=_playersIndices.Length){
+									_playersIndices=new int[_numPlayers];
+									_playerDisplayOptions=new string [_numPlayers];
+									for(int pi=0;pi<_numPlayers;pi++){
+										_playersIndices[pi]=pi;
+										_playerDisplayOptions[pi]="Player"+pi;
+									}
+
+
+									InputManager.Settings.Players=new InputPlayer[_numPlayers];
+									
+								}
+
+								_playerIndexSelected=EditorGUILayout.IntPopup(_playerIndexSelected,_playerDisplayOptions,_playersIndices);
+								
+
+								if(_profilesTextAsset==null){
+								_profilesTextAsset=AssetDatabase.LoadAssetAtPath(Path.Combine(Application.dataPath,"profiles.txt"), typeof(TextAsset)) as TextAsset;
+											string[] profiles=_profilesTextAsset.text.Split('|');
+											List<string> pList=new List<string>();
+
+											pList.Add("default");
+											for(int prI=1;prI<profiles.Length;prI+=2){
+												if(!pList.Contains(profiles[prI]))
+												 pList.Add(profiles[prI]);
+											
+											}
+
+											_profilesSelectedDisplayOptions=pList.ToArray();
+								}
+								
+							
+								
+								
+								
+								
+
+								_profileSelectedIndex=EditorGUILayout.Popup(_profileSelectedIndex,_profilesSelectedDisplayOptions);
+
+
+
+								EditorGUILayout.EndHorizontal();
+								EditorGUILayout.Separator();
+
+
+
+								
+
                                 //////////  ANY/FULL AXIS Checkers ///////
                                 EditorGUILayout.BeginHorizontal();
                                 _isDeviceAny = GUILayout.Toggle(_isDeviceAny, "Any");
@@ -631,6 +700,10 @@ namespace ws.winx.editor
                                 EditorGUILayout.EndHorizontal();
 
                                 EditorGUILayout.Separator();
+
+
+								
+
 
 						}
 				
