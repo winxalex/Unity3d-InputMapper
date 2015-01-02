@@ -12,6 +12,7 @@ namespace ws.winx.devices
 {
 		public class DeviceProfile
 		{
+		public string Name;
 		public string[] axisNaming;
 		public string[] buttonNaming;
 		public float sensitivity;

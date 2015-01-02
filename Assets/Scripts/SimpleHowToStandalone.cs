@@ -82,7 +82,7 @@ namespace ws.winx
 				
 				
 				
-				ui.StateInputCombinations = InputManager.Settings.stateInputs;
+				ui.settings = InputManager.Settings;
 			}
 			
 			

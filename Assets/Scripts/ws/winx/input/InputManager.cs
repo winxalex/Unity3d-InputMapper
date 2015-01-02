@@ -55,6 +55,8 @@ namespace ws.winx.input
 
 		}
 
+		public static InputPlayer currentPlayer=InputPlayer.Player.Player0;
+
 
 
 	 static DevicesCollection _devices;
@@ -1373,7 +1375,7 @@ namespace ws.winx.input
 			}
 
 			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
-			[DataMember(Name="Players",Order=8)]
+			[DataMember(Name="Players",Order=9)]
 			#endif
 			protected InputPlayer[] _players;
 			
@@ -1384,24 +1386,41 @@ namespace ws.winx.input
 
 
 
+			public Dictionary<int,InputState> GetInputStatesOfPlayer(InputPlayer.Player index){
+
+
+				InputPlayer player = _players [(int)index];
+				if (player != null) {
+					string profileName=player.Device.profile!=null ? player.Device.profile.Name: "default";
+
+					if(player.DeviceStateInputs.ContainsKey(profileName)){
+						return player.DeviceStateInputs[profileName];
+
+					}
+
+					return player.DeviceStateInputs["default"];
+				}
+
+
+			}
 
 
 
 
 
-
-			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
-			[DataMember(Name="StateInputs",Order=9)]
-			#endif
-			protected Dictionary<int,InputState> _stateInputs;
+//			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+//			[DataMember(Name="StateInputs",Order=9)]
+//			#endif
+//			protected Dictionary<int,InputState> _stateInputs;
 			
 			public Dictionary<int,InputState> stateInputs{
-				get {return _stateInputs;}
+				get {return GetInputStatesOfPlayer(InputManager.currentPlayer);}
 			}
 
 
 		   public InputSettings(){
-					_stateInputs=new Dictionary<int,InputState>();
+					//_stateInputs=new Dictionary<int,InputState>();
+
 		   }
 		}
 		#endregion

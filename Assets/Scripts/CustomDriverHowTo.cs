@@ -81,8 +81,8 @@ namespace ws.winx
 				InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));
 				
 				
-				
-				ui.StateInputCombinations = InputManager.Settings.stateInputs;
+				ui.settings=InputManager.Settings;
+				//ui.StateInputCombinations = InputManager.Settings.stateInputs;
 			}
 			
 			

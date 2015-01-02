@@ -8,7 +8,7 @@ public class PlayerInputComponent : MonoBehaviour
 
 		
 
-	public int PlayerIndex;
+	public InputPlayer.Player PlayerIndex;
 
 		// Use this for initialization
 		void Start ()

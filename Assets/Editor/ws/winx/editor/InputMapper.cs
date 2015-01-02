@@ -29,29 +29,30 @@ namespace ws.winx.editor
 
 	
 		
-				protected static Dictionary<int,InputState> _stateInputCombinations = InputManager.Settings.stateInputs; //new Dictionary<int,InputState> ();
+				protected static Dictionary<int,InputState> _stateInputCombinations;// = InputManager.Settings.stateInputs; //new Dictionary<int,InputState> ();
+				
+
 				protected static bool _settingsLoaded = false;
 				protected UnityEngine.Object _lastController;
 				protected TextAsset _lastSettingsXML;
 				protected static int _selectedStateHash = 0;
 				protected static int _deleteStateWithHash = 0;
-              
-                protected bool _isDeviceAny;
-                private bool _isDeviceAxisPositionFull;
+				protected bool _isDeviceAny;
+				private bool _isDeviceAxisPositionFull;
 				protected string _warrningAddStateLabel;
 				protected int _isPrimary = 0;
 				protected string _currentInputString;
 
 				//Players
-				protected int _numPlayers=1;
+				protected int _numPlayers = 1;
 				protected int[] _playersIndices;
-				protected int _playerIndexSelected=0;
+				protected int _playerIndexSelected = 0;
 				protected string[] _playerDisplayOptions;
 
 				//Profiles
 				TextAsset _profilesTextAsset;
 				int _profileSelectedIndex;
-				string[] _profilesSelectedDisplayOptions;
+				string[] _profilesDevicesDisplayOptions;
 				
 				
 	
@@ -92,8 +93,7 @@ namespace ws.winx.editor
 				protected string _prevlongClickDesignator = InputManager.Settings.longDesignator;
 				protected string _prevdoubleClickDesignator = InputManager.Settings.doubleDesignator;
 				protected bool[] _showLayer;
-
-				private static bool __wereDevicesEnumerated=false;
+				private static bool __wereDevicesEnumerated = false;
 
 
 				//PUBLIC
@@ -102,7 +102,6 @@ namespace ws.winx.editor
 				public int maxCombosNum = 3;
 				public TextAsset settingsXML;
 				public AnimatorController controller;
-              
 	    
 				void Awake ()
 				{
@@ -128,7 +127,7 @@ namespace ws.winx.editor
 
 						if (!Application.isPlaying) {
 								InputManager.hidInterface.Enumerate ();
-								__wereDevicesEnumerated=true;
+								__wereDevicesEnumerated = true;
 						}
 			   
 				}
@@ -501,12 +500,11 @@ namespace ws.winx.editor
 
 
 
-                        if (!Application.isPlaying && _selectedStateHash != 0)
-                        {
+						if (!Application.isPlaying && _selectedStateHash != 0) {
 
-								if(!__wereDevicesEnumerated){
-									InputManager.hidInterface.Enumerate();
-									__wereDevicesEnumerated=true;
+								if (!__wereDevicesEnumerated) {
+										InputManager.hidInterface.Enumerate ();
+										__wereDevicesEnumerated = true;
 								}
 
 
@@ -524,17 +522,15 @@ namespace ws.winx.editor
 
 										} else {
 
-                                            if (_isDeviceAny)
-                                            {
-                                                _action.code = InputCode.toCodeAnyDevice(_action.code);
-                                                _action.type = InputActionType.SINGLE;
-                                            }
+												if (_isDeviceAny) {
+														_action.code = InputCode.toCodeAnyDevice (_action.code);
+														_action.type = InputActionType.SINGLE;
+												}
 
-                                            if (_isDeviceAxisPositionFull)
-                                            {
-                                                _action.code = InputCode.toCodeAxisFull(_action.code);
-                                                _action.type = InputActionType.SINGLE;
-                                            }
+												if (_isDeviceAxisPositionFull) {
+														_action.code = InputCode.toCodeAxisFull (_action.code);
+														_action.type = InputActionType.SINGLE;
+												}
 
 												toInputCombination (_stateInputCombinations [_selectedStateHash].combinations [_isPrimary], _action);
 										}
@@ -640,66 +636,93 @@ namespace ws.winx.editor
 
 
 								//////////// PLAYERS //////////////
-								EditorGUILayout.BeginHorizontal();
-								_numPlayers = EditorGUILayout.IntField("Number of Players",_numPlayers);
+								EditorGUILayout.BeginHorizontal ();
+								_numPlayers = EditorGUILayout.IntField ("Number of Players", _numPlayers);
 								
-
+				bool hasPlayerNumberChanged=false;
 								
-								if(_playersIndices==null || _numPlayers!=_playersIndices.Length){
-									_playersIndices=new int[_numPlayers];
-									_playerDisplayOptions=new string [_numPlayers];
-									for(int pi=0;pi<_numPlayers;pi++){
-										_playersIndices[pi]=pi;
-										_playerDisplayOptions[pi]="Player"+pi;
-									}
+								if (_playersIndices == null || _numPlayers != _playersIndices.Length) {
+										_playersIndices = new int[_numPlayers];
+										_playerDisplayOptions = new string [_numPlayers];
+										for (int pi=0; pi<_numPlayers; pi++) {
+												_playersIndices [pi] = pi;
+												_playerDisplayOptions [pi] = "Player" + pi;
+										}
 
 
-									InputManager.Settings.Players=new InputPlayer[_numPlayers];
-									
+										InputManager.Settings.Players = new InputPlayer[_numPlayers];
+					hasPlayerNumberChanged=true;
 								}
 
-								_playerIndexSelected=EditorGUILayout.IntPopup(_playerIndexSelected,_playerDisplayOptions,_playersIndices);
+								_playerIndexSelected = EditorGUILayout.IntPopup (_playerIndexSelected, _playerDisplayOptions, _playersIndices);
 								
 
-								if(_profilesTextAsset==null){
-								_profilesTextAsset=AssetDatabase.LoadAssetAtPath(Path.Combine(Application.dataPath,"profiles.txt"), typeof(TextAsset)) as TextAsset;
-											string[] profiles=_profilesTextAsset.text.Split('|');
-											List<string> pList=new List<string>();
+								if (_profilesTextAsset == null) {
+										_profilesTextAsset = AssetDatabase.LoadAssetAtPath ("Assets/StreamingAssets/profiles.txt", typeof(TextAsset)) as TextAsset;
+										
+					//extract profiles lines
+										string[] profiles = _profilesTextAsset.text.Split ('\n');
+										List<string> pList = new List<string> ();
+										string deviceType = null;
 
-											pList.Add("default");
-											for(int prI=1;prI<profiles.Length;prI+=2){
-												if(!pList.Contains(profiles[prI]))
-												 pList.Add(profiles[prI]);
+										pList.Add ("default");
+
+										//add deviceTypes mark from profiles to List
+										for (i=0; i<profiles.Length; i+=1) {
+												
+												deviceType = profiles [i].Split ('|') [1];
+												if (!pList.Contains (deviceType))
+														pList.Add (deviceType);
+											
+										}
+
+										_profilesDevicesDisplayOptions = pList.ToArray ();
+								}
+								
+
+							
+								//create
+								if(hasPlayerNumberChanged){
+
+											InputPlayer player=null;						
+										for(i=0;i<_playersIndices.Length;i++){
+											player=new InputPlayer();
+											InputManager.Settings.Players[i]=player;
+
+											for(j=0;j<_profilesDevicesDisplayOptions.Length;j++){
+												
+
+												player.DeviceStateInputs[_profilesDevicesDisplayOptions[j]]=new Dictionary<int, InputState>();
 											
 											}
+										}
 
-											_profilesSelectedDisplayOptions=pList.ToArray();
+
 								}
 								
-							
-								
-								
-								
 								
 
-								_profileSelectedIndex=EditorGUILayout.Popup(_profileSelectedIndex,_profilesSelectedDisplayOptions);
+								_profileSelectedIndex = EditorGUILayout.Popup (_profileSelectedIndex, _profilesDevicesDisplayOptions);
+
+
+								_stateInputCombinations=InputManager.Settings.Players[_playerIndexSelected].DeviceStateInputs[_profilesDevicesDisplayOptions[_profileSelectedIndex]];
 
 
 
-								EditorGUILayout.EndHorizontal();
-								EditorGUILayout.Separator();
+								EditorGUILayout.EndHorizontal ();
+								EditorGUILayout.Separator ();
 
 
 
 								
 
-                                //////////  ANY/FULL AXIS Checkers ///////
-                                EditorGUILayout.BeginHorizontal();
-                                _isDeviceAny = GUILayout.Toggle(_isDeviceAny, "Any");
-                                _isDeviceAxisPositionFull = GUILayout.Toggle(_isDeviceAxisPositionFull, "Full Axis");
-                                EditorGUILayout.EndHorizontal();
+								//////////  ANY/FULL AXIS Checkers ///////
+								EditorGUILayout.BeginHorizontal ();
+								_isDeviceAny = GUILayout.Toggle (_isDeviceAny, "Any");
+								_isDeviceAxisPositionFull = GUILayout.Toggle (_isDeviceAxisPositionFull, "Full Axis");
+								EditorGUILayout.EndHorizontal ();
 
-                                EditorGUILayout.Separator();
+								EditorGUILayout.Separator ();
 
 
 								
@@ -824,7 +847,7 @@ namespace ws.winx.editor
 										_showLayer = new bool[controller.layerCount];
 					   
 				
-								for (; i<numLayers; i++) {
+								for (i=0; i<numLayers; i++) {
 										layer = ac.GetLayer (i);
 
 								
