@@ -24,7 +24,7 @@ namespace ws.winx.devices
         bool isReady { get; }
 		IDriver driver{get;} 
 		string Name{get;set;}
-		DeviceProfile profile;
+		DeviceProfile profile{ get; set; }
      
 
 			

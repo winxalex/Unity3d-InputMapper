@@ -55,7 +55,7 @@ namespace ws.winx.input
 
 		}
 
-		public static InputPlayer currentPlayer=InputPlayer.Player.Player0;
+		public static InputPlayer.Player currentPlayer=InputPlayer.Player.Player0;
 
 
 
@@ -1288,8 +1288,21 @@ namespace ws.winx.input
 			}
 
 			Debug.Log ("Try to remove states");
-		if (InputManager.Settings.stateInputs != null)
-								InputManager.Settings.stateInputs.Clear ();
+			InputPlayer[] players = InputManager.Settings.Players;
+			for (int i=0; i<players.Length; i++) {
+
+				foreach (var DeviceStateInputPair in players[i].DeviceStateInputs) {
+					DeviceStateInputPair.Value.Clear();
+					
+				}
+
+
+				players[i].DeviceStateInputs.Clear();
+
+			}
+
+//		if (InputManager.Settings.stateInputs != null)
+//								InputManager.Settings.stateInputs.Clear ();
 			
 			Debug.Log ("Dispose Finished");
 
@@ -1390,7 +1403,8 @@ namespace ws.winx.input
 
 
 				InputPlayer player = _players [(int)index];
-				if (player != null) {
+
+
 					string profileName=player.Device.profile!=null ? player.Device.profile.Name: "default";
 
 					if(player.DeviceStateInputs.ContainsKey(profileName)){
@@ -1399,7 +1413,6 @@ namespace ws.winx.input
 					}
 
 					return player.DeviceStateInputs["default"];
-				}
 
 
 			}

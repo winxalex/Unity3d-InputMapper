@@ -35,11 +35,9 @@ namespace ws.winx.devices
 				int _PID;
 				bool _isReady = true;
 				int _lastFrameNum = -1;
+		string _ID;
 
-		string _ID {
-			get;
-			set;
-		}
+
 
 				//int axisDominantPrevInx = -1;
 
@@ -83,6 +81,14 @@ namespace ws.winx.devices
         #region Public Members
 
 		#region IDevice implementation
+
+		#region IDevice implementation
+
+		public DeviceProfile profile {
+			 get; set; 
+		}
+
+		#endregion
 
 	
 		public string ID {

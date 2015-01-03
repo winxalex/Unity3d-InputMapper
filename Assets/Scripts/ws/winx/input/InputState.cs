@@ -80,6 +80,16 @@ namespace ws.winx.input
             else
                 this.combinations[_count++] = combination;
         }
+
+
+
+		public InputState Clone(){
+			InputState inputStateNew = new InputState (this.name, this.hash);
+
+			inputStateNew.combinations [0] = this.combinations [0].Clone ();
+			inputStateNew.combinations [1] = this.combinations [1].Clone ();
+			return inputStateNew;
+		}
     }
 }
 

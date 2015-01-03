@@ -6,9 +6,14 @@ using ws.winx.devices;
 
 namespace ws.winx.input{
 
+
+
+
+
 	public class InputPlayer 
 	{
-		public enum Player:uint{
+
+		public enum Player:int{
 			Player0,
 			Player1,
 			Player2,
@@ -17,10 +22,11 @@ namespace ws.winx.input{
 			Player5,
 			Player6,
 			Player7
-
-
-
+			
+			
+			
 		}
+
 
 		 Dictionary<string,Dictionary<int,InputState>> _DeviceStateInputs;
 
@@ -36,6 +42,25 @@ namespace ws.winx.input{
 		public IDevice Device;
 
 
+		public InputPlayer Clone(){
+			InputPlayer newInputPlayer = new InputPlayer ();
+			Dictionary<int,InputState> stateInputs;
+
+			foreach (var DeviceHashStateInputPair in this.DeviceStateInputs) {
+
+				stateInputs=newInputPlayer.DeviceStateInputs[DeviceHashStateInputPair.Key]=new Dictionary<int,InputState>();
+
+				foreach(var HashStateInputPair in DeviceHashStateInputPair.Value){
+					stateInputs[HashStateInputPair.Key]=HashStateInputPair.Value.Clone();
+				}
+
+
+			}
+
+
+			return newInputPlayer;
+
+		}
 
 
 

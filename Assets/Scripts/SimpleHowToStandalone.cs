@@ -218,7 +218,7 @@ namespace ws.winx
 			
 									
 			//Generated value from -1 to 1f
-			float axisPos = InputManager.GetInputRaw (Animator.StringToHash ("WalkForward"), 0.3f, 0.1f, 0.2f);
+//			float axisPos = InputManager.GetInputRaw (Animator.StringToHash ("WalkForward"), 0.3f, 0.1f, 0.2f);
 			
 						//Generated value from 0 to 1f
 //						float axisPos = InputManager.GetInput (Animator.StringToHash ("WalkForward"), 0.3f, 0.1f, 0.2f);

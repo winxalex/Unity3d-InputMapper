@@ -310,7 +310,7 @@ namespace ws.winx.gui
 								/// convert stateInputs to selected Device inx
 
 
-								List<IDevice> devices = InputManager.GetDevices<JoystickDevice> ();
+								List<JoystickDevice> devices = InputManager.GetDevices<JoystickDevice> ();
 
 								if (devices.Count > 0) {
 										_deviceDisplayOptions = new string[devices.Count];

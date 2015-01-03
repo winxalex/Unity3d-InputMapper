@@ -30,8 +30,7 @@ namespace ws.winx.editor
 	
 		
 				protected static Dictionary<int,InputState> _stateInputCombinations;// = InputManager.Settings.stateInputs; //new Dictionary<int,InputState> ();
-				
-
+				protected static InputManager.InputSettings settings = InputManager.Settings;
 				protected static bool _settingsLoaded = false;
 				protected UnityEngine.Object _lastController;
 				protected TextAsset _lastSettingsXML;
@@ -280,27 +279,33 @@ namespace ws.winx.editor
 								InputManager.loadSettingsFromText (text, false);
 								//InputManager.loadSettings (path);
 
+
+								settings=InputManager.Settings;
+
 								//assign settings
-								_doubleClickDesignator = InputManager.Settings.doubleDesignator;
-								_doubleClickSensitivity = InputManager.Settings.doubleClickSensitivity;
-								_combosClickSensitivity = InputManager.Settings.combinationsClickSensitivity;
-								_singleClickSensitivity = InputManager.Settings.singleClickSensitivity;
-								_longClickDesignator = InputManager.Settings.longDesignator;
-								_longClickSensitivity = InputManager.Settings.longClickSensitivity;
-								_spaceDesignator = InputManager.Settings.spaceDesignator;
+								_doubleClickDesignator = settings.doubleDesignator;
+								_doubleClickSensitivity = settings.doubleClickSensitivity;
+								_combosClickSensitivity = settings.combinationsClickSensitivity;
+								_singleClickSensitivity = settings.singleClickSensitivity;
+								_longClickDesignator = settings.longDesignator;
+								_longClickSensitivity = settings.longClickSensitivity;
+								_spaceDesignator = settings.spaceDesignator;
+
+
+								
 						
-								var stateInputs = InputManager.Settings.stateInputs;
+							//	var stateInputs = InputManager.Settings.stateInputs;
 						
 								//concat//concate with priority of keys/items loaded from .xml
-								foreach (var KeyValuePair in _stateInputCombinations) {
-										if (!stateInputs.ContainsKey (KeyValuePair.Key))
-												InputManager.Settings.stateInputs.Add (KeyValuePair.Key, KeyValuePair.Value);
-							
-							
-								}
+//								foreach (var KeyValuePair in _stateInputCombinations) {
+//										if (!stateInputs.ContainsKey (KeyValuePair.Key))
+//												InputManager.Settings.stateInputs.Add (KeyValuePair.Key, KeyValuePair.Value);
+//							
+//							
+//								}
 
 						
-								_stateInputCombinations = InputManager.Settings.stateInputs;
+								//_stateInputCombinations = InputManager.Settings.stateInputs;
 								//Debug.Log ("Concat..." + _stateInputCombinations.Count);	
 			
 						
@@ -637,30 +642,72 @@ namespace ws.winx.editor
 
 								//////////// PLAYERS //////////////
 								EditorGUILayout.BeginHorizontal ();
+
+
+								InputPlayer player = null;
 								_numPlayers = EditorGUILayout.IntField ("Number of Players", _numPlayers);
+
+								if (_numPlayers < 1)
+										_numPlayers = 1;
 								
-				bool hasPlayerNumberChanged=false;
+							
 								
-								if (_playersIndices == null || _numPlayers != _playersIndices.Length) {
-										_playersIndices = new int[_numPlayers];
+								if (settings.Players == null || _numPlayers != settings.Players.Length) {
+										
 										_playerDisplayOptions = new string [_numPlayers];
-										for (int pi=0; pi<_numPlayers; pi++) {
-												_playersIndices [pi] = pi;
-												_playerDisplayOptions [pi] = "Player" + pi;
+										InputPlayer[] players = new InputPlayer[_numPlayers];
+
+										for (i=0; i<_numPlayers; i++) {
+												
+												_playerDisplayOptions [i] = "Player" + i;
+
+												//don't delete previous players just add new
+												if (settings.Players != null && settings.Players.Length > i)
+														players [i] = settings.Players [i];
+												else
+														players [i] = new InputPlayer ();
 										}
 
 
-										InputManager.Settings.Players = new InputPlayer[_numPlayers];
-					hasPlayerNumberChanged=true;
+										settings.Players = players;
+
+										//set last player as current
+										_playerIndexSelected = _numPlayers - 1;
+
+										//reset profile to default
+										_profileSelectedIndex = 0;
+
+										
 								}
 
-								_playerIndexSelected = EditorGUILayout.IntPopup (_playerIndexSelected, _playerDisplayOptions, _playersIndices);
-								
+								_playerIndexSelected = EditorGUILayout.Popup (_playerIndexSelected, _playerDisplayOptions);
+					
+
+				if(_numPlayers>1 &&  GUILayout.Button("Clone To All")){
+					InputPlayer sample=settings.Players[_playerIndexSelected];
+					
+					for (i=0; i<_numPlayers; i++) {
+						if(i!=_playerIndexSelected)
+							settings.Players[i]=sample.Clone();
+					}
+				}
+
+
+				EditorGUILayout.EndHorizontal ();
+
+
+
+
+								//////////// Profiles /////////////
+				 
+				 EditorGUILayout.BeginHorizontal();
+
+				EditorGUILayout.LabelField("Profiles");
 
 								if (_profilesTextAsset == null) {
 										_profilesTextAsset = AssetDatabase.LoadAssetAtPath ("Assets/StreamingAssets/profiles.txt", typeof(TextAsset)) as TextAsset;
 										
-					//extract profiles lines
+										//extract profiles lines
 										string[] profiles = _profilesTextAsset.text.Split ('\n');
 										List<string> pList = new List<string> ();
 										string deviceType = null;
@@ -681,31 +728,48 @@ namespace ws.winx.editor
 								
 
 							
-								//create
-								if(hasPlayerNumberChanged){
-
-											InputPlayer player=null;						
-										for(i=0;i<_playersIndices.Length;i++){
-											player=new InputPlayer();
-											InputManager.Settings.Players[i]=player;
-
-											for(j=0;j<_profilesDevicesDisplayOptions.Length;j++){
-												
-
-												player.DeviceStateInputs[_profilesDevicesDisplayOptions[j]]=new Dictionary<int, InputState>();
-											
-											}
-										}
-
-
-								}
 								
 								
 
 								_profileSelectedIndex = EditorGUILayout.Popup (_profileSelectedIndex, _profilesDevicesDisplayOptions);
 
 
-								_stateInputCombinations=InputManager.Settings.Players[_playerIndexSelected].DeviceStateInputs[_profilesDevicesDisplayOptions[_profileSelectedIndex]];
+								player = settings.Players[_playerIndexSelected];
+
+								Dictionary<int,InputState> stateInputsCurrent;
+
+								//init stateInput Dictionary if player numbers is increased
+								if (!player.DeviceStateInputs.ContainsKey (_profilesDevicesDisplayOptions [_profileSelectedIndex]))
+										player.DeviceStateInputs [_profilesDevicesDisplayOptions [_profileSelectedIndex]] = new Dictionary<int, InputState> ();
+
+
+								stateInputsCurrent = player.DeviceStateInputs [_profilesDevicesDisplayOptions [_profileSelectedIndex]];
+
+
+								if (_profileSelectedIndex > 0) {
+										if (GUILayout.Button ("Clone default")) {
+
+												Dictionary<int,InputState> stateInputsDefault = player.DeviceStateInputs ["default"];
+												foreach (var HashInputStatePair in stateInputsDefault) {
+														if (!stateInputsCurrent.ContainsKey (HashInputStatePair.Key))
+																stateInputsCurrent.Add (HashInputStatePair.Key, HashInputStatePair.Value.Clone());
+											
+												}
+
+
+
+										}
+
+
+
+
+						
+					
+
+								}
+
+
+								_stateInputCombinations = stateInputsCurrent;
 
 
 
@@ -894,6 +958,7 @@ namespace ws.winx.editor
 						if (GUILayout.Button ("+", _addRemoveButtonStyle)) {
 			
 								EditorGUIUtility.keyboardControl = 0;
+								_selectedStateHash=0;
 
 								if (_newCustomStateName != null && _newCustomStateName.Length > 0) {
 										int hash = Animator.StringToHash (_newCustomStateName);
