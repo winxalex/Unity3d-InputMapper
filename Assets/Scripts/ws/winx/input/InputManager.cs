@@ -435,6 +435,13 @@ namespace ws.winx.input
 
 
 
+
+
+		///!!!! UNITY DOESN"T INCLUDE SYSTEM.XML (OR SOME PARTS OF IT) SO RUNTIME SERIALIZATION DOESN"T WORK IN WEBPLAYER
+		/// manual deserialzation is done with addtional methods for WEBPLAYER 
+		/// TODO mulitplayer changes for webplayer ser/des should be done if there is interest of community
+
+
 #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
         /// <summary>
 		/// Loads the Input settings from InputSettings.xml and deserialize into OO structure.
@@ -460,6 +467,30 @@ namespace ws.winx.input
 			
 
 
+			return __settings;
+		}
+
+
+		public static InputSettings loadSettings(StringReader stringReader){
+			XmlReaderSettings xmlSettings=new XmlReaderSettings();
+			xmlSettings.CloseInput=true;
+			xmlSettings.IgnoreWhitespace=true;
+			
+			
+			
+			//DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<int,InputCombination[]>),"Inputs","");
+			DataContractSerializer serializer = new DataContractSerializer(typeof(InputSettings),"Inputs","");
+			
+			
+			using(XmlReader reader=XmlReader.Create(stringReader,xmlSettings))
+			{
+				
+				__settings=(InputSettings)serializer.ReadObject(reader);
+				
+			}
+			
+			
+			
 			return __settings;
 		}
 #endif
@@ -782,8 +813,8 @@ namespace ws.winx.input
 
             if(www.error!=null) UnityEngine.Debug.LogError(www.error);
 		}
-#endif
 
+		#endif
 
         public static string formatOutput()
         {
@@ -879,6 +910,7 @@ namespace ws.winx.input
             return String.Format(HEADFORMAT, settings.doubleDesignator, settings.longDesignator, settings.spaceDesignator, settings.singleClickSensitivity, settings.doubleClickSensitivity, settings.longClickSensitivity, settings.combinationsClickSensitivity,
                                 sb.ToString());
         }
+
 
         #if UNITY_WEBPLAYER && UNITY_EDITOR
        public static void saveSettings(string path){
@@ -1287,17 +1319,18 @@ namespace ws.winx.input
 				_devices=null;
 			}
 
-			Debug.Log ("Try to remove states");
+			Debug.Log ("Try to remove states per player");
 			InputPlayer[] players = InputManager.Settings.Players;
+			if(players!=null)
 			for (int i=0; i<players.Length; i++) {
 
-				foreach (var DeviceStateInputPair in players[i].DeviceStateInputs) {
+				foreach (var DeviceStateInputPair in players[i].DeviceProfileStateInputs) {
 					DeviceStateInputPair.Value.Clear();
 					
 				}
 
 
-				players[i].DeviceStateInputs.Clear();
+				players[i].DeviceProfileStateInputs.Clear();
 
 			}
 
@@ -1407,12 +1440,12 @@ namespace ws.winx.input
 
 					string profileName=player.Device.profile!=null ? player.Device.profile.Name: "default";
 
-					if(player.DeviceStateInputs.ContainsKey(profileName)){
-						return player.DeviceStateInputs[profileName];
+					if(player.DeviceProfileStateInputs.ContainsKey(profileName)){
+						return player.DeviceProfileStateInputs[profileName];
 
 					}
 
-					return player.DeviceStateInputs["default"];
+					return player.DeviceProfileStateInputs["default"];
 
 
 			}

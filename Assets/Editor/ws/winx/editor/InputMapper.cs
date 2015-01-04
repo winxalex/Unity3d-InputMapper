@@ -43,7 +43,7 @@ namespace ws.winx.editor
 				protected string _currentInputString;
 
 				//Players
-				protected int _numPlayers = 1;
+				protected int _playerNumber = 1;
 				protected int[] _playersIndices;
 				protected int _playerIndexSelected = 0;
 				protected string[] _playerDisplayOptions;
@@ -173,65 +173,41 @@ namespace ws.winx.editor
 						generator.Session.Add ("EnumName", enumName);		
 						generator.Session.Add ("Values", statesStringBuilder.ToString ());
 		
-						string generatedFileName = fileName;
+						
 
 						string generated;
 
-						//split ws.winx.input.states
-						string[] namespacePath = namespaceName.Split ('.');
-						int i = 0;
-						generated = Application.dataPath;
 
-						//search for directory
-						string[] directoriesFound = Directory.GetDirectories (generated, namespacePath [0], SearchOption.AllDirectories);
-				
-						//find if file already exist
-						if (directoriesFound.Length > 0) {
-								if (directoriesFound.Length > 1)
-										UnityEngine.Debug.LogWarning ("Only first found " + generatedFileName + " will be used");
-					
-								generated = directoriesFound [0];
-								i = 1;
-					
-						} else {
-								generated = Path.Combine (Application.dataPath, "Scripts");
-							
-								//if Scripts doesn't exist
-								if (!Directory.Exists (generated))
-										Directory.CreateDirectory (generated);
-						}
-		
-		
-		
-						//generate subdirs
-						for (; i<namespacePath.Length; i++) {
-								generated = Path.Combine (generated, namespacePath [i]);
 
-								if (!Directory.Exists (generated))
-										Directory.CreateDirectory (generated);
-						}
-		
+						generated = Path.Combine (Application.dataPath, "Scripts");
+						
+						//if Scripts doesn't exist
+						if (!Directory.Exists (generated))
+								Directory.CreateDirectory (generated);
 
-			
-			
-						generated = Path.GetFullPath (Path.Combine (generated, generatedFileName));
 
-				
+						//string[] filesFound=Directory.GetFiles (Path.Combine (generated, fileName));
 
-		         
-
+						//if (filesFound.Length == 0) {
+						generated = namespaceToDirectory (generated, namespaceName);
+						generated = Path.GetFullPath (Path.Combine (generated, fileName));
+						//} else {
+						//		generated=filesFound[0];
+						//}
+								
 
 		
 						try {
 
-								///!!! OSX: error happen here cos of unity bug
-								/// Error running gmcs: Cannot find the specified file
-								/// workaround is (check your version mine was 2.10.11) typing this command line in terminal
-								/// sudo ln -s /Applications/Unity/MonoDevelop.app/Contents/Frameworks/Mono.framework/Versions/2.10.2/bin/gmcs /usr/bin
-						
-								generator.ProcessTemplate (Path.Combine (Path.Combine (Application.dataPath, "Editor"), "StatesEnumTemplate.tpl"), generated);
+				///!!! OSX : error !Error running gmcs : Cannot find the specified file.! happen here cos of unity bug
+								/// Download and install MRE(Mono Runtime Envi)
+								/// http://www.mono-project.com/download/
+				/// saving doesn't work still cos of unknown
+								fileName = Path.Combine (Path.Combine (Application.dataPath, "Editor"), "StatesEnumTemplate.tpl");
+								UnityEngine.Debug.Log ("Generating " + generated + " from template:" + fileName);
+								generator.ProcessTemplate (fileName, generated);
 			
-								UnityEngine.Debug.Log ("Generated States Enum at:" + generated);
+								
 						} catch (Exception e) {
 								UnityEngine.Debug.LogError (e.Message);
 						}
@@ -240,6 +216,35 @@ namespace ws.winx.editor
 
 				}
 
+
+				/// <summary>
+				/// Generates Directory Structure based on namespace string ex. ws.winx.input
+				/// in specified "rootDir"
+				/// </summary>
+				/// <returns>The to directory.</returns>
+				/// <param name="root">Root.</param>
+				/// <param name="namespaceName">Namespace name.</param>
+				static string namespaceToDirectory (string root, string namespaceName)
+				{
+
+						//split ws.winx.input.states
+						string[] namespacePath = namespaceName.Split ('.');
+						int i = 0;
+
+
+						//generate subdirs
+						for (; i<namespacePath.Length; i++) {
+								root = Path.Combine (root, namespacePath [i]);
+								
+								if (!Directory.Exists (root))
+										Directory.CreateDirectory (root);
+						}
+
+
+						return root;
+			
+				}
+		
 				void loadTextAsset (string path)
 				{
 						Uri fullPath = new Uri (path, UriKind.Absolute);
@@ -272,15 +277,23 @@ namespace ws.winx.editor
 								Debug.Log ("Loading..." + _stateInputCombinations);
 
 								//clone
-								_stateInputCombinations = new Dictionary<int,InputState> (_stateInputCombinations);
+								//_stateInputCombinations = new Dictionary<int,InputState> (_stateInputCombinations);
 								//Debug.Log ("Clone..." + _stateInputCombinations.Count);		
 						
 								//load
+								#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+								InputManager.loadSettings(new StringReader(text));
+								#else
 								InputManager.loadSettingsFromText (text, false);
+								#endif
+
 								//InputManager.loadSettings (path);
 
-
-								settings=InputManager.Settings;
+				
+								
+								
+							
+								settings = InputManager.Settings;
 
 								//assign settings
 								_doubleClickDesignator = settings.doubleDesignator;
@@ -291,10 +304,11 @@ namespace ws.winx.editor
 								_longClickSensitivity = settings.longClickSensitivity;
 								_spaceDesignator = settings.spaceDesignator;
 
-
+								_playerNumber=settings.Players.Length;
+								_playerIndexSelected=0;
 								
 						
-							//	var stateInputs = InputManager.Settings.stateInputs;
+								//	var stateInputs = InputManager.Settings.stateInputs;
 						
 								//concat//concate with priority of keys/items loaded from .xml
 //								foreach (var KeyValuePair in _stateInputCombinations) {
@@ -325,7 +339,7 @@ namespace ws.winx.editor
 
 						if (path != null && path.Length > 1) {
 								//Debug.Log ("Before..." + _stateInputCombinations.Count+" inputmngr "+InputManager.Settings.stateInputs.Count);
-								generateCSharpStatesEnum (_namespace, _enumName, _enumFileName, filterInputStates ());
+								generateCSharpStatesEnum (_namespace, _enumName, _enumFileName, HashStateInputsToStringBuilder ());
 						
 			          	
 								InputManager.saveSettings (path);
@@ -337,55 +351,87 @@ namespace ws.winx.editor
 						
 						}
 				}
-
-
-				/// <summary>
-				/// Filters the input states.
-				/// </summary>
-				/// <returns>The input states.</returns>
-				StringBuilder filterInputStates ()
+				
+				StringBuilder HashStateInputsToStringBuilder ()
 				{
-						Dictionary<int,InputState> stateInputs;
+						Dictionary<int,InputState> stateInputsCurrent;
 						List<int> keysToBeRemovedList;
-						stateInputs = InputMapper._stateInputCombinations;
-						keysToBeRemovedList = new List<int> ();
-						StringBuilder statesStringBuilder = new StringBuilder ();
-		
-						//Filter
-						foreach (var KeyValuePair in stateInputs) {
-								InputCombination combos = KeyValuePair.Value.combinations [0];
-					
-								if (combos != null && combos.GetActionAt (0).code == (int)KeyCode.None) {
-										combos.Clear ();
-										//stateInputs.Remove(KeyCombinationStringPair.Key);
-										keysToBeRemovedList.Add (KeyValuePair.Key);
-								}
-					
-					
-								combos = KeyValuePair.Value.combinations [1];
-					
-								if (combos != null && combos.GetActionAt (0).code == (int)KeyCode.None) {
-										combos.Clear ();
-										KeyValuePair.Value.combinations [1] = null;
+						StringBuilder statesStringBuilder;
+
+						statesStringBuilder = new StringBuilder ();
 						
+						Dictionary<int,bool> stateInputsCombined = new Dictionary<int, bool> ();
+						int numPlayers = settings.Players.Length;
+
+						for (int i=0; i<numPlayers; i++) {
+
+								foreach (var DeviceProfileHashStateInput in settings.Players[i].DeviceProfileStateInputs) {
+
+
+										stateInputsCurrent = DeviceProfileHashStateInput.Value;
+										keysToBeRemovedList = new List<int> ();
+
+
+							
+								
+				
+										//Filter
+										foreach (var HashStateInput in stateInputsCurrent) {
+
+
+												//fill String Builder with unique StateInputs
+												if (!stateInputsCombined.ContainsKey (HashStateInput.Key)) {
+
+														stateInputsCombined [HashStateInput.Key] = true;
+
+														statesStringBuilder.Append ("\t" + HashStateInput.Value.name.Replace (" ", "_") + "=" + HashStateInput.Key + ",\n\r");
+
+
+												}
+
+
+
+
+
+
+												InputCombination combos = HashStateInput.Value.combinations [0];
+							
+												if (combos != null && combos.GetActionAt (0).code == (int)KeyCode.None) {
+														combos.Clear ();
+												
+														keysToBeRemovedList.Add (HashStateInput.Key);
+												}
+							
+							
+												combos = HashStateInput.Value.combinations [1];
+							
+												if (combos != null && combos.GetActionAt (0).code == (int)KeyCode.None) {
+														combos.Clear ();
+														HashStateInput.Value.combinations [1] = null;
+								
+												}
+
+
+										
+
+										
+							
+					
+					
+					
+										}
+
+										//remove those with "None" as Primary combination
+										foreach (var key in keysToBeRemovedList) {
+												stateInputsCurrent.Remove (key);
+										}
+
 								}
 
-
-
-
-								statesStringBuilder.Append ("\t" + KeyValuePair.Value.name.Replace (" ", "_") + "=" + KeyValuePair.Key + ",\n\r");
-						
-					
-			
-			
-			
 						}
 
 
-						//remove those with "None" as Primary combinaiton
-						foreach (var key in keysToBeRemovedList) {
-								stateInputs.Remove (key);
-						}
+						
 
 
 
@@ -645,21 +691,21 @@ namespace ws.winx.editor
 
 
 								InputPlayer player = null;
-								_numPlayers = EditorGUILayout.IntField ("Number of Players", _numPlayers);
+								_playerNumber = EditorGUILayout.IntField ("Number of Players", _playerNumber);
 
-								if (_numPlayers < 1)
-										_numPlayers = 1;
+								if (_playerNumber < 1)
+										_playerNumber = 1;
 								
 							
-								
-								if (settings.Players == null || _numPlayers != settings.Players.Length) {
+								//create Players
+								if (settings.Players == null || _playerNumber != settings.Players.Length) {
 										
-										_playerDisplayOptions = new string [_numPlayers];
-										InputPlayer[] players = new InputPlayer[_numPlayers];
+										
+										InputPlayer[] players = new InputPlayer[_playerNumber];
 
-										for (i=0; i<_numPlayers; i++) {
+										for (i=0; i<_playerNumber; i++) {
 												
-												_playerDisplayOptions [i] = "Player" + i;
+												
 
 												//don't delete previous players just add new
 												if (settings.Players != null && settings.Players.Length > i)
@@ -672,7 +718,7 @@ namespace ws.winx.editor
 										settings.Players = players;
 
 										//set last player as current
-										_playerIndexSelected = _numPlayers - 1;
+										_playerIndexSelected = _playerNumber - 1;
 
 										//reset profile to default
 										_profileSelectedIndex = 0;
@@ -680,29 +726,41 @@ namespace ws.winx.editor
 										
 								}
 
+								//create player display options
+								if (_playerDisplayOptions == null || _playerNumber != _playerDisplayOptions.Length) {
+										_playerDisplayOptions = new string [_playerNumber];
+										for (i=0; i<_playerNumber; i++) {
+												_playerDisplayOptions [i] = "Player" + i;
+										}
+
+								}
+
+
+
+
 								_playerIndexSelected = EditorGUILayout.Popup (_playerIndexSelected, _playerDisplayOptions);
 					
 
-				if(_numPlayers>1 &&  GUILayout.Button("Clone To All")){
-					InputPlayer sample=settings.Players[_playerIndexSelected];
+								if (_playerNumber > 1 && GUILayout.Button ("Clone To All")) {
+										InputPlayer sample = settings.Players [_playerIndexSelected];
 					
-					for (i=0; i<_numPlayers; i++) {
-						if(i!=_playerIndexSelected)
-							settings.Players[i]=sample.Clone();
-					}
-				}
+										for (i=0; i<_playerNumber; i++) {
+												if (i != _playerIndexSelected)
+														settings.Players [i] = sample.Clone ();
+										}
+								}
 
 
-				EditorGUILayout.EndHorizontal ();
+								EditorGUILayout.EndHorizontal ();
 
 
 
 
 								//////////// Profiles /////////////
 				 
-				 EditorGUILayout.BeginHorizontal();
+								EditorGUILayout.BeginHorizontal ();
 
-				EditorGUILayout.LabelField("Profiles");
+								EditorGUILayout.LabelField ("Profiles");
 
 								if (_profilesTextAsset == null) {
 										_profilesTextAsset = AssetDatabase.LoadAssetAtPath ("Assets/StreamingAssets/profiles.txt", typeof(TextAsset)) as TextAsset;
@@ -734,25 +792,25 @@ namespace ws.winx.editor
 								_profileSelectedIndex = EditorGUILayout.Popup (_profileSelectedIndex, _profilesDevicesDisplayOptions);
 
 
-								player = settings.Players[_playerIndexSelected];
+								player = settings.Players [_playerIndexSelected];
 
 								Dictionary<int,InputState> stateInputsCurrent;
 
 								//init stateInput Dictionary if player numbers is increased
-								if (!player.DeviceStateInputs.ContainsKey (_profilesDevicesDisplayOptions [_profileSelectedIndex]))
-										player.DeviceStateInputs [_profilesDevicesDisplayOptions [_profileSelectedIndex]] = new Dictionary<int, InputState> ();
+								if (!player.DeviceProfileStateInputs.ContainsKey (_profilesDevicesDisplayOptions [_profileSelectedIndex]))
+										player.DeviceProfileStateInputs [_profilesDevicesDisplayOptions [_profileSelectedIndex]] = new Dictionary<int, InputState> ();
 
 
-								stateInputsCurrent = player.DeviceStateInputs [_profilesDevicesDisplayOptions [_profileSelectedIndex]];
+								stateInputsCurrent = player.DeviceProfileStateInputs [_profilesDevicesDisplayOptions [_profileSelectedIndex]];
 
 
 								if (_profileSelectedIndex > 0) {
 										if (GUILayout.Button ("Clone default")) {
 
-												Dictionary<int,InputState> stateInputsDefault = player.DeviceStateInputs ["default"];
+												Dictionary<int,InputState> stateInputsDefault = player.DeviceProfileStateInputs ["default"];
 												foreach (var HashInputStatePair in stateInputsDefault) {
 														if (!stateInputsCurrent.ContainsKey (HashInputStatePair.Key))
-																stateInputsCurrent.Add (HashInputStatePair.Key, HashInputStatePair.Value.Clone());
+																stateInputsCurrent.Add (HashInputStatePair.Key, HashInputStatePair.Value.Clone ());
 											
 												}
 
@@ -958,7 +1016,7 @@ namespace ws.winx.editor
 						if (GUILayout.Button ("+", _addRemoveButtonStyle)) {
 			
 								EditorGUIUtility.keyboardControl = 0;
-								_selectedStateHash=0;
+								_selectedStateHash = 0;
 
 								if (_newCustomStateName != null && _newCustomStateName.Length > 0) {
 										int hash = Animator.StringToHash (_newCustomStateName);

@@ -193,7 +193,7 @@ namespace ws.winx.gui
 						//_stateInputCombinations = new Dictionary<int, InputState>(InputManager.Settings.stateInputs);
 
 
-						_stateInputCombinations = InputManager.Settings.Players [0].DeviceStateInputs ["default"];
+						_stateInputCombinations = InputManager.Settings.Players [0].DeviceProfileStateInputs ["default"];
 
 
 				}
