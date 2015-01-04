@@ -27,7 +27,7 @@ namespace ws.winx
 
 
 
-        bool _settingsLoaded = false;
+    
         private float vSliderValue;
         private ThrustmasterRGTFFDDevice TTFFDDevice;
         private XInputDevice XDevice;
@@ -285,7 +285,7 @@ namespace ws.winx
             ev.UP += new EventHandler(onUp);
             ev.DOWN += new EventHandler(onDown);
 
-            _settingsLoaded = true;
+          
 
 
 
@@ -298,9 +298,7 @@ namespace ws.winx
 
 
 
-            //Use is mapping states so no quering keys during gameplay
-            if (InputManager.EditMode || !_settingsLoaded)
-                return;
+         
 
             //
             //						if (InputManager.GetInputHold ((int)States.Wave)) {

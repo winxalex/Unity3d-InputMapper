@@ -560,7 +560,7 @@ namespace ws.winx.editor
 
 
 
-								_action = InputEx.GetInput ();
+								_action = InputManager.GetAction ();
 
 								if (_action != null && (_action.code ^ (int)KeyCode.Escape) != 0 && (_action.code ^ (int)KeyCode.Return) != 0) {
 

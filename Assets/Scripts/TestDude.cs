@@ -23,7 +23,7 @@ public class TestDude : MonoBehaviour {
     {
 
         //use auto generated States.[state_name] (Don't forget to loadSettings before)
-        InputManager.PlayStateOnInputDown(_animator, (int)States.Wave);
+       //  InputManager.PlayStateOnInputDown(_animator, (int)States.Wave);
     }
 	
 }

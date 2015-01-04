@@ -656,7 +656,7 @@ namespace ws.winx.input
 
 				}
 
-				public static InputAction GetInput ()
+				internal static InputAction GetInput ()
 				{
 
 						bool isPlaying = Application.isPlaying;

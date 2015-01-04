@@ -50,8 +50,23 @@ namespace ws.winx.input{
 
 		public IDevice Device;
 
-		public string _DeviceID;
 
+		#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+		[DataMember(Order=1)]
+		#endif
+		public string _deviceID;
+
+		public string DeviceID {
+			get {
+				if(Device!=null)
+					return Device.ID;
+				else
+					return _deviceID;
+			}
+			set {
+				_deviceID = value;
+			}
+		}
 
 
 

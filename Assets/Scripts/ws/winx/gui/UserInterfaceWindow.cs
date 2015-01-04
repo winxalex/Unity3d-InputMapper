@@ -88,7 +88,7 @@ namespace ws.winx.gui
 								//Use is mapping states so no quering keys during gameplay
 								InputManager.EditMode = true;
 
-								_action = InputEx.GetInput ();
+								_action = InputManager.GetAction ();
 
 
 
@@ -192,8 +192,8 @@ namespace ws.winx.gui
 						//clone(cos maybe some are added manually)
 						//_stateInputCombinations = new Dictionary<int, InputState>(InputManager.Settings.stateInputs);
 
-
-						_stateInputCombinations = InputManager.Settings.Players [0].DeviceProfileStateInputs ["default"];
+						settings = InputManager.Settings;
+						_stateInputCombinations = settings.Players [0].DeviceProfileStateInputs ["default"];
 
 
 				}
@@ -320,10 +320,10 @@ namespace ws.winx.gui
 
 										}
 
-									_deviceIndexSelected = EditorGUILayout.Popup (_deviceIndexSelected, _deviceDisplayOptions);
-									//bind Device to player
+										_deviceIndexSelected = EditorGUILayout.Popup (_deviceIndexSelected, _deviceDisplayOptions);
+										//bind Device to player
 									
-					settings.Players[_playerIndexSelected].Device=devices[_deviceIndexSelected];
+										settings.Players [_playerIndexSelected].Device = devices [_deviceIndexSelected];
 								}
 								
 								
@@ -384,7 +384,7 @@ namespace ws.winx.gui
 
 
 								if (GUILayout.Button (InputCode.toProfiled (combinations [0]), _inputButtonStyle)) {
-               // if (GUILayout.Button(combinations[0].combinationString, _inputButtonStyle))
+										// if (GUILayout.Button(combinations[0].combinationString, _inputButtonStyle))
 										_selectedStateHash = hash;
 										_previousStateInput = null;
 										_isPrimary = 0;
@@ -392,7 +392,7 @@ namespace ws.winx.gui
 
 								if (combinations.Length > 1 && combinations [1] != null)
 								if (GUILayout.Button (InputCode.toProfiled (combinations [1]), _inputButtonStyle)) {
-                    //if (GUILayout.Button(combinations[1].combinationString, _inputButtonStyle))
+										//if (GUILayout.Button(combinations[1].combinationString, _inputButtonStyle))
 										_selectedStateHash = hash;
 										_previousStateInput = null;
 										_isPrimary = 1;

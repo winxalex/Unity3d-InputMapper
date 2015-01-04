@@ -29,7 +29,7 @@ namespace ws.winx
 	{
 			
 	
-		bool _settingsLoaded = false;
+
 		private float vSliderValue;
 		private ThrustmasterRGTFFDDevice TTFFDDevice;
 		IEnumerator runEffectEnumerator;
@@ -242,7 +242,7 @@ namespace ws.winx
 			ev.UP += new EventHandler(onUp);
 			ev.DOWN += new EventHandler(onDown);
 			
-			_settingsLoaded = true;
+		
 			
 			
 			
@@ -252,11 +252,6 @@ namespace ws.winx
 		// Update is called once per frame
 		void Update()
 		{
-			
-			
-			
-			//Use is mapping states so no quering keys during gameplay
-			if (InputManager.EditMode || !_settingsLoaded) return;
 			
 
 

@@ -40,23 +40,59 @@ namespace ws.winx.input
 
 
         /// <summary>
-        /// Edit Mode = true stops all keys quering and checks while gameplay. Useful when use open UI to map keys to states
+        /// Edit Mode = true stops all keys quering and checks of gameplay. Useful when use open UI to map keys to states
         /// 
         /// </summary>
-        public static bool EditMode = false;
+		public static bool EditMode=false;
+      	
+	
+		public enum Error:ushort{
 
-		public enum InputManagerMode:ushort{
-
-			Ready= 0x1,
-			Edit= 0x2,
-			Disposing= 0x4
+			NoError= 0x0,
+			SettingNotLoaded= 0x1,
+			//Disposing= 0x4
 
 
 
 		}
 
-		public static InputPlayer.Player currentPlayer=InputPlayer.Player.Player0;
+		public static bool isReady(){
 
+			//settings should be loaded
+			if (InputManager.__settings == null) {
+				Debug.LogError("InputSetting not loaded");
+				return false;
+			}
+
+
+
+			return !EditMode;
+		}
+
+	   static InputPlayer.Player _currentPlayerIndex=InputPlayer.Player.Player0;
+
+		public static InputPlayer.Player currentPlayerIndex {
+			get {
+				return currentPlayerIndex;
+			}
+			set {
+				if(!isReady()) return;
+
+				_currentPlayerIndex = value;
+
+				if(__settings.Players.Length>(int)value){
+					InputPlayer inputPlayer=__settings.Players[(int)value];
+
+					if(inputPlayer.Device==null && inputPlayer.DeviceID!=null){
+						if(Devices.ContainsID(inputPlayer.DeviceID))
+							inputPlayer.Device=Devices[inputPlayer.DeviceID];
+
+					}
+
+
+				}
+			}
+		}
 
 
 	 static DevicesCollection _devices;
@@ -357,10 +393,13 @@ namespace ws.winx.input
 
             if (at > 2) throw new Exception("Only indexes 0(Primary) and 1(Secondary) input are allowed");
 
+			if (!isReady ())
+								return;
+
             int stateNameHash=Animator.StringToHash(stateName);
             InputState state;
 
-            if (!Settings.stateInputs.ContainsKey(stateNameHash))
+            if (!__settings.stateInputs.ContainsKey(stateNameHash))
             {
                 //create InputState and add to Dictionary of state inputs
                 state = __settings.stateInputs[stateNameHash] = new InputState(stateName, stateNameHash);
@@ -384,11 +423,12 @@ namespace ws.winx.input
 		public static void MapStateToInput(int stateNameHash,InputCombination combination,int at=-1){
 
 			if(at>2) throw new Exception("Only indexes 0(Primary) and 1(Secondary) input are allowed");
-			
+			if (!isReady ())
+				return;
 			
 			InputState state;
 			
-			if(!Settings.stateInputs.ContainsKey(stateNameHash)){
+			if(!__settings.stateInputs.ContainsKey(stateNameHash)){
 				//create InputState and add to Dictionary of state inputs
 				state=__settings.stateInputs[stateNameHash]=new InputState("GenState_"+stateNameHash,stateNameHash);
 			}else{
@@ -401,37 +441,39 @@ namespace ws.winx.input
 
         public static bool HasInputState(int stateNameHash)
         {
-            return __settings.stateInputs.ContainsKey(stateNameHash);
+
+			return isReady () && __settings.stateInputs.ContainsKey(stateNameHash);
         }
 
         public static bool HasInputState(string stateName)
         {
-            return InputManager.HasInputState(Animator.StringToHash(stateName));
+
+			return isReady() && InputManager.HasInputState(Animator.StringToHash(stateName));
         }
 	
 
 		//[Not tested] idea for expansion
-		public static void PlayStateOnInputUp(Animator animator,int stateNameHash,int layer=0,float normalizedTime=0f){
-					if(InputManager.GetInputUp(stateNameHash)) 
-						animator.Play(stateNameHash,layer,normalizedTime); 
-		}
-
-		public static void PlayStateOnInputDown(Animator animator,int stateNameHash,int layer=0,float normalizedTime=0f){
-			if(InputManager.GetInputDown(stateNameHash)) 
-				animator.Play(stateNameHash,layer,normalizedTime); 
-		}
-
-
-		public static void CrossFadeStateOnInputUp(Animator animator,int stateNameHash,float transitionDuration=0.5f,int layer=0,float normailizeTime=0f){
-				if(InputManager.GetInputUp(stateNameHash)) 
-				animator.CrossFade(stateNameHash,transitionDuration,layer,normailizeTime);
-
-		}
-
-		public static void CrossFadeStateOnInputDown(Animator animator,int stateNameHash,float transitionDuration=0.5f,int layer=0,float normailizeTime=0f){
-			if(InputManager.GetInputDown(stateNameHash)) 
-				animator.CrossFade(stateNameHash,transitionDuration,layer,normailizeTime);
-    	}
+//		public static void PlayStateOnInputUp(Animator animator,int stateNameHash,int layer=0,float normalizedTime=0f){
+//					if(InputManager.GetInputUp(stateNameHash)) 
+//						animator.Play(stateNameHash,layer,normalizedTime); 
+//		}
+//
+//		public static void PlayStateOnInputDown(Animator animator,int stateNameHash,int layer=0,float normalizedTime=0f){
+//			if(InputManager.GetInputDown(stateNameHash)) 
+//				animator.Play(stateNameHash,layer,normalizedTime); 
+//		}
+//
+//
+//		public static void CrossFadeStateOnInputUp(Animator animator,int stateNameHash,float transitionDuration=0.5f,int layer=0,float normailizeTime=0f){
+//				if(InputManager.GetInputUp(stateNameHash)) 
+//				animator.CrossFade(stateNameHash,transitionDuration,layer,normailizeTime);
+//
+//		}
+//
+//		public static void CrossFadeStateOnInputDown(Animator animator,int stateNameHash,float transitionDuration=0.5f,int layer=0,float normailizeTime=0f){
+//			if(InputManager.GetInputDown(stateNameHash)) 
+//				animator.CrossFade(stateNameHash,transitionDuration,layer,normailizeTime);
+//    	}
 
 
 
@@ -991,6 +1033,17 @@ namespace ws.winx.input
         //}
 
 		/// <summary>
+		/// Gets the action that happens on keyboard,mouse or game controller input.(useful for building user mapping interface)
+		/// </summary>
+		/// <returns>The action.</returns>
+		public static InputAction GetAction(){
+			if (__settings != null)
+								return InputEx.GetInput ();
+						else
+								return null;
+		}
+
+		/// <summary>
 		/// Gets the input of generic created values in range 0f to 1f
 		/// in steps defined with "sensitivity" param
 		/// while key, button,mouse is HOLD
@@ -1005,7 +1058,7 @@ namespace ws.winx.input
 		/// <param name="gravity">Gravity. After no signal from input value would drop with step of gravity or immidiately</param>
 		public static float GetInput(int stateNameHash,float sensitivity=0.1f,float dreadzone=0.1f,float gravity=0.3f){
            //Use is mapping states so no quering keys during gameplay
-            if (InputManager.EditMode) return 0f;
+            if (InputManager.isReady()) return 0f;
             
             __inputCombinations=__settings.stateInputs[stateNameHash].combinations;
 
@@ -1027,7 +1080,7 @@ namespace ws.winx.input
 		/// <param name="gravity">Gravity. After no signal from input value would drop with step of gravity or immidiately</param>
 		public static float GetInputRaw(int stateNameHash,float sensitivity=0.1f,float dreadzone=0.1f,float gravity=0.3f){
 			//Use is mapping states so no quering keys during gameplay
-			if (InputManager.EditMode) return 0f;
+			if (InputManager.isReady()) return 0f;
 			
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
 
@@ -1046,7 +1099,7 @@ namespace ws.winx.input
 		/// <param name="stateNameHash">State name hash.</param>
 		public static bool GetInputHold(int stateNameHash){
 			//Use is mapping states so no quering keys during gameplay
-			if (InputManager.EditMode) return false;
+			if (!InputManager.isReady()) return false;
 			
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
 			return __inputCombinations[0].GetInputHold() || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputHold());
@@ -1061,7 +1114,7 @@ namespace ws.winx.input
 		/// 
 		public static bool GetInputUp(int stateNameHash){
             //Use is mapping states so no quering keys during gameplay
-            if (InputManager.EditMode) return false;
+            if (!InputManager.isReady()) return false;
 
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
 
@@ -1079,7 +1132,7 @@ namespace ws.winx.input
 		/// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts down state in row </param>		 
 		public static bool GetInputDown(int stateNameHash,bool atOnce=false){
 			//Use is mapping states so no quering keys during gameplay
-			if (InputManager.EditMode) return false;
+			if (!InputManager.isReady()) return false;
 
 			//__settings.Players[InputManager.currentPlayerInx].GetStateInputBasedOnControllerMappedToPlayer
 
@@ -1437,11 +1490,14 @@ namespace ws.winx.input
 
 				InputPlayer player = _players [(int)index];
 
+					//if there is device attached to player
+					if (player.Device != null) {
+										string profileName = player.Device.profile != null ? player.Device.profile.Name : "default";
 
-					string profileName=player.Device.profile!=null ? player.Device.profile.Name: "default";
+										if (player.DeviceProfileStateInputs.ContainsKey (profileName)) {
+												return player.DeviceProfileStateInputs [profileName];
 
-					if(player.DeviceProfileStateInputs.ContainsKey(profileName)){
-						return player.DeviceProfileStateInputs[profileName];
+										}
 
 					}
 
@@ -1460,7 +1516,7 @@ namespace ws.winx.input
 //			protected Dictionary<int,InputState> _stateInputs;
 			
 			public Dictionary<int,InputState> stateInputs{
-				get {return GetInputStatesOfPlayer(InputManager.currentPlayer);}
+				get {return GetInputStatesOfPlayer(InputManager.currentPlayerIndex);}
 			}
 
 

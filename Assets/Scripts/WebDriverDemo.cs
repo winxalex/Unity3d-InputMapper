@@ -104,7 +104,7 @@ namespace ws.winx
 			if (ui != null)//without settingsXML defined =>load them manually and attach them
 			{
 				InputManager.loadSettingsFromText(args.data.ElementAt(0).text);
-				ui.StateInputCombinations = InputManager.Settings.stateInputs;
+				ui.settings = InputManager.Settings;
 			}
 			
 			
@@ -147,7 +147,7 @@ namespace ws.winx
 						ev.UP += new EventHandler (onUp);
 						ev.DOWN += new EventHandler (onDown);
 			
-						_settingsLoaded = true;
+						
 			
 			
 			
@@ -160,9 +160,7 @@ namespace ws.winx
 			
 			
 			
-						//Use is mapping states so no quering keys during gameplay
-						if (InputManager.EditMode || !_settingsLoaded)
-								return;
+					
 			
 			
 						//Input.GetInput allows combos (combined input actions)
