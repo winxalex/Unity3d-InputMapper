@@ -13,7 +13,7 @@ namespace ws.winx.devices
 //		where k:IButtonDetails
 //		where p:IDeviceExtension
 //    {
-	public interface IDevice
+	public interface IDevice:IEquatable<IDevice>
         
 	{
 		int VID{get;}

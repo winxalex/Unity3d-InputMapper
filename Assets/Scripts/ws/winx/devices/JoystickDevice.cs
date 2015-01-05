@@ -80,15 +80,29 @@ namespace ws.winx.devices
 
         #region Public Members
 
-		#region IDevice implementation
+		#region IEquatable implementation
+
+
+
+		public bool Equals (IDevice other)
+		{
+			if (other == null)
+								return false;
+
+
+			return this.ID == other.ID;
+		}
+
+		#endregion
 
 		#region IDevice implementation
+
+
 
 		public DeviceProfile profile {
 			 get; set; 
 		}
 
-		#endregion
 
 	
 		public string ID {
