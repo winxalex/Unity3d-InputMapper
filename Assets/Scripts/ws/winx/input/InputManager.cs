@@ -73,7 +73,7 @@ namespace ws.winx.input
 
 		public static InputPlayer.Player currentPlayerIndex {
 			get {
-				return currentPlayerIndex;
+				return _currentPlayerIndex;
 			}
 			set {
 				if(!isReady()) return;

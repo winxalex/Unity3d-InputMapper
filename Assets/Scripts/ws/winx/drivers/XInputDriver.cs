@@ -459,12 +459,9 @@ namespace ws.winx.drivers
             int i = 0;
 
            _hidInterface = hidDevice.hidInterface;
-           
 
 
-            device = new XInputDevice(hidDevice.index, hidDevice.PID, hidDevice.VID,hidDevice.ID, 8, 20, this, type);
-			device.Name = hidDevice.Name;
-
+			//check for profile
 			DeviceProfile profile = null;
 			
 			if (hidDevice.hidInterface.Profiles.ContainsKey (hidDevice.Name)) {
@@ -473,6 +470,14 @@ namespace ws.winx.drivers
 				
 				profile = hidDevice.hidInterface.LoadProfile (hidDevice.hidInterface.Profiles [hidDevice.Name]);
 			}
+           
+
+
+            device = new XInputDevice(hidDevice.index, hidDevice.PID, hidDevice.VID,hidDevice.ID, 8, 20, this, type);
+			device.Name = hidDevice.Name;
+			device.profile = profile;
+
+		
 
 			
 			

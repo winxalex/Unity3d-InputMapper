@@ -52,7 +52,7 @@ namespace ws.winx.input{
 
 
 		#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
-		[DataMember(Order=1)]
+		[DataMember(Order=2)]
 		#endif
 		public string _deviceID;
 
@@ -68,7 +68,10 @@ namespace ws.winx.input{
 			}
 		}
 
-
+		#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+		[DataMember(Order=3)]
+		#endif
+		public string Name;
 
 		public InputPlayer Clone(){
 			InputPlayer newInputPlayer = new InputPlayer ();

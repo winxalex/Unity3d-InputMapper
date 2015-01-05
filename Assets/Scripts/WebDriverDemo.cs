@@ -24,7 +24,7 @@ namespace ws.winx
 
 
 				Animator animator = null;
-				bool _settingsLoaded = false;
+				
 
 				// Use this for initialization
 				void Start ()

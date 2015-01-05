@@ -5,8 +5,8 @@ namespace ws.winx.input.states
 {
 		public enum States:int
 		{
-				Wave=1397315813,
-
+				Wave=2050359991,
+		
 				MyCustomState=-1624475888,
 
 				ManualAddedSTATE=-977892492,

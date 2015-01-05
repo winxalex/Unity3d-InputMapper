@@ -176,7 +176,7 @@ namespace ws.winx.platform.osx
 
 
 			
-		
+			profile.Name = fileBase;
 			char splitChar='|';
 			
 			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileBase+"_osx.txt"))){
@@ -302,7 +302,7 @@ namespace ws.winx.platform.osx
             get { if (__defaultJoystickDriver == null) { __defaultJoystickDriver = new OSXDriver(); } return __defaultJoystickDriver; }
             set { __defaultJoystickDriver = value; 
 				if(value is ws.winx.drivers.UnityDriver){
-					Debug.LogWarning("UnityDriver set as default driver.\n Warring:Unity doesn't make distinction between triggers/axis/pow and axes happen to be mapped on different Joysticks#, doesn't support plug&play and often return weired raw results");
+					Debug.LogWarning("UnityDriver set as default driver.\n Warring:Unity doesn't make distinction between triggers/axis/pow");
 				}
 			}
 
@@ -404,6 +404,8 @@ namespace ws.winx.platform.osx
 			}
 
 
+
+
 				int product_id = (int)(new Native.CFNumber(Native.IOHIDDeviceGetProperty(deviceRef, Native.CFSTR(Native.kIOHIDProductIDKey)))).ToInteger();
 
 				
@@ -443,8 +445,12 @@ namespace ws.winx.platform.osx
 						lock(syncRoot){
 							__Generics[path] = hidDevice;
 						}
-					
+
+					if (context != IntPtr.Zero) {
 					Native.IOHIDDeviceRegisterRemovalCallback(deviceRef,HandleDeviceRemoved,context);
+					}else{
+						Debug.LogWarning("IOHIDDeviceRegisterRemovalCallback not registerd cos of Context IntPtr.Zero");
+					}
 
 					Debug.Log("Device PID:" + joyDevice.PID + " VID:" + joyDevice.VID +  "["+joyDevice.Name+"] attached to " + driver.GetType().ToString());
 
@@ -465,6 +471,12 @@ namespace ws.winx.platform.osx
                        
 						lock(syncRoot){
 						__Generics[path] = hidDevice;
+						}
+
+						if (context != IntPtr.Zero) {
+							Native.IOHIDDeviceRegisterRemovalCallback(deviceRef,HandleDeviceRemoved,context);
+						}else{
+							Debug.LogWarning("IOHIDDeviceRegisterRemovalCallback not registerd cos of Context IntPtr.Zero");
 						}
 						
 						Debug.Log("Device PID:" + joyDevice.PID + " VID:" + joyDevice.VID + "["+joyDevice.Name+"] attached to " + defaultDriver.GetType().ToString());

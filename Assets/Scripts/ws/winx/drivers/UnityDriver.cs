@@ -60,6 +60,7 @@ namespace ws.winx.drivers
 
 						JoystickDevice device = new JoystickDevice (inx, hidDevice.PID, hidDevice.VID,hidDevice.ID, 12, 20, this);
 						device.Name = hidDevice.Name;
+						device.profile = profile;
 
 						int numAxis = device.Axis.Count;
 						int numButtons = device.Buttons.Count;

@@ -11,6 +11,11 @@ namespace ws.winx.gui
 {
 		public class UserInterfaceWindow : MonoBehaviour
 		{
+
+
+
+
+
 				protected Rect _buttonRect = new Rect (0, 0, 100, 15);
 				protected Rect _layerLabelRect = new Rect (0, 0, 100, 15);
 				protected Dictionary<int, InputState> _stateInputCombinations;
@@ -24,10 +29,12 @@ namespace ws.winx.gui
 
 				protected static bool _settingsLoaded = false;
 				protected static bool _submitButton = false;
+				protected static bool _deviceListShow = false;
 				protected int _selectedStateHash = 0;
 				protected string _combinationSeparator = InputAction.SPACE_DESIGNATOR.ToString ();
 				protected int _isPrimary = 0;
 				protected string _currentInputString;
+				protected string _defaultProfile = "default";
 				protected GUILayoutOption[] _inputLabelStyle = new GUILayoutOption[] { GUILayout.Width (200) };
 				protected GUILayoutOption[] _stateNameLabelStyle = new GUILayoutOption[] { GUILayout.Width (250) };
 #if UNITY_ANDROID || UNITY_IPHONE
@@ -45,7 +52,7 @@ namespace ws.winx.gui
 				int _deviceIndexSelected;
 				string[] _deviceDisplayOptions;
 				int[] _deviceIndices;
-
+				int _deviceIndexSelectedPrev;
 
 				/// <summary>
 				/// Path very InputSettings would be saved
@@ -288,43 +295,98 @@ namespace ws.winx.gui
 				
 
 								}
+
+
+								_playerIndexSelected = GUILayout.SelectionGrid (_playerIndexSelected, _playerDisplayOptions, _playerDisplayOptions.Length);
 			
 
-								_playerIndexSelected = EditorGUILayout.Popup (_playerIndexSelected, _playerDisplayOptions);
+
+								
 
 
 
-
-
-								/////////// PROFILES //////////
-
-
-
-								//_stateInputCombinations = InputManager.Settings.Players[0].DeviceStateInputs["default"];
-
-
-
-								///////////// DEVICES /////////
+				InputPlayer currentPlayer = settings.Players [_playerIndexSelected];
+				
+				
+				
+				///////////// DEVICES /////////
 								/// 
 								/// 
 								/// convert stateInputs to selected Device inx
 
 
+
+
 								List<JoystickDevice> devices = InputManager.GetDevices<JoystickDevice> ();
 
+
+
+
 								if (devices.Count > 0) {
-										_deviceDisplayOptions = new string[devices.Count];
-										for (i=0; i<devices.Count; i++) {
-												_deviceDisplayOptions [i] = "(" + i + ")" + devices [i].Name;
+
+										if (_deviceDisplayOptions == null || _deviceDisplayOptions.Length - 1 != devices.Count) {
+												_deviceDisplayOptions = new string[devices.Count + 1];
+										
+												_deviceDisplayOptions [0] = "No Device";
+												for (i=1; i<_deviceDisplayOptions.Length; i++) {
+														_deviceDisplayOptions [i] = "(" + (i - 1) + ")" + devices [i - 1].Name;
 										
 
+												}
+										}
+										
+									
+										
+
+										if (GUILayout.Button (_deviceDisplayOptions [_deviceIndexSelected])) {
+
+												_deviceListShow = !_deviceListShow;
+									
 										}
 
-										_deviceIndexSelected = EditorGUILayout.Popup (_deviceIndexSelected, _deviceDisplayOptions);
-										//bind Device to player
-									
-										settings.Players [_playerIndexSelected].Device = devices [_deviceIndexSelected];
+
+										if (_deviceListShow) {
+												_deviceIndexSelected = GUILayout.SelectionGrid (_deviceIndexSelected, _deviceDisplayOptions, 1);
+												if (_deviceIndexSelectedPrev != _deviceIndexSelected)
+														_deviceListShow = false;
+												_deviceIndexSelectedPrev = _deviceIndexSelected;
+								
+										}
+
+
+
+								//assign device to player
+								if(_deviceIndexSelected>0 && devices [_deviceIndexSelected-1]!=currentPlayer.Device){
+
+									currentPlayer.Device = devices [_deviceIndexSelected-1];
+
+									if(currentPlayer.Device.profile!=null){
+
+									}
 								}
+					   }
+
+
+
+
+								
+
+									
+				///PROFILE
+								//if device is assigned to player and device have profile and there are input settings for that profile
+								if (currentPlayer.Device != null && currentPlayer.Device.profile != null && currentPlayer.DeviceProfileStateInputs.ContainsKey(currentPlayer.Device.profile.Name)){
+										
+										_stateInputCombinations = currentPlayer.DeviceProfileStateInputs [currentPlayer.Device.profile.Name];
+								}else{
+										_stateInputCombinations = currentPlayer.DeviceProfileStateInputs [_defaultProfile];
+								}
+										
+									
+									
+
+
+
+								
 								
 								
 						}

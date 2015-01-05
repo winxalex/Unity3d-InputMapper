@@ -106,7 +106,7 @@ namespace ws.winx.platform.windows
             DeviceProfile profile = new DeviceProfile();
 
 
-
+			profile.Name = fileBase;
 
             char splitChar = '|';
 

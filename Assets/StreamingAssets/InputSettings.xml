@@ -11,84 +11,34 @@
     <d1p1:InputPlayer>
       <d1p1:_DeviceStateInputs xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
         <d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
-          <d4p1:Key>default</d4p1:Key>
-          <d4p1:Value>
-            <d4p1:KeyValueOfintInputState>
-              <d4p1:Key>295091302</d4p1:Key>
-              <d4p1:Value>
-                <d1p1:Hash>295091302</d1p1:Hash>
-                <d1p1:InputCombinations>
-                  <d1p1:InputCombination>
-                    <d1p1:InputActions>
-                      <d1p1:InputAction>
-                        <d1p1:Code>L</d1p1:Code>
-                      </d1p1:InputAction>
-                      <d1p1:InputAction>
-                        <d1p1:Code>Mouse0</d1p1:Code>
-                      </d1p1:InputAction>
-                    </d1p1:InputActions>
-                  </d1p1:InputCombination>
-                  <d1p1:InputCombination i:nil="true" />
-                </d1p1:InputCombinations>
-                <d1p1:Name>d1</d1p1:Name>
-              </d4p1:Value>
-            </d4p1:KeyValueOfintInputState>
-            <d4p1:KeyValueOfintInputState>
-              <d4p1:Key>-2002784804</d4p1:Key>
-              <d4p1:Value>
-                <d1p1:Hash>-2002784804</d1p1:Hash>
-                <d1p1:InputCombinations>
-                  <d1p1:InputCombination>
-                    <d1p1:InputActions>
-                      <d1p1:InputAction>
-                        <d1p1:Code>Mouse0</d1p1:Code>
-                      </d1p1:InputAction>
-                    </d1p1:InputActions>
-                  </d1p1:InputCombination>
-                  <d1p1:InputCombination i:nil="true" />
-                </d1p1:InputCombinations>
-                <d1p1:Name>d2</d1p1:Name>
-              </d4p1:Value>
-            </d4p1:KeyValueOfintInputState>
-          </d4p1:Value>
-        </d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
-        <d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
-          <d4p1:Key>tm_rgtffpro</d4p1:Key>
-          <d4p1:Value />
-        </d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
-        <d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
           <d4p1:Key>xbox360</d4p1:Key>
           <d4p1:Value>
             <d4p1:KeyValueOfintInputState>
-              <d4p1:Key>-609057781</d4p1:Key>
+              <d4p1:Key>2050359991</d4p1:Key>
               <d4p1:Value>
-                <d1p1:Hash>-609057781</d1p1:Hash>
+                <d1p1:Hash>2050359991</d1p1:Hash>
                 <d1p1:InputCombinations>
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>G</d1p1:Code>
+                        <d1p1:Code>Joystick0Button19</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
                   <d1p1:InputCombination i:nil="true" />
                 </d1p1:InputCombinations>
-                <d1p1:Name>x360s</d1p1:Name>
+                <d1p1:Name>Wave</d1p1:Name>
               </d4p1:Value>
             </d4p1:KeyValueOfintInputState>
           </d4p1:Value>
         </d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
-      </d1p1:_DeviceStateInputs>
-    </d1p1:InputPlayer>
-    <d1p1:InputPlayer>
-      <d1p1:_DeviceStateInputs xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
         <d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
           <d4p1:Key>default</d4p1:Key>
           <d4p1:Value>
             <d4p1:KeyValueOfintInputState>
-              <d4p1:Key>295091302</d4p1:Key>
+              <d4p1:Key>2050359991</d4p1:Key>
               <d4p1:Value>
-                <d1p1:Hash>295091302</d1p1:Hash>
+                <d1p1:Hash>2050359991</d1p1:Hash>
                 <d1p1:InputCombinations>
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
@@ -99,37 +49,64 @@
                   </d1p1:InputCombination>
                   <d1p1:InputCombination i:nil="true" />
                 </d1p1:InputCombinations>
-                <d1p1:Name>d1</d1p1:Name>
+                <d1p1:Name>Wave</d1p1:Name>
               </d4p1:Value>
             </d4p1:KeyValueOfintInputState>
+          </d4p1:Value>
+        </d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
+      </d1p1:_DeviceStateInputs>
+      <d1p1:_deviceID i:nil="true" />
+      <d1p1:Name i:nil="true" />
+    </d1p1:InputPlayer>
+    <d1p1:InputPlayer>
+      <d1p1:_DeviceStateInputs xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+        <d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
+          <d4p1:Key>xbox360</d4p1:Key>
+          <d4p1:Value>
             <d4p1:KeyValueOfintInputState>
-              <d4p1:Key>-2002784804</d4p1:Key>
+              <d4p1:Key>2050359991</d4p1:Key>
               <d4p1:Value>
-                <d1p1:Hash>-2002784804</d1p1:Hash>
+                <d1p1:Hash>2050359991</d1p1:Hash>
                 <d1p1:InputCombinations>
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>P</d1p1:Code>
+                        <d1p1:Code>Joystick0Button16</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
                   <d1p1:InputCombination i:nil="true" />
                 </d1p1:InputCombinations>
-                <d1p1:Name>d2</d1p1:Name>
+                <d1p1:Name>Wave</d1p1:Name>
               </d4p1:Value>
             </d4p1:KeyValueOfintInputState>
           </d4p1:Value>
         </d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
         <d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
-          <d4p1:Key>xbox360</d4p1:Key>
-          <d4p1:Value />
-        </d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
-        <d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
-          <d4p1:Key>tm_rgtffpro</d4p1:Key>
-          <d4p1:Value />
+          <d4p1:Key>default</d4p1:Key>
+          <d4p1:Value>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>2050359991</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>2050359991</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>L</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>Wave</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+          </d4p1:Value>
         </d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
       </d1p1:_DeviceStateInputs>
+      <d1p1:_deviceID i:nil="true" />
+      <d1p1:Name i:nil="true" />
     </d1p1:InputPlayer>
   </d1p1:Players>
 </Inputs>

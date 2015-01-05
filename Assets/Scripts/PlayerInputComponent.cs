@@ -14,7 +14,7 @@ public class PlayerInputComponent : MonoBehaviour
 		// Use this for initialization
 		void Start ()
 		{
-			
+			int a = Animator.StringToHash ("Wave");
 		}
 
 
@@ -92,7 +92,7 @@ public class PlayerInputComponent : MonoBehaviour
 
 		    
 			//InputManager.currentPlayerIndex = PlayerIndex;
-		InputManager.currentPlayerIndex = Player;
+		//InputManager.currentPlayerIndex = Player;
 
 
 			if (InputManager.GetInputDown((int)States.Wave)) {
@@ -101,18 +101,18 @@ public class PlayerInputComponent : MonoBehaviour
 			
 			//	
 			//
-			if (InputManager.GetInputHold (Animator.StringToHash ("WalkBackward"))) {
-				Debug.Log ("WalkBackward-Hold");
-			}
-			
-			
-			if (InputManager.GetInputDown (Animator.StringToHash ("WalkBackward"))) {
-				Debug.Log ("WalkBackward-Down");
-			}
-			
-			if (InputManager.GetInputUp (Animator.StringToHash ("WalkBackward"))) {
-				Debug.Log ("WalkBackward-Up");
-			}
+//			if (InputManager.GetInputHold (Animator.StringToHash ("WalkBackward"))) {
+//				Debug.Log ("WalkBackward-Hold");
+//			}
+//			
+//			
+//			if (InputManager.GetInputDown (Animator.StringToHash ("WalkBackward"))) {
+//				Debug.Log ("WalkBackward-Down");
+//			}
+//			
+//			if (InputManager.GetInputUp (Animator.StringToHash ("WalkBackward"))) {
+//				Debug.Log ("WalkBackward-Up");
+//			}
 
 
 				//Generated value from -1 to 1f

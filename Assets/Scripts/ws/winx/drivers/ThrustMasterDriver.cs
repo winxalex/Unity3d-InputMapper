@@ -23,15 +23,11 @@ namespace ws.winx.drivers
         {
             if (hidDevice.PID == 46675 && hidDevice.VID == 1103)
             {
+				this.__hidInterface = hidDevice.hidInterface;
 
-                JoystickDevice joystick = new ThrustmasterRGTFFDDevice(hidDevice.index, hidDevice.PID, hidDevice.VID,hidDevice.ID, 8, 10, this);
-				joystick.Name=hidDevice.Name;
-                //JoystickDevice joystick = new JoystickDevice(hidDevice.index, hidDevice.PID, hidDevice.VID, 8, 10, this);
-
-                this.__hidInterface = hidDevice.hidInterface;
-
+				//check for profile
 				DeviceProfile profile = null;
-				
+
 				if (hidDevice.hidInterface.Profiles.ContainsKey (hidDevice.Name)) {
 					
 					
@@ -39,14 +35,25 @@ namespace ws.winx.drivers
 					profile = hidDevice.hidInterface.LoadProfile (hidDevice.hidInterface.Profiles [hidDevice.Name]);
 				}
 
+                JoystickDevice device = new ThrustmasterRGTFFDDevice(hidDevice.index, hidDevice.PID, hidDevice.VID,hidDevice.ID, 8, 10, this);
+				device.Name=hidDevice.Name;
+				device.profile = profile;
+                //JoystickDevice joystick = new JoystickDevice(hidDevice.index, hidDevice.PID, hidDevice.VID, 8, 10, this);
+
+               
+
+
+
+
+
 
                 int index=0;
                 for (; index < 10; index++)
                 {
-                    joystick.Buttons[index] = new ButtonDetails();
+                    device.Buttons[index] = new ButtonDetails();
 
 					if (profile != null && profile.buttonNaming.Length > index) {
-						joystick.Buttons[index].name = profile.buttonNaming [index];
+						device.Buttons[index].name = profile.buttonNaming [index];
 					}
                 }
 
@@ -54,9 +61,9 @@ namespace ws.winx.drivers
                 for (index = 0; index < 8; index++)
                 {
 
-                    joystick.Axis[index] = new AxisDetails();
-					if (profile != null && profile.axisNaming.Length > index && joystick.Axis[index]!=null) {
-						joystick.Axis[index].name = profile.axisNaming [index];
+                    device.Axis[index] = new AxisDetails();
+					if (profile != null && profile.axisNaming.Length > index && device.Axis[index]!=null) {
+						device.Axis[index].name = profile.axisNaming [index];
 						
 					}
 
@@ -65,7 +72,7 @@ namespace ws.winx.drivers
 
            
 
-                    return joystick;
+                    return device;
             }
 
             return null;

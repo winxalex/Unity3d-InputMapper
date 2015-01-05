@@ -355,7 +355,8 @@ namespace ws.winx.editor
 				StringBuilder HashStateInputsToStringBuilder ()
 				{
 						Dictionary<int,InputState> stateInputsCurrent;
-						List<int> keysToBeRemovedList;
+						List<int> inputStatesToBeRemoved;
+						List<string> profilesToBeRemoved;
 						StringBuilder statesStringBuilder;
 
 						statesStringBuilder = new StringBuilder ();
@@ -365,11 +366,20 @@ namespace ws.winx.editor
 
 						for (int i=0; i<numPlayers; i++) {
 
+							profilesToBeRemoved=new List<string>();
+
 								foreach (var DeviceProfileHashStateInput in settings.Players[i].DeviceProfileStateInputs) {
 
 
 										stateInputsCurrent = DeviceProfileHashStateInput.Value;
-										keysToBeRemovedList = new List<int> ();
+
+										if(stateInputsCurrent.Count==0){
+											profilesToBeRemoved.Add(DeviceProfileHashStateInput.Key);
+											continue;
+										}
+
+
+										inputStatesToBeRemoved = new List<int> ();
 
 
 							
@@ -399,7 +409,7 @@ namespace ws.winx.editor
 												if (combos != null && combos.GetActionAt (0).code == (int)KeyCode.None) {
 														combos.Clear ();
 												
-														keysToBeRemovedList.Add (HashStateInput.Key);
+														inputStatesToBeRemoved.Add (HashStateInput.Key);
 												}
 							
 							
@@ -422,16 +432,26 @@ namespace ws.winx.editor
 										}
 
 										//remove those with "None" as Primary combination
-										foreach (var key in keysToBeRemovedList) {
+										foreach (var key in inputStatesToBeRemoved) {
 												stateInputsCurrent.Remove (key);
 										}
 
 								}
 
-						}
 
 
-						
+
+									
+									//remove empty profiles
+									foreach (var key in profilesToBeRemoved) {
+										settings.Players[i].DeviceProfileStateInputs.Remove (key);
+									}
+				
+				
+			}//end for Players
+			
+			
+			
 
 
 

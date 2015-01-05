@@ -86,7 +86,10 @@ namespace ws.winx.input
 		public InputState Clone(){
 			InputState inputStateNew = new InputState (this.name, this.hash);
 
+			if(this.combinations[0]!=null)
 			inputStateNew.combinations [0] = this.combinations [0].Clone ();
+
+			if(this.combinations [1]!=null)
 			inputStateNew.combinations [1] = this.combinations [1].Clone ();
 			return inputStateNew;
 		}

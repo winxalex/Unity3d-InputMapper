@@ -306,9 +306,9 @@ namespace ws.winx.platform.osx
 	
 			this._hidInterface = hidDevice.hidInterface;
 
-			IntPtr device=hidDevice.deviceHandle;
+			IntPtr deviceRef=hidDevice.deviceHandle;
 
-			JoystickDevice joystick;
+			JoystickDevice device;
 			int axisIndex=0;
 			int buttonIndex=0;
 
@@ -317,7 +317,7 @@ namespace ws.winx.platform.osx
 			IOHIDElementType type;
 
 			//copy all matched 
-			elements.typeRef=Native.IOHIDDeviceCopyMatchingElements(device, IntPtr.Zero,(int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone );
+			elements.typeRef=Native.IOHIDDeviceCopyMatchingElements(deviceRef, IntPtr.Zero,(int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone );
 			
 			int numButtons=0;
 		
@@ -326,7 +326,7 @@ namespace ws.winx.platform.osx
 			int numElements=elements.Length;
 			int HIDElementType=Native.IOHIDElementGetTypeID();
 
-
+			//check for profile
 			DeviceProfile profile = null;
 			
 			if (hidDevice.hidInterface.Profiles.ContainsKey (hidDevice.Name)) {
@@ -436,16 +436,17 @@ namespace ws.winx.platform.osx
 			}
 
 
-			joystick=new JoystickDevice(hidDevice.index,hidDevice.PID,hidDevice.VID,hidDevice.ID,axisDetailsList.Count,numButtons,this);
-			joystick.Name = hidDevice.Name;
-			joystick.numPOV = numPov;
+			device=new JoystickDevice(hidDevice.index,hidDevice.PID,hidDevice.VID,hidDevice.ID,axisDetailsList.Count,numButtons,this);
+			device.Name = hidDevice.Name;
+			device.numPOV = numPov;
+			device.profile = profile;
 
-			for(;axisIndex<joystick.Axis.Count;axisIndex++)
+			for(;axisIndex<device.Axis.Count;axisIndex++)
 			{
 				
-				joystick.Axis[(JoystickAxis)axisIndex]=axisDetailsList[axisIndex];
-				if (profile != null && profile.axisNaming.Length > axisIndex && joystick.Axis[axisIndex]!=null) {
-					joystick.Axis[axisIndex].name = profile.axisNaming [axisIndex];
+				device.Axis[(JoystickAxis)axisIndex]=axisDetailsList[axisIndex];
+				if (profile != null && profile.axisNaming.Length > axisIndex && device.Axis[axisIndex]!=null) {
+					device.Axis[axisIndex].name = profile.axisNaming [axisIndex];
 					
 				}
 
@@ -462,11 +463,11 @@ namespace ws.winx.platform.osx
 				type = Native.IOHIDElementGetType(element);
 				 if (type == IOHIDElementType.kIOHIDElementTypeInput_Button) {
 								//
-								joystick.Buttons[buttonIndex]=new ButtonDetails(Native.IOHIDElementGetCookie(element));
+								device.Buttons[buttonIndex]=new ButtonDetails(Native.IOHIDElementGetCookie(element));
 
 
 						if (profile != null && profile.buttonNaming.Length > buttonIndex) {
-							joystick.Buttons[buttonIndex].name = profile.buttonNaming [buttonIndex];
+							device.Buttons[buttonIndex].name = profile.buttonNaming [buttonIndex];
 						}
 						buttonIndex++;
 							
@@ -483,7 +484,7 @@ namespace ws.winx.platform.osx
 
 			//joystick.isReady = false;
 
-						joystick.Extension=new OSXDefaultExtension();
+						device.Extension=new OSXDefaultExtension();
 
 
 
@@ -492,7 +493,7 @@ namespace ws.winx.platform.osx
 
 
 
-             return joystick;
+             return device;
 
 		}
 		
