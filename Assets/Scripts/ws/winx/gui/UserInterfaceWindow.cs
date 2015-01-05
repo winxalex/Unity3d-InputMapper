@@ -46,9 +46,15 @@ namespace ws.winx.gui
 				protected InputAction _action;
 				protected Vector2 _scrollPosition = Vector2.zero;
 				protected InputCombination _previousStateInput = null;
+
+
+				//Players
 				int _playerIndexSelected;
+				int _playerIndexSelectedPrev;
 				string[] _playerDisplayOptions;
 				int[] _playerIndices;
+
+				//Device
 				int _deviceIndexSelected;
 				string[] _deviceDisplayOptions;
 				int[] _deviceIndices;
@@ -299,52 +305,68 @@ namespace ws.winx.gui
 
 								_playerIndexSelected = GUILayout.SelectionGrid (_playerIndexSelected, _playerDisplayOptions, _playerDisplayOptions.Length);
 			
-
-
+				// close/hide device list when changed index
+				if(_playerIndexSelectedPrev!=_playerIndexSelected) _deviceListShow=false;
+				_playerIndexSelectedPrev= _playerIndexSelected;
 								
 
 
 
-				InputPlayer currentPlayer = settings.Players [_playerIndexSelected];
+								InputPlayer currentPlayer = settings.Players [_playerIndexSelected];
 				
 				
 				
-				///////////// DEVICES /////////
-								/// 
-								/// 
-								/// convert stateInputs to selected Device inx
+								///////////// DEVICES /////////
+								
+
+								
+				List<IDevice> devicesList = InputManager.GetDevices<IDevice> ();
 
 
 
 
-								List<JoystickDevice> devices = InputManager.GetDevices<JoystickDevice> ();
 
+								if (devicesList.Count > 0) {
 
+										//remove devices already assigned
+					for(i=0;i<settings.Players.Length;i++){
+						IDevice device =settings.Players[i].Device;
+						if(device!=null)
+							devicesList.Remove(device);
 
+					}
+					                    
 
-								if (devices.Count > 0) {
-
-										if (_deviceDisplayOptions == null || _deviceDisplayOptions.Length - 1 != devices.Count) {
-												_deviceDisplayOptions = new string[devices.Count + 1];
+										//Fill Device List (first option NoDevice)
+										if (_deviceDisplayOptions == null || _deviceDisplayOptions.Length - 1 != devicesList.Count) {
+												
+												_deviceDisplayOptions = new string[devicesList.Count + 1];
 										
 												_deviceDisplayOptions [0] = "No Device";
-												for (i=1; i<_deviceDisplayOptions.Length; i++) {
-														_deviceDisplayOptions [i] = "(" + (i - 1) + ")" + devices [i - 1].Name;
+												for (i=1; i<_deviceDisplayOptions.Length;) {
+														//if(currentPlayer.Device!=devices [i - 1]){
+														_deviceDisplayOptions [i] = "(" + (i - 1) + ")" + devicesList [i - 1].Name;
+														i++;
+														//}
 										
 
 												}
 										}
 										
 									
-										
+					string deviceButtonLabel= currentPlayer.Device!=null? currentPlayer.Device.Name:"No Device";
 
-										if (GUILayout.Button (_deviceDisplayOptions [_deviceIndexSelected])) {
+					//if(currentPlayer.Device!=null)
+					//	_deviceIndexSelected=devices.IndexOf(currentPlayer.Device as JoystickDevice)+1;
+										
+										//toggle DeviceList
+										if (GUILayout.Button (deviceButtonLabel)) {
 
 												_deviceListShow = !_deviceListShow;
 									
 										}
 
-
+										//show Device List
 										if (_deviceListShow) {
 												_deviceIndexSelected = GUILayout.SelectionGrid (_deviceIndexSelected, _deviceDisplayOptions, 1);
 												if (_deviceIndexSelectedPrev != _deviceIndexSelected)
@@ -355,15 +377,14 @@ namespace ws.winx.gui
 
 
 
-								//assign device to player
-								if(_deviceIndexSelected>0 && devices [_deviceIndexSelected-1]!=currentPlayer.Device){
+								//assign/remove device to player
+//								if(_deviceIndexSelected==0)
+//									currentPlayer.Device = null;
+//								else 
+//									currentPlayer.Device = devicesList [_deviceIndexSelected-1];
 
-									currentPlayer.Device = devices [_deviceIndexSelected-1];
-
-									if(currentPlayer.Device.profile!=null){
-
-									}
-								}
+									
+								
 					   }
 
 

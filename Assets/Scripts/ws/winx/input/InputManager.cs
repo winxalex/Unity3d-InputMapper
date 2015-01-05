@@ -157,9 +157,23 @@ namespace ws.winx.input
 	   internal static void onRemoveDevice(object sender,DeviceEventArgs<string> args){
 
 						lock (syncRoot) {
-								if (Devices.ContainsID (args.data)) 
-					
+								if (Devices.ContainsID (args.data)){
+
+									//remove asigned device from InputPlayer
+									if(__settings!=null && __settings.Players.Length>0){
+
+										IDevice device=Devices[args.data];
+
+										for(int i=0;i<__settings.Players.Length;i++){
+											if(__settings.Players[i].Device==device){
+												__settings.Players[i].Device=null;
+												Debug.Log("Device detached from Player"+i);
+											}
+										}
+									}
+
 										_devices.Remove (args.data);
+								}
 					
 						}
 				}
@@ -195,7 +209,7 @@ namespace ws.winx.input
 								List<T> Result = new List<T> ();
 
 								foreach (IDevice device in devices) {
-										if (device.GetType () == typeof(T)) {
+										if (device.GetType () == typeof(T) || device is T) {
 												Result.Add ((T)device);
 
 										}
