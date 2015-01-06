@@ -210,15 +210,15 @@ namespace ws.winx.input
 			
 				}
 
-				static InputPlayer.Player _currentPlayerIndex = InputPlayer.Player.Player0;
+				static InputPlayer _currentPlayer;
 		
-				internal static InputPlayer.Player currentPlayerIndex {
+				internal static InputPlayer currentPlayer {
 						get {
-								return _currentPlayerIndex;
+								return _currentPlayer;
 						}
 						set {
 
-								_currentPlayerIndex = value;
+								_currentPlayer = value;
 					
 
 						}
@@ -546,25 +546,46 @@ namespace ws.winx.input
 								return keycodeInputHandlerCallback ((KeyCode)code);
 						} else {
 					
+								if (_currentPlayer == null)
+										return false;
+
 								lock (syncRoot) {
-										if (fromAny) {
+
+										
+										if (_currentPlayer.Device!=null) {
+
+
+												return _currentPlayer.Device.GetInputBase (code, buttonState);
+
+
+											
+										} else {
 											
 												foreach (IDevice device in Devices)
 														if (device.GetInputBase (code, buttonState))
 																return true;
-							
-												return false;
-							
-										} else {
-												int index = InputCode.toDeviceInx (code);
-												if (Devices.ContainsIndex (index))
-								
-														return Devices.GetDeviceAt (index).GetInputBase (code, buttonState);
-												else
-														return false;
-							
-							
+						
+												return false;						
+						
 										}
+										//										if (fromAny) {
+										//											
+										//												foreach (IDevice device in Devices)
+//														if (device.GetInputBase (code, buttonState))
+//																return true;
+//							
+//												return false;
+//							
+//										} else {
+//												int index = InputCode.toDeviceInx (code);
+//												if (Devices.ContainsIndex (index))
+//								
+//														return Devices.GetDeviceAt (index).GetInputBase (code, buttonState);
+//												else
+//														return false;
+//							
+//							
+//										}
 								}
 						}
 
@@ -850,8 +871,6 @@ namespace ws.winx.input
 
 				}
 
-			
-
 				internal static InputAction GetAction (IDevice device)
 				{
 
@@ -861,13 +880,13 @@ namespace ws.winx.input
 
 						//prioterize joysticks vs keys/mouse  
 						if (device != null) {
-							if ((_code = device.GetInputCode ()) != 0) {
-								Debug.Log ("Get Input Just from set device" + device.Index + " " + InputCode.toEnumString (_code) + " frame: " + Time.frameCount);
-								return processInputCode (_code, time);
-							}
+								if ((_code = device.GetInputCode ()) != 0) {
+										Debug.Log ("Get Input Just from set device" + device.Index + " " + InputCode.toEnumString (_code) + " frame: " + Time.frameCount);
+										return processInputCode (_code, time);
+								}
 
 							
-						}else	
+						} else	
 							if (Devices.Count > 0) {
 								foreach (IDevice deviceAvailable in Devices) {
 

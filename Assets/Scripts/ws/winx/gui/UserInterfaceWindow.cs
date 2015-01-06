@@ -111,6 +111,7 @@ namespace ws.winx.gui
 
 									_action = InputManager.GetAction (_playerSelected.Device);
 
+									
 
 
 
@@ -121,6 +122,10 @@ namespace ws.winx.gui
 												_stateInputCombinations [_selectedStateHash].combinations [_isPrimary].Clear ();
 												_stateInputCombinations [_selectedStateHash].combinations [_isPrimary].Add (new InputAction (KeyCode.None));
 										} else {
+
+												//remove ord
+												_action.code=InputCode.toCodeAnyDevice (_action.code);
+
 												toInputCombination (_stateInputCombinations [_selectedStateHash].combinations [_isPrimary], _action);
 										}
 

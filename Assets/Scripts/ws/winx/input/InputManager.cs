@@ -70,15 +70,15 @@ namespace ws.winx.input
 		}
 
 	  
-
+		static InputPlayer.Player _currentPlayerIndex=InputPlayer.Player.Player0;
 		public static InputPlayer.Player currentPlayerIndex {
 			get {
-				return InputEx.currentPlayerIndex;
+				return _currentPlayerIndex;
 			}
 			set {
 				if(!isReady()) return;
 
-				InputEx.currentPlayerIndex = value;
+				_currentPlayerIndex = value;
 
 
 				//assigning Device to player from deserialization
@@ -93,7 +93,7 @@ namespace ws.winx.input
 
 					}
 
-
+					InputEx.currentPlayer=inputPlayer;
 				}
 			}
 		}

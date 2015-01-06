@@ -1,2 +1,2 @@
-LeftShifter|RightShifter|Y|B|X|A|Left|Right|ClouchBack|ClouchForward
+LeftShifter|RightShifter|Y|X|B|A|Left|Right|ClouchBack|ClouchForward
 WheelX|Left Trigger Y|Right Trigger Z|||DPAD_X|DPAD_|DPAD_
