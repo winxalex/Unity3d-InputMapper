@@ -243,7 +243,7 @@ namespace ws.winx.drivers
             
             ParseInputReport(data as HIDReport);
 
-			WiimoteDevice device = InputManager.Devices.GetDeviceAt((data as HIDReport).index) as WiimoteDevice;
+			WiimoteDevice device = InputEx.Devices.GetDeviceAt((data as HIDReport).index) as WiimoteDevice;
 			//_hidInterface.Devices[(data as HIDReport).index] as WiimoteDevice;
 
          
@@ -402,7 +402,7 @@ namespace ws.winx.drivers
 
 
 
-                WiimoteDevice device = InputManager.Devices.GetDeviceAt(report.index) as WiimoteDevice;
+                WiimoteDevice device = InputEx.Devices.GetDeviceAt(report.index) as WiimoteDevice;
                
 
                 InputReport type = (InputReport)buff[0];

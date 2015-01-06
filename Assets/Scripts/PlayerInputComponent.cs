@@ -14,7 +14,7 @@ public class PlayerInputComponent : MonoBehaviour
 		// Use this for initialization
 		void Start ()
 		{
-			int a = Animator.StringToHash ("Wave");
+			
 		}
 
 

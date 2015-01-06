@@ -143,7 +143,7 @@ namespace ws.winx.drivers
               // Debug.Log("ThustmasterDriver>>onRead:processRead" + BitConverter.ToString(report.Data));
 
 
-                JoystickDevice device = InputManager.Devices.GetDeviceAt(report.index) as JoystickDevice;
+                JoystickDevice device = InputEx.Devices.GetDeviceAt(report.index) as JoystickDevice;
 
                 //TODO in future use some sofisticate syncronization system as things gone threading unpredicatable
                 //have noticed 2 packets sent in same frame

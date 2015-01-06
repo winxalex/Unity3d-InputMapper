@@ -952,8 +952,8 @@ namespace ws.winx.input
 //			}
 
 
-						if (InputManager.Devices.ContainsIndex (joyInx)) {
-								device = InputManager.Devices.GetDeviceAt (joyInx);
+						if (InputEx.Devices.ContainsIndex (joyInx)) {
+								device = InputEx.Devices.GetDeviceAt (joyInx);
 
 								if (axis == JoystickAxis.None) {   //MO data for axis => buttons data
 										//UnityEngine.Debug.Log("Button state>" + button_collection[data].buttonState);

@@ -472,8 +472,10 @@ namespace ws.winx
 
             //don't take device here in the loop this is just for demo
 
-            if (InputManager.Devices.ContainsIndex(0))
-                TTFFDDevice = InputManager.Devices.GetDeviceAt(0) as ThrustmasterRGTFFDDevice;
+			//don't take device here in the loop this is just for demo
+			List<ThrustmasterRGTFFDDevice> devices = InputManager.GetDevices<ThrustmasterRGTFFDDevice> ();
+			if (devices.Count>0)
+				TTFFDDevice = devices[0];
 
 
 

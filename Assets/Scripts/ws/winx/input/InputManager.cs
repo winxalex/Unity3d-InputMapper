@@ -69,23 +69,27 @@ namespace ws.winx.input
 			return !EditMode;
 		}
 
-	   static InputPlayer.Player _currentPlayerIndex=InputPlayer.Player.Player0;
+	  
 
 		public static InputPlayer.Player currentPlayerIndex {
 			get {
-				return _currentPlayerIndex;
+				return InputEx.currentPlayerIndex;
 			}
 			set {
 				if(!isReady()) return;
 
-				_currentPlayerIndex = value;
+				InputEx.currentPlayerIndex = value;
 
+
+				//assigning Device to player from deserialization
 				if(__settings.Players.Length>(int)value){
 					InputPlayer inputPlayer=__settings.Players[(int)value];
 
+					//if Device==null means no Device is assigned to player
+					//check DeviceID to find
 					if(inputPlayer.Device==null && inputPlayer.DeviceID!=null){
-						if(Devices.ContainsID(inputPlayer.DeviceID))
-							inputPlayer.Device=Devices[inputPlayer.DeviceID];
+						if(InputEx.Devices.ContainsID(inputPlayer.DeviceID))
+							inputPlayer.Device=InputEx.Devices[inputPlayer.DeviceID];
 
 					}
 
@@ -95,18 +99,7 @@ namespace ws.winx.input
 		}
 
 
-	 static DevicesCollection _devices;
-
-
-		internal static IDeviceCollection Devices
-		{
-
-			get {  
-				if(_devices==null) _devices = new DevicesCollection(); 
-				return _devices; 
-			}
-
-		}
+	
 
 
 	
@@ -157,13 +150,14 @@ namespace ws.winx.input
 	   internal static void onRemoveDevice(object sender,DeviceEventArgs<string> args){
 
 						lock (syncRoot) {
-								if (Devices.ContainsID (args.data)){
+								if (InputEx.Devices.ContainsID (args.data)){
 
 									//remove asigned device from InputPlayer
 									if(__settings!=null && __settings.Players.Length>0){
 
-										IDevice device=Devices[args.data];
+										IDevice device=InputEx.Devices[args.data];
 
+										//indexOf maybe
 										for(int i=0;i<__settings.Players.Length;i++){
 											if(__settings.Players[i].Device==device){
 												__settings.Players[i].Device=null;
@@ -172,7 +166,7 @@ namespace ws.winx.input
 										}
 									}
 
-										_devices.Remove (args.data);
+										InputEx.Devices.Remove (args.data);
 								}
 					
 						}
@@ -182,10 +176,10 @@ namespace ws.winx.input
 
 			        lock (syncRoot) {
 						//do not allow duplicates
-						if (Devices.ContainsID (args.data.ID))
+						if (InputEx.Devices.ContainsID (args.data.ID))
 								return;
 
-						_devices[args.data.ID] = args.data;
+							InputEx.Devices[args.data.ID] = args.data;
 					}
 
 		}
@@ -204,7 +198,7 @@ namespace ws.winx.input
         {
 
 			lock (syncRoot) {
-								IDeviceCollection devices = InputManager.Devices;
+								IDeviceCollection devices = InputEx.Devices;
 
 								List<T> Result = new List<T> ();
 
@@ -1190,170 +1184,7 @@ namespace ws.winx.input
 		
 	
 		
-		
-		#region ControllerDevicesCollection
-		
-		/// <summary>
-		/// Defines a collection of ControllerAxes.
-		/// </summary>
-		public sealed class DevicesCollection : IDeviceCollection
-		{
-			#region Fields
-			readonly Dictionary<string, IDevice> IDToDevice;
-				
-			readonly Dictionary<byte, string> IndexToID;
-			
-			
-			List<IDevice> _iterationCacheList;//
-			bool _isEnumeratorDirty = true;
-			
-			#endregion
-			
-			#region Constructors
-			
-			internal DevicesCollection()
-			{
-				IDToDevice = new Dictionary<string, IDevice>();
-				
-				IndexToID = new Dictionary<byte, string>();
-				
-			}
-			
-			#endregion
-			
-			#region Public Members
-			
-		
-			
-			
-			#region IDeviceCollection implementation
-
-
-			/// <summary>
-			/// Remove the specified device with specified PID.
-			/// </summary>
-			/// <param name="PID">PI.</param>
-			public void Remove(string ID)
-			{
-				IndexToID.Remove((byte)IDToDevice[ID].Index);
-				IDToDevice.Remove(ID);
-
-				_isEnumeratorDirty = true;
-			}
-			
-			/// <summary>
-			/// Remove the specified device with specified index byte(0-15)
-			/// </summary>
-			/// <param name="index">Index.</param>
-			public void Remove(byte index)
-			{
-				string id = IndexToID[index];
-
-				//PIDToDevice[pid].
-				IndexToID.Remove(index);
-				IDToDevice.Remove(id);
-				
-				_isEnumeratorDirty = true;
-			}
-			
-
-
-			/// <summary>
-			/// Gets the <see cref="ws.winx.input.InputManager+JoystickDevicesCollection"/> at the specified index.
-			/// use case (byte)#
-			/// </summary>
-			/// <param name="index">Index.</param>
-			public IDevice this[byte index]
-			{
-				get { return IDToDevice[IndexToID[index]]; }
-			
-			}
-			
-			
-			public IDevice GetDeviceAt(int index){
-				return IDToDevice[IndexToID[(byte)index]];
-			}
-			
-			
-			/// <summary>
-			/// Gets or sets the <see cref="ws.winx.input.InputManager+JoystickDevicesCollection"/> with the specified PID.
-			/// </summary>
-			/// <param name="PID">PI.</param>
-			public IDevice this[string ID]
-			{
-				get { return IDToDevice[ID]; }
-				internal set
-				{
-					IndexToID[(byte)value.Index] = ID;
-					IDToDevice[ID] = value;
-					
-					_isEnumeratorDirty = true;
-					
-				}
-			}
-			
-			/// <summary>
-			/// Containses the key of device index (0-15) Joystick0,1..15.
-			/// </summary>
-			/// <returns>true</returns>
-			/// <c>false</c>
-			/// <param name="index">Index.</param>
-			public bool ContainsIndex(int index)
-			{
-				return IndexToID.ContainsKey((byte)index);
-			}
-
-			/// <summary>
-			/// Containses the key of device with PID
-			/// </summary>
-			/// <returns>true</returns>
-			/// <c>false</c>
-			/// <param name="id">id.</param>
-			public bool ContainsID(string id)
-			{
-				return IDToDevice.ContainsKey(id);
-			}
-			
-			public void Clear(){
-				IndexToID.Clear();
-				IDToDevice.Clear();
-			}
-			
-			public System.Collections.IEnumerator GetEnumerator()
-			{
-				if (_isEnumeratorDirty)
-				{
-					_iterationCacheList = IDToDevice.Values.ToList<IDevice>();
-					_isEnumeratorDirty = false;
-					
-					
-				}
-				
-				return _iterationCacheList.GetEnumerator();
-				
-			}
-			
-			
-			/// <summary>
-			/// Gets a System.Int32 indicating the available amount of JoystickDevices.
-			/// </summary>
-			public int Count
-			{
-				get { return IDToDevice.Count; }
-			}
-			
-			#endregion
-			
-			#endregion
-			
-			
-			
-			
-			
-			
-			
-		}
-		#endregion;
+	
 
 
 
@@ -1380,10 +1211,10 @@ namespace ws.winx.input
                 UnityEngine.Debug.Log(" NotificationHandle Erorr" + error);
 
 
-			if (_devices != null) {
+			if (InputEx.Devices != null) {
 				Debug.Log ("Try to remove devices");
-				_devices.Clear ();
-				_devices=null;
+				InputEx.Devices.Clear ();
+
 			}
 
 			Debug.Log ("Try to remove states per player");

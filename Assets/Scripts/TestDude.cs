@@ -12,7 +12,7 @@ public class TestDude : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	_animator=this.GetComponent<Animator>();
+	//_animator=this.GetComponent<Animator>();
 
         
 
