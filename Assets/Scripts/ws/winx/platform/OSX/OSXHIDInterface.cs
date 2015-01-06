@@ -446,11 +446,11 @@ namespace ws.winx.platform.osx
 							__Generics[path] = hidDevice;
 						}
 
-					if (context != IntPtr.Zero) {
+					//if (context != IntPtr.Zero) {
 					Native.IOHIDDeviceRegisterRemovalCallback(deviceRef,HandleDeviceRemoved,context);
-					}else{
-						Debug.LogWarning("IOHIDDeviceRegisterRemovalCallback not registerd cos of Context IntPtr.Zero");
-					}
+					//}else{
+					//	Debug.LogWarning("IOHIDDeviceRegisterRemovalCallback not registerd cos of Context IntPtr.Zero");
+					//}
 
 					Debug.Log("Device PID:" + joyDevice.PID + " VID:" + joyDevice.VID +  "["+joyDevice.Name+"] attached to " + driver.GetType().ToString());
 
@@ -473,11 +473,11 @@ namespace ws.winx.platform.osx
 						__Generics[path] = hidDevice;
 						}
 
-						if (context != IntPtr.Zero) {
+						//if (context != IntPtr.Zero) {
 							Native.IOHIDDeviceRegisterRemovalCallback(deviceRef,HandleDeviceRemoved,context);
-						}else{
-							Debug.LogWarning("IOHIDDeviceRegisterRemovalCallback not registerd cos of Context IntPtr.Zero");
-						}
+						//}else{
+						//	Debug.LogWarning("IOHIDDeviceRegisterRemovalCallback not registerd cos of Context IntPtr.Zero");
+						//}
 						
 						Debug.Log("Device PID:" + joyDevice.PID + " VID:" + joyDevice.VID + "["+joyDevice.Name+"] attached to " + defaultDriver.GetType().ToString());
 

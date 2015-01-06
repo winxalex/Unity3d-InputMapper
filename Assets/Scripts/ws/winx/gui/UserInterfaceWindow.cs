@@ -53,6 +53,7 @@ namespace ws.winx.gui
 				int _playerIndexSelectedPrev;
 				string[] _playerDisplayOptions;
 				int[] _playerIndices;
+				InputPlayer _playerSelected;
 
 				//Device
 				int _deviceDisplayIndex;
@@ -101,7 +102,15 @@ namespace ws.winx.gui
 								//Use is mapping states so no quering keys during gameplay
 								InputManager.EditMode = true;
 
-								_action = InputManager.GetAction ();
+								
+
+							
+
+			
+
+
+									_action = InputManager.GetAction (_playerSelected.Device);
+
 
 
 
@@ -249,8 +258,7 @@ namespace ws.winx.gui
 										_selectedStateHash = 0;
 										_previousStateInput = null;
 										//this.Repaint ();
-								} else
-                    if (Event.current.keyCode == KeyCode.Escape) {
+								} else if (Event.current.keyCode == KeyCode.Escape) {
 										if (_selectedStateHash != 0) {
 												_stateInputCombinations [_selectedStateHash].combinations [_isPrimary] = _previousStateInput;
 												_previousStateInput = null;
@@ -305,18 +313,20 @@ namespace ws.winx.gui
 
 								_playerIndexSelected = GUILayout.SelectionGrid (_playerIndexSelected, _playerDisplayOptions, _playerDisplayOptions.Length);
 			
+							_playerSelected=settings.Players[_playerIndexSelected];
+				
 				// close/hide device list when player index changed
-				if(_playerIndexSelectedPrev!=_playerIndexSelected) 
-				{_deviceListShow=false;
-					_deviceDisplayIndexPrev=0;
-				}
+								if (_playerIndexSelectedPrev != _playerIndexSelected) {
+										_deviceListShow = false;
+										_deviceDisplayIndexPrev = 0;
+								}
 
-				_playerIndexSelectedPrev= _playerIndexSelected;
+								_playerIndexSelectedPrev = _playerIndexSelected;
 								
 
 
 
-								InputPlayer currentPlayer = settings.Players [_playerIndexSelected];
+							
 				
 				
 				
@@ -324,7 +334,7 @@ namespace ws.winx.gui
 								
 
 								
-				List<IDevice> devicesList = InputManager.GetDevices<IDevice> ();
+								List<IDevice> devicesList = InputManager.GetDevices<IDevice> ();
 
 
 
@@ -334,39 +344,39 @@ namespace ws.winx.gui
 
 										//remove devices already assigned except of currentPlayer's Device
 
-					for(i=0;i<settings.Players.Length;i++){
-						IDevice device =settings.Players[i].Device;
-						if(device!=null && !device.Equals(currentPlayer.Device))
-							devicesList.Remove(device);
+										for (i=0; i<settings.Players.Length; i++) {
+												IDevice device = settings.Players [i].Device;
+												if (device != null && !device.Equals (_playerSelected.Device))
+														devicesList.Remove (device);
 
-					}
+										}
 					                    
 
-												//Fill Device List (first option NoDevice)
-												_deviceDisplayOptions = new string[devicesList.Count + 1];
+										//Fill Device List (first option NoDevice)
+										_deviceDisplayOptions = new string[devicesList.Count + 1];
 										
-												_deviceDisplayOptions [0] = "No Device";
-												for (i=1; i<_deviceDisplayOptions.Length;) {
-														//if(currentPlayer.Device!=devices [i - 1]){
-														_deviceDisplayOptions [i] = "(" + (i - 1) + ")" + devicesList [i - 1].Name;
-														i++;
-														//}
+										_deviceDisplayOptions [0] = "No Device";
+										for (i=1; i<_deviceDisplayOptions.Length;) {
+												//if(currentPlayer.Device!=devices [i - 1]){
+												_deviceDisplayOptions [i] = "(" + (i - 1) + ")" + devicesList [i - 1].Name;
+												i++;
+												//}
 										
 
-												}
+										}
 										
 										
 									
-					string deviceButtonLabel= currentPlayer.Device!=null? currentPlayer.Device.Name:"No Device";
+										string deviceButtonLabel = _playerSelected.Device != null ? _playerSelected.Device.Name : "No Device";
 
-					int deviceIndex=-1;
+										int deviceIndex = -1;
 
-					if(currentPlayer.Device!=null){
-						deviceIndex=devicesList.IndexOf(currentPlayer.Device);
-						_deviceDisplayIndex=deviceIndex+1;
-					}else{
-						_deviceDisplayIndex=0;
-					}
+										if (_playerSelected.Device != null) {
+												deviceIndex = devicesList.IndexOf (_playerSelected.Device);
+												_deviceDisplayIndex = deviceIndex + 1;
+										} else {
+												_deviceDisplayIndex = 0;
+										}
 
 										
 										//toggle DeviceList
@@ -389,15 +399,15 @@ namespace ws.winx.gui
 
 
 
-								//assign/remove device to player
-								if(_deviceDisplayIndex==0)
-									currentPlayer.Device = null;
-								else if(deviceIndex+1!=_deviceDisplayIndex)
-									currentPlayer.Device = devicesList [_deviceDisplayIndex-1];
+										//assign/remove device to player
+										if (_deviceDisplayIndex == 0)
+												_playerSelected.Device = null;
+										else if (deviceIndex + 1 != _deviceDisplayIndex)
+												_playerSelected.Device = devicesList [_deviceDisplayIndex - 1];
 
 									
 								
-					   }
+								}
 
 
 
@@ -405,13 +415,13 @@ namespace ws.winx.gui
 								
 
 									
-				///PROFILE
+								///PROFILE
 								//if device is assigned to player and device have profile and there are input settings for that profile
-								if (currentPlayer.Device != null && currentPlayer.Device.profile != null && currentPlayer.DeviceProfileStateInputs.ContainsKey(currentPlayer.Device.profile.Name)){
+								if (_playerSelected.Device != null && _playerSelected.Device.profile != null && _playerSelected.DeviceProfileStateInputs.ContainsKey (_playerSelected.Device.profile.Name)) {
 										
-										_stateInputCombinations = currentPlayer.DeviceProfileStateInputs [currentPlayer.Device.profile.Name];
-								}else{
-										_stateInputCombinations = currentPlayer.DeviceProfileStateInputs [_defaultProfile];
+										_stateInputCombinations = _playerSelected.DeviceProfileStateInputs [_playerSelected.Device.profile.Name];
+								} else {
+										_stateInputCombinations = _playerSelected.DeviceProfileStateInputs [_defaultProfile];
 								}
 										
 									
@@ -432,7 +442,7 @@ namespace ws.winx.gui
 						if (_stateInputCombinations != null)
 								foreach (var keyValuPair in _stateInputCombinations) {
 										//primary,secondary...
-										createCombinationGUI (keyValuPair.Key, keyValuPair.Value.name, keyValuPair.Value.combinations);
+										createInputStateGUI (keyValuPair.Key, keyValuPair.Value.name, keyValuPair.Value.combinations);
 
 								}
 
@@ -454,11 +464,12 @@ namespace ws.winx.gui
 
 
 				/// <summary>
-				/// Creates the combination GU.
+				/// Creates the Input State GUI.
 				/// </summary>
-				/// <param name="hash">Hash.</param>
-				/// <param name="combinations">Combinations.</param>
-				void createCombinationGUI (int hash, string stateName, InputCombination[] combinations)
+				/// <param name="hash">State Hash.</param>
+				/// <param name="stateName">State name.</param>
+				/// <param name="combinations">State Combinations.</param>
+				void createInputStateGUI (int hash, string stateName, InputCombination[] combinations)
 				{
 
 						string currentCombinationString;
@@ -478,7 +489,7 @@ namespace ws.winx.gui
 						if (_selectedStateHash != hash) {
 
 
-								if (GUILayout.Button (InputCode.toProfiled (combinations [0]), _inputButtonStyle)) {
+								if (GUILayout.Button (InputCode.toProfiled (_playerSelected.Device, combinations [0]), _inputButtonStyle)) {
 										// if (GUILayout.Button(combinations[0].combinationString, _inputButtonStyle))
 										_selectedStateHash = hash;
 										_previousStateInput = null;
@@ -486,7 +497,7 @@ namespace ws.winx.gui
 								}
 
 								if (combinations.Length > 1 && combinations [1] != null)
-								if (GUILayout.Button (InputCode.toProfiled (combinations [1]), _inputButtonStyle)) {
+								if (GUILayout.Button (InputCode.toProfiled (_playerSelected.Device, combinations [1]), _inputButtonStyle)) {
 										//if (GUILayout.Button(combinations[1].combinationString, _inputButtonStyle))
 										_selectedStateHash = hash;
 										_previousStateInput = null;
@@ -500,7 +511,7 @@ namespace ws.winx.gui
 
 
 
-								currentCombinationString = InputCode.toProfiled (combinations [_isPrimary]);
+								currentCombinationString = InputCode.toProfiled (_playerSelected.Device, combinations [_isPrimary]);
 								//currentCombinationString = combinations[_isPrimary].combinationString;
 
 								if (_previousStateInput == null) {

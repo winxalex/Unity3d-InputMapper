@@ -97,7 +97,12 @@ namespace ws.winx.drivers
 						int numAxis = device.Axis.Count;
 						int numButtons = device.Buttons.Count;
                    
-						int index = device.Index;
+						//int index = device.Index;//if this was as easy=> Unity reorder/insert new added devices
+						int index = Array.IndexOf (Input.GetJoystickNames (), device.Name);
+			            if (index < 0) {
+							Debug.LogWarning("Devices can't be found by UnityDriver");		
+						return;
+						}
 
 						// Debug.Log("axis value raw:" + Input.GetAxisRaw("10") + " " + Input.GetAxis("11"));
 						//Debug.Log("axis value raw:" +);

@@ -1031,6 +1031,11 @@ namespace ws.winx.input
 		}
 
 		#endif     
+
+		public static void processGUIEvent (Event current)
+		{
+			InputEx.processGUIEvent (current);
+		}
       
 
 
@@ -1040,16 +1045,22 @@ namespace ws.winx.input
         //public void resetMap(){
         //}
 
+	
 		/// <summary>
-		/// Gets the action that happens on keyboard,mouse or game controller input.(useful for building user mapping interface)
+		/// Gets action from IDevice or if null
+		/// gets the action that happens on any keyboard,mouse or game controller input.(useful for building user mapping interface)
 		/// </summary>
-		/// <returns>The action.</returns>
-		public static InputAction GetAction(){
-			if (__settings != null)
-								return InputEx.GetInput ();
-						else
-								return null;
-		}
+		 /// <returns>The action.</returns>
+		 /// <param name="">.</param>
+		public static InputAction GetAction(IDevice device){
+				if (__settings != null)
+									return InputEx.GetAction (device);
+							else
+									return null;
+			}
+
+
+
 
 		/// <summary>
 		/// Gets the input of generic created values in range 0f to 1f

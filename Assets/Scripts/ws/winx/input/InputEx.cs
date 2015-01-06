@@ -34,43 +34,34 @@ namespace ws.winx.input
 				}
 		}
 
-
-	
-
-
-		
-
 		public class InputEx
 		{
 
 
 		#region ControllerDevicesCollection
 		
-		/// <summary>
-		/// Defines a collection of ControllerAxes.
-		/// </summary>
-		public  sealed class DevicesCollection : IDeviceCollection
-		{
+				/// <summary>
+				/// Defines a collection of ControllerAxes.
+				/// </summary>
+				public  sealed class DevicesCollection : IDeviceCollection
+				{
 			#region Fields
-			readonly Dictionary<string, IDevice> IDToDevice;
-			
-			readonly Dictionary<byte, string> IndexToID;
-			
-			
-			List<IDevice> _iterationCacheList;//
-			bool _isEnumeratorDirty = true;
+						readonly Dictionary<string, IDevice> IDToDevice;
+						readonly Dictionary<byte, string> IndexToID;
+						List<IDevice> _iterationCacheList;//
+						bool _isEnumeratorDirty = true;
 			
 			#endregion
 			
 			#region Constructors
 			
-			internal DevicesCollection()
-			{
-				IDToDevice = new Dictionary<string, IDevice>();
+						internal DevicesCollection ()
+						{
+								IDToDevice = new Dictionary<string, IDevice> ();
 				
-				IndexToID = new Dictionary<byte, string>();
+								IndexToID = new Dictionary<byte, string> ();
 				
-			}
+						}
 			
 			#endregion
 			
@@ -82,119 +73,115 @@ namespace ws.winx.input
 			#region IDeviceCollection implementation
 			
 			
-			/// <summary>
-			/// Remove the specified device with specified PID.
-			/// </summary>
-			/// <param name="PID">PI.</param>
-			public void Remove(string ID)
-			{
-				IndexToID.Remove((byte)IDToDevice[ID].Index);
-				IDToDevice.Remove(ID);
+						/// <summary>
+						/// Remove the specified device with specified PID.
+						/// </summary>
+						/// <param name="PID">PI.</param>
+						public void Remove (string ID)
+						{
+								IndexToID.Remove ((byte)IDToDevice [ID].Index);
+								IDToDevice.Remove (ID);
 				
-				_isEnumeratorDirty = true;
-			}
+								_isEnumeratorDirty = true;
+						}
 			
-			/// <summary>
-			/// Remove the specified device with specified index byte(0-15)
-			/// </summary>
-			/// <param name="index">Index.</param>
-			public void Remove(byte index)
-			{
-				string id = IndexToID[index];
+						/// <summary>
+						/// Remove the specified device with specified index byte(0-15)
+						/// </summary>
+						/// <param name="index">Index.</param>
+						public void Remove (byte index)
+						{
+								string id = IndexToID [index];
 				
-				//PIDToDevice[pid].
-				IndexToID.Remove(index);
-				IDToDevice.Remove(id);
+								//PIDToDevice[pid].
+								IndexToID.Remove (index);
+								IDToDevice.Remove (id);
 				
-				_isEnumeratorDirty = true;
-			}
+								_isEnumeratorDirty = true;
+						}
 			
 			
 			
-			/// <summary>
-			/// Gets the <see cref="ws.winx.input.InputManager+JoystickDevicesCollection"/> at the specified index.
-			/// use case (byte)#
-			/// </summary>
-			/// <param name="index">Index.</param>
-			public IDevice this[byte index]
-			{
-				get { return IDToDevice[IndexToID[index]]; }
+						/// <summary>
+						/// Gets the <see cref="ws.winx.input.InputManager+JoystickDevicesCollection"/> at the specified index.
+						/// use case (byte)#
+						/// </summary>
+						/// <param name="index">Index.</param>
+						public IDevice this [byte index] {
+								get { return IDToDevice [IndexToID [index]]; }
 				
-			}
+						}
+			
+						public IDevice GetDeviceAt (int index)
+						{
+								return IDToDevice [IndexToID [(byte)index]];
+						}
 			
 			
-			public IDevice GetDeviceAt(int index){
-				return IDToDevice[IndexToID[(byte)index]];
-			}
-			
-			
-			/// <summary>
-			/// Gets or sets the <see cref="ws.winx.input.InputManager+JoystickDevicesCollection"/> with the specified PID.
-			/// </summary>
-			/// <param name="PID">PI.</param>
-			public IDevice this[string ID]
-			{
-				get { return IDToDevice[ID]; }
-				set
-				{
-					IndexToID[(byte)value.Index] = ID;
-					IDToDevice[ID] = value;
+						/// <summary>
+						/// Gets or sets the <see cref="ws.winx.input.InputManager+JoystickDevicesCollection"/> with the specified PID.
+						/// </summary>
+						/// <param name="PID">PI.</param>
+						public IDevice this [string ID] {
+								get { return IDToDevice [ID]; }
+								set {
+										IndexToID [(byte)value.Index] = ID;
+										IDToDevice [ID] = value;
 					
-					_isEnumeratorDirty = true;
+										_isEnumeratorDirty = true;
 					
-				}
-			}
+								}
+						}
 			
-			/// <summary>
-			/// Containses the key of device index (0-15) Joystick0,1..15.
-			/// </summary>
-			/// <returns>true</returns>
-			/// <c>false</c>
-			/// <param name="index">Index.</param>
-			public bool ContainsIndex(int index)
-			{
-				return IndexToID.ContainsKey((byte)index);
-			}
+						/// <summary>
+						/// Containses the key of device index (0-15) Joystick0,1..15.
+						/// </summary>
+						/// <returns>true</returns>
+						/// <c>false</c>
+						/// <param name="index">Index.</param>
+						public bool ContainsIndex (int index)
+						{
+								return IndexToID.ContainsKey ((byte)index);
+						}
 			
-			/// <summary>
-			/// Containses the key of device with PID
-			/// </summary>
-			/// <returns>true</returns>
-			/// <c>false</c>
-			/// <param name="id">id.</param>
-			public bool ContainsID(string id)
-			{
-				return IDToDevice.ContainsKey(id);
-			}
+						/// <summary>
+						/// Containses the key of device with PID
+						/// </summary>
+						/// <returns>true</returns>
+						/// <c>false</c>
+						/// <param name="id">id.</param>
+						public bool ContainsID (string id)
+						{
+								return IDToDevice.ContainsKey (id);
+						}
 			
-			public void Clear(){
-				IndexToID.Clear();
-				IDToDevice.Clear();
-			}
+						public void Clear ()
+						{
+								IndexToID.Clear ();
+								IDToDevice.Clear ();
+						}
 			
-			public System.Collections.IEnumerator GetEnumerator()
-			{
-				if (_isEnumeratorDirty)
-				{
-					_iterationCacheList = IDToDevice.Values.ToList<IDevice>();
-					_isEnumeratorDirty = false;
+						public System.Collections.IEnumerator GetEnumerator ()
+						{
+								if (_isEnumeratorDirty) {
+										_iterationCacheList = IDToDevice.Values.ToList<IDevice> ();
+										_isEnumeratorDirty = false;
 					
 					
-				}
+								}
 				
-				return _iterationCacheList.GetEnumerator();
+								return _iterationCacheList.GetEnumerator ();
 				
-			}
+						}
 			
 			
 			
-			/// <summary>
-			/// Gets a System.Int32 indicating the available amount of JoystickDevices.
-			/// </summary>
-			public int Count
-			{
-				get { return IDToDevice.Count; }
-			}
+						/// <summary>
+						/// Gets a System.Int32 indicating the available amount of JoystickDevices.
+						/// </summary>
+						public int Count {
+								get { return IDToDevice.Count; }
+						}
 			
 			#endregion
 			
@@ -206,46 +193,38 @@ namespace ws.winx.input
 			
 			
 			
-		}
+				}
 		#endregion;
 
-		static DevicesCollection _devices;
+				static DevicesCollection _devices;
 		
-		
-		internal static DevicesCollection Devices
-		{
+				internal static DevicesCollection Devices {
 			
-			get {  
-				if(_devices==null) _devices = new DevicesCollection(); 
-				return _devices; 
-			}
+						get {  
+								if (_devices == null)
+										_devices = new DevicesCollection (); 
+								return _devices; 
+						}
 
 
 			
-		}
+				}
 
-
-
-
-		static InputPlayer.Player _currentPlayerIndex=InputPlayer.Player.Player0;
+				static InputPlayer.Player _currentPlayerIndex = InputPlayer.Player.Player0;
 		
-		internal static InputPlayer.Player currentPlayerIndex {
-			get {
-				return _currentPlayerIndex;
-			}
-			set {
+				internal static InputPlayer.Player currentPlayerIndex {
+						get {
+								return _currentPlayerIndex;
+						}
+						set {
 
-				_currentPlayerIndex = value;
+								_currentPlayerIndex = value;
 					
 
-			}
-		}
+						}
+				}
 
-
-
-
-
-		private static readonly object syncRoot = new object();	
+				private static readonly object syncRoot = new object ();
 		
 				public event EventHandler<InputExArgs> InputProcessed;
 
@@ -567,25 +546,25 @@ namespace ws.winx.input
 								return keycodeInputHandlerCallback ((KeyCode)code);
 						} else {
 					
-								lock(syncRoot){
-									if (fromAny) {
+								lock (syncRoot) {
+										if (fromAny) {
 											
-											foreach (IDevice device in Devices)
-													if (device.GetInputBase (code, buttonState))
-															return true;
+												foreach (IDevice device in Devices)
+														if (device.GetInputBase (code, buttonState))
+																return true;
 							
-											return false;
+												return false;
 							
-									} else {
-											int index = InputCode.toDeviceInx (code);
-											if (Devices.ContainsIndex (index))
+										} else {
+												int index = InputCode.toDeviceInx (code);
+												if (Devices.ContainsIndex (index))
 								
-													return Devices.GetDeviceAt (index).GetInputBase (code, buttonState);
-											else
-													return false;
+														return Devices.GetDeviceAt (index).GetInputBase (code, buttonState);
+												else
+														return false;
 							
 							
-									}
+										}
 								}
 						}
 
@@ -871,28 +850,34 @@ namespace ws.winx.input
 
 				}
 
-				internal static InputAction GetInput ()
+			
+
+				internal static InputAction GetAction (IDevice device)
 				{
 
 						bool isPlaying = Application.isPlaying;
 
 						float time = isPlaying ? Time.time : Time.realtimeSinceStartup;
 
-           
+						//prioterize joysticks vs keys/mouse  
+						if (device != null) {
+							if ((_code = device.GetInputCode ()) != 0) {
+								Debug.Log ("Get Input Just from set device" + device.Index + " " + InputCode.toEnumString (_code) + " frame: " + Time.frameCount);
+								return processInputCode (_code, time);
+							}
 
+							
+						}else	
+							if (Devices.Count > 0) {
+								foreach (IDevice deviceAvailable in Devices) {
 
+										//test only
+										//	if(device.Index==3)
+										
 
-						//prioterize joysticks vs keys/mouse
-				
-						if (Devices.Count > 0) 
-						{
-								foreach (IDevice device in Devices) {
-
-                                    //test only
-									//	if(device.Index==3)
-										if ((_code = device.GetInputCode ()) != 0) {
-												Debug.Log ("Get Input Joy" + device.Index + " " + InputCode.toEnumString (_code) + " frame: " + Time.frameCount);
-												return processInput (_code, time);
+										if ((_code = deviceAvailable.GetInputCode ()) != 0) {
+												Debug.Log ("Get Input Joy" + deviceAvailable.Index + " " + InputCode.toEnumString (_code) + " frame: " + Time.frameCount);
+												return processInputCode (_code, time);
 										}
 								}
 						} 
@@ -908,7 +893,7 @@ namespace ws.winx.input
 
             
 
-						return processInput (_code, time);
+						return processInputCode (_code, time);
 				}
 
        
@@ -1052,7 +1037,7 @@ namespace ws.winx.input
 				/// <returns>InputAction (single,double,long) or null.</returns>
 				/// <param name="code">Code.</param>
 				/// <param name="time">Time.</param>
-				internal static InputAction processInput (int code, float time)
+				internal static InputAction processInputCode (int code, float time)
 				{
 
 
@@ -1137,20 +1122,17 @@ namespace ws.winx.input
 						float _value;
 						uint _uid;
 						ButtonState _buttonState;
-                        string _name;
+						string _name;
 			
 			#region IDeviceDetails implementation
-                        public string name
-                        {
-                            get
-                            {
-                                return _name;
-                            }
-                            set
-                            {
-                                _name = value;
-                            }
-                        }
+						public string name {
+								get {
+										return _name;
+								}
+								set {
+										_name = value;
+								}
+						}
 			
 						public uint uid {
 								get {

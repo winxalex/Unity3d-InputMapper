@@ -902,7 +902,7 @@ namespace ws.winx.input
 						return (JoystickAxis)((code & CODE_AXIS_MASK) >> CODE_DATA_SHIFT);
 				}
 				
-				public static int toDeviceInx(int code)
+				public static int toDeviceInx (int code)
 				{
 						code -= InputCode.MAX_KEY_CODE;
 						return code >> CODE_ID_SHIFT;
@@ -914,7 +914,91 @@ namespace ws.winx.input
 						return code & CODE_DATA_MASK;
 				}
 
-				public static string toProfiled (InputCombination combination, bool showIndex=false, bool showDirection=false)
+//				public static string toProfiled1 (InputCombination combination,string profileName, bool showDirection=true)
+//				{
+//					
+//					InputAction[] actions = combination.actions;
+//					int len = actions.Length;
+//					string profiledString = String.Empty;
+//					
+//					for (int i=0; i<len; i++) {
+//						
+//						profiledString += InputCode.toProfiled1 (actions [i],profileName,showDirection) + InputAction.SPACE_DESIGNATOR;
+//					}
+//					
+//					if (String.IsNullOrEmpty (profiledString))
+//						throw new Exception ("InputCombination profiled to empty string");
+//					
+//					return profiledString.Substring (0, profiledString.Length - 1);//remove last space desig
+//					
+//				}
+//
+//		public static string toProfiled1 (InputAction action,string profileName, bool showDirection=true)
+//		{
+//			
+//			int code = action.code;
+//
+//			JoystickAxis axis = InputCode.toAxis (code);
+//			int data = InputCode.toData (code);
+//			IDeviceDetails details;
+//			
+//			IDevice device=null;
+//			
+//			foreach (var device in InputEx.Devices)
+//			
+//
+//			if (device!=null) {
+//
+//				
+//				if (axis == JoystickAxis.None) {   //MO data for axis => buttons data
+//					//UnityEngine.Debug.Log("Button state>" + button_collection[data].buttonState);
+//					
+//					//previous mapping might be to device with less or more buttons
+//					//at same device index
+//					
+//					if (device.Buttons.Count > data && !String.IsNullOrEmpty ((details = device.Buttons [data]).name)) {
+//						
+//						if (showIndex)
+//							return joyInx.ToString () + "_" + details.name + action.type.ToDesignatorString ();
+//						else
+//							return details.name + action.type.ToDesignatorString ();
+//					} else
+//						return InputCode.toEnumString (code);
+//					
+//				}
+//				
+//				if (device.Axis.Count > (int)axis && 
+//				    !String.IsNullOrEmpty ((details = device.Axis [axis]).name)
+//				    ) {
+//					string direction = String.Empty;
+//					
+//					
+//					if (axis == JoystickAxis.AxisPovX || axis == JoystickAxis.AxisPovY) {
+//						direction = ((JoystickPovPosition)data).ToString ();
+//					} else if (showDirection)
+//						direction = ((JoystickPosition)data).ToString ().Replace ("Full", "");
+//					
+//				
+//						return details.name + direction + action.type.ToDesignatorString ();
+//				} else
+//					return InputCode.toEnumString (code);
+//				
+//				
+//				
+//				
+//				
+//				
+//				
+//				
+//				
+//			}
+//			
+//			return toEnumString (code);
+//		}
+//		
+		
+		
+		public static string toProfiled (IDevice device, InputCombination combination,  bool showDirection=false)
 				{
 				
 						InputAction[] actions = combination.actions;
@@ -923,7 +1007,7 @@ namespace ws.winx.input
 
 						for (int i=0; i<len; i++) {
 
-								profiledString += InputCode.toProfiled (actions [i]) + InputAction.SPACE_DESIGNATOR;
+								profiledString += InputCode.toProfiled (device,actions [i]) + InputAction.SPACE_DESIGNATOR;
 						}
 
 						if (String.IsNullOrEmpty (profiledString))
@@ -933,28 +1017,24 @@ namespace ws.winx.input
 
 				}
 
-				public static string toProfiled (InputAction action, bool showIndex=false, bool showDirection=false)
+				public static string toProfiled (IDevice device,InputAction action, bool showDirection=false)
 				{
 
+		
+
 						int code = action.code;
-						int joyInx = InputCode.toDeviceInx (code);
+
+						if (code < InputCode.MAX_KEY_CODE || device == null)
+								return toEnumString (code);
+						
+
+
 						JoystickAxis axis = InputCode.toAxis (code);
 						int data = InputCode.toData (code);
 						IDeviceDetails details;
 
-						IDevice device;
-
-//			//any
-//			if (joyInx == Joysticks.Joystick) {
-//
-//
-//
-//			}
-
-
-						if (InputEx.Devices.ContainsIndex (joyInx)) {
-								device = InputEx.Devices.GetDeviceAt (joyInx);
-
+						
+							
 								if (axis == JoystickAxis.None) {   //MO data for axis => buttons data
 										//UnityEngine.Debug.Log("Button state>" + button_collection[data].buttonState);
 					
@@ -963,9 +1043,7 @@ namespace ws.winx.input
 					
 										if (device.Buttons.Count > data && !String.IsNullOrEmpty ((details = device.Buttons [data]).name)) {
 
-												if (showIndex)
-														return joyInx.ToString () + "_" + details.name + action.type.ToDesignatorString ();
-												else
+												
 														return details.name + action.type.ToDesignatorString ();
 										} else
 												return InputCode.toEnumString (code);
@@ -978,14 +1056,12 @@ namespace ws.winx.input
 										string direction = String.Empty;
 
 										
-											if (axis == JoystickAxis.AxisPovX || axis == JoystickAxis.AxisPovY) {
-													direction = ((JoystickPovPosition)data).ToString ();
-											} else if(showDirection)
+										if (axis == JoystickAxis.AxisPovX || axis == JoystickAxis.AxisPovY) {
+												direction = ((JoystickPovPosition)data).ToString ();
+										} else if (showDirection)
 												direction = ((JoystickPosition)data).ToString ().Replace ("Full", "");
 
-										if (showIndex)
-												return joyInx.ToString () + "_" + details.name + direction + action.type.ToDesignatorString ();
-										else
+										
 												return details.name + direction + action.type.ToDesignatorString ();
 								} else
 										return InputCode.toEnumString (code);
@@ -998,9 +1074,7 @@ namespace ws.winx.input
 
 
 
-						}
-
-						return toEnumString (code);
+						
 				}
 		
 				public static string toEnumString (int code)
@@ -1180,13 +1254,11 @@ namespace ws.winx.input
 						if (code < InputCode.MAX_KEY_CODE)
 								return code;
 
-						JoystickAxis axis = InputCode.toAxis (code);
-						if (axis == JoystickAxis.None || axis == JoystickAxis.AxisPovX || axis == JoystickAxis.AxisPovX)
-								return code;
+//						JoystickAxis axis = InputCode.toAxis (code);
+//						if (axis == JoystickAxis.None || axis == JoystickAxis.AxisPovX || axis == JoystickAxis.AxisPovX)
+//								return code;
 
-                        
-                       
-
+         
 
 						code -= InputCode.MAX_KEY_CODE;
 
