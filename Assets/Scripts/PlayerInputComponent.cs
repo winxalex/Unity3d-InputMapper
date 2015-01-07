@@ -95,7 +95,7 @@ public class PlayerInputComponent : MonoBehaviour
 		InputManager.currentPlayerIndex = Player;
 
 
-			if (InputManager.GetInputDown((int)States.Wave)) {
+			if (InputManager.GetInputDown((int)States.Wave,true)) {
 				this.GetComponent<Animator>().Play("Wave");
 			}
 			

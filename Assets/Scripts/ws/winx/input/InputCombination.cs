@@ -229,7 +229,11 @@ namespace ws.winx.input
 										int len = actions.Length;
 
 										for (int i=0; i<len; i++) {
-												if (!InputEx.GetInputDown (actions [i]))
+
+                                            //LONG is counted as HOLD in this mode
+                                            if(actions[i].type==InputActionType.LONG){
+                                                if (!InputEx.GetInputHold(actions[i])) return false;
+                                            }else if(!InputEx.GetInputDown (actions [i]))
 														return false;
 										}
 

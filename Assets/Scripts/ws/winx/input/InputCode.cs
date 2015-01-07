@@ -1024,8 +1024,8 @@ namespace ws.winx.input
 
 						int code = action.code;
 
-						if (code < InputCode.MAX_KEY_CODE || device == null)
-								return toEnumString (code);
+                        if (code < InputCode.MAX_KEY_CODE || device == null)
+                            return action.ToString();
 						
 
 

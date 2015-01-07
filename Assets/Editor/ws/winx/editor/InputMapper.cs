@@ -798,27 +798,7 @@ namespace ws.winx.editor
 
 								EditorGUILayout.LabelField ("Profiles");
 
-//								if (_profilesTextAsset == null) {
-//										_profilesTextAsset = AssetDatabase.LoadAssetAtPath ("Assets/StreamingAssets/profiles.txt", typeof(TextAsset)) as TextAsset;
-//										
-//										//extract profiles lines
-//										string[] profiles = _profilesTextAsset.text.Split ('\n');
-//										List<string> pList = new List<string> ();
-//										string deviceType = null;
-//
-//										pList.Add ("default");
-//
-//										//add deviceTypes mark from profiles to List
-//										for (i=0; i<profiles.Length; i+=1) {
-//												
-//												deviceType = profiles [i].Split ('|') [1];
-//												if (!pList.Contains (deviceType))
-//														pList.Add (deviceType);
-//											
-//										}
-//
-//										_profilesDevicesDisplayOptions = pList.ToArray ();
-//								}
+
 
 				List<IDevice> devices=InputManager.GetDevices<IDevice>();
 
@@ -895,8 +875,8 @@ namespace ws.winx.editor
 
 								//////////  ANY/Complex Action Types(doubles,long...)  /FULL AXIS Checkers ///////
 								EditorGUILayout.BeginHorizontal ();
-								_isDeviceAny = GUILayout.Toggle (_isDeviceAny, "Any");
-								_isComplexActionTypesAllowed = GUILayout.Toggle (_isComplexActionTypesAllowed, "Complex Actions Allowed");
+								_isDeviceAny = GUILayout.Toggle (_isDeviceAny, "Any(Uncheck 4Testing Only");
+								_isComplexActionTypesAllowed = GUILayout.Toggle (_isComplexActionTypesAllowed, "Allow DOUBLE/LONG(HOLD)");
 								_isDeviceAxisPositionFull = GUILayout.Toggle (_isDeviceAxisPositionFull, "Full Axis");
 								EditorGUILayout.EndHorizontal ();
 

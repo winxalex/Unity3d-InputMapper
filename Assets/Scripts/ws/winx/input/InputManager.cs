@@ -1148,7 +1148,9 @@ namespace ws.winx.input
 		/// </summary>
 		/// <returns><c>true</c>, if input binded to state started to return values (than is reseted), <c>false</c> otherwise.</returns>
 		/// <param name="stateNameHash">State name hash.</param>
-		/// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts down state in row </param>		 
+		/// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts successive action (ex. W+C => W pressed,released then C pressed)
+        /// atOnce=true useful for building modifires like behaviour (LeftCtrl(-)+C)
+        /// </param>		 
 		public static bool GetInputDown(int stateNameHash,bool atOnce=false){
 			//Use is mapping states so no quering keys during gameplay
 			if (!InputManager.isReady()) return false;
