@@ -389,18 +389,21 @@ namespace ws.winx.platform.windows
                             try
                             {
 
-                                HIDDevice hidDevice = CreateHIDDeviceFrom(PointerToDevicePath(lParam));
+                                HIDDevice hidDevice;
+                                //= CreateHIDDeviceFrom(PointerToDevicePath(lParam));
+                                //devicePath is used as ID
+                                string ID = PointerToDevicePath(lParam);
                                 bool hidDeviceExisted = false;
 
                                 lock (syncRoot)
                                 {
-                                    hidDeviceExisted = this.Generics.ContainsKey(hidDevice.ID);
+                                    hidDeviceExisted = this.Generics.ContainsKey(ID);
 
                                     if (hidDeviceExisted)
                                     {
 
-
-                                        this.Generics.Remove(hidDevice.ID);
+                                        hidDevice=this.Generics[ID];
+                                        this.Generics.Remove(ID);
 
 
 
@@ -410,7 +413,7 @@ namespace ws.winx.platform.windows
                                 }
 
                                 if (hidDeviceExisted)
-                                    this.DeviceDisconnectEvent(this, new DeviceEventArgs<string>(hidDevice.ID));
+                                    this.DeviceDisconnectEvent(this, new DeviceEventArgs<string>(ID));
 
 
 
@@ -493,7 +496,7 @@ namespace ws.winx.platform.windows
 			
             if (notificationHandle != IntPtr.Zero)
                 Native.UnregisterDeviceNotification(notificationHandle);
-
+            
             notificationHandle = IntPtr.Zero;
         }
 

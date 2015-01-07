@@ -37,7 +37,7 @@ namespace ws.winx.drivers
 						inx = Array.IndexOf (names, hidDevice.Name);
 
 
-						Debug.Log(String.Join(",",names));
+					//	Debug.Log(String.Join(",",names));
 
 						if (inx < 0)
 								return null;
