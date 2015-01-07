@@ -458,6 +458,74 @@ namespace ws.winx.input
 
 			return isReady() && InputManager.HasInputState(Animator.StringToHash(stateName));
         }
+
+
+        public static InputEvent addEventListener(int stateNameHash)
+        {
+            if (isReady())
+
+                return InputEx.currentPlayer.GetEvent(stateNameHash);
+
+            return null;
+        }
+
+
+        internal static void dispatchEvent()
+        {
+            Delegate[] delegates;
+
+            Dictionary<int,InputEvent> stateEvents=InputEx.currentPlayer.stateEvents;
+
+            foreach (var stateInputEventsPair in stateEvents)
+            {
+                var Events=stateInputEventsPair.Value.Events;
+                foreach (KeyValuePair<int, Delegate[]> pair in Events)
+                {
+
+                    //                    if(pair.Value[0]!=null && InputManager.GetInput(pair.Key,false)){
+                    //                        delegates= pair.Value[0].GetInvocationList();
+                    //                        foreach(Delegate d in delegates)
+                    //                            ((EventHandler)d).BeginInvoke(this, args, EndAsyncEvent, null);
+                    //                    }
+
+                    if (pair.Value[1] != null && InputManager.GetInputUp(pair.Key))
+                    {
+                        delegates = pair.Value[1].GetInvocationList();
+                        foreach (Delegate d in delegates)
+                            ((EventHandler)d).BeginInvoke(null, null, EndAsyncEvent, null);
+                    }
+
+                    if (pair.Value[2] != null && InputManager.GetInputDown(pair.Key))
+                    {
+                        delegates = pair.Value[2].GetInvocationList();
+                        foreach (Delegate d in delegates)
+                            ((EventHandler)d).BeginInvoke(null, null, EndAsyncEvent, null);
+                    }
+
+
+
+                }
+
+            }
+        }
+
+
+
+        private static void EndAsyncEvent(IAsyncResult iar)
+        {
+            var ar = (System.Runtime.Remoting.Messaging.AsyncResult)iar;
+            var invokedMethod = (EventHandler)ar.AsyncDelegate;
+
+            try
+            {
+                invokedMethod.EndInvoke(iar);
+            }
+            catch
+            {
+                // Handle any exceptions that were thrown by the invoked method
+                Debug.Log("An event listener went kaboom!");
+            }
+        }
 	
 
 		//[Not tested] idea for expansion
@@ -1389,6 +1457,8 @@ namespace ws.winx.input
 
 
 
+
+       
     }
 }
 

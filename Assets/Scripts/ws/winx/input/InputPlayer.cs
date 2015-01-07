@@ -13,7 +13,7 @@ namespace ws.winx.input{
 	#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 	[DataContract]
 	#endif
-	public class InputPlayer 
+	public class InputPlayer:System.IDisposable
 	{
 
 		public enum Player:int{
@@ -73,6 +73,11 @@ namespace ws.winx.input{
 		#endif
 		public string Name;
 
+
+
+
+        public Dictionary<int, InputEvent> stateEvents = new Dictionary<int, InputEvent>();
+
 		public InputPlayer Clone(){
 			InputPlayer newInputPlayer = new InputPlayer ();
 			Dictionary<int,InputState> stateInputs;
@@ -97,6 +102,40 @@ namespace ws.winx.input{
 
 
 
-	}
+
+        internal InputEvent GetEvent(int stateNameHash)
+        {
+            if (stateEvents.ContainsKey(stateNameHash))
+            {
+                stateEvents[stateNameHash] = new InputEvent(stateNameHash);
+
+            }
+
+
+            return stateEvents[stateNameHash];
+        }
+
+        public void Dispose()
+        {
+
+            foreach (var stateEventsPair in this.stateEvents)
+            {
+
+                stateEventsPair.Value.Dispose();
+
+            }
+
+            stateEvents.Clear();
+
+            foreach (var DeviceHashStateInputPair in this.DeviceProfileStateInputs)
+            {
+
+                DeviceHashStateInputPair.Value.Clear();
+
+            }
+
+            this.DeviceProfileStateInputs.Clear();
+        }
+    }
 }
 

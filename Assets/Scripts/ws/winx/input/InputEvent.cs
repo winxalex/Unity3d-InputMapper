@@ -14,7 +14,7 @@ namespace ws.winx.input
 
 
         protected int _stateNameHash;
-        protected static GameObject _container;
+     
         //public static delegate bool GetInputDelegate(int stateNameHash,bool atOnce);
 		protected static Func<int,bool,bool> _action;
 
@@ -38,8 +38,8 @@ namespace ws.winx.input
 
 
 
-        private static Dictionary<int, Delegate[]> __events;
-        protected static Dictionary<int, Delegate[]> Events
+        private  Dictionary<int, Delegate[]> __events;
+        public  Dictionary<int, Delegate[]> Events
         {
             get
             {
@@ -112,15 +112,6 @@ namespace ws.winx.input
             }
 
 
-            //Create watcher of input and dispatcher of events
-            if (_container == null)
-            {
-                _container = new GameObject("InputEventManagerBehaviour");
-
-                InputEventDispatcherBehaviour w = _container.AddComponent<InputEventDispatcherBehaviour>();
-                w.Events = InputEvent.Events;
-                w.args = new EventArgs();
-            }
 
 
         }
@@ -145,10 +136,10 @@ namespace ws.winx.input
         {
        
 
-            if (InputEvent.Events != null)
+            if (this.Events != null)
             {
 
-                InputEvent.Events.Remove(_stateNameHash);
+                this.Events.Remove(_stateNameHash);
            
             }
 

@@ -21,8 +21,8 @@ public class PlayerInputComponent : MonoBehaviour
 
 	void manuallyAddStateAndHandlers()
 	{
-		
-		
+
+        InputManager.currentPlayerIndex = Player;
 		
 		//   UnityEngine.Debug.Log(InputManager.Log());
 		
@@ -47,15 +47,15 @@ public class PlayerInputComponent : MonoBehaviour
 		//			InputManager.MapStateToInput ("WalkBackward", 1, InputCode.Joystick1AxisYNegative.SINGLE);
 		
 		UnityEngine.Debug.Log("Log:" + InputManager.Log());
-		
-		
-		////Event Based input handling
-		InputEvent ev = new InputEvent("ManualFullAxisMap");
-		//InputEvent ev = new InputEvent((int)States.SomeState);
-		
-		
-		ev.UP += new EventHandler(onUp);
-		ev.DOWN += new EventHandler(onDown);
+
+
+
+
+        InputManager.addEventListener((int)States.Wave).UP += onUp;
+        InputManager.addEventListener((int)States.Wave).DOWN += onDown;
+            
+            
+
 		
 		
 		
@@ -74,15 +74,7 @@ public class PlayerInputComponent : MonoBehaviour
 		Debug.Log("Down");
 	}
 	
-	void Handle1(object o, EventArgs args)
-	{
-		Debug.Log("Handle1");
-	}
 	
-	void Handle2(object o, EventArgs args)
-	{
-		Debug.Log("Handle2");
-	}
 	
 	// Update is called once per frame
 		void Update ()
@@ -138,7 +130,7 @@ public class PlayerInputComponent : MonoBehaviour
 
 
 
-
+            InputManager.dispatchEvent();
 
 		}
 }
