@@ -266,7 +266,7 @@ namespace ws.winx.drivers
 			
 			
 			HIDReport report = data as HIDReport;
-			IDevice device = InputManager.Devices.GetDeviceAt (report.index);// _hidInterface.Devices[report.index];
+			IDevice device = InputEx.Devices.GetDeviceAt (report.index);// _hidInterface.Devices[report.index];
 			
 			//  UnityEngine.Debug.Log("report.index"+report.index+"device.PID"+device.PID+" Name:"+device.Name);
 			// UnityEngine.Debug.Log(BitConverter.ToString(report.Data));
