@@ -355,6 +355,12 @@ namespace ws.winx.editor
 						}
 				}
 				
+
+
+            /// <summary>
+            /// Fill StringBuilde with StateName=Hash,...values
+            /// </summary>
+            /// <returns></returns>
 				StringBuilder HashStateInputsToStringBuilder ()
 				{
 						Dictionary<int,InputState> stateInputsCurrent;

@@ -255,6 +255,7 @@ namespace ws.winx.platform.windows
                     device = new JoystickDevice(hidDevice.index, hidDevice.PID, hidDevice.VID,hidDevice.ID, 8, caps.NumButtons, this);
                     device.Extension = new WinDefaultExtension();
                     device.Name = hidDevice.Name;
+                    device.profile = profile;
 
                     int buttonIndex = 0;
                     for (; buttonIndex < caps.NumButtons; buttonIndex++)

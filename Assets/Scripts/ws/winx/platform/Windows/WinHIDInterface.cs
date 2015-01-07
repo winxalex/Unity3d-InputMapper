@@ -507,8 +507,8 @@ namespace ws.winx.platform.windows
         public void Enumerate()
         {
 
-            if (Application.isPlaying)
-            {
+           // if (Application.isPlaying)
+           // {
                 if (hidDeviceNotificationReceiverWindowHandle == IntPtr.Zero)
                 {
 
@@ -517,11 +517,11 @@ namespace ws.winx.platform.windows
                     if (hidDeviceNotificationReceiverWindowHandle != IntPtr.Zero)
                         RegisterHIDDeviceNotification(hidDeviceNotificationReceiverWindowHandle);
                 }
-            }
-            else
-            {
-                UnityEngine.Debug.Log("Plug&play isn't support in InputMapper Editor until I found way to destroy safely add/remove notification handle");
-            }
+           // }
+            //else
+            //{
+            //    UnityEngine.Debug.Log("Plug&play isn't support in InputMapper Editor until I found way to destroy safely add/remove notification handle");
+            //}
 
 
             uint deviceCount = 0;
