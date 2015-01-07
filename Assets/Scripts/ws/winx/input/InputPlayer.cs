@@ -48,24 +48,24 @@ namespace ws.winx.input{
 		}
 
 
-		public IDevice Device;
+		public IDevice _Device;
+
+        public IDevice Device{
+            get{ return _Device;}
+            set { _Device = value; if (_Device != null) _deviceID = _Device.ID; else _deviceID = null; }
+        }
 
 
 		#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 		[DataMember(Order=2)]
 		#endif
-		public string _deviceID;
+		protected string _deviceID;
 
 		public string DeviceID {
 			get {
-				if(Device!=null)
-					return Device.ID;
-				else
 					return _deviceID;
 			}
-			set {
-				_deviceID = value;
-			}
+			
 		}
 
 		#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
