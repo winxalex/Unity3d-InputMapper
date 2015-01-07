@@ -214,7 +214,7 @@ namespace ws.winx.platform.windows
             Native.JoyCaps caps;
             Native.JoystickError result = Native.JoystickError.InvalidParameters;
 
-
+            System.Threading.Thread.Sleep(100);
 
             DeviceProfile profile = null;
 
@@ -404,7 +404,7 @@ namespace ws.winx.platform.windows
 
                   //  UnityEngine.Debug.Log(" max:" + caps.YMax + " min:" + caps.YMin + " max:" + caps.ZMax + " min:" + caps.ZMin);
 
-                    UnityEngine.Debug.Log(" max:" + caps.RMax + " min:" + caps.RMin + " max:" + caps.UMax + " min:" + caps.UMin);
+                //    UnityEngine.Debug.Log(" max:" + caps.RMax + " min:" + caps.RMin + " max:" + caps.UMax + " min:" + caps.UMin);
 
                     return device;
 

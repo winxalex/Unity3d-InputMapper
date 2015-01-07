@@ -157,13 +157,17 @@ namespace ws.winx.input
 			
 						public void Clear ()
 						{
+                           
+
 								IndexToID.Clear ();
 								IDToDevice.Clear ();
+
+                                _isEnumeratorDirty = true;
 						}
 			
 						public System.Collections.IEnumerator GetEnumerator ()
 						{
-								if (_isEnumeratorDirty) {
+								if (_isEnumeratorDirty || _iterationCacheList.Count!=IDToDevice.Count) {
 										_iterationCacheList = IDToDevice.Values.ToList<IDevice> ();
 										_isEnumeratorDirty = false;
 					

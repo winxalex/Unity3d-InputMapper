@@ -104,11 +104,13 @@ namespace ws.winx.editor
 				public int maxCombosNum = 3;
 				public TextAsset settingsXML;
 				public AnimatorController controller;
+
+                public static EditorWindow _instance;
 	    
-				void Awake ()
+				void Start ()
 				{
 
-						Debug.Log ("Awake");
+						Debug.Log ("Start");
 
 
 //			#if (UNITY_STANDALONE_WIN)
@@ -158,7 +160,14 @@ namespace ws.winx.editor
 						_selectedStateHash = 0;
 
 						// Get existing open window or if none, make a new one:
-						EditorWindow.GetWindow (typeof(InputMapper));
+						if(InputMapper._instance==null)
+                            if (!Application.isPlaying)
+                            {
+                                InputManager.hidInterface.Enumerate();
+                                __wereDevicesEnumerated = true;
+                            }
+
+                       _instance=EditorWindow.GetWindow (typeof(InputMapper));
 
 
 
@@ -809,7 +818,7 @@ namespace ws.winx.editor
 
 					_profilesDevicesDisplayOptions=pList.ToArray();
 
-				}else if(_profilesDevicesDisplayOptions==null)
+				}else
 				_profilesDevicesDisplayOptions=new string[]{"default"};
 
 

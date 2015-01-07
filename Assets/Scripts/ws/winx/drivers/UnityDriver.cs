@@ -37,7 +37,7 @@ namespace ws.winx.drivers
 						inx = Array.IndexOf (names, hidDevice.Name);
 
 
-					//	Debug.Log(String.Join(",",names));
+						Debug.Log(String.Join(",",names));
 
 						if (inx < 0)
 								return null;
@@ -98,6 +98,8 @@ namespace ws.winx.drivers
 						int numButtons = device.Buttons.Count;
                    
 						//int index = device.Index;//if this was as easy=> Unity reorder/insert new added devices
+
+                  //  Debug.Log(String.Join(Input.GetJoystickNames()
 						int index = Array.IndexOf (Input.GetJoystickNames (), device.Name);
 			            if (index < 0) {
 							Debug.LogWarning("Devices can't be found by UnityDriver");		
@@ -109,7 +111,7 @@ namespace ws.winx.drivers
 						//   joystick.Axis[0].value=Input.GetAxis("00");//index-of joystick, i-ord number of axis
 						// Debug.Log("axis value:" + joystick.Axis[0].value + " state:" + joystick.Axis[0].buttonState);
 
-
+                       // index = 1;
 						float axisValue = 0f;
 						for (; i < numAxis; i++) {
 
@@ -120,7 +122,7 @@ namespace ws.winx.drivers
 								//axisValue = Input.GetAxis (index.ToString () + i.ToString ()) + " ";
 
 //							if(i==1){
-//								Debug.Log(axisValue);
+								Debug.Log(axisValue);
 //								
 //							}
 

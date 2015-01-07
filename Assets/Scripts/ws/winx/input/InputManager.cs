@@ -159,9 +159,9 @@ namespace ws.winx.input
 
 										//indexOf maybe
 										for(int i=0;i<__settings.Players.Length;i++){
-											if(__settings.Players[i].Device==device){
+											if(device.Equals(__settings.Players[i].Device)){
 												__settings.Players[i].Device=null;
-												Debug.Log("Device detached from Player"+i);
+												Debug.Log("Device "+args.data+" dettached from Player"+i);
 											}
 										}
 									}
@@ -227,12 +227,12 @@ namespace ws.winx.input
 
 
 
-		/// <summary>
-		/// Maps state to input.
-		/// </summary>
-		/// <param name="stateName">State name.</param>
-		/// <param name="at">At.</param>
-		/// <param name="combos">Combos.</param>
+	/// <summary>
+	/// Map state to input on player with index and profile
+	/// </summary>
+	/// <param name="stateName"></param>
+	/// <param name="at"></param>
+	/// <param name="combos"></param>
 		public static void MapStateToInput(String stateName,int at=-1,params KeyCode[] combos){
 			
 			MapStateToInput(stateName,new InputCombination(combos),at);
