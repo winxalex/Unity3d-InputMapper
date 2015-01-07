@@ -277,7 +277,7 @@ namespace ws.winx.drivers
                 byte[] buff = report.Data;
 
             //C3-85-47-7B-2A-76-6D-7A-00-80-00-80-00-8E
-                UnityEngine.Debug.Log("Normal:"+BitConverter.ToString(report.Data));
+               // UnityEngine.Debug.Log("Normal:"+BitConverter.ToString(report.Data));
 
 		
 
@@ -393,7 +393,7 @@ namespace ws.winx.drivers
                 device.Axis[JoystickAxis.AxisPovX].value = x;
                 device.Axis[JoystickAxis.AxisPovY].value = y;
 
-            UnityEngine.Debug.Log("x=" + x+" y="+y);
+          //  UnityEngine.Debug.Log("x=" + x+" y="+y);
 
 
             //    ////////////////////////// AXIS //////////////////////////////////
