@@ -159,9 +159,9 @@ namespace ws.winx.input
 
 										//indexOf maybe
 										for(int i=0;i<__settings.Players.Length;i++){
-											if(__settings.Players[i].Device==device){
+											if(device.Equals(__settings.Players[i].Device)){
 												__settings.Players[i].Device=null;
-												Debug.Log("Device detached from Player"+i);
+												Debug.Log("Device "+args.data+" dettached from Player"+i);
 											}
 										}
 									}
@@ -227,12 +227,12 @@ namespace ws.winx.input
 
 
 
-		/// <summary>
-		/// Maps state to input.
-		/// </summary>
-		/// <param name="stateName">State name.</param>
-		/// <param name="at">At.</param>
-		/// <param name="combos">Combos.</param>
+	/// <summary>
+	/// Map state to input on player with index and profile
+	/// </summary>
+	/// <param name="stateName"></param>
+	/// <param name="at"></param>
+	/// <param name="combos"></param>
 		public static void MapStateToInput(String stateName,int at=-1,params KeyCode[] combos){
 			
 			MapStateToInput(stateName,new InputCombination(combos),at);
@@ -457,6 +457,74 @@ namespace ws.winx.input
         {
 
 			return isReady() && InputManager.HasInputState(Animator.StringToHash(stateName));
+        }
+
+
+        public static InputEvent addEventListener(int stateNameHash)
+        {
+            if (isReady())
+
+                return InputEx.currentPlayer.GetEvent(stateNameHash);
+
+            return null;
+        }
+
+
+        internal static void dispatchEvent()
+        {
+            Delegate[] delegates;
+
+            Dictionary<int,InputEvent> stateEvents=InputEx.currentPlayer.stateEvents;
+
+            foreach (var stateInputEventsPair in stateEvents)
+            {
+                var Events=stateInputEventsPair.Value.Events;
+                foreach (KeyValuePair<int, Delegate[]> pair in Events)
+                {
+
+                    //                    if(pair.Value[0]!=null && InputManager.GetInput(pair.Key,false)){
+                    //                        delegates= pair.Value[0].GetInvocationList();
+                    //                        foreach(Delegate d in delegates)
+                    //                            ((EventHandler)d).BeginInvoke(this, args, EndAsyncEvent, null);
+                    //                    }
+
+                    if (pair.Value[1] != null && InputManager.GetInputUp(pair.Key))
+                    {
+                        delegates = pair.Value[1].GetInvocationList();
+                        foreach (Delegate d in delegates)
+                            ((EventHandler)d).BeginInvoke(null, null, EndAsyncEvent, null);
+                    }
+
+                    if (pair.Value[2] != null && InputManager.GetInputDown(pair.Key))
+                    {
+                        delegates = pair.Value[2].GetInvocationList();
+                        foreach (Delegate d in delegates)
+                            ((EventHandler)d).BeginInvoke(null, null, EndAsyncEvent, null);
+                    }
+
+
+
+                }
+
+            }
+        }
+
+
+
+        private static void EndAsyncEvent(IAsyncResult iar)
+        {
+            var ar = (System.Runtime.Remoting.Messaging.AsyncResult)iar;
+            var invokedMethod = (EventHandler)ar.AsyncDelegate;
+
+            try
+            {
+                invokedMethod.EndInvoke(iar);
+            }
+            catch
+            {
+                // Handle any exceptions that were thrown by the invoked method
+                Debug.Log("An event listener went kaboom!");
+            }
         }
 	
 
@@ -1150,7 +1218,9 @@ namespace ws.winx.input
 		/// </summary>
 		/// <returns><c>true</c>, if input binded to state started to return values (than is reseted), <c>false</c> otherwise.</returns>
 		/// <param name="stateNameHash">State name hash.</param>
-		/// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts down state in row </param>		 
+		/// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts successive action (ex. W+C => W pressed,released then C pressed)
+        /// atOnce=true useful for building modifires like behaviour (LeftCtrl(-)+C)
+        /// </param>		 
 		public static bool GetInputDown(int stateNameHash,bool atOnce=false){
 			//Use is mapping states so no quering keys during gameplay
 			if (!InputManager.isReady()) return false;
@@ -1389,6 +1459,8 @@ namespace ws.winx.input
 
 
 
+
+       
     }
 }
 

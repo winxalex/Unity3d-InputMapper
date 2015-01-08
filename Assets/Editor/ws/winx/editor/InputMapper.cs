@@ -104,11 +104,13 @@ namespace ws.winx.editor
 				public int maxCombosNum = 3;
 				public TextAsset settingsXML;
 				public AnimatorController controller;
+
+                public static EditorWindow _instance;
 	    
-				void Awake ()
+				void Start ()
 				{
 
-						Debug.Log ("Awake");
+						Debug.Log ("Start");
 
 
 //			#if (UNITY_STANDALONE_WIN)
@@ -158,7 +160,14 @@ namespace ws.winx.editor
 						_selectedStateHash = 0;
 
 						// Get existing open window or if none, make a new one:
-						EditorWindow.GetWindow (typeof(InputMapper));
+						if(InputMapper._instance==null)
+                            if (!Application.isPlaying)
+                            {
+                                InputManager.hidInterface.Enumerate();
+                                __wereDevicesEnumerated = true;
+                            }
+
+                       _instance=EditorWindow.GetWindow (typeof(InputMapper));
 
 
 
@@ -355,6 +364,12 @@ namespace ws.winx.editor
 						}
 				}
 				
+
+
+            /// <summary>
+            /// Fill StringBuilde with StateName=Hash,...values
+            /// </summary>
+            /// <returns></returns>
 				StringBuilder HashStateInputsToStringBuilder ()
 				{
 						Dictionary<int,InputState> stateInputsCurrent;
@@ -792,27 +807,7 @@ namespace ws.winx.editor
 
 								EditorGUILayout.LabelField ("Profiles");
 
-//								if (_profilesTextAsset == null) {
-//										_profilesTextAsset = AssetDatabase.LoadAssetAtPath ("Assets/StreamingAssets/profiles.txt", typeof(TextAsset)) as TextAsset;
-//										
-//										//extract profiles lines
-//										string[] profiles = _profilesTextAsset.text.Split ('\n');
-//										List<string> pList = new List<string> ();
-//										string deviceType = null;
-//
-//										pList.Add ("default");
-//
-//										//add deviceTypes mark from profiles to List
-//										for (i=0; i<profiles.Length; i+=1) {
-//												
-//												deviceType = profiles [i].Split ('|') [1];
-//												if (!pList.Contains (deviceType))
-//														pList.Add (deviceType);
-//											
-//										}
-//
-//										_profilesDevicesDisplayOptions = pList.ToArray ();
-//								}
+
 
 				List<IDevice> devices=InputManager.GetDevices<IDevice>();
 
@@ -823,7 +818,7 @@ namespace ws.winx.editor
 
 					_profilesDevicesDisplayOptions=pList.ToArray();
 
-				}else if(_profilesDevicesDisplayOptions==null)
+				}else
 				_profilesDevicesDisplayOptions=new string[]{"default"};
 
 
@@ -889,8 +884,8 @@ namespace ws.winx.editor
 
 								//////////  ANY/Complex Action Types(doubles,long...)  /FULL AXIS Checkers ///////
 								EditorGUILayout.BeginHorizontal ();
-								_isDeviceAny = GUILayout.Toggle (_isDeviceAny, "Any");
-								_isComplexActionTypesAllowed = GUILayout.Toggle (_isComplexActionTypesAllowed, "Complex Actions Allowed");
+								_isDeviceAny = GUILayout.Toggle (_isDeviceAny, "Any(Uncheck 4Testing Only");
+								_isComplexActionTypesAllowed = GUILayout.Toggle (_isComplexActionTypesAllowed, "Allow DOUBLE/LONG(HOLD)");
 								_isDeviceAxisPositionFull = GUILayout.Toggle (_isDeviceAxisPositionFull, "Full Axis");
 								EditorGUILayout.EndHorizontal ();
 
@@ -1270,6 +1265,8 @@ namespace ws.winx.editor
 						EditorGUILayout.Separator ();
 				}
 
+
+            
 
 				///////////////////     ON DESTROY     ////////////////
 				void OnDestroy ()

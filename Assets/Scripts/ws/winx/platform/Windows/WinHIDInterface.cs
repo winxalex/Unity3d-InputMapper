@@ -33,7 +33,7 @@ namespace ws.winx.platform.windows
 
         private IDriver __defaultJoystickDriver;
 
-
+        private const string NOTIFICATION_WND_CLS = "InputManager Device Change Notification Reciver Wnd";
 
 		private string[] __ports;
 
@@ -208,7 +208,7 @@ namespace ws.winx.platform.windows
                 __defaultJoystickDriver = value;
                 if (value is ws.winx.drivers.UnityDriver)
                 {
-                    Debug.LogWarning("UnityDriver set as default driver.\n Warring:Unity doesn't make distinction between triggers/axis/poitOfView and axes happen to be mapped on different Joysticks#, often return weired raw results");
+                    Debug.LogWarning("UnityDriver set as default driver.\n Warring:Unity doesn't make distinction between triggers/axis/poitOfView and doesn't make controller distinction as multiply instances of same type have same name");
                 }
 
             }
@@ -273,11 +273,14 @@ namespace ws.winx.platform.windows
 
 
 
+       
         /// <summary>
         /// Registers a window to receive notifications when USB devices are plugged or unplugged.
         /// </summary>
-        /// <param name="windowHandle">Handle to the window receiving notifications.</param>
-        public void RegisterHIDDeviceNotification(IntPtr windowHandle)
+     
+        /// <param name="windowHandle"></param>
+        /// <returns></returns>
+        public IntPtr RegisterHIDDeviceNotification(IntPtr windowHandle)
         {
             Native.DEV_BROADCAST_DEVICEINTERFACE dbi = new Native.DEV_BROADCAST_DEVICEINTERFACE
             {
@@ -299,7 +302,7 @@ namespace ws.winx.platform.windows
             IntPtr buffer = Marshal.AllocHGlobal(dbi.dbcc_size);
             Marshal.StructureToPtr(dbi, buffer, true);
 
-            notificationHandle = Native.RegisterDeviceNotification(windowHandle, buffer, 0);
+          return  Native.RegisterDeviceNotification(windowHandle, buffer, 0);
 
 
         }
@@ -312,12 +315,18 @@ namespace ws.winx.platform.windows
         IntPtr CreateReceiverWnd()
         {
 
+
+
+
             IntPtr wndHnd = IntPtr.Zero;
+
+         
+
             m_wnd_proc_delegate = CustomWndProc;
 
             // Create WNDCLASS
             Native.WNDCLASS wind_class = new Native.WNDCLASS();
-            wind_class.lpszClassName = "InputManager Device Change Notification Reciver Wnd";
+            wind_class.lpszClassName = NOTIFICATION_WND_CLS;
             wind_class.lpfnWndProc = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(m_wnd_proc_delegate);
 
             UInt16 class_atom = Native.RegisterClassW(ref wind_class);
@@ -389,28 +398,53 @@ namespace ws.winx.platform.windows
                             try
                             {
 
-                                HIDDevice hidDevice = CreateHIDDeviceFrom(PointerToDevicePath(lParam));
+                              
+
+                                if (lParam == IntPtr.Zero)
+                                {
+                                    Debug.LogWarning("lParam was Zerro on Removing");
+                                    break;
+                                }
+                         
+                                //devicePath is used as ID
+                                string devicePath = PointerToDevicePath(lParam);
+
+                                if (String.IsNullOrEmpty(devicePath))
+                                {
+                                    Debug.LogWarning("DevicPath was Empty or Null on Arrival");
+                                    break;
+                                }
+
+
+
+                                HIDDevice hidDevice=null;   //= CreateHIDDeviceFrom(devicePath);
+
                                 bool hidDeviceExisted = false;
 
                                 lock (syncRoot)
                                 {
-                                    hidDeviceExisted = this.Generics.ContainsKey(hidDevice.ID);
+                                    hidDeviceExisted = this.Generics.ContainsKey(devicePath);
 
                                     if (hidDeviceExisted)
                                     {
 
+                                        hidDevice=this.Generics[devicePath];
+                                        this.Generics.Remove(devicePath);
 
-                                        this.Generics.Remove(hidDevice.ID);
 
 
-
-                                        UnityEngine.Debug.Log("WinHIDInterface: " + hidDevice.Name + " Removed");
+                                       
                                     }
 
                                 }
 
+                                if(hidDevice!=null)
+                                   UnityEngine.Debug.Log("WinHIDInterface: " + hidDevice.Name + " Removed"); 
+                                else
+                                    UnityEngine.Debug.Log("WinHIDInterface: Not resolved device " + devicePath + " Removed"); 
+
                                 if (hidDeviceExisted)
-                                    this.DeviceDisconnectEvent(this, new DeviceEventArgs<string>(hidDevice.ID));
+                                    this.DeviceDisconnectEvent(this, new DeviceEventArgs<string>(devicePath));
 
 
 
@@ -434,21 +468,41 @@ namespace ws.winx.platform.windows
                             try
                             {
 
-
-
-                                HIDDevice hidDevice = CreateHIDDeviceFrom(PointerToDevicePath(lParam));
-
-                                if (!Generics.ContainsKey(hidDevice.ID))
+                                if (lParam == IntPtr.Zero)
                                 {
-                                    // string name = ReadRegKey(Native.HKEY_CURRENT_USER, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_" + hidDevice.VID.ToString("X4") + "&PID_" + hidDevice.PID.ToString("X4"), Native.REGSTR_VAL_JOYOEMNAME);
+                                    Debug.LogWarning("lParam was Zerro on Arrival");
+                                    break;
+                                }
 
-                                    UnityEngine.Debug.Log("WinHIDInterface: " + hidDevice.Name + " Connected");
+                                string devicePath = PointerToDevicePath(lParam);
 
-                                    ResolveDevice(hidDevice);
+                                if (String.IsNullOrEmpty(devicePath))
+                                {
+                                    Debug.LogWarning("DevicPath was Empty or Null on Arrival");
+                                    break;
+                                }
+
+                                HIDDevice hidDevice = CreateHIDDeviceFrom(devicePath);
+
+                                if (hidDevice != null)
+                                {
+                                    if (!Generics.ContainsKey(hidDevice.ID))
+                                    {
+                                        // string name = ReadRegKey(Native.HKEY_CURRENT_USER, @"SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_" + hidDevice.VID.ToString("X4") + "&PID_" + hidDevice.PID.ToString("X4"), Native.REGSTR_VAL_JOYOEMNAME);
+
+                                        UnityEngine.Debug.Log("WinHIDInterface: " + hidDevice.Name + " Connected");
+
+                                        ResolveDevice(hidDevice);
+                                    }
+                                    else
+                                    {
+                                        UnityEngine.Debug.Log("WinHIDInterface: " + hidDevice.Name + " Already Connected.");
+                                    }
                                 }
                                 else
                                 {
-                                    UnityEngine.Debug.Log("WinHIDInterface: " + hidDevice.Name + " Already Connected.");
+                                    UnityEngine.Debug.Log("Can't create Device on "+devicePath);
+
                                 }
                             }
                             catch (Exception e)
@@ -493,7 +547,7 @@ namespace ws.winx.platform.windows
 			
             if (notificationHandle != IntPtr.Zero)
                 Native.UnregisterDeviceNotification(notificationHandle);
-
+            
             notificationHandle = IntPtr.Zero;
         }
 
@@ -507,21 +561,27 @@ namespace ws.winx.platform.windows
         public void Enumerate()
         {
 
-            if (Application.isPlaying)
-            {
+           // if (Application.isPlaying)
+           // {
                 if (hidDeviceNotificationReceiverWindowHandle == IntPtr.Zero)
                 {
 
-                    hidDeviceNotificationReceiverWindowHandle = CreateReceiverWnd();
+                   // hidDeviceNotificationReceiverWindowHandle=Native.FindWindow(NOTIFICATION_WND_CLS, null);
 
-                    if (hidDeviceNotificationReceiverWindowHandle != IntPtr.Zero)
-                        RegisterHIDDeviceNotification(hidDeviceNotificationReceiverWindowHandle);
+                   // if (hidDeviceNotificationReceiverWindowHandle == IntPtr.Zero)
+                 //   {
+                        hidDeviceNotificationReceiverWindowHandle = CreateReceiverWnd();
+                  //  }
+
+                        if (hidDeviceNotificationReceiverWindowHandle != IntPtr.Zero)
+                            notificationHandle = RegisterHIDDeviceNotification(hidDeviceNotificationReceiverWindowHandle);
+                    
                 }
-            }
-            else
-            {
-                UnityEngine.Debug.Log("Plug&play isn't support in InputMapper Editor until I found way to destroy safely add/remove notification handle");
-            }
+           // }
+            //else
+            //{
+            //    UnityEngine.Debug.Log("Plug&play isn't support in InputMapper Editor until I found way to destroy safely add/remove notification handle");
+            //}
 
 
             uint deviceCount = 0;
@@ -631,12 +691,15 @@ namespace ws.winx.platform.windows
 
                 //return ReadRegKey(HKEY_LOCAL_MACHINE, RegPath, "FriendlyName")+ReadRegKey(HKEY_LOCAL_MACHINE, RegPath, "DeviceDesc");
 
-				//devicePath is used as ID
+
+
+                //devicePath is used as ID
                 //!!! deviceHandle set to IntPtr.Zero (think not needed in widows)
-                return new GenericHIDDevice(GetIndexForDeviceWithID(devicePath), Convert.ToInt32(VID_PID_Parts[0].Replace("VID_", ""), 16), Convert.ToInt32(VID_PID_Parts[1].Replace("PID_", ""), 16),devicePath, IntPtr.Zero, this, devicePath);
+                return new GenericHIDDevice(GetIndexForDeviceWithID(devicePath), Convert.ToInt32(VID_PID_Parts[0].Replace("VID_", ""), 16), Convert.ToInt32(VID_PID_Parts[1].Replace("PID_", ""), 16), devicePath, IntPtr.Zero, this, devicePath);
             }
 
             return null;
+
         }
 
         /// <summary>
@@ -650,7 +713,7 @@ namespace ws.winx.platform.windows
 
 
             Native.DeviceInfo deviceInfo = GetDeviceInfo(rawInputDeviceList.DeviceHandle);
-            UnityEngine.Debug.Log("PID:" + deviceInfo.HIDInfo.ProductID + " VID:" + deviceInfo.HIDInfo.VendorID);
+          //  UnityEngine.Debug.Log("PID:" + deviceInfo.HIDInfo.ProductID + " VID:" + deviceInfo.HIDInfo.VendorID);
 
             string devicePath = GetDevicePath(rawInputDeviceList.DeviceHandle);
 
@@ -760,16 +823,27 @@ namespace ws.winx.platform.windows
 		/// <returns>Old index for device after reconnection or new if first connection.</returns>
 		/// <param name="ID">I.</param>
 		int GetIndexForDeviceWithID(string ID){
-			int inx;
-			//find if this device was using same port before (during same app runitime)
-			inx=Array.IndexOf(__ports,ID);
 			
-			if(inx<0)//if not found => use next available(20 ports in total) position
-				inx=Array.IndexOf(__ports,null);
 
-			__ports [inx] = ID;
-			
-			return inx;
+
+          
+                int inx;
+
+        
+
+
+                //find if this device was using same port before (during same app runitime)
+                inx = Array.IndexOf(__ports, ID);
+
+                if (inx < 0)//if not found => use next available(20 ports in total) position
+                    inx = Array.IndexOf(__ports, null);
+
+                __ports[inx] = ID;
+
+                return inx;
+
+            
+		
 			
 		}
 
@@ -888,12 +962,24 @@ namespace ws.winx.platform.windows
 
                     UnityEngine.Debug.Log("Try to destroy plug&play Notificaiton window");
 
-                    // Native.DestroyWindow(receiverWindowHandle);
+                   
+                   IntPtr wndHnd= Native.FindWindow(NOTIFICATION_WND_CLS, null);
 
-                    //TODO test with this (issue when open  close InputMapper in Editor twice
-                    //maybe use bellow code
-                    if (Application.isPlaying)
-                        Native.PostMessage(new HandleRef(this, this.hidDeviceNotificationReceiverWindowHandle), Native.WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
+                    if (wndHnd == IntPtr.Zero)
+                        UnityEngine.Debug.Log("wndow not found");
+                    else
+                    {
+                        bool result = Native.DestroyWindow(hidDeviceNotificationReceiverWindowHandle);
+
+                        UnityEngine.Debug.Log("Destroy Result " + result);
+                    }
+
+                    //!!! Problem with InputMapper EditorWindow doesn't clean close Notification Window
+                    //so several open close or playing Aplication which also try to create Notification Window
+                    //cousing Unity to blow (No solution yet)
+                 
+                  //  if (Application.isPlaying)
+                   //    Native.PostMessage(new HandleRef(this, this.hidDeviceNotificationReceiverWindowHandle), Native.WM_DESTROY, IntPtr.Zero, IntPtr.Zero);
                     error = Marshal.GetLastWin32Error();
                     if (error > 0)
 

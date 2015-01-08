@@ -266,7 +266,7 @@ namespace ws.winx.drivers
 			
 			
 			HIDReport report = data as HIDReport;
-			IDevice device = InputManager.Devices.GetDeviceAt (report.index);// _hidInterface.Devices[report.index];
+			IDevice device = InputEx.Devices.GetDeviceAt (report.index);// _hidInterface.Devices[report.index];
 			
 			//  UnityEngine.Debug.Log("report.index"+report.index+"device.PID"+device.PID+" Name:"+device.Name);
 			// UnityEngine.Debug.Log(BitConverter.ToString(report.Data));
@@ -277,7 +277,7 @@ namespace ws.winx.drivers
                 byte[] buff = report.Data;
 
             //C3-85-47-7B-2A-76-6D-7A-00-80-00-80-00-8E
-              //  UnityEngine.Debug.Log("Normal:"+BitConverter.ToString(report.Data));
+               // UnityEngine.Debug.Log("Normal:"+BitConverter.ToString(report.Data));
 
 		
 
@@ -294,14 +294,24 @@ namespace ws.winx.drivers
 
              ////byte 11
             ///////////////////////////////////// BUTTONS ////////////////////////////////////////
-                device.Buttons[9].value = (buff[11] & 0x80) != 0 ? 1f : 0f;//Start
-                device.Buttons[10].value =  (buff[11] & 0x40) != 0 ? 1f : 0f;//Back
-                device.Buttons[13].value = (buff[11] & 0x10) != 0 ? 1f : 0f;//Left Bumper
-                device.Buttons[14].value = (buff[11] & 0x20) != 0 ? 1f : 0f;//Right Bumper
-                device.Buttons[16].value = (buff[11] & 0x01) != 0 ? 1f : 0f;//A
-                device.Buttons[17].value = (buff[11] & 0x02) != 0 ? 1f : 0f;//B
-                device.Buttons[18].value = (buff[11] & 0x04) != 0 ? 1f : 0f;//X
-                device.Buttons[19].value = (buff[11] & 0x08) != 0 ? 1f : 0f;//Y
+                //device.Buttons[9].value = (buff[11] & 0x80) != 0 ? 1f : 0f;//Start
+                //device.Buttons[10].value =  (buff[11] & 0x40) != 0 ? 1f : 0f;//Back
+                //device.Buttons[13].value = (buff[11] & 0x10) != 0 ? 1f : 0f;//Left Bumper
+                //device.Buttons[14].value = (buff[11] & 0x20) != 0 ? 1f : 0f;//Right Bumper
+                //device.Buttons[16].value = (buff[11] & 0x01) != 0 ? 1f : 0f;//A
+                //device.Buttons[17].value = (buff[11] & 0x02) != 0 ? 1f : 0f;//B
+                //device.Buttons[18].value = (buff[11] & 0x04) != 0 ? 1f : 0f;//X
+                //device.Buttons[19].value = (buff[11] & 0x08) != 0 ? 1f : 0f;//Y
+
+
+                device.Buttons[7].value = (buff[11] & 0x80) != 0 ? 1f : 0f;//Start
+                device.Buttons[6].value = (buff[11] & 0x40) != 0 ? 1f : 0f;//Back
+                device.Buttons[4].value = (buff[11] & 0x10) != 0 ? 1f : 0f;//Left Bumper
+                device.Buttons[5].value = (buff[11] & 0x20) != 0 ? 1f : 0f;//Right Bumper
+                device.Buttons[0].value = (buff[11] & 0x01) != 0 ? 1f : 0f;//A
+                device.Buttons[1].value = (buff[11] & 0x02) != 0 ? 1f : 0f;//B
+                device.Buttons[2].value = (buff[11] & 0x04) != 0 ? 1f : 0f;//X
+                device.Buttons[3].value = (buff[11] & 0x08) != 0 ? 1f : 0f;//Y
 
           
 				//00-13-00-00-00-00-62-F2-27-FF-59-03-45-FE-00
@@ -327,13 +337,28 @@ namespace ws.winx.drivers
                 // 98   1001 1000  LB(-,-)
                 // 9C   1001 1100  X-
 
+                // 00   00 0000 -neutral
+
+                // 2O   10 0000 LT(-,+)
+                // 04   00 0100  Y+
+                // 08   00 1000 RT(+,+)
+                // 0C   00 1100  X+
+
+                // 10   01 0000  RB(+,-)
+                // 14   01 0100  Y-
+                // 18   01 1000  LB(-,-)
+                // 1C   01 1100  X-
+
+
 
             //    //////////////////////////////  POV ////////////////////////////////////////
                 float x = 0, y = 0;
                 int sign = 1;
 
-                if(buff[12] != 0x80){
-                    if ((buff[12] >> 4) == 9)
+                buff[12] =(byte)( buff[12] & 0x3F);
+
+                if(buff[12] != 0x00){
+                    if ((buff[12] >> 4) == 1)
                     {
                         sign = -1;
                         
@@ -368,7 +393,7 @@ namespace ws.winx.drivers
                 device.Axis[JoystickAxis.AxisPovX].value = x;
                 device.Axis[JoystickAxis.AxisPovY].value = y;
 
-           // UnityEngine.Debug.Log("x=" + x+" y="+y);
+          //  UnityEngine.Debug.Log("x=" + x+" y="+y);
 
 
             //    ////////////////////////// AXIS //////////////////////////////////
@@ -393,7 +418,7 @@ namespace ws.winx.drivers
 
 
             value = (buff[5] | (buff[6] << 8));
-            axisDetails = device.Axis[JoystickAxis.AxisZ];
+            axisDetails = device.Axis[JoystickAxis.AxisU];
             axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max, 0.1f);
           //  UnityEngine.Debug.Log("valueZ=" + axisDetails.value);
 
@@ -402,11 +427,12 @@ namespace ws.winx.drivers
             axisDetails.value = NormalizeAxis(value, axisDetails.min, axisDetails.max,0.1f);
          //   UnityEngine.Debug.Log("valueR=" + axisDetails.value);
 
+            //    00-DA-8C-DB-78-4D-85-99-5D-80-00-00-00-00-E0
 
              //byte 9,10??? (triggerL 80->FF  and triggerR 80->00)
             value=buff[10];
 
-            axisDetails = device.Axis[JoystickAxis.AxisU];
+            axisDetails = device.Axis[JoystickAxis.AxisZ];
             if(value>128){
 
                 axisDetails.value =1 - NormalizeTrigger(value-128, axisDetails.min, axisDetails.max,0.05f);
@@ -509,10 +535,20 @@ namespace ws.winx.drivers
             device.Axis[JoystickAxis.AxisY] = axisDetails;
 
             //RX
+#if UNITY_STANDALONE_OSX 
             axisDetails = new AxisDetails();
             axisDetails.max = 65535;
             axisDetails.min = 0;
             device.Axis[JoystickAxis.AxisZ] = axisDetails;
+#endif
+
+ //RX
+#if UNITY_STANDALONE_WIN
+            axisDetails = new AxisDetails();
+            axisDetails.max = 65535;
+            axisDetails.min = 0;
+            device.Axis[JoystickAxis.AxisU] = axisDetails;
+#endif
 
             //RY
             axisDetails = new AxisDetails();
@@ -522,11 +558,25 @@ namespace ws.winx.drivers
 
 
             //TRIGGERS
+
+            //LEFT TRIGGER
+            #if UNITY_STANDALONE_OSX
             axisDetails = new AxisDetails();
             axisDetails.max = 128;
             axisDetails.min = 0;
             device.Axis[JoystickAxis.AxisU] = axisDetails;
+            #endif
 
+
+            //LEFT TRIGGER
+            #if UNITY_STANDALONE_WIN
+            axisDetails = new AxisDetails();
+            axisDetails.max = 128;
+            axisDetails.min = 0;
+            device.Axis[JoystickAxis.AxisZ] = axisDetails;
+            #endif
+
+            //RIGHT TRIGGER
             axisDetails = new AxisDetails();
             axisDetails.max = 128;
             axisDetails.min = 0;

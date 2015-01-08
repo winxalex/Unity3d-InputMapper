@@ -45,6 +45,7 @@ namespace ws.winx.platform.windows
         internal const int WAIT_ABANDONED = 0x80;
 
 		internal const UInt32 WM_CLOSE          = 0x0010;
+        internal const UInt32 WM_DESTROY        = 0x0002;
 
         #region NativeStructures
 
@@ -260,6 +261,10 @@ namespace ws.winx.platform.windows
         public static extern uint GetLastError();
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        [DllImport("user32.dll", SetLastError = true)]
+       public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
 
         [DllImport("user32", EntryPoint = "SetWindowsHookEx")]
         public static extern IntPtr SetWindowsHookEx(int idHook, Delegate lpfn, IntPtr hmod, IntPtr dwThreadId);
