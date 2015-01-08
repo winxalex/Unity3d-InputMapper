@@ -476,6 +476,7 @@ namespace ws.winx.input
 
             Dictionary<int,InputEvent> stateEvents=InputEx.currentPlayer.stateEvents;
 
+			if(stateEvents!=null)
             foreach (var stateInputEventsPair in stateEvents)
             {
                 var Events=stateInputEventsPair.Value.Events;

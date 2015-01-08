@@ -238,13 +238,13 @@ namespace ws.winx.drivers
 				//byte 9,10??? (triggerL 80->FF  and triggerR 80->00)
 				value=buff[4];
 				
-				axisDetails = device.Axis[JoystickAxis.AxisV];
+				axisDetails = device.Axis[JoystickAxis.AxisU];
 
 				axisDetails.value =1 - NormalizeTrigger(value, 0, 255,0.05f);
 
 				value=buff[5];
 				
-				axisDetails = device.Axis[JoystickAxis.AxisU];
+				axisDetails = device.Axis[JoystickAxis.AxisV];
 				
 				axisDetails.value =1 - NormalizeTrigger(value, 0, 255,0.05f);
 
@@ -565,23 +565,30 @@ namespace ws.winx.drivers
             axisDetails.max = 128;
             axisDetails.min = 0;
             device.Axis[JoystickAxis.AxisU] = axisDetails;
-            #endif
 
-
-            //LEFT TRIGGER
-            #if UNITY_STANDALONE_WIN
+			//RIGHT TRIGGER
+			axisDetails = new AxisDetails();
+			axisDetails.max = 128;
+			axisDetails.min = 0;
+			device.Axis[JoystickAxis.AxisV] = axisDetails;
+			#endif
+			
+			
+			//LEFT TRIGGER
+			#if UNITY_STANDALONE_WIN
             axisDetails = new AxisDetails();
             axisDetails.max = 128;
             axisDetails.min = 0;
             device.Axis[JoystickAxis.AxisZ] = axisDetails;
-            #endif
+          
+
 
             //RIGHT TRIGGER
             axisDetails = new AxisDetails();
             axisDetails.max = 128;
             axisDetails.min = 0;
             device.Axis[JoystickAxis.AxisV] = axisDetails;
-
+			#endif
 
             //POV
             axisDetails = new AxisDetails();
