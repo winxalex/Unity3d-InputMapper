@@ -10,15 +10,23 @@ public class PlayerInputComponent : MonoBehaviour
 		
 
 	public InputPlayer.Player Player;
+	Animator animator;
+	int forwardHash;
+	int turnHash;
 
 		// Use this for initialization
 		void Start ()
 		{
-			
-		}
+		animator = this.GetComponent<Animator> ();
+
+		forwardHash = Animator.StringToHash ("forward");
+		turnHash = Animator.StringToHash ("turn");
 
 
-
+	}
+	
+	
+	
 	void manuallyAddStateAndHandlers()
 	{
 		
@@ -87,34 +95,40 @@ public class PlayerInputComponent : MonoBehaviour
 	// Update is called once per frame
 		void Update ()
 		{
-		    ///
-			//InputManager.Settings
-
 		    
-			//InputManager.currentPlayerIndex = PlayerIndex;
-		InputManager.currentPlayerIndex = Player;
+			InputManager.currentPlayerIndex = Player;
 
-
-			if (InputManager.GetInputDown((int)States.Wave)) {
-				this.GetComponent<Animator>().Play("Wave");
-			}
+//
+//			if (InputManager.GetInputDown((int)States.Wave)) {
+//				animator.Play((int)States.Wave);
+//			}
 			
-			//	
-			//
-//			if (InputManager.GetInputHold (Animator.StringToHash ("WalkBackward"))) {
-//				Debug.Log ("WalkBackward-Hold");
-//			}
-//			
-//			
-//			if (InputManager.GetInputDown (Animator.StringToHash ("WalkBackward"))) {
-//				Debug.Log ("WalkBackward-Down");
-//			}
-//			
-//			if (InputManager.GetInputUp (Animator.StringToHash ("WalkBackward"))) {
-//				Debug.Log ("WalkBackward-Up");
-//			}
+		if (InputManager.GetInputDown((int)States.Jump)) {
+			animator.Play((int)States.Jump);
+		}
+//
+		float forward = Math.Abs(InputManager.GetInput ((int)States.WalkForward,0.25f))
+			- Math.Abs (InputManager.GetInput ((int)States.WalkBackward,0.25f));
+
+		//Debug.Log (forward);
+
+		animator.SetFloat (forwardHash,forward);
+//
+//
+//		float turn = Math.Abs(InputManager.GetInput ((int)States.TurnRight,0.25f))
+//			- Math.Abs (InputManager.GetInput ((int)States.TurnLeft,0.25f));
+//		
+//		//Debug.Log (forward);
+//		
+//		animator.SetFloat (turnHash,turn);
 
 
+
+	
+		
+
+
+		//Debug.Log (InputManager.GetInputRaw ((int)States.Jump));
 				//Generated value from -1 to 1f
 				//			float axisPos = InputManager.GetInputRaw (Animator.StringToHash ("WalkForward"), 0.3f, 0.1f, 0.2f);
 				

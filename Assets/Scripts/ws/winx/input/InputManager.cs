@@ -1077,7 +1077,7 @@ namespace ws.winx.input
 		/// <param name="gravity">Gravity. After no signal from input value would drop with step of gravity or immidiately</param>
 		public static float GetInput(int stateNameHash,float sensitivity=0.1f,float dreadzone=0.1f,float gravity=0.3f){
            //Use is mapping states so no quering keys during gameplay
-            if (InputManager.isReady()) return 0f;
+            if (!InputManager.isReady()) return 0f;
             
             __inputCombinations=__settings.stateInputs[stateNameHash].combinations;
 
@@ -1087,7 +1087,9 @@ namespace ws.winx.input
 
 
 
-
+		
+		
+		
 		/// <summary>
 		/// Gets the input of device(hardware)
 		/// if device mapped is digital would return 0f or 1f 
@@ -1099,7 +1101,7 @@ namespace ws.winx.input
 		/// <param name="gravity">Gravity. After no signal from input value would drop with step of gravity or immidiately</param>
 		public static float GetInputRaw(int stateNameHash,float sensitivity=0.1f,float dreadzone=0.1f,float gravity=0.3f){
 			//Use is mapping states so no quering keys during gameplay
-			if (InputManager.isReady()) return 0f;
+			if (!InputManager.isReady()) return 0f;
 			
 			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
 

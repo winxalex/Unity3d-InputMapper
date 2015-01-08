@@ -35,7 +35,7 @@ namespace ws.winx.devices
 				int _PID;
 				bool _isReady = true;
 				int _lastFrameNum = -1;
-		string _ID;
+				string _ID;
 
 
 
@@ -50,7 +50,7 @@ namespace ws.winx.devices
 
         #region Constructors
 
-				internal JoystickDevice (int index, int pid, int vid,string ID, int axes, int buttons, IDriver driver)
+				internal JoystickDevice (int index, int pid, int vid, string ID, int axes, int buttons, IDriver driver)
 				{
 						if (axes < 0)
 								throw new ArgumentOutOfRangeException ("axes");
@@ -84,14 +84,14 @@ namespace ws.winx.devices
 
 
 
-		public bool Equals (IDevice other)
-		{
-			if (other == null)
+				public bool Equals (IDevice other)
+				{
+						if (other == null)
 								return false;
 
 
-			return this.ID == other.ID;
-		}
+						return this.ID == other.ID;
+				}
 
 		#endregion
 
@@ -99,20 +99,16 @@ namespace ws.winx.devices
 
 
 
-		public DeviceProfile profile {
-			 get; set; 
-		}
-
-
+				public DeviceProfile profile {
+						get;
+						set; 
+				}
 	
-		public string ID {
-			get {
-				return _ID;
-			}
-		}
-
-
-
+				public string ID {
+						get {
+								return _ID;
+						}
+				}
 
 				public bool isReady {
 						get {
@@ -211,7 +207,7 @@ namespace ws.winx.devices
 				/// </summary>
 				/// <returns>The axis.</returns>
 				/// <param name="code">Code. joystick(4bits) + axis(4bits) + data(+/- 5bits)</param>
-				public float GetInput (int code)
+				public float GetInputAnalog (int code)
 				{
 						Update ();
 
@@ -281,14 +277,17 @@ namespace ws.winx.devices
 										return false;
 						}
 
-			//previous mapping might be to device with less or more axess
-			//at same device index
-			if (axis_collection.Count <= (int)axis)
+						//previous mapping might be to device with less or more axess
+						//at same device index
+						if (axis_collection.Count <= (int)axis)
 								return false;
 
-			IAxisDetails axisDetails= axis_collection [axis];
+						IAxisDetails axisDetails = axis_collection [axis];
 
-			if (axisDetails == null)
+
+
+
+						if (axisDetails == null)
 								return false;
 
 						if (axis == JoystickAxis.AxisPovX) {
@@ -307,7 +306,7 @@ namespace ws.winx.devices
 								return false;
 						}
 
-						//check if the axis moved in Negative values was relesed
+						//check if the axis moved in Negative values was released
 						if (data == (int)JoystickPosition.Negative && axisDetails.buttonState == ButtonState.NegToUp)
 								return true;
 						if (data == (int)JoystickPosition.Positive && axisDetails.buttonState == ButtonState.PosToUp)
@@ -316,18 +315,10 @@ namespace ws.winx.devices
 						return false;
 				}
 
-
-
-
-				public virtual bool GetInputBase (int code, ButtonState buttonState)
+				public virtual bool GetInputDigital (int code, ButtonState buttonState)
 				{
 
-			//UnityEngine.Debug.Log("Button state>" + buttonState+" code:"+code);
-
-						if (ButtonState.Up == buttonState)
-								return GetInputUp (code);
-
-
+		
 
 						Update ();
 							
@@ -343,35 +334,38 @@ namespace ws.winx.devices
 
 								//previous mapping might be to device with less or more buttons
 								//at same device index
-								if(button_collection.Count>data)
-									return button_collection [data].buttonState == buttonState;
+								if (button_collection.Count > data)
+										return button_collection [data].buttonState == buttonState;
 								else
-									return false;
+										return false;
 								
 						}
 
 						
 
-			//previous mapping might be to device with less or more axess
-			//at same device index
-			if (axis_collection.Count <= (int)axis)
-				return false;
+						//previous mapping might be to device with less or more axess
+						//at same device index
+						if (axis_collection.Count <= (int)axis)
+								return false;
 			
-			IAxisDetails axisDetails= axis_collection [axis];
+						IAxisDetails axisDetails = axis_collection [axis];
 
-			if (axisDetails == null)
-				return false;
+						if (axisDetails == null)
+								return false;
 			
-			bool isEqualToButtonState = axisDetails.buttonState == buttonState;
-							
-							
-							
+						bool isEqualToButtonState = axisDetails.buttonState == buttonState || ButtonState.Up == buttonState;
+
+						bool isNegative = ButtonState.Up == buttonState ? axisDetails.buttonState == ButtonState.NegToUp : axisDetails.value < 0;		
+						bool isPositive = ButtonState.Up == buttonState ? axisDetails.buttonState == ButtonState.PosToUp : axisDetails.value > 0;		
+
+		
+			
 						if (axis == JoystickAxis.AxisPovX) {
 
-
-								if (data == (int)JoystickPovPosition.Left && isEqualToButtonState && axisDetails.value < 0)
+				
+								if (data == (int)JoystickPovPosition.Left && isEqualToButtonState && isNegative)
 										return true;
-								if (data == (int)JoystickPovPosition.Right && isEqualToButtonState && axisDetails.value > 0)
+								if (data == (int)JoystickPovPosition.Right && isEqualToButtonState && isPositive)
 										return true;
 								
 								return false;
@@ -380,23 +374,29 @@ namespace ws.winx.devices
 							
 							
 						if (axis == JoystickAxis.AxisPovY) {
-								if (data == (int)JoystickPovPosition.Backward && isEqualToButtonState && axisDetails.value < 0)
+
+				
+								if (data == (int)JoystickPovPosition.Backward && isEqualToButtonState && isNegative)
 										return true;
-								if (data == (int)JoystickPovPosition.Forward && isEqualToButtonState && axisDetails.value > 0)
+								if (data == (int)JoystickPovPosition.Forward && isEqualToButtonState && isPositive)
 										return true;
 								
 								return false;
 								
 						}
-							
-							
-						if (data == (int)JoystickPosition.Negative && isEqualToButtonState && axisDetails.value < 0)
+
+
+
+		
+						
+			
+						if (data == (int)JoystickPosition.Negative && isEqualToButtonState && isNegative)
 								return true;
 
 
-						if (data == (int)JoystickPosition.Positive && isEqualToButtonState && axisDetails.value > 0) {
+						if (data == (int)JoystickPosition.Positive && isEqualToButtonState && isPositive) {
 
-							//	UnityEngine.Debug.Log("data:" + data+"buttotnState:"+buttonState+" equal"+isEqualToButtonState+" value:"+axisDetails.value);
+								//	UnityEngine.Debug.Log("data:" + data+"buttotnState:"+buttonState+" equal"+isEqualToButtonState+" value:"+axisDetails.value);
 								return true;
 						}
 							
@@ -438,7 +438,7 @@ namespace ws.winx.devices
 						IAxisDetails axisDetails;
 
 
-                        //UnityEngine.Debug.Log("Code" + axis_collection[6].buttonState);
+						//UnityEngine.Debug.Log("Code" + axis_collection[6].buttonState);
 						//UnityEngine.Debug.Log("Count" + axis_collection.Count);
 						// if(this.Index==0)
 						//     UnityEngine.Debug.Log("GetInput>Joy" + this.Index + "AxisPovY state:" + axis_collection[JoystickAxis.AxisPovY].buttonState + " frame:" + this.LastFrameNum);
@@ -451,44 +451,44 @@ namespace ws.winx.devices
 
 						//only if there is no last dominant axis or  when last axis have been released you can search for new dominant axis
 						//not reconginzed trigger axis can hangout this kind of soliving never go to Up
-                    //if (axisDominantPrevInx < 0 || (axisDominantPrevInx > -1 && ((axisDetails = axis_collection [axisDominantPrevInx]).buttonState == ButtonState.PosToUp || axisDetails.buttonState == ButtonState.NegToUp))) {
+						//if (axisDominantPrevInx < 0 || (axisDominantPrevInx > -1 && ((axisDetails = axis_collection [axisDominantPrevInx]).buttonState == ButtonState.PosToUp || axisDetails.buttonState == ButtonState.NegToUp))) {
 								
 								
 
-								while (axis < num_axes) {
+						while (axis < num_axes) {
 
-										if (axis < num_axes && (axisDetails = axis_collection [axis]) != null) {
+								if (axis < num_axes && (axisDetails = axis_collection [axis]) != null) {
 
-												axisDetails = axis_collection [axis];
+										axisDetails = axis_collection [axis];
 											
 
-												if (axisDetails.buttonState == ButtonState.Down) {
+										if (axisDetails.buttonState == ButtonState.Down) {
 														
 
 														
 							
-														// index 6 and 7 are reserved for Pov Axes
-														if (axis == 6) { //(int)JoystickAxis.AxisPovX
-																if (axis_collection [axis].value > 0)
-																		return InputCode.toCode ((Joysticks)Index, axis, JoystickPovPosition.Right);
-																else
-																		return InputCode.toCode ((Joysticks)Index, axis, JoystickPovPosition.Left);
-														}
+												// index 6 and 7 are reserved for Pov Axes
+												if (axis == 6) { //(int)JoystickAxis.AxisPovX
+														if (axis_collection [axis].value > 0)
+																return InputCode.toCode ((Joysticks)Index, axis, JoystickPovPosition.Right);
+														else
+																return InputCode.toCode ((Joysticks)Index, axis, JoystickPovPosition.Left);
+												}
 							
 													
 							
-														if (axis == 7) {//(int)JoystickAxis.AxisPovY
+												if (axis == 7) {//(int)JoystickAxis.AxisPovY
 								
-																if (axis_collection [axis].value > 0)
-																		return InputCode.toCode ((Joysticks)Index, axis, JoystickPovPosition.Forward);
-																else
-																		return InputCode.toCode ((Joysticks)Index, axis, JoystickPovPosition.Backward);
-														}
-							
 														if (axis_collection [axis].value > 0)
-																return InputCode.toCode ((Joysticks)Index, axis, (int)JoystickPosition.Positive);
+																return InputCode.toCode ((Joysticks)Index, axis, JoystickPovPosition.Forward);
 														else
-																return InputCode.toCode ((Joysticks)Index, axis, (int)JoystickPosition.Negative);
+																return InputCode.toCode ((Joysticks)Index, axis, JoystickPovPosition.Backward);
+												}
+							
+												if (axis_collection [axis].value > 0)
+														return InputCode.toCode ((Joysticks)Index, axis, (int)JoystickPosition.Positive);
+												else
+														return InputCode.toCode ((Joysticks)Index, axis, (int)JoystickPosition.Negative);
 
 
 
@@ -497,16 +497,16 @@ namespace ws.winx.devices
 
 
 														
-												}
-
-
-
-
 										}
 
-										axis++;
+
+
+
+								}
+
+								axis++;
 								
-								}//end while
+						}//end while
 
 								
 
@@ -590,19 +590,6 @@ namespace ws.winx.devices
 				{
 						return this._index;
 				}
-
-			
-
-
-		 
-			
-       
-
-     
-
-      
-
-	
                
 				public IDeviceExtension Extension { get; set; }
 

@@ -7,9 +7,11 @@ namespace ws.winx.input.states
 		{
 				Wave=2050359991,
 		
-				MyCustomState=-1624475888,
-
-				ManualAddedSTATE=-977892492,
+				WalkForward=-2035216068,
+				WalkBackward=2035415549,
+				Jump=125937960,
+				TurnLeft=-1847120011,
+				TurnRight=-685270779
 
 
 	

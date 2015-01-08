@@ -926,12 +926,14 @@ namespace ws.winx.drivers
 							else
 								_buttonState = ButtonState.NegToUp;
 
-							//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
+							Debug.Log("val:"+value+"_buttonState:"+_buttonState);
 							
 						}
 						else
 						{//if(buttonState==JoystickButtonState.Up){
 							_buttonState = ButtonState.None;
+
+							//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
 						}
 	
 						

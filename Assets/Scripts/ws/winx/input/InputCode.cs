@@ -998,7 +998,7 @@ namespace ws.winx.input
 //		
 		
 		
-		public static string toProfiled (IDevice device, InputCombination combination,  bool showDirection=false)
+				public static string toProfiled (IDevice device, InputCombination combination,  bool showDirection=true)
 				{
 				
 						InputAction[] actions = combination.actions;
@@ -1017,7 +1017,7 @@ namespace ws.winx.input
 
 				}
 
-				public static string toProfiled (IDevice device,InputAction action, bool showDirection=false)
+				public static string toProfiled (IDevice device,InputAction action, bool showDirection=true)
 				{
 
 		

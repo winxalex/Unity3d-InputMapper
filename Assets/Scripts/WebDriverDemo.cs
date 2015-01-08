@@ -172,11 +172,7 @@ namespace ws.winx
 						}
 			
 			
-						if (InputManager.GetInputUp ((int)States.MyCustomState)) {
-								Debug.Log (States.MyCustomState + "-Up");
-								// animator.Play((int)States.Wave);
-						}
-			
+					
 			
 
 			
