@@ -208,7 +208,7 @@ namespace ws.winx.platform.windows
                 __defaultJoystickDriver = value;
                 if (value is ws.winx.drivers.UnityDriver)
                 {
-                    Debug.LogWarning("UnityDriver set as default driver.\n Warring:Unity doesn't make distinction between triggers/axis/poitOfView and doesn't make controller distinction as multiply instances of same type have same name");
+                    Debug.LogWarning("UnityDriver set as default driver.\n Warring:Unity doesn't make distinction between triggers/axis/poitOfView and doesn't make controller distinction as multiply instances of same type have same name and can hard code index of devices no matter position in GetJoystickNames list");
                 }
 
             }

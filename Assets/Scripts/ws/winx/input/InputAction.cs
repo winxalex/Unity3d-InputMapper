@@ -73,7 +73,7 @@ namespace ws.winx.input
 			}
 			set{
 				_codeString=value;
-				parse(value);
+				//parse(value);
 			}
 		}
 
@@ -83,10 +83,11 @@ namespace ws.winx.input
 				return _fromAny;}
 		}
 
-		public int code{
-			get{return _code;}
-			set{_code=value;}
-		}
+        public int code
+        {
+            get { return _code; }
+            set { _code = value; }
+        }
 
 		public bool isKey { get{ return _isKey;} }
 		public bool isMouse { get{ return _isMouse;} }
@@ -260,10 +261,51 @@ namespace ws.winx.input
 
 		}
 
-	
-        
 
-        
-    
+
+
+
+
+
+        internal int getCode(DeviceProfile profile)
+        {
+           if(profile!=null && _code==0 && !String.IsNullOrEmpty(_codeString)){
+
+               _type=InputActionType.SINGLE;
+
+                 if(_codeString.Contains(InputAction.DOUBLE_DESIGNATOR)){
+				_type=InputActionType.DOUBLE;
+				_codeString=_codeString.Replace(InputAction.DOUBLE_DESIGNATOR,"");
+
+
+			}else if(_codeString.Contains(InputAction.LONG_DESIGNATOR)){
+				_type=InputActionType.LONG;
+				_codeString=_codeString.Replace(InputAction.LONG_DESIGNATOR,"");
+
+			 }
+
+               //find positive negative
+              
+
+               int inx = Array.IndexOf(profile.axisNaming, _codeString);
+               if (inx > 0)
+               {
+                   //axis number
+               }
+               else
+               {
+                   inx = Array.IndexOf(profile.buttonNaming, _codeString);
+
+                   if (inx > 0)
+                   {
+                      
+                   }
+
+               }
+           }
+
+
+           return _code;
+        }
     }
 }

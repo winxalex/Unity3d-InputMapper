@@ -51,7 +51,21 @@ namespace ws.winx.input{
 		public IDevice _Device;
 
         public IDevice Device{
-            get{ return _Device;}
+            get{ 
+                
+                
+               
+            //assign deserialized Device to Player
+            if (_Device == null && _deviceID != null)
+            {
+                if (InputEx.Devices.ContainsID(_deviceID))
+                    _Device = InputEx.Devices[_deviceID];
+
+            }
+            
+            return _Device;
+            
+            }
             set { _Device = value; if (_Device != null) _deviceID = _Device.ID; else _deviceID = null; }
         }
 

@@ -214,19 +214,19 @@ namespace ws.winx.input
 			
 				}
 
-				static InputPlayer _currentPlayer;
+                //static InputPlayer _currentPlayer;
 		
-				internal static InputPlayer currentPlayer {
-						get {
-								return _currentPlayer;
-						}
-						set {
+                //internal static InputPlayer currentPlayer {
+                //        get {
+                //                return _currentPlayer;
+                //        }
+                //        set {
 
-								_currentPlayer = value;
+                //                _currentPlayer = value;
 					
 
-						}
-				}
+                //        }
+                //}
 
 				private static readonly object syncRoot = new object ();
 		
@@ -466,20 +466,21 @@ namespace ws.winx.input
 				/// </summary>
 				/// <returns>The axis.</returns>
 				/// <param name="action">Action.</param>
-				public static float GetInputAnalog (InputAction action)
+				public static float GetInputAnalog (InputAction action,IDevice Device)
 				{
 						int code = action.code;
+                       // action.getCode(_currentPlayer._Device.profile);
 
-						if (_currentPlayer == null)
-							return 0f;
+
+					
 						
 						lock (syncRoot) {
 							
 							
-							if (_currentPlayer.Device!=null) {
+							if (Device!=null) {
 								
 								
-								return _currentPlayer.Device.GetInputAnalog (code);
+								return Device.GetInputAnalog (code);
 								
 								
 								
@@ -512,9 +513,9 @@ namespace ws.winx.input
 		/// </summary>
 				/// <returns><c>true</c>, if key was gotten, <c>false</c> otherwise.</returns>
 				/// <param name="action">Action.</param>
-				internal static bool GetInputHold (InputAction action)
+				internal static bool GetInputHold (InputAction action,IDevice Device)
 				{
-						return GetInputDigital (action, ButtonState.Hold);
+						return GetInputDigital (action, ButtonState.Hold,Device);
 			
 				}
 
@@ -525,9 +526,9 @@ namespace ws.winx.input
 				/// </summary>
 				/// <returns><c>true</c>, if input hold was gotten, <c>false</c> otherwise.</returns>
 				/// <param name="code">Code.</param>
-				internal static bool GetInputHold (int code)
+				internal static bool GetInputHold (int code,IDevice Device)
 				{
-					return GetInputDigital (code, ButtonState.Hold);
+					return GetInputDigital (code, ButtonState.Hold,Device);
 			
 				}
 
@@ -538,9 +539,9 @@ namespace ws.winx.input
 				/// </summary>
 				/// <returns><c>true</c>, if key up was gotten, <c>false</c> otherwise.</returns>
 				/// <param name="action">Action.</param>
-				internal static bool GetInputUp (InputAction action)
+				internal static bool GetInputUp (InputAction action,IDevice Device)
 				{
-					return GetInputDigital (action, ButtonState.Up);
+					return GetInputDigital (action, ButtonState.Up,Device);
 				}
 
 
@@ -549,12 +550,12 @@ namespace ws.winx.input
 				/// </summary>
 				/// <returns><c>true</c>, if input down was gotten, <c>false</c> otherwise.</returns>
 				/// <param name="action">Action.</param>
-				public static bool GetInputDown (InputAction action)
+				public static bool GetInputDown (InputAction action,IDevice Device)
 				{
-					return GetInputDigital ( action, ButtonState.Down);
+					return GetInputDigital ( action, ButtonState.Down,Device);
 				}
 
-				public static bool GetInputDigital (int code, ButtonState buttonState)
+                public static bool GetInputDigital(int code, ButtonState buttonState, IDevice Device)
 				{
 
 						if (code < InputCode.MAX_KEY_CODE) {
@@ -565,16 +566,15 @@ namespace ws.winx.input
 				                                                            
 						} else {
 					
-								if (_currentPlayer == null)
-										return false;
+								
 
 								lock (syncRoot) {
 
 										
-										if (_currentPlayer.Device!=null) {
+										if (Device!=null) {
 
 
-												return _currentPlayer.Device.GetInputDigital (code, buttonState);
+												return Device.GetInputDigital (code, buttonState);
 
 
 											
@@ -593,10 +593,10 @@ namespace ws.winx.input
 
 				}
 
-				private static bool GetInputDigital (InputAction action, ButtonState buttonState)
+				private static bool GetInputDigital (InputAction action, ButtonState buttonState,IDevice Device)
 				{
 
-						return GetInputDigital (action.code, buttonState);
+						return GetInputDigital (action.code, buttonState,Device);
 
 				}
 
@@ -884,7 +884,7 @@ namespace ws.winx.input
 						if (device != null) {
 								if ((_code = device.GetInputCode ()) != 0) {
 										Debug.Log ("Get Input Just from set device" + device.Index + " " + InputCode.toEnumString (_code) + " frame: " + Time.frameCount);
-										return processInputCode (_code, time);
+										return processInputCode (_code, time,device);
 								}
 
 							
@@ -898,7 +898,7 @@ namespace ws.winx.input
 
 										if ((_code = deviceAvailable.GetInputCode ()) != 0) {
 												Debug.Log ("Get Input Joy" + deviceAvailable.Index + " " + InputCode.toEnumString (_code) + " frame: " + Time.frameCount);
-												return processInputCode (_code, time);
+												return processInputCode (_code, time,device);
 										}
 								}
 						} 
@@ -914,7 +914,7 @@ namespace ws.winx.input
 
             
 
-						return processInputCode (_code, time);
+						return processInputCode (_code, time,device);
 				}
 
        
@@ -924,11 +924,11 @@ namespace ws.winx.input
 				/// </summary>
 				/// <returns>true/false</returns>
 				/// <param name="action">InputAction to be compared with input</param>
-				internal static bool GetAction (InputAction action)
+				internal static bool GetAction (InputAction action,IDevice device)
 				{
 
 						if (action.type == InputActionType.SINGLE) {
-								if (InputEx.GetInputDigital (action, ButtonState.Down)) {
+								if (InputEx.GetInputDigital (action, ButtonState.Down,device)) {
 										Debug.Log ("Single <" + InputActionType.SINGLE);
 										//action.startTime = Time.time;
 										_lastCode = action.code;
@@ -940,7 +940,7 @@ namespace ws.winx.input
 
 
 						if (action.type == InputActionType.DOUBLE) {
-								if (InputEx.GetInputDigital (action, ButtonState.Down)) {
+								if (InputEx.GetInputDigital (action, ButtonState.Down,device)) {
 										if (_lastCode != action.code) {//first click
 
 												_lastCode = action.code;
@@ -967,7 +967,7 @@ namespace ws.winx.input
 
 
 						if (action.type == InputActionType.LONG) {
-								if (InputEx.GetInputDigital (action, ButtonState.Hold)) {//if hold
+								if (InputEx.GetInputDigital (action, ButtonState.Hold,device)) {//if hold
 										if (_lastCode != action.code) {
 
 												_lastCode = action.code;
@@ -1058,7 +1058,7 @@ namespace ws.winx.input
 				/// <returns>InputAction (single,double,long) or null.</returns>
 				/// <param name="code">Code.</param>
 				/// <param name="time">Time.</param>
-				internal static InputAction processInputCode (int code, float time)
+				internal static InputAction processInputCode (int code, float time,IDevice device)
 				{
 
 
@@ -1109,7 +1109,7 @@ namespace ws.winx.input
 
 								if (_lastCode != 0) {//=KeyCode.None
 										//if key is still down and time longer then default long time click => display long click
-										if (InputEx.GetInputHold (_lastCode) || (!Application.isPlaying && InputEx.GetKeyDown (_lastCode))) {
+										if (InputEx.GetInputHold (_lastCode,device) || (!Application.isPlaying && InputEx.GetKeyDown (_lastCode))) {
 												if (time - _lastCodeTime >= InputAction.LONG_CLICK_SENSITIVITY) {
 														action = new InputAction (_lastCode, InputActionType.LONG);
 														_lastCode = 0;//KeyCode.None;

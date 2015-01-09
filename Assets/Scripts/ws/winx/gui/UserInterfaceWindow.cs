@@ -126,6 +126,8 @@ namespace ws.winx.gui
 												//remove ord
 												_action.code=InputCode.toCodeAnyDevice (_action.code);
 
+                                                _action.codeString = InputCode.toProfiled(_playerSelected.Device, _action);
+
 												toInputCombination (_stateInputCombinations [_selectedStateHash].combinations [_isPrimary], _action);
 										}
 
