@@ -37,7 +37,7 @@ namespace ws.winx.editor
 				protected TextAsset _lastSettingsXML;
 				protected static int _selectedStateHash = 0;
 				protected static int _deleteStateWithHash = 0;
-				protected bool _isDeviceAny = true;
+				
 				protected bool _isDeviceAxisPositionFull;
 				protected bool _isComplexActionTypesAllowed;
 				protected string _warrningAddStateLabel;
@@ -884,7 +884,7 @@ namespace ws.winx.editor
 
 								//////////  ANY/Complex Action Types(doubles,long...)  /FULL AXIS Checkers ///////
 								EditorGUILayout.BeginHorizontal ();
-								_isDeviceAny = GUILayout.Toggle (_isDeviceAny, "Any(Uncheck 4Testing Only");
+							//	_isDeviceAny = GUILayout.Toggle (_isDeviceAny, "Any(Uncheck 4Testing Only");
 								_isComplexActionTypesAllowed = GUILayout.Toggle (_isComplexActionTypesAllowed, "Allow DOUBLE/LONG(HOLD)");
 								_isDeviceAxisPositionFull = GUILayout.Toggle (_isDeviceAxisPositionFull, "Full Axis");
 								EditorGUILayout.EndHorizontal ();
