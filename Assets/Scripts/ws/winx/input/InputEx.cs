@@ -328,7 +328,8 @@ namespace ws.winx.input
 			KeyCode.LeftWindows,
 			KeyCode.RightCommand,
 			KeyCode.RightApple,
-			KeyCode.RightWindows
+			KeyCode.RightWindows,
+			KeyCode.Space
 		};
 				private static float _lastCodeTime;
 				private static volatile InputEx instance;
@@ -465,46 +466,56 @@ namespace ws.winx.input
 				/// </summary>
 				/// <returns>The axis.</returns>
 				/// <param name="action">Action.</param>
-				public static float GetInput (InputAction action)
+				public static float GetInputAnalog (InputAction action)
 				{
 						int code = action.code;
 
+						if (_currentPlayer == null)
+							return 0f;
+						
 						lock (syncRoot) {
-								if (action.fromAny) {//first device that have value not equal 0 or return 0
+							
+							
+							if (_currentPlayer.Device!=null) {
+								
+								
+								return _currentPlayer.Device.GetInputAnalog (code);
+								
+								
+								
+							} else {
+								float axisValue=0f;
+
+									foreach (IDevice device in Devices)
+										if((axisValue=device.GetInputAnalog (code))!=0f)
+										return axisValue;
 										
-										float axisValue;
-
-										foreach (IDevice device in Devices)
-												if ((axisValue = device.GetInput (code)) != 0)
-														return axisValue;
-
-										return 0;
-
-								} else {
-										int index = InputCode.toDeviceInx (code);
-										if (Devices.ContainsIndex (index))
-												return Devices.GetDeviceAt (index).GetInput (code);
-										else
-												return 0;
-								}
+								
+									return 0f;		
+					
+							}
+							
 						}
-				}
 
 
 
-
-    
-
-
-				/// <summary>
-				/// Gets the key.
-				/// </summary>
+		}
+		
+		
+		
+		
+		
+		
+		
+		/// <summary>
+		/// Gets the key.
+		/// </summary>
 				/// <returns><c>true</c>, if key was gotten, <c>false</c> otherwise.</returns>
 				/// <param name="action">Action.</param>
 				internal static bool GetInputHold (InputAction action)
 				{
-						return GetInputBase (InputEx.IGetKey, action, ButtonState.Hold);
-
+						return GetInputDigital (action, ButtonState.Hold);
+			
 				}
 
 
@@ -516,7 +527,7 @@ namespace ws.winx.input
 				/// <param name="code">Code.</param>
 				internal static bool GetInputHold (int code)
 				{
-						return GetInputBase (InputEx.IGetKey, code, ButtonState.Hold);
+					return GetInputDigital (code, ButtonState.Hold);
 			
 				}
 
@@ -529,7 +540,7 @@ namespace ws.winx.input
 				/// <param name="action">Action.</param>
 				internal static bool GetInputUp (InputAction action)
 				{
-						return GetInputBase (InputEx.IGetKeyUp, action, ButtonState.Up);
+					return GetInputDigital (action, ButtonState.Up);
 				}
 
 
@@ -540,14 +551,18 @@ namespace ws.winx.input
 				/// <param name="action">Action.</param>
 				public static bool GetInputDown (InputAction action)
 				{
-						return GetInputBase (InputEx.IGetKeyDown, action, ButtonState.Down);
+					return GetInputDigital ( action, ButtonState.Down);
 				}
 
-				public static bool GetInputBase (KeyCodeInputResolverCallback keycodeInputHandlerCallback, int code, ButtonState buttonState, bool fromAny=false)
+				public static bool GetInputDigital (int code, ButtonState buttonState)
 				{
 
 						if (code < InputCode.MAX_KEY_CODE) {
-								return keycodeInputHandlerCallback ((KeyCode)code);
+								if(buttonState==ButtonState.Down) return InputEx.IGetKeyDown((KeyCode)code);
+								if(buttonState==ButtonState.Up) return InputEx.IGetKeyUp((KeyCode)code);
+								if(buttonState==ButtonState.Hold) return InputEx.IGetKey((KeyCode)code);
+								return false;
+				                                                            
 						} else {
 					
 								if (_currentPlayer == null)
@@ -559,46 +574,29 @@ namespace ws.winx.input
 										if (_currentPlayer.Device!=null) {
 
 
-												return _currentPlayer.Device.GetInputBase (code, buttonState);
+												return _currentPlayer.Device.GetInputDigital (code, buttonState);
 
 
 											
 										} else {
 											
 												foreach (IDevice device in Devices)
-														if (device.GetInputBase (code, buttonState))
+														if (device.GetInputDigital (code, buttonState))
 																return true;
 						
 												return false;						
 						
 										}
-										//										if (fromAny) {
-										//											
-										//												foreach (IDevice device in Devices)
-//														if (device.GetInputBase (code, buttonState))
-//																return true;
-//							
-//												return false;
-//							
-//										} else {
-//												int index = InputCode.toDeviceInx (code);
-//												if (Devices.ContainsIndex (index))
-//								
-//														return Devices.GetDeviceAt (index).GetInputBase (code, buttonState);
-//												else
-//														return false;
-//							
-//							
-//										}
+
 								}
 						}
 
 				}
 
-				private static bool GetInputBase (KeyCodeInputResolverCallback keycodeInputHandlerCallback, InputAction action, ButtonState buttonState)
+				private static bool GetInputDigital (InputAction action, ButtonState buttonState)
 				{
 
-						return GetInputBase (keycodeInputHandlerCallback, action.code, buttonState, action.fromAny);
+						return GetInputDigital (action.code, buttonState);
 
 				}
 
@@ -930,7 +928,7 @@ namespace ws.winx.input
 				{
 
 						if (action.type == InputActionType.SINGLE) {
-								if (InputEx.GetInputBase (Input.GetKeyDown, action, ButtonState.Down)) {
+								if (InputEx.GetInputDigital (action, ButtonState.Down)) {
 										Debug.Log ("Single <" + InputActionType.SINGLE);
 										//action.startTime = Time.time;
 										_lastCode = action.code;
@@ -942,7 +940,7 @@ namespace ws.winx.input
 
 
 						if (action.type == InputActionType.DOUBLE) {
-								if (InputEx.GetInputBase (Input.GetKeyDown, action, ButtonState.Down)) {
+								if (InputEx.GetInputDigital (action, ButtonState.Down)) {
 										if (_lastCode != action.code) {//first click
 
 												_lastCode = action.code;
@@ -969,7 +967,7 @@ namespace ws.winx.input
 
 
 						if (action.type == InputActionType.LONG) {
-								if (InputEx.GetInputBase (Input.GetKey, action, ButtonState.Hold)) {//if hold
+								if (InputEx.GetInputDigital (action, ButtonState.Hold)) {//if hold
 										if (_lastCode != action.code) {
 
 												_lastCode = action.code;

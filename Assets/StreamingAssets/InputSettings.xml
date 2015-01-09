@@ -21,13 +21,98 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>JoystickButton16</d1p1:Code>
+                        <d1p1:Code>JoystickButton18</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
                   <d1p1:InputCombination i:nil="true" />
                 </d1p1:InputCombinations>
                 <d1p1:Name>Wave</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-2035216068</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-2035216068</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisYNegative</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>WalkForward</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>2035415549</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>2035415549</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisYPositive</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>WalkBackward</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-1847120011</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-1847120011</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisXNegative</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>TurnLeft</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-685270779</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-685270779</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisXPositive</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>TurnRight</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>125937960</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>125937960</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisVPositive</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>Jump</d1p1:Name>
               </d4p1:Value>
             </d4p1:KeyValueOfintInputState>
           </d4p1:Value>
@@ -47,9 +132,130 @@
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
-                  <d1p1:InputCombination i:nil="true" />
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickButton0</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
                 </d1p1:InputCombinations>
                 <d1p1:Name>Wave</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-2035216068</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-2035216068</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>W</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisPovYForward</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                </d1p1:InputCombinations>
+                <d1p1:Name>WalkForward</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>2035415549</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>2035415549</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>S</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisPovYBackward</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                </d1p1:InputCombinations>
+                <d1p1:Name>WalkBackward</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-1847120011</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-1847120011</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>A</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisPovXLeft</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                </d1p1:InputCombinations>
+                <d1p1:Name>TurnLeft</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-685270779</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-685270779</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>D</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisPovXRight</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                </d1p1:InputCombinations>
+                <d1p1:Name>TurnRight</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>125937960</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>125937960</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>Space</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickButton1</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                </d1p1:InputCombinations>
+                <d1p1:Name>Jump</d1p1:Name>
               </d4p1:Value>
             </d4p1:KeyValueOfintInputState>
           </d4p1:Value>
@@ -72,6 +278,91 @@
                   <d1p1:InputCombination i:nil="true" />
                 </d1p1:InputCombinations>
                 <d1p1:Name>Wave</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-2035216068</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-2035216068</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisPovYForward</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>WalkForward</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>2035415549</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>2035415549</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisPovYBackward</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>WalkBackward</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-1847120011</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-1847120011</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisPovXLeft</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>TurnLeft</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-685270779</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-685270779</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisPovXRight</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>TurnRight</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>125937960</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>125937960</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickButton1</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>Jump</d1p1:Name>
               </d4p1:Value>
             </d4p1:KeyValueOfintInputState>
           </d4p1:Value>
@@ -102,6 +393,91 @@
                 <d1p1:Name>Wave</d1p1:Name>
               </d4p1:Value>
             </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-2035216068</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-2035216068</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisYNegative</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>WalkForward</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>2035415549</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>2035415549</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisYPositive</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>WalkBackward</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-1847120011</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-1847120011</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisXNegative</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>TurnLeft</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-685270779</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-685270779</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisXPositive</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>TurnRight</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>125937960</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>125937960</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisVPositive</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>Jump</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
           </d4p1:Value>
         </d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
         <d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
@@ -115,6 +491,98 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
+                        <d1p1:Code>P</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickButton0</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                </d1p1:InputCombinations>
+                <d1p1:Name>Wave</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-2035216068</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-2035216068</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>I</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisPovYForward</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                </d1p1:InputCombinations>
+                <d1p1:Name>WalkForward</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>2035415549</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>2035415549</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>K</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisPovYBackward</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                </d1p1:InputCombinations>
+                <d1p1:Name>WalkBackward</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-1847120011</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-1847120011</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>J</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisPovXLeft</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                </d1p1:InputCombinations>
+                <d1p1:Name>TurnLeft</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-685270779</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-685270779</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
                         <d1p1:Code>L</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
@@ -122,12 +590,35 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>Mouse0</d1p1:Code>
+                        <d1p1:Code>JoystickAxisPovXRight</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
                 </d1p1:InputCombinations>
-                <d1p1:Name>Wave</d1p1:Name>
+                <d1p1:Name>TurnRight</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>125937960</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>125937960</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>Space</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickButton1</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                </d1p1:InputCombinations>
+                <d1p1:Name>Jump</d1p1:Name>
               </d4p1:Value>
             </d4p1:KeyValueOfintInputState>
           </d4p1:Value>
@@ -143,13 +634,98 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>JoystickButton2</d1p1:Code>
+                        <d1p1:Code>JoystickButton3</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
                   <d1p1:InputCombination i:nil="true" />
                 </d1p1:InputCombinations>
                 <d1p1:Name>Wave</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-2035216068</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-2035216068</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisPovYForward</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>WalkForward</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>2035415549</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>2035415549</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisPovYBackward</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>WalkBackward</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-1847120011</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-1847120011</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisPovXLeft</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>TurnLeft</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-685270779</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-685270779</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisPovXRight</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>TurnRight</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>125937960</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>125937960</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickButton1</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>Jump</d1p1:Name>
               </d4p1:Value>
             </d4p1:KeyValueOfintInputState>
           </d4p1:Value>

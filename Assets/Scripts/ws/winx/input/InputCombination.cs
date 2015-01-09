@@ -364,7 +364,7 @@ namespace ws.winx.input
 							return 0f;
 						} else {
 			
-							return InputEx.GetInput (__currentInputAction);
+							return InputEx.GetInputAnalog (__currentInputAction);
 		
 						}
 
@@ -406,7 +406,7 @@ namespace ws.winx.input
 										return 0f;
 								} else {
 								
-										return Math.Abs (InputEx.GetInput (__currentInputAction));
+										return Math.Abs (InputEx.GetInputAnalog (__currentInputAction));
 								}
 
 
@@ -436,7 +436,7 @@ namespace ws.winx.input
 								_analogValue = Mathf.Lerp (0, 1, Mathf.Clamp01 (_timeDelta));
 
 
-								//Debug.Log("hold");
+								//Debug.Log("hold"+_analogValue);
 
 
 						} else { //on KeyUp reset _timeDelta

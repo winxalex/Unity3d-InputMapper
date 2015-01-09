@@ -37,8 +37,8 @@ namespace ws.winx.devices
 
 		
 		int GetInputCode();
-		bool GetInputBase(int code,ButtonState buttonState);
-		float GetInput (int code);
+		bool GetInputDigital(int code,ButtonState buttonState);
+		float GetInputAnalog (int code);
 		bool GetAnyInputDown();
     }
 
