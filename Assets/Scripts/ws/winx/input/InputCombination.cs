@@ -310,7 +310,7 @@ namespace ws.winx.input
 						//TODO check current type and time waiting for type of
 
 						// time passed while waiting for double/long action to happen => don't reset we aren't idle
-						if (Time.time > __currentInputAction.startTime + InputAction.COMBINATION_CLICK_SENSITIVITY && InputEx.LastCode == __currentInputAction.code) {// or waiting for double/long action to happen => don't reset we aren't idle
+						if (Time.time > __currentInputAction.startTime + InputAction.COMBINATION_CLICK_SENSITIVITY && InputEx.LastCode == __currentInputAction.getCode(device)) {// or waiting for double/long action to happen => don't reset we aren't idle
 
 								//UnityEngine.Debug.Log ("Reset in cos time waiting for double/long passed" + Time.time + " Time Allowed:" + (_pointer.Current.startTime + InputAction.COMBINATION_CLICK_SENSITIVITY));
 
@@ -329,7 +329,7 @@ namespace ws.winx.input
 
                
 						//key happend that isn't expected inbetween combination sequence
-						if (InputEx.anyKeyDown && InputEx.LastCode != __currentInputAction.code && __actionHappenTime > 0) {
+						if (InputEx.anyKeyDown && InputEx.LastCode != __currentInputAction.getCode(device) && __actionHappenTime > 0) {
 								// UnityEngine.Debug.Log("Last Code:"+InputEx.LastCode+" current"+_pointer.Current.codeString);
 								//  UnityEngine.Debug.Log("Reset cos some other key is pressed" + InputEx.anyKeyDown + " Unity anykey:" + Input.anyKeyDown);
 
@@ -357,7 +357,7 @@ namespace ws.winx.input
 				internal float GetAnalogValue (IDevice device,float sensitivity, float dreadzone, float gravity)
 				{
 						//if key,mouse, joy button
-						if (__currentInputAction.code < InputCode.MAX_KEY_CODE || InputCode.toAxis (__currentInputAction.code) == JoystickAxis.None) {
+						if (__currentInputAction.getCode(device) < InputCode.MAX_KEY_CODE || InputCode.toAxis (__currentInputAction.getCode(device)) == JoystickAxis.None) {
 							if(InputEx.GetInputHold(__currentInputAction,device) || InputEx.GetInputDown(__currentInputAction,device))
 							return 2f * (GetGenericAnalogValue (device,sensitivity, dreadzone, gravity) -0.5f);
 							else
@@ -388,17 +388,17 @@ namespace ws.winx.input
 						JoystickAxis axis;
 
 						//if key,mouse 
-						if (__currentInputAction.code < InputCode.MAX_KEY_CODE) {
+						if (__currentInputAction.getCode(device) < InputCode.MAX_KEY_CODE) {
 								return GetGenericAnalogValue (device,sensitivity, dreadzone, gravity);
 
 						} else 
 						//or button
-						if ((axis = InputCode.toAxis (__currentInputAction.code)) == JoystickAxis.None) {
+						if ((axis = InputCode.toAxis (__currentInputAction.getCode(device))) == JoystickAxis.None) {
 										return GetGenericAnalogValue (device,sensitivity, dreadzone, gravity);
 						
 						} else {
 
-								int data = InputCode.toData (__currentInputAction.code);
+								int data = InputCode.toData (__currentInputAction.getCode(device));
 								if (axis != JoystickAxis.AxisPovX && axis != JoystickAxis.AxisPovY && ((JoystickPosition)data) == JoystickPosition.Full) {
 										//full Axis => normalize in range 0 to 1
 

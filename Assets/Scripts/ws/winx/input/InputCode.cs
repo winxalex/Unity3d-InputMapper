@@ -1022,7 +1022,7 @@ namespace ws.winx.input
 
 		
 
-						int code = action.code;
+						int code = action.getCode(device);
 
                         if (code < InputCode.MAX_KEY_CODE || device == null)
                             return action.ToString();
@@ -1040,7 +1040,7 @@ namespace ws.winx.input
 					
 										//previous mapping might be to device with less or more buttons
 										//at same device index
-					
+					                    //device.profile.buttonNaming
 										if (device.Buttons.Count > data && !String.IsNullOrEmpty ((details = device.Buttons [data]).name)) {
 
 												
@@ -1312,7 +1312,85 @@ namespace ws.winx.input
 
 
 				}
-		                          
-		}
+
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="code"><example>Left Stick XPositive,DPAD_Left,X,A,B</example></param>
+            /// <param name="profile"></param>
+            /// <returns></returns>
+                internal static int toCode(string code, DeviceProfile profile)
+                {
+
+                    int inx;
+
+                    inx = Array.IndexOf(profile.buttonNaming, code);
+
+                    var positions =(JoystickPosition[]) Enum.GetValues(typeof(JoystickPosition));
+                
+
+                    foreach (var position in positions)
+                    {
+
+                        if (code.Contains(position.ToString()))
+                        {
+                            code = code.Replace(position.ToString(), "");
+                            inx = Array.IndexOf(profile.axisNaming, code);
+
+                            if (inx < 0) Debug.LogError("Wrong profile naming " + code + " in profile " + profile.Name);
+
+                            return InputCode.toCode(Joysticks.Joystick, (JoystickAxis)inx, position);
+                        }
+
+
+
+                    }
+
+
+                    var povPositions = (JoystickPovPosition[])Enum.GetValues(typeof(JoystickPovPosition));
+
+                    foreach (var position in povPositions)
+                    {
+
+                        if (code.Contains(position.ToString()))
+                        {
+                            //check if the pov is represented as buttons or "Left Bumper" contains Left
+                            inx = Array.IndexOf(profile.buttonNaming, code);
+
+                            if(inx>-1)
+                                return InputCode.toCode(Joysticks.Joystick, JoystickAxis.None, inx);
+
+                            //Left Trigger
+                            //inx = Array.IndexOf(profile.axisNaming, code);
+                            //if (inx > -1)
+                            //    return InputCode.toCode(Joysticks.Joystick, JoystickAxis.None, inx);
+
+                            if (position == JoystickPovPosition.Backward || position == JoystickPovPosition.Forward)
+                                return InputCode.toCode(Joysticks.Joystick, JoystickAxis.AxisPovY, position);
+
+                            if (position == JoystickPovPosition.Left || position == JoystickPovPosition.Right)
+                                return InputCode.toCode(Joysticks.Joystick, JoystickAxis.AxisPovX, position);
+
+                            if (inx < 0) Debug.LogError("Wrong profile naming "+code+" in profile " + profile.Name);
+
+                           
+                        }
+
+
+
+                    }
+
+
+                    //check any other button
+                    inx = Array.IndexOf(profile.buttonNaming, code);
+
+                    if (inx < 0) Debug.LogError("Wrong profile naming " + code + " in profile " + profile.Name);
+
+                    return InputCode.toCode(Joysticks.Joystick, JoystickAxis.None, inx);
+
+                  
+                }
+        }
 }
 

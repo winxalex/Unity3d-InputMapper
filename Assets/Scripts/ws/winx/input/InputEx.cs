@@ -466,9 +466,9 @@ namespace ws.winx.input
 				/// </summary>
 				/// <returns>The axis.</returns>
 				/// <param name="action">Action.</param>
-				public static float GetInputAnalog (InputAction action,IDevice Device)
+				public static float GetInputAnalog (InputAction action,IDevice device)
 				{
-						int code = action.code;
+						int code = action.getCode(device);
                        // action.getCode(_currentPlayer._Device.profile);
 
 
@@ -477,18 +477,18 @@ namespace ws.winx.input
 						lock (syncRoot) {
 							
 							
-							if (Device!=null) {
+							if (device!=null) {
 								
 								
-								return Device.GetInputAnalog (code);
+								return device.GetInputAnalog (code);
 								
 								
 								
 							} else {
 								float axisValue=0f;
 
-									foreach (IDevice device in Devices)
-										if((axisValue=device.GetInputAnalog (code))!=0f)
+									foreach (IDevice dev in Devices)
+										if((axisValue=dev.GetInputAnalog (code))!=0f)
 										return axisValue;
 										
 								
@@ -593,10 +593,10 @@ namespace ws.winx.input
 
 				}
 
-				private static bool GetInputDigital (InputAction action, ButtonState buttonState,IDevice Device)
+				private static bool GetInputDigital (InputAction action, ButtonState buttonState,IDevice device)
 				{
 
-						return GetInputDigital (action.code, buttonState,Device);
+						return GetInputDigital (action.getCode(device), buttonState,device);
 
 				}
 
@@ -931,7 +931,7 @@ namespace ws.winx.input
 								if (InputEx.GetInputDigital (action, ButtonState.Down,device)) {
 										Debug.Log ("Single <" + InputActionType.SINGLE);
 										//action.startTime = Time.time;
-										_lastCode = action.code;
+										_lastCode = action.getCode(device);
 										return true;
 								}
 
@@ -941,9 +941,9 @@ namespace ws.winx.input
 
 						if (action.type == InputActionType.DOUBLE) {
 								if (InputEx.GetInputDigital (action, ButtonState.Down,device)) {
-										if (_lastCode != action.code) {//first click
+										if (_lastCode != action.getCode(device)) {//first click
 
-												_lastCode = action.code;
+												_lastCode = action.getCode(device);
 												action.startTime = Time.time;
 												Debug.Log ("First Click" + Time.time + ":" + action.startTime + " going for " + InputActionType.DOUBLE);
 												return false;
@@ -968,14 +968,14 @@ namespace ws.winx.input
 
 						if (action.type == InputActionType.LONG) {
 								if (InputEx.GetInputDigital (action, ButtonState.Hold,device)) {//if hold
-										if (_lastCode != action.code) {
+										if (_lastCode != action.getCode(device)) {
 
-												_lastCode = action.code;
+												_lastCode = action.getCode(device);
 
 												action.startTime = Time.time;
 
 												return false;
-										} else {//InputEx.LastCode==_pointer.Current.code //hold
+										} else {//InputEx.LastCode==_pointer.Current.getCode(device) //hold
 												//check time diffrence if less then
 												if (Time.time - action.startTime >= InputAction.LONG_CLICK_SENSITIVITY) {
 
@@ -1080,7 +1080,7 @@ namespace ws.winx.input
 										//if new pressed key is different then the last
 										if (_lastCode != code) {
 												//consturct string from lastCode
-												action = new InputAction (_lastCode, InputActionType.SINGLE);
+												action = new InputAction (_lastCode, InputActionType.SINGLE,device);
 
 												//take new pressed code as lastCode
 												_lastCode = code;
@@ -1093,7 +1093,7 @@ namespace ws.winx.input
 
 
 												if (time - _lastCodeTime < InputAction.DOUBLE_CLICK_SENSITIVITY) {
-														action = new InputAction (_lastCode, InputActionType.DOUBLE);
+														action = new InputAction (_lastCode, InputActionType.DOUBLE,device);
 														_lastCode = 0;//KeyCode.None;
 														Debug.Log ("Double " + time + ":" + _lastCodeTime + "<" + InputActionType.DOUBLE);
 												}
@@ -1117,7 +1117,7 @@ namespace ws.winx.input
 												}
 										} else {//time wating for double click activity passed => display last code
 												if (time - _lastCodeTime >= InputAction.DOUBLE_CLICK_SENSITIVITY) {
-														action = new InputAction (_lastCode, InputActionType.SINGLE);
+														action = new InputAction (_lastCode, InputActionType.SINGLE,device);
 														_lastCode = 0;//KeyCode.None;
 
 														Debug.Log ("Single after wating Double time pass " + (time - _lastCodeTime) + " " + InputActionType.SINGLE);

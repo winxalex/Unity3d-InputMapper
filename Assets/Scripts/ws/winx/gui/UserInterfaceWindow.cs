@@ -112,28 +112,29 @@ namespace ws.winx.gui
 									_action = InputManager.GetAction (_playerSelected.Device);
 
 									
+                           // _action.getCode(_playerSelected.Device.profile)
 
 
+                                    if (_action != null && (_action.getCode(_playerSelected.Device) ^ (int)KeyCode.Escape) != 0 && (_action.getCode(_playerSelected.Device) ^ (int)KeyCode.Return) != 0)
+                                    {
 
-								if (_action != null && (_action.code ^ (int)KeyCode.Escape) != 0 && (_action.code ^ (int)KeyCode.Return) != 0) {
 
-
-										if ((_action.code ^ (int)KeyCode.Backspace) == 0) {
+										if ((_action.getCode(_playerSelected.Device) ^ (int)KeyCode.Backspace) == 0) {
 												_stateInputCombinations [_selectedStateHash].combinations [_isPrimary].Clear ();
 												_stateInputCombinations [_selectedStateHash].combinations [_isPrimary].Add (new InputAction (KeyCode.None));
 										} else {
 
 												//remove ord
-												_action.code=InputCode.toCodeAnyDevice (_action.code);
+												//_action.getCode(_playerSelected.Device)=InputCode.toCodeAnyDevice (_action.getCode(_playerSelected.Device));
 
-                                                _action.codeString = InputCode.toProfiled(_playerSelected.Device, _action);
+                                               // _action.codeString = InputCode.toProfiled(_playerSelected.Device, _action);
 
 												toInputCombination (_stateInputCombinations [_selectedStateHash].combinations [_isPrimary], _action);
 										}
 
 
 
-										// Debug.Log("Action:" + _action + " " + _action.code);
+										// Debug.Log("Action:" + _action + " " + _action.getCode(_playerSelected.Device));
 								}
 
 
@@ -236,7 +237,7 @@ namespace ws.winx.gui
 				void toInputCombination (InputCombination combos, InputAction input)
 				{
 
-						if (combos.numActions + 1 > maxCombosNum || (combos.numActions == 1 && combos.GetActionAt (0).code == 0))
+						if (combos.numActions + 1 > maxCombosNum || (combos.numActions == 1 && combos.GetActionAt (0).getCode(_playerSelected.Device) == 0))
 								combos.Clear ();
 
 						combos.Add (input);
@@ -496,16 +497,16 @@ namespace ws.winx.gui
 						if (_selectedStateHash != hash) {
 
 
-								if (GUILayout.Button (InputCode.toProfiled (_playerSelected.Device, combinations [0]), _inputButtonStyle)) {
-										// if (GUILayout.Button(combinations[0].combinationString, _inputButtonStyle))
+								//if (GUILayout.Button (InputCode.toProfiled (_playerSelected.Device, combinations [0]), _inputButtonStyle)) {
+										 if (GUILayout.Button(combinations[0].combinationString, _inputButtonStyle)){
 										_selectedStateHash = hash;
 										_previousStateInput = null;
 										_isPrimary = 0;
 								}
 
 								if (combinations.Length > 1 && combinations [1] != null)
-								if (GUILayout.Button (InputCode.toProfiled (_playerSelected.Device, combinations [1]), _inputButtonStyle)) {
-										//if (GUILayout.Button(combinations[1].combinationString, _inputButtonStyle))
+								//if (GUILayout.Button (InputCode.toProfiled (_playerSelected.Device, combinations [1]), _inputButtonStyle)) {
+										if (GUILayout.Button(combinations[1].combinationString, _inputButtonStyle)){
 										_selectedStateHash = hash;
 										_previousStateInput = null;
 										_isPrimary = 1;
@@ -518,8 +519,8 @@ namespace ws.winx.gui
 
 
 
-								currentCombinationString = InputCode.toProfiled (_playerSelected.Device, combinations [_isPrimary]);
-								//currentCombinationString = combinations[_isPrimary].combinationString;
+								//currentCombinationString = InputCode.toProfiled (_playerSelected.Device, combinations [_isPrimary]);
+								currentCombinationString = combinations[_isPrimary].combinationString;
 
 								if (_previousStateInput == null) {
 										_previousStateInput = combinations [_isPrimary].Clone ();

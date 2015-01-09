@@ -55,7 +55,7 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>JoystickAxisYPositive</d1p1:Code>
+                        <d1p1:Code>Left TriggerNegative(x2)</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
@@ -72,7 +72,7 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>JoystickAxisXNegative</d1p1:Code>
+                        <d1p1:Code>DPAD_Backward(-)</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
@@ -89,7 +89,7 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>JoystickAxisXPositive</d1p1:Code>
+                        <d1p1:Code>Right Stick XPositive</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>

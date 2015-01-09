@@ -12,6 +12,8 @@ namespace ws.winx.utils
             return listToClone.Select(item => (T)item.Clone()).ToList();
         }
 
+   
+
 
 		public static void Resize<T>(this List<T> list, int sz, T c)
 		{
