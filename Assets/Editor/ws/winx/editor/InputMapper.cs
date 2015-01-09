@@ -424,7 +424,7 @@ namespace ws.winx.editor
 
 												InputCombination combos = HashStateInput.Value.combinations [0];
 							
-												if (combos != null && combos.GetActionAt (0).getCode(_deviceByProfile) == (int)KeyCode.None) {
+												if (combos != null && combos.GetActionAt (0).codeString == "None") {
 														combos.Clear ();
 												
 														inputStatesToBeRemoved.Add (HashStateInput.Key);
@@ -433,7 +433,7 @@ namespace ws.winx.editor
 							
 												combos = HashStateInput.Value.combinations [1];
 							
-												if (combos != null && combos.GetActionAt (0).getCode(_deviceByProfile) == (int)KeyCode.None) {
+												if (combos != null && combos.GetActionAt (0).codeString == "None") {
 														combos.Clear ();
 														HashStateInput.Value.combinations [1] = null;
 								
@@ -1174,7 +1174,7 @@ namespace ws.winx.editor
 										if (combinations [0] == null)
 												combinations [0] = new InputCombination ("None");
 
-												if (GUILayout.Button (InputCode.toProfiled (_deviceByProfile,combinations [0]))) {
+												if (GUILayout.Button (combinations [0].combinationString)) {
 												_selectedStateHash = hash;
 												_previousStateInput = null;
 												_isPrimary = 0;
@@ -1184,7 +1184,7 @@ namespace ws.winx.editor
 										if (combinations [1] == null)
 												combinations [1] = new InputCombination ("None");
 
-										if (GUILayout.Button (InputCode.toProfiled (_deviceByProfile,combinations [1]))) {
+										if (GUILayout.Button (combinations [1].combinationString)) {
 												_selectedStateHash = hash;
 												_previousStateInput = null;
 												_isPrimary = 1;
@@ -1236,7 +1236,7 @@ namespace ws.winx.editor
 										combinations = InputMapper._stateInputCombinations [hash].combinations;
 			
 
-										currentCombinationString = InputCode.toProfiled(_deviceByProfile,combinations [_isPrimary]);
+										currentCombinationString =combinations[_isPrimary].combinationString;
 
 										if (_previousStateInput == null) {
 												_previousStateInput = combinations [_isPrimary].Clone ();

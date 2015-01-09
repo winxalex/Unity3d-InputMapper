@@ -112,7 +112,7 @@ namespace ws.winx.gui
 									_action = InputManager.GetAction (_playerSelected.Device);
 
 									
-                           // _action.getCode(_playerSelected.Device.profile)
+                          
 
 
                                     if (_action != null && (_action.getCode(_playerSelected.Device) ^ (int)KeyCode.Escape) != 0 && (_action.getCode(_playerSelected.Device) ^ (int)KeyCode.Return) != 0)

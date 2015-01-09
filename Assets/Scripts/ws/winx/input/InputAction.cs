@@ -115,14 +115,32 @@ namespace ws.winx.input
                 code = InputCode.toCode((KeyCode)code);
 
             }
-        
 
-				//if(InputCode.toDeviceInx(code)==(int)Joysticks.Joystick) _fromAny=true;
-            _codeString = InputCode.toProfiled(device, this);
 
-			//Debug.Log("From Any:"+_fromAny);
-			__defaultCode=_code=code;
-			__defaultType=_type=type;
+            __defaultCode = _code = code;
+
+            __defaultType = _type = type;
+
+            //if(InputCode.toDeviceInx(_code)==(int)Joysticks.Joystick) _fromAny=true;
+            //Debug.Log("From Any:"+_fromAny);
+
+
+
+            if (device != null)
+                _codeString = InputCode.toProfiled(code, device);
+            else
+                _codeString = InputCode.toEnumString(code);
+
+            //if(_codeString.IndexOf("Joy")>-1) throw new Exception("Use JoystickDevice.toCode function for Joystick inputs");
+
+            if ((_isMouse = _codeString.IndexOf("Mou") > -1))
+            {
+
+                _isKey = true;
+            }
+
+            if (_type != InputActionType.SINGLE)
+                _codeString += _type.ToDesignatorString();
 
 		}
 	      
@@ -132,30 +150,11 @@ namespace ws.winx.input
 		/// </summary>
 		/// <param name="code">Code.</param>
 		/// <param name="type">Type.</param>
-		public InputAction(KeyCode code,InputActionType type=InputActionType.SINGLE,IDevice device=null){
+		public InputAction(KeyCode code,InputActionType type=InputActionType.SINGLE,IDevice device=null):this((int)code,type,device)
+        {
 		
 
-			__defaultCode=_code=InputCode.toCode(code);
-
-			__defaultType=_type=type;
-
-            //if(InputCode.toDeviceInx(_code)==(int)Joysticks.Joystick) _fromAny=true;
-            //Debug.Log("From Any:"+_fromAny);
-
-
-
-
-            _codeString = InputCode.toProfiled(device, this);
-
-			//if(_codeString.IndexOf("Joy")>-1) throw new Exception("Use JoystickDevice.toCode function for Joystick inputs");
-
-			if((_isMouse=_codeString.IndexOf("Mou")>-1)){
-				
-				_isKey=true;
-			}
-				
-			if(_type!=InputActionType.SINGLE)
-					_codeString+=_type.ToDesignatorString();
+		        
 
 
 
@@ -168,7 +167,7 @@ namespace ws.winx.input
 		/// <param name="code">Code in format like "Mouse1+Joystick12AxisXPositive(x2)+B(-)"</param>
 		public InputAction(String code,IDevice device=null){
 			_codeString=code;
-			parse(code,device);
+			//parse(code,device);
 //			Debug.Log("From Any:"+_fromAny);
 		}
 
@@ -247,17 +246,7 @@ namespace ws.winx.input
 
                 _code = InputCode.toCode(code, device.profile);
 
-              
-
-
-
-
-                    
-
-
-
-
-
+      
             }
             else//default parsing 
             {
@@ -279,7 +268,7 @@ namespace ws.winx.input
                     _code = InputCode.toCode(code);
 
 
-                    if (InputCode.toDeviceInx(_code) == (int)Joysticks.Joystick) _fromAny = true;
+                   // if (InputCode.toDeviceInx(_code) == (int)Joysticks.Joystick) _fromAny = true;
 
 
                 }
@@ -309,7 +298,7 @@ namespace ws.winx.input
         public int getCode(IDevice device)
         {
 
-             if (_code == 0 && !String.IsNullOrEmpty(_codeString)){
+             if (_code == 0 && !String.IsNullOrEmpty(_codeString) && _codeString!="None"){
                
                         parse(_codeString,device);
              }
