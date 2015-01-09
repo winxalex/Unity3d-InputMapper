@@ -98,20 +98,21 @@ public class PlayerInputComponent : MonoBehaviour
         {
             animator.Play((int)States.Jump);
         }
+
+
+        //
         //
         float forward = Math.Abs(InputManager.GetInput((int)States.WalkForward,Player, 0.25f))
             - Math.Abs(InputManager.GetInput((int)States.WalkBackward,Player, 0.25f));
 
-        //Debug.Log (forward);
+        
 
         animator.SetFloat(forwardHash, forward);
         //
         //
         float turn = Math.Abs(InputManager.GetInput((int)States.TurnRight,Player, 0.25f))
             - Math.Abs(InputManager.GetInput((int)States.TurnLeft,Player, 0.25f));
-        //		
-        //		//Debug.Log (turn);
-        //		
+       
         animator.SetFloat(turnHash, turn);
 
 

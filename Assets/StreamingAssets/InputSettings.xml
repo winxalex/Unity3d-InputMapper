@@ -259,7 +259,7 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>JoystickButton3</d1p1:Code>
+                        <d1p1:Code>ClouchForward</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
@@ -276,7 +276,7 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>JoystickAxisPovYForward</d1p1:Code>
+                        <d1p1:Code>DPAD_Forward</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
@@ -293,7 +293,7 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>JoystickAxisPovYBackward</d1p1:Code>
+                        <d1p1:Code>DPAD_Backward</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
@@ -310,7 +310,7 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>JoystickAxisPovXLeft</d1p1:Code>
+                        <d1p1:Code>WheelXNegative</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
@@ -327,7 +327,7 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>JoystickAxisPovXRight</d1p1:Code>
+                        <d1p1:Code>WheelXPositive</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
@@ -344,7 +344,7 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>JoystickButton1</d1p1:Code>
+                        <d1p1:Code>LeftShifter</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
@@ -356,7 +356,7 @@
           </d4p1:Value>
         </d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
       </d1p1:_DeviceStateInputs>
-      <d1p1:_deviceID>\\?\HID#VID_045E&amp;PID_02A1&amp;IG_00#7&amp;1e27c39e&amp;0&amp;0000#{4d1e55b2-f16f-11cf-88cb-001111000030}</d1p1:_deviceID>
+      <d1p1:_deviceID i:nil="true" />
       <d1p1:Name i:nil="true" />
     </d1p1:InputPlayer>
     <d1p1:InputPlayer>
@@ -479,7 +479,7 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>K</d1p1:Code>
+                        <d1p1:Code>L</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
@@ -622,7 +622,7 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>JoystickButton3</d1p1:Code>
+                        <d1p1:Code>ClouchForward</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
@@ -639,7 +639,7 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>JoystickAxisPovYForward</d1p1:Code>
+                        <d1p1:Code>DPAD_Forward</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
@@ -656,7 +656,7 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>JoystickAxisPovYBackward</d1p1:Code>
+                        <d1p1:Code>DPAD_Backward</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
@@ -673,7 +673,7 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>JoystickAxisPovXLeft</d1p1:Code>
+                        <d1p1:Code>WheelXNegative</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
@@ -690,7 +690,7 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>JoystickAxisPovXRight</d1p1:Code>
+                        <d1p1:Code>WheelXPositive</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
