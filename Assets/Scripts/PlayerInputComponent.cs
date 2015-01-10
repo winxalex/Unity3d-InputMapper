@@ -22,6 +22,7 @@ public class PlayerInputComponent : MonoBehaviour
         forwardHash = Animator.StringToHash("forward");
         turnHash = Animator.StringToHash("turn");
 
+
     }
 
 

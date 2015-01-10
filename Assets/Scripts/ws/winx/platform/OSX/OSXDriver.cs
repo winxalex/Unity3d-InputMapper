@@ -328,7 +328,10 @@ namespace ws.winx.platform.osx
 
 			//check for profile
 			DeviceProfile profile = null;
-			
+
+			//V2 faster version with profilemin.txt but won't work with Unity as default driver
+			//String.Format ("X4{0}#X4{1}", hidDevice.VID, hidDevice.PID);
+
 			if (hidDevice.hidInterface.Profiles.ContainsKey (hidDevice.Name)) {
 				
 				

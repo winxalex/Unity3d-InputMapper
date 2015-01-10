@@ -82,6 +82,8 @@ namespace ws.winx
 				
 				ui.settings = InputManager.Settings;
 
+			
+
 			}
 			
 			

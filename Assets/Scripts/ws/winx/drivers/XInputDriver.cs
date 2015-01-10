@@ -181,7 +181,7 @@ namespace ws.winx.drivers
 
 
 				////////////////////////////////  POV ////////////////////////////////////////
-				float x = 0, y = 0;
+				//float x = 0, y = 0;
                 float f=0;
                 float b=0;
                 float l=0;
@@ -496,13 +496,17 @@ namespace ws.winx.drivers
 
 			//check for profile
 			DeviceProfile profile = null;
-			
-			if (hidDevice.hidInterface.Profiles.ContainsKey (hidDevice.Name)) {
-				
-				
-				
-				profile = hidDevice.hidInterface.LoadProfile (hidDevice.hidInterface.Profiles [hidDevice.Name]);
-			}
+
+			//								if (hidDevice.hidInterface.Profiles.ContainsKey (hidDevice.Name)) {
+			//										
+			//											
+			//
+			//							
+			//												profile = hidDevice.hidInterface.LoadProfile (hidDevice.hidInterface.Profiles [hidDevice.Name]);
+			//									}
+
+				profile = hidDevice.hidInterface.LoadProfile ("xbox360");
+
            
 
 
