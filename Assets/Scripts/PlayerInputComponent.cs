@@ -43,7 +43,7 @@ public class PlayerInputComponent : MonoBehaviour
 
         ////easiest way to map state to combination (ex.of single W and C click)
         if (!InputManager.HasInputState("ManualFullAxisMap"))
-            InputManager.MapStateToInput("ManualFullAxisMap",InputPlayer.Player.Player0, InputCode.Joystick0AxisX);// InputCode.W.SINGLE, InputCode.C.SINGLE);
+            InputManager.MapStateToInput("ManualFullAxisMap",Player, InputCode.Joystick0AxisX);// InputCode.W.SINGLE, InputCode.C.SINGLE);
 
 
         //			InputManager.MapStateToInput ("WalkForward", InputCode.W.SINGLE);
@@ -89,7 +89,7 @@ public class PlayerInputComponent : MonoBehaviour
        
 
 
-        if (InputManager.GetInputDown((int)States.Wave,Player))
+        if (InputManager.GetInputDown((int)States.Wave,Player,true))
         {
             animator.Play((int)States.Wave);
         }
