@@ -198,30 +198,30 @@ namespace ws.winx.input
 						return _actionsList.Remove (_actionsList.Last ());
 				}
 
-				internal bool GetInputHold ()
+				internal bool GetInputHold (IDevice device)
 				{
 						if (_actionsList.Count > 1 || __currentInputAction.type != InputActionType.SINGLE) { /*Debug.LogWarning("You found need of GetInputHold with combos. Fork code on github");*/
 								return false;
 						} else
-								return InputEx.GetInputHold (__currentInputAction);
+								return InputEx.GetInputHold (__currentInputAction,device);
 								
 				}
 
-				internal bool GetInputUp ()
+				internal bool GetInputUp (IDevice device)
 				{
 						if (_actionsList.Count > 1 || __currentInputAction.type != InputActionType.SINGLE) { 
 								/*Debug.LogWarning("You found need of GetInputUp with combos. Fork code on github");*/
 								return false;
 						} else
-								return InputEx.GetInputUp (__currentInputAction);
+								return InputEx.GetInputUp (__currentInputAction,device);
 				}
 
-				internal bool GetInputDown (bool atOnce=false)
+				internal bool GetInputDown (IDevice device,bool atOnce=false)
 				{
 						
 						if (__currentInputAction.type == InputActionType.SINGLE && _actionsList.Count == 1) {
 						
-								return InputEx.GetInputDown (__currentInputAction);				
+								return InputEx.GetInputDown (__currentInputAction,device);				
 
 						
 						} else {
@@ -232,14 +232,14 @@ namespace ws.winx.input
 
                                             //LONG is counted as HOLD in this mode
                                             if(actions[i].type==InputActionType.LONG){
-                                                if (!InputEx.GetInputHold(actions[i])) return false;
-                                            }else if(!InputEx.GetInputDown (actions [i]))
+                                                if (!InputEx.GetInputHold(actions[i],device)) return false;
+                                            }else if(!InputEx.GetInputDown (actions [i],device))
 														return false;
 										}
 
 										return true;
 								} else // Double,Long are also count as combinations handled by InputEx.GetAction
-										return GetCombinationInput ();
+										return GetCombinationInput (device);
 						}
 
 
@@ -252,11 +252,11 @@ namespace ws.winx.input
 
 
 				//TODO this with corutine to compare performace
-				internal bool GetCombinationInput ()
+				internal bool GetCombinationInput (IDevice device)
 				{
 
 
-						if (InputEx.GetAction (__currentInputAction)) {//and// if code and type are ok go in
+						if (InputEx.GetAction (__currentInputAction,device)) {//and// if code and type are ok go in
 								//	UnityEngine.Debug.Log ("CODE:" + _pointer.Current.codeString);
                      
 
@@ -310,7 +310,7 @@ namespace ws.winx.input
 						//TODO check current type and time waiting for type of
 
 						// time passed while waiting for double/long action to happen => don't reset we aren't idle
-						if (Time.time > __currentInputAction.startTime + InputAction.COMBINATION_CLICK_SENSITIVITY && InputEx.LastCode == __currentInputAction.code) {// or waiting for double/long action to happen => don't reset we aren't idle
+						if (Time.time > __currentInputAction.startTime + InputAction.COMBINATION_CLICK_SENSITIVITY && InputEx.LastCode == __currentInputAction.getCode(device)) {// or waiting for double/long action to happen => don't reset we aren't idle
 
 								//UnityEngine.Debug.Log ("Reset in cos time waiting for double/long passed" + Time.time + " Time Allowed:" + (_pointer.Current.startTime + InputAction.COMBINATION_CLICK_SENSITIVITY));
 
@@ -329,7 +329,7 @@ namespace ws.winx.input
 
                
 						//key happend that isn't expected inbetween combination sequence
-						if (InputEx.anyKeyDown && InputEx.LastCode != __currentInputAction.code && __actionHappenTime > 0) {
+						if (InputEx.anyKeyDown && InputEx.LastCode != __currentInputAction.getCode(device) && __actionHappenTime > 0) {
 								// UnityEngine.Debug.Log("Last Code:"+InputEx.LastCode+" current"+_pointer.Current.codeString);
 								//  UnityEngine.Debug.Log("Reset cos some other key is pressed" + InputEx.anyKeyDown + " Unity anykey:" + Input.anyKeyDown);
 
@@ -354,17 +354,17 @@ namespace ws.winx.input
 				/// Gets the analog value.
 				/// </summary>
 				/// <returns> for analog input return values -1f to 1f or inverted depending of device</returns>
-				internal float GetAnalogValue (float sensitivity, float dreadzone, float gravity)
+				internal float GetAnalogValue (IDevice device,float sensitivity, float dreadzone, float gravity)
 				{
 						//if key,mouse, joy button
-						if (__currentInputAction.code < InputCode.MAX_KEY_CODE || InputCode.toAxis (__currentInputAction.code) == JoystickAxis.None) {
-							if(InputEx.GetInputHold(__currentInputAction) || InputEx.GetInputDown(__currentInputAction))
-							return 2f * (GetGenericAnalogValue (sensitivity, dreadzone, gravity) -0.5f);
+						if (__currentInputAction.getCode(device) < InputCode.MAX_KEY_CODE || InputCode.toAxis (__currentInputAction.getCode(device)) == JoystickAxis.None) {
+							if(InputEx.GetInputHold(__currentInputAction,device) || InputEx.GetInputDown(__currentInputAction,device))
+							return 2f * (GetGenericAnalogValue (device,sensitivity, dreadzone, gravity) -0.5f);
 							else
 							return 0f;
 						} else {
 			
-							return InputEx.GetInputAnalog (__currentInputAction);
+							return InputEx.GetInputAnalog (__currentInputAction,device);
 		
 						}
 
@@ -378,7 +378,7 @@ namespace ws.winx.input
 				/// <param name="sensitivity">Sensitivity.</param>
 				/// <param name="dreadzone">Dreadzone.</param>
 				/// <param name="gravity">Gravity.</param>
-				internal float GetInputNormalized (float sensitivity, float dreadzone, float gravity)
+				internal float GetInputNormalized (IDevice device,float sensitivity, float dreadzone, float gravity)
 				{
 
 						if (_actionsList.Count > 1)
@@ -388,17 +388,17 @@ namespace ws.winx.input
 						JoystickAxis axis;
 
 						//if key,mouse 
-						if (__currentInputAction.code < InputCode.MAX_KEY_CODE) {
-								return GetGenericAnalogValue (sensitivity, dreadzone, gravity);
+						if (__currentInputAction.getCode(device) < InputCode.MAX_KEY_CODE) {
+								return GetGenericAnalogValue (device,sensitivity, dreadzone, gravity);
 
 						} else 
 						//or button
-						if ((axis = InputCode.toAxis (__currentInputAction.code)) == JoystickAxis.None) {
-										return GetGenericAnalogValue (sensitivity, dreadzone, gravity);
+						if ((axis = InputCode.toAxis (__currentInputAction.getCode(device))) == JoystickAxis.None) {
+										return GetGenericAnalogValue (device,sensitivity, dreadzone, gravity);
 						
 						} else {
 
-								int data = InputCode.toData (__currentInputAction.code);
+								int data = InputCode.toData (__currentInputAction.getCode(device));
 								if (axis != JoystickAxis.AxisPovX && axis != JoystickAxis.AxisPovY && ((JoystickPosition)data) == JoystickPosition.Full) {
 										//full Axis => normalize in range 0 to 1
 
@@ -406,7 +406,7 @@ namespace ws.winx.input
 										return 0f;
 								} else {
 								
-										return Math.Abs (InputEx.GetInputAnalog (__currentInputAction));
+										return Math.Abs (InputEx.GetInputAnalog (__currentInputAction,device));
 								}
 
 
@@ -424,11 +424,11 @@ namespace ws.winx.input
 				/// <param name="sensitivity">Sensitivity.</param>
 				/// <param name="dreadzone">Dreadzone.</param>
 				/// <param name="gravity">Gravity.</param>
-				internal float GetGenericAnalogValue (float sensitivity, float dreadzone, float gravity)
+				internal float GetGenericAnalogValue (IDevice device,float sensitivity, float dreadzone, float gravity)
 				{
 
 
-						if (InputEx.GetInputHold (__currentInputAction)) {
+						if (InputEx.GetInputHold (__currentInputAction,device)) {
 								_isActive = true;
 								_timeDelta += Time.deltaTime * sensitivity;
 
@@ -440,7 +440,7 @@ namespace ws.winx.input
 
 
 						} else { //on KeyUp reset _timeDelta
-								if (InputEx.GetInputUp (__currentInputAction)) {
+								if (InputEx.GetInputUp (__currentInputAction,device)) {
 										_isActive = false;
 										_timeDelta = 0f;//reset
 

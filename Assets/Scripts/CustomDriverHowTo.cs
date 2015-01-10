@@ -221,7 +221,7 @@ namespace ws.winx
 			
 			//		adding input-states pairs manually
 			//			InputManager.MapStateToInput("My State1",new InputCombination(KeyCodeExtension.toCode(Joysticks.Joystick1,JoystickAxis.AxisPovX,JoystickPovPosition.Forward),(int)KeyCode.Joystick4Button9,(int)KeyCode.P,(int)KeyCode.JoystickButton0));
-			//			InputManager.MapStateToInput("My State2",new InputCombination(KeyCode.Joystick4Button9,KeyCode.P,KeyCode.JoystickButton0));
+			//			InputManager.Map`StateToInput("My State2",new InputCombination(KeyCode.Joystick4Button9,KeyCode.P,KeyCode.JoystickButton0));
 			//			InputManager.MapStateToInput("My State3",new InputCombination("A(x2)+Mouse1+JoystickButton31"));
 			//			InputManager.MapStateToInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
 			
@@ -229,7 +229,7 @@ namespace ws.winx
 			
 			////easiest way to map state to combination (ex.of single W and C click)
 			if (!InputManager.HasInputState("ManualAddedSTATE"))
-				InputManager.MapStateToInput("ManualAddedSTATE", InputCode.W.SINGLE, InputCode.C.SINGLE);
+				InputManager.MapStateToInput("ManualAddedSTATE",InputPlayer.Player.Player0, InputCode.W.SINGLE, InputCode.C.SINGLE);
 			
 			UnityEngine.Debug.Log("Log:" + InputManager.Log());
 			

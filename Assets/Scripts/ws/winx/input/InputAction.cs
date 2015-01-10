@@ -67,13 +67,13 @@ namespace ws.winx.input
 		[DataMember(Name = "Code")]
         #endif
         public String codeString{
-			get{ 
-				if(_codeString==null) _codeString=ToString();
+			get{
+                if (_codeString == null) _codeString = String.Empty;
 				return _codeString;
 			}
 			set{
 				_codeString=value;
-				parse(value);
+				//parse(value);
 			}
 		}
 
@@ -83,10 +83,11 @@ namespace ws.winx.input
 				return _fromAny;}
 		}
 
-		public int code{
-			get{return _code;}
-			set{_code=value;}
-		}
+        //public int code
+        //{
+        //    get { return _code; }
+        //    set { _code = value; }
+        //}
 
 		public bool isKey { get{ return _isKey;} }
 		public bool isMouse { get{ return _isMouse;} }
@@ -107,19 +108,39 @@ namespace ws.winx.input
 		/// </summary>
 		/// <param name="code">Code.</param>
 		/// <param name="type">Type.</param>
-		public InputAction(int code,InputActionType type=InputActionType.SINGLE){
-			if(code<InputCode.MAX_KEY_CODE){
+		public InputAction(int code,InputActionType type=InputActionType.SINGLE,IDevice device=null){
+            if (code < InputCode.MAX_KEY_CODE)
+            {
 
-				code=InputCode.toCode((KeyCode) code);
+                code = InputCode.toCode((KeyCode)code);
 
-			}
-
-				if(InputCode.toDeviceInx(code)==(int)Joysticks.Joystick) _fromAny=true;
+            }
 
 
-			//Debug.Log("From Any:"+_fromAny);
-			__defaultCode=_code=code;
-			__defaultType=_type=type;
+            __defaultCode = _code = code;
+
+            __defaultType = _type = type;
+
+            //if(InputCode.toDeviceInx(_code)==(int)Joysticks.Joystick) _fromAny=true;
+            //Debug.Log("From Any:"+_fromAny);
+
+
+
+            if (device != null)
+                _codeString = InputCode.toProfiled(code, device);
+            else
+                _codeString = InputCode.toEnumString(code);
+
+            //if(_codeString.IndexOf("Joy")>-1) throw new Exception("Use JoystickDevice.toCode function for Joystick inputs");
+
+            if ((_isMouse = _codeString.IndexOf("Mou") > -1))
+            {
+
+                _isKey = true;
+            }
+
+            if (_type != InputActionType.SINGLE)
+                _codeString += _type.ToDesignatorString();
 
 		}
 	      
@@ -129,27 +150,11 @@ namespace ws.winx.input
 		/// </summary>
 		/// <param name="code">Code.</param>
 		/// <param name="type">Type.</param>
-		public InputAction(KeyCode code,InputActionType type=InputActionType.SINGLE){
+		public InputAction(KeyCode code,InputActionType type=InputActionType.SINGLE,IDevice device=null):this((int)code,type,device)
+        {
 		
 
-			__defaultCode=_code=InputCode.toCode(code);
-
-			__defaultType=_type=type;
-
-			if(InputCode.toDeviceInx(_code)==(int)Joysticks.Joystick) _fromAny=true;
-			Debug.Log("From Any:"+_fromAny);
-
-			_codeString=ToString();
-
-			//if(_codeString.IndexOf("Joy")>-1) throw new Exception("Use JoystickDevice.toCode function for Joystick inputs");
-
-			if((_isMouse=_codeString.IndexOf("Mou")>-1)){
-				
-				_isKey=true;
-			}
-				
-			if(_type!=InputActionType.SINGLE)
-					_codeString+=_type.ToDesignatorString();
+		        
 
 
 
@@ -160,9 +165,9 @@ namespace ws.winx.input
 		/// Initializes a new instance of the <see cref="ws.winx.input.InputAction"/> class.
 		/// </summary>
 		/// <param name="code">Code in format like "Mouse1+Joystick12AxisXPositive(x2)+B(-)"</param>
-		public InputAction(String code){
+		public InputAction(String code,IDevice device=null){
 			_codeString=code;
-			parse(code);
+			//parse(code,device);
 //			Debug.Log("From Any:"+_fromAny);
 		}
 
@@ -185,7 +190,7 @@ namespace ws.winx.input
 		/// </summary>
 		/// <returns>A <see cref="System.String"/> that represents the current <see cref="ws.winx.input.InputAction"/>.</returns>
 		public override string ToString(){
-			return ToEnumString(_code)+_type.ToDesignatorString();
+            return _codeString;
 		}
 
 
@@ -213,43 +218,67 @@ namespace ws.winx.input
 		///
 		/// </summary>
 		/// <param name="code">Code.</param>
-		protected void parse(String code){
+		protected void parse(String code,IDevice device){
 
-			_isJoystick=code.IndexOf("Joy")>-1;
-
-			if((_isMouse=code.IndexOf("Mou")>-1) && _isJoystick){
-
-				_isKey=true;
-			}
-
-			_type=InputActionType.SINGLE;
-
-			  if(code.Contains(InputAction.DOUBLE_DESIGNATOR)){
-				_type=InputActionType.DOUBLE;
-				code=code.Replace(InputAction.DOUBLE_DESIGNATOR,"");
+         
 
 
-			}else if(code.Contains(InputAction.LONG_DESIGNATOR)){
-				_type=InputActionType.LONG;
-				code=code.Replace(InputAction.LONG_DESIGNATOR,"");
+//parse TYPE
+               _type = InputActionType.SINGLE;
 
-			 }
-
-			if(_isJoystick){ 
-				 
-
-
-					_code=InputCode.toCode(code);
+            if (code.Contains(InputAction.DOUBLE_DESIGNATOR))
+            {
+                _type = InputActionType.DOUBLE;
+                code = code.Replace(InputAction.DOUBLE_DESIGNATOR, "");
 
 
-					if(InputCode.toDeviceInx(_code)==(int)Joysticks.Joystick) _fromAny=true;
+            }
+            else if (code.Contains(InputAction.LONG_DESIGNATOR))
+            {
+                _type = InputActionType.LONG;
+                code = code.Replace(InputAction.LONG_DESIGNATOR, "");
+
+            }
 
 
-			}
-			else{
-				if(_isKey) code=code.ToUpper();
-				_code=(int)Enum.Parse(typeof(KeyCode),code);
-			}
+            if (device != null  && device.profile!=null)//parsing by profile
+            {
+
+                _code = InputCode.toCode(code, device.profile);
+
+      
+            }
+            else//default parsing 
+            {
+                _isJoystick = code.IndexOf("Joy") > -1;
+
+                if ((_isMouse = code.IndexOf("Mou") > -1) && _isJoystick)
+                {
+
+                    _isKey = true;
+                }
+
+
+
+                if (_isJoystick)
+                {
+
+
+
+                    _code = InputCode.toCode(code);
+
+
+                   // if (InputCode.toDeviceInx(_code) == (int)Joysticks.Joystick) _fromAny = true;
+
+
+                }
+                else
+                {
+                    if (_isKey) code = code.ToUpper();
+                    _code = (int)Enum.Parse(typeof(KeyCode), code);
+                }
+
+            }
 
 
 
@@ -260,10 +289,22 @@ namespace ws.winx.input
 
 		}
 
-	
-        
 
-        
-    
+
+
+
+
+
+        public int getCode(IDevice device)
+        {
+
+             if (_code == 0 && !String.IsNullOrEmpty(_codeString) && _codeString!="None"){
+               
+                        parse(_codeString,device);
+             }
+  
+
+           return _code;
+        }
     }
 }

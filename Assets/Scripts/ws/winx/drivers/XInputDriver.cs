@@ -182,30 +182,37 @@ namespace ws.winx.drivers
 
 				////////////////////////////////  POV ////////////////////////////////////////
 				float x = 0, y = 0;
-
+                float f=0;
+                float b=0;
+                float l=0;
+                float r=0;
 
 				int pov=buff[2] & 0x0F;
 
 				if(pov>0){
 					if((pov & 0xC)!=0){
 
-						if((pov&0x8)!=0) x=1;
-						   else x=-1;
+						if((pov&0x8)!=0) r=1;
+						   else l=-1;
 					}
 
 
 					if((pov & 0x3) !=0) {
-						if((pov & 0x1) !=0)  y=1 ;
-						else y=-1;
+						if((pov & 0x1) !=0)  f=1 ;
+						else b=-1;
 
 					}
 				}
 				 
 				
+				device.Buttons[5].value=f;       //Forward;
+                device.Buttons[6].value=b;               //Backward
+                device.Buttons[7].value= l;               //Left
+                device.Buttons[8].value=r;             //Right
+
 				
-				
-				device.Axis[JoystickAxis.AxisPovX].value = x;
-				device.Axis[JoystickAxis.AxisPovY].value = y;
+				//device.Axis[JoystickAxis.AxisPovX].value = x;
+				//device.Axis[JoystickAxis.AxisPovY].value = y;
 				
 				// UnityEngine.Debug.Log("x=" + x+" y="+y);
 
@@ -257,11 +264,11 @@ namespace ws.winx.drivers
 				return;
 			}
 		}
-		#endif
-		
-		
-		#if UNITY_STANDALONE_WIN
-		void onRead(object data)
+#endif
+
+
+#if UNITY_STANDALONE_WIN
+        void onRead(object data)
 		{
 			
 			
@@ -983,7 +990,7 @@ namespace ws.winx.drivers
 							else
 								_buttonState = ButtonState.NegToUp;
 
-							Debug.Log("val:"+value+"_buttonState:"+_buttonState);
+						//	Debug.Log("val:"+value+"_buttonState:"+_buttonState);
 							
 						}
 						else

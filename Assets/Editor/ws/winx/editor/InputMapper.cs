@@ -37,7 +37,7 @@ namespace ws.winx.editor
 				protected TextAsset _lastSettingsXML;
 				protected static int _selectedStateHash = 0;
 				protected static int _deleteStateWithHash = 0;
-				protected bool _isDeviceAny = true;
+				
 				protected bool _isDeviceAxisPositionFull;
 				protected bool _isComplexActionTypesAllowed;
 				protected string _warrningAddStateLabel;
@@ -424,7 +424,7 @@ namespace ws.winx.editor
 
 												InputCombination combos = HashStateInput.Value.combinations [0];
 							
-												if (combos != null && combos.GetActionAt (0).code == (int)KeyCode.None) {
+												if (combos != null && combos.GetActionAt (0).codeString == "None") {
 														combos.Clear ();
 												
 														inputStatesToBeRemoved.Add (HashStateInput.Key);
@@ -433,7 +433,7 @@ namespace ws.winx.editor
 							
 												combos = HashStateInput.Value.combinations [1];
 							
-												if (combos != null && combos.GetActionAt (0).code == (int)KeyCode.None) {
+												if (combos != null && combos.GetActionAt (0).codeString == "None") {
 														combos.Clear ();
 														HashStateInput.Value.combinations [1] = null;
 								
@@ -568,7 +568,7 @@ namespace ws.winx.editor
 				void toInputCombination (InputCombination combos, InputAction input)
 				{
 				
-						if (combos.numActions + 1 > maxCombosNum || (combos.numActions == 1 && combos.GetActionAt (0).code == 0))
+						if (combos.numActions + 1 > maxCombosNum || (combos.numActions == 1 && combos.GetActionAt (0).getCode(_deviceByProfile) == 0))
 								combos.Clear ();
 				
 						combos.Add (input);
@@ -600,11 +600,11 @@ namespace ws.winx.editor
 								_action = InputManager.GetAction(_deviceByProfile);
 				
 
-								if (_action != null && (_action.code ^ (int)KeyCode.Escape) != 0 && (_action.code ^ (int)KeyCode.Return) != 0) {
+								if (_action != null && (_action.getCode(_deviceByProfile) ^ (int)KeyCode.Escape) != 0 && (_action.getCode(_deviceByProfile) ^ (int)KeyCode.Return) != 0) {
 
 
 
-										if ((_action.code ^ (int)KeyCode.Backspace) == 0) {
+										if ((_action.getCode(_deviceByProfile) ^ (int)KeyCode.Backspace) == 0) {
 												state = _stateInputCombinations [_selectedStateHash];
 												state.combinations [_isPrimary].Clear ();
 												state.combinations [_isPrimary].Add (new InputAction (KeyCode.None));
@@ -618,22 +618,22 @@ namespace ws.winx.editor
 												if (!_isComplexActionTypesAllowed)
 														_action.type = InputActionType.SINGLE;
 
-												if (_isDeviceAny) {
-														_action.code = InputCode.toCodeAnyDevice (_action.code);
+												//if (_isDeviceAny) {
+														//_action.getCode(_deviceByProfile) = InputCode.toCodeAnyDevice (_action.getCode(_deviceByProfile));
 														//_action.type = InputActionType.SINGLE;
-												}
+												//}
 
-												if (_isDeviceAxisPositionFull) {
-														_action.code = InputCode.toCodeAxisFull (_action.code);
-														_action.type = InputActionType.SINGLE;
-												}
+                                                //if (_isDeviceAxisPositionFull) {
+                                                //        _action.getCode(_deviceByProfile) = InputCode.toCodeAxisFull (_action.getCode(_deviceByProfile));
+                                                //        _action.type = InputActionType.SINGLE;
+                                                //}
 
 												toInputCombination (_stateInputCombinations [_selectedStateHash].combinations [_isPrimary], _action);
 										}
 
 
 
-										//								Debug.Log ("Action:" + _action + " " + _action.code);
+										//								Debug.Log ("Action:" + _action + " " + _action.getCode(_deviceByProfile));
 								}
 
 
@@ -884,7 +884,7 @@ namespace ws.winx.editor
 
 								//////////  ANY/Complex Action Types(doubles,long...)  /FULL AXIS Checkers ///////
 								EditorGUILayout.BeginHorizontal ();
-								_isDeviceAny = GUILayout.Toggle (_isDeviceAny, "Any(Uncheck 4Testing Only");
+							//	_isDeviceAny = GUILayout.Toggle (_isDeviceAny, "Any(Uncheck 4Testing Only");
 								_isComplexActionTypesAllowed = GUILayout.Toggle (_isComplexActionTypesAllowed, "Allow DOUBLE/LONG(HOLD)");
 								_isDeviceAxisPositionFull = GUILayout.Toggle (_isDeviceAxisPositionFull, "Full Axis");
 								EditorGUILayout.EndHorizontal ();
@@ -1174,7 +1174,7 @@ namespace ws.winx.editor
 										if (combinations [0] == null)
 												combinations [0] = new InputCombination ("None");
 
-												if (GUILayout.Button (InputCode.toProfiled (_deviceByProfile,combinations [0]))) {
+												if (GUILayout.Button (combinations [0].combinationString)) {
 												_selectedStateHash = hash;
 												_previousStateInput = null;
 												_isPrimary = 0;
@@ -1184,7 +1184,7 @@ namespace ws.winx.editor
 										if (combinations [1] == null)
 												combinations [1] = new InputCombination ("None");
 
-										if (GUILayout.Button (InputCode.toProfiled (_deviceByProfile,combinations [1]))) {
+										if (GUILayout.Button (combinations [1].combinationString)) {
 												_selectedStateHash = hash;
 												_previousStateInput = null;
 												_isPrimary = 1;
@@ -1236,7 +1236,7 @@ namespace ws.winx.editor
 										combinations = InputMapper._stateInputCombinations [hash].combinations;
 			
 
-										currentCombinationString = InputCode.toProfiled(_deviceByProfile,combinations [_isPrimary]);
+										currentCombinationString =combinations[_isPrimary].combinationString;
 
 										if (_previousStateInput == null) {
 												_previousStateInput = combinations [_isPrimary].Clone ();

@@ -269,10 +269,10 @@ namespace ws.winx
 
             ////easiest way to map state to combination (ex.of single W and C click)
             if (!InputManager.HasInputState("ManualAddedSTATE"))
-                InputManager.MapStateToInput("ManualAddedSTATE", InputCode.W.SINGLE, InputCode.C.SINGLE);
+                InputManager.MapStateToInput("ManualAddedSTATE",InputPlayer.Player.Player0, InputCode.W.SINGLE, InputCode.C.SINGLE);
 
             //add secondary
-            InputManager.MapStateToInput("AnyJoystick", InputCode.JoystickAxisXPositive.SINGLE);
+            InputManager.MapStateToInput("AnyJoystick", InputPlayer.Player.Player0,InputCode.JoystickAxisXPositive.SINGLE);
 
             UnityEngine.Debug.Log("Log:" + InputManager.Log());
 

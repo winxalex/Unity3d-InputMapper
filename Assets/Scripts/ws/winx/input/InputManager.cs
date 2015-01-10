@@ -23,170 +23,160 @@ using System.Threading;
 using System.Runtime.InteropServices;
 using System.Linq;
 
-namespace ws.winx.input 
+namespace ws.winx.input
 {
 
     public static class InputManager
     {
 
-		       
-       
-		private static InputCombination[] __inputCombinations;
-		private static InputSettings __settings;//=new InputSettings();
-		private static IHIDInterface __hidInterface;//=new ws.winx.platform.windows.WinHIDInterface();
-       
 
-		private static readonly object syncRoot = new object();
+
+        private static InputCombination[] __inputCombinations;
+        private static InputSettings __settings;//=new InputSettings();
+        private static IHIDInterface __hidInterface;//=new ws.winx.platform.windows.WinHIDInterface();
+
+
+        private static readonly object syncRoot = new object();
 
 
         /// <summary>
         /// Edit Mode = true stops all keys quering and checks of gameplay. Useful when use open UI to map keys to states
         /// 
         /// </summary>
-		public static bool EditMode=false;
-      	
-	
-		public enum Error:ushort{
-
-			NoError= 0x0,
-			SettingNotLoaded= 0x1,
-			//Disposing= 0x4
+        public static bool EditMode = false;
 
 
+        public enum Error : ushort
+        {
 
-		}
-
-		public static bool isReady(){
-
-			//settings should be loaded
-			if (InputManager.__settings == null) {
-				Debug.LogError("InputSetting not loaded");
-				return false;
-			}
+            NoError = 0x0,
+            SettingNotLoaded = 0x1,
+            //Disposing= 0x4
 
 
 
-			return !EditMode;
-		}
+        }
 
-	  
-		static InputPlayer.Player _currentPlayerIndex=InputPlayer.Player.Player0;
-		public static InputPlayer.Player currentPlayerIndex {
-			get {
-				return _currentPlayerIndex;
-			}
-			set {
-				if(!isReady()) return;
+        public static bool isReady()
+        {
 
-				_currentPlayerIndex = value;
+            //settings should be loaded
+            if (InputManager.__settings == null)
+            {
+                Debug.LogError("InputSetting not loaded");
+                return false;
+            }
 
 
-				//assigning Device to player from deserialization
-				if(__settings.Players.Length>(int)value){
-					InputPlayer inputPlayer=__settings.Players[(int)value];
 
-					//if Device==null means no Device is assigned to player
-					//check DeviceID to find
-					if(inputPlayer.Device==null && inputPlayer.DeviceID!=null){
-						if(InputEx.Devices.ContainsID(inputPlayer.DeviceID))
-							inputPlayer.Device=InputEx.Devices[inputPlayer.DeviceID];
-
-					}
-
-					InputEx.currentPlayer=inputPlayer;
-				}
-			}
-		}
+            return !EditMode;
+        }
 
 
-	
+     
 
 
-	
 
 
-		public static IHIDInterface hidInterface{
-			get{ 
-               
-				if(__hidInterface==null){
-					//if((Application.platform & (RuntimePlatform.WindowsPlayer | RuntimePlatform.WindowsEditor))!=0){
 
-                        #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-                        __hidInterface = new ws.winx.platform.windows.WinHIDInterface();
-                         #endif
-                        
 
-					 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+
+
+        public static IHIDInterface hidInterface
+        {
+            get
+            {
+
+                if (__hidInterface == null)
+                {
+                    //if((Application.platform & (RuntimePlatform.WindowsPlayer | RuntimePlatform.WindowsEditor))!=0){
+
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+                    __hidInterface = new ws.winx.platform.windows.WinHIDInterface();
+#endif
+
+
+#if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
 						__hidInterface=new ws.winx.platform.osx.OSXHIDInterface();
-                     #endif
+#endif
 
 
-					#if UNITY_WEBPLAYER && !UNITY_EDITOR
+#if UNITY_WEBPLAYER && !UNITY_EDITOR
 						__hidInterface=new ws.winx.platform.web.WebHIDInterface();
-                    #endif
+#endif
 
-                #if UNITY_ANDROID && !UNITY_EDITOR
+#if UNITY_ANDROID && !UNITY_EDITOR
                           __hidInterface=new ws.winx.platform.android.AndroidHIDInterface();
-                #endif
+#endif
 
-					//register events
-					__hidInterface.DeviceDisconnectEvent+=new EventHandler<DeviceEventArgs<string>>(onRemoveDevice);
-					__hidInterface.DeviceConnectEvent+=new EventHandler<DeviceEventArgs<IDevice>>(onAddDevice);
-
-
-
-                        Debug.Log(__hidInterface.GetType()+" is Initialized");
-				}
+                    //register events
+                    __hidInterface.DeviceDisconnectEvent += new EventHandler<DeviceEventArgs<string>>(onRemoveDevice);
+                    __hidInterface.DeviceConnectEvent += new EventHandler<DeviceEventArgs<IDevice>>(onAddDevice);
 
 
-			//	if(_joysticks==null) _joysticks = new JoystickDevicesCollection(); 
-				
+
+                    Debug.Log(__hidInterface.GetType() + " is Initialized");
+                }
 
 
-				return __hidInterface; }
-		}
+                //	if(_joysticks==null) _joysticks = new JoystickDevicesCollection(); 
 
 
-	   internal static void onRemoveDevice(object sender,DeviceEventArgs<string> args){
 
-						lock (syncRoot) {
-								if (InputEx.Devices.ContainsID (args.data)){
+                return __hidInterface;
+            }
+        }
 
-									//remove asigned device from InputPlayer
-									if(__settings!=null && __settings.Players.Length>0){
 
-										IDevice device=InputEx.Devices[args.data];
+        internal static void onRemoveDevice(object sender, DeviceEventArgs<string> args)
+        {
 
-										//indexOf maybe
-										for(int i=0;i<__settings.Players.Length;i++){
-											if(device.Equals(__settings.Players[i].Device)){
-												__settings.Players[i].Device=null;
-												Debug.Log("Device "+args.data+" dettached from Player"+i);
-											}
-										}
-									}
+            lock (syncRoot)
+            {
+                if (InputEx.Devices.ContainsID(args.data))
+                {
 
-										InputEx.Devices.Remove (args.data);
-								}
-					
-						}
-				}
+                    //remove asigned device from InputPlayer
+                    if (__settings != null && __settings.Players.Length > 0)
+                    {
 
-		internal static void onAddDevice(object sender,DeviceEventArgs<IDevice> args){
+                        IDevice device = InputEx.Devices[args.data];
 
-			        lock (syncRoot) {
-						//do not allow duplicates
-						if (InputEx.Devices.ContainsID (args.data.ID))
-								return;
+                        //indexOf maybe
+                        for (int i = 0; i < __settings.Players.Length; i++)
+                        {
+                            if (device.Equals(__settings.Players[i].Device))
+                            {
+                                __settings.Players[i].Device = null;
+                                Debug.Log("Device " + args.data + " dettached from Player" + i);
+                            }
+                        }
+                    }
 
-							InputEx.Devices[args.data.ID] = args.data;
-					}
+                    InputEx.Devices.Remove(args.data);
+                }
 
-		}
+            }
+        }
 
-		public static InputSettings Settings{
-			get{  if(__settings==null) __settings=new InputSettings(); return __settings;}
-		}
+        internal static void onAddDevice(object sender, DeviceEventArgs<IDevice> args)
+        {
+
+            lock (syncRoot)
+            {
+                //do not allow duplicates
+                if (InputEx.Devices.ContainsID(args.data.ID))
+                    return;
+
+                InputEx.Devices[args.data.ID] = args.data;
+            }
+
+        }
+
+        public static InputSettings Settings
+        {
+            get { if (__settings == null) __settings = new InputSettings(); return __settings; }
+        }
 
 
         /// <summary>
@@ -197,86 +187,81 @@ namespace ws.winx.input
         public static List<T> GetDevices<T>()
         {
 
-			lock (syncRoot) {
-								IDeviceCollection devices = InputEx.Devices;
+            lock (syncRoot)
+            {
+                IDeviceCollection devices = InputEx.Devices;
 
-								List<T> Result = new List<T> ();
+                List<T> Result = new List<T>();
 
-								foreach (IDevice device in devices) {
-										if (device.GetType () == typeof(T) || device is T) {
-												Result.Add ((T)device);
+                foreach (IDevice device in devices)
+                {
+                    if (device.GetType() == typeof(T) || device is T)
+                    {
+                        Result.Add((T)device);
 
-										}
-                
-								}
-						
+                    }
+
+                }
 
 
-								return Result;
-					}
+
+                return Result;
+            }
         }
 
         /// <summary>
         /// Add driver that would support custom device (see WinMMDriver,OSXDriver...for HOW TO)
         /// </summary>
         /// <param name="driver"></param>
-		public static void AddDriver(IDriver driver){
-			hidInterface.AddDriver (driver);
+        public static void AddDriver(IDriver driver)
+        {
+            hidInterface.AddDriver(driver);
 
-		}
+        }
 
 
 
-	/// <summary>
-	/// Map state to input on player with index and profile
-	/// </summary>
-	/// <param name="stateName"></param>
-	/// <param name="at"></param>
-	/// <param name="combos"></param>
-		public static void MapStateToInput(String stateName,int at=-1,params KeyCode[] combos){
-			
-			MapStateToInput(stateName,new InputCombination(combos),at);
-			
-		}
+        /// <summary>
+        /// Map state to input on player with index and profile
+        /// </summary>
+        /// <param name="stateName"></param>
+        /// <param name="player"></param>
+        /// <param name="at"></param>
+        /// <param name="combos"></param>
+        public static void MapStateToInput(String stateName, InputPlayer.Player player = InputPlayer.Player.Player0, int at = -1, params KeyCode[] combos)
+        {
+
+            MapStateToInput(stateName, new InputCombination(combos), player, at);
+
+        }
 
 
         /// <summary>
         /// Maps state to input.
         /// </summary>
         /// <param name="stateName">State name hash.</param>
+        /// <param name="player"></param>
         /// <param name="at">At.</param>
         /// <param name="combos">Combos.</param>
-        public static void MapStateToInput(int stateNameHash, int at = -1, params KeyCode[] combos)
+        public static void MapStateToInput(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0, int at = -1, params KeyCode[] combos)
         {
 
-            MapStateToInput(stateNameHash, new InputCombination(combos), at);
+            MapStateToInput(stateNameHash, new InputCombination(combos), player, at);
 
         }
-
-
-		/// <summary>
-		/// Maps state to input.
-		/// </summary>
-		/// <param name="stateName">State name.</param>
-		/// <param name="at">At.</param>
-		/// <param name="combos">Combos.</param>
-		public static void MapStateToInput(String stateName,int at=-1,params int[] combos){
-
-            MapStateToInput(stateName, new InputCombination(combos), at);
-			
-		}
 
 
         /// <summary>
         /// Maps state to input.
         /// </summary>
-        /// <param name="stateName">State name Hash.</param>
+        /// <param name="stateName">State name.</param>
+        /// <param name="player"></param>
         /// <param name="at">At.</param>
         /// <param name="combos">Combos.</param>
-        public static void MapStateToInput(int stateNameHash, int at = -1, params int[] combos)
+        public static void MapStateToInput(String stateName, InputPlayer.Player player = InputPlayer.Player.Player0, int at = -1, params int[] combos)
         {
 
-            MapStateToInput(stateNameHash, new InputCombination(combos), at);
+            MapStateToInput(stateName, new InputCombination(combos), player, at);
 
         }
 
@@ -285,12 +270,28 @@ namespace ws.winx.input
         /// Maps state to input.
         /// </summary>
         /// <param name="stateName">State name Hash.</param>
+        /// <param name="player"></param>
+        /// <param name="at">At.</param>
+        /// <param name="combos">Combos.</param>
+        public static void MapStateToInput(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0, int at = -1, params int[] combos)
+        {
+
+            MapStateToInput(stateNameHash, new InputCombination(combos), player, at);
+
+        }
+
+
+        /// <summary>
+        /// Maps state to input.
+        /// </summary>
+        /// <param name="stateName">State name Hash.</param>
+        /// <param name="player"></param>
         /// <param name="at">At.</param>
         /// <param name="combos">Actions. KeyExtension.Backspace.DOUBLE,...</param>
-        public static void MapStateToInput(int stateNameHash, int at = -1, params InputAction[] actions)
+        public static void MapStateToInput(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0, int at = -1, params InputAction[] actions)
         {
 
-            MapStateToInput(stateNameHash, new InputCombination(actions), at);
+            MapStateToInput(stateNameHash, new InputCombination(actions), player, at);
 
         }
 
@@ -299,37 +300,42 @@ namespace ws.winx.input
         /// Maps state to input.
         /// </summary>
         /// <param name="stateName">State name .</param>
+        /// <param name="player"></param>
         /// <param name="at">At.</param>
         /// <param name="combos">Actions. ex KeyExtension.Backspace.DOUBLE,...</param>
-        public static void MapStateToInput(string stateName, int at = -1, params InputAction[] actions)
+        public static void MapStateToInput(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0, int at = -1, params InputAction[] actions)
         {
 
-            MapStateToInput(stateName, new InputCombination(actions), at);
+            MapStateToInput(stateName, new InputCombination(actions), player, at);
 
         }
 
 
-		/// <summary>
-		/// Maps state to input.
-		/// </summary>
-		/// <param name="stateName">State name </param>
-		/// <param name="codeCombination">Code combination.
-		/// just "I" for KeyCode.I
-		/// or "I"+InputAction.DOUBLE_DESIGNATOR 
-		///	 or "I"+InputAction.DOUBLE_DESIGNATOR+InputAction.SPACE_DESIGNATOR+(other code);
-		///   or just "I(x2)" depending of InputAction.DOUBLE_DESIGNATOR value
-		/// </param>
-		/// <param name="at">At.Valid:-1(next) or 0(primary) and 1(secondary)</param>
-		public static void MapStateToInput(String stateName,String codeCombination,int at=-1){
+        /// <summary>
+        /// Maps state to input.
+        /// </summary>
+        /// <param name="stateName">State name </param>
+        /// 
+        /// <param name="codeCombination">Code combination.
+        /// just "I" for KeyCode.I
+        /// or "I"+InputAction.DOUBLE_DESIGNATOR 
+        ///	 or "I"+InputAction.DOUBLE_DESIGNATOR+InputAction.SPACE_DESIGNATOR+(other code);
+        ///   or just "I(x2)" depending of InputAction.DOUBLE_DESIGNATOR value
+        /// </param>
+        /// <param name="player"></param>
+        /// <param name="at">At.Valid:-1(next) or 0(primary) and 1(secondary)</param>
+        public static void MapStateToInput(String stateName,string codeCombination, InputPlayer.Player player = InputPlayer.Player.Player0,int at = -1)
+        {
 
-			MapStateToInput(stateName,new InputCombination(codeCombination),at);
+            MapStateToInput(stateName, new InputCombination(codeCombination), player, at);
 
-		}
+        }
 
         /// <summary>
         /// Maps state to input.
         /// </summary>
         /// <param name="stateNameHash">State name hash(int) </param>
+        /// <param name="player"></param>
         /// <param name="codeCombination">Code combination.
         /// just "I" for KeyCode.I
         /// or "I"+InputAction.DOUBLE_DESIGNATOR 
@@ -337,10 +343,10 @@ namespace ws.winx.input
         ///   or just "I(x2)" depending of InputAction.DOUBLE_DESIGNATOR value
         /// </param>
         /// <param name="at">At.Valid:-1(next) or 0(primary) and 1(secondary)</param>
-        public static void MapStateToInput(int stateNameHash, String codeCombination, int at = -1)
+        public static void MapStateToInput(int stateNameHash, String codeCombination, InputPlayer.Player player = InputPlayer.Player.Player0, int at = -1)
         {
 
-            MapStateToInput(stateNameHash, new InputCombination(codeCombination), at);
+            MapStateToInput(stateNameHash, new InputCombination(codeCombination), player, at);
 
         }
 
@@ -349,10 +355,11 @@ namespace ws.winx.input
         /// Maps state to input.
         /// </summary>
         /// <param name="stateName">State name.</param>
+        /// <param name="player"></param>
         /// <param name="combos">Combos (ex. (int)KeyCode.P,(int)KeyCode.Joystick2Button12,JoystickDevice.toCode(...))</param>
-        public static void MapStateToInput(String stateName, params int[] combos)
+        public static void MapStateToInput(String stateName, InputPlayer.Player player = InputPlayer.Player.Player0, params int[] combos)
         {
-            MapStateToInput(stateName, new InputCombination(combos));
+            MapStateToInput(stateName, new InputCombination(combos),player);
         }
 
 
@@ -360,10 +367,11 @@ namespace ws.winx.input
         /// Maps state to input.
         /// </summary>
         /// <param name="stateName">State name hash.</param>
+        /// <param name="player"></param>
         /// <param name="combos">Combos (ex. (int)KeyCode.P,(int)KeyCode.Joystick2Button12,JoystickDevice.toCode(...))</param>
-        public static void MapStateToInput(int stateNameHash, params int[] combos)
+        public static void MapStateToInput(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0, params int[] combos)
         {
-            MapStateToInput(stateNameHash, new InputCombination(combos));
+            MapStateToInput(stateNameHash, new InputCombination(combos),player);
         }
 
 
@@ -371,10 +379,11 @@ namespace ws.winx.input
         /// Maps state to input.
         /// </summary>
         /// <param name="stateName">State name hash.</param>
+        /// <param name="player"></param>
         /// <param name="combos">Combos (ex. KeyCodeExtension.Backspace.DOUBLE,KeyCodeExtesnion.Joystick1AxisYPositive.SINGLE)</param>
-        public static void MapStateToInput(int stateNameHash, params InputAction[] actions)
+        public static void MapStateToInput(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0, params InputAction[] actions)
         {
-            MapStateToInput(stateNameHash, new InputCombination(actions));
+            MapStateToInput(stateNameHash, new InputCombination(actions),player);
         }
 
 
@@ -382,11 +391,12 @@ namespace ws.winx.input
         /// <summary>
         /// Maps state to input.
         /// </summary>
-        /// <param name="stateName">State name</param>
+        /// <param name="stateName">State name</param> 
+        /// <param name="player"></param>
         /// <param name="combos">Combos (ex. KeyCodeExtension.Backspace.DOUBLE,KeyCodeExtesnion.Joystick1AxisYPositive.SINGLE)</param>
-        public static void MapStateToInput(string stateName, params InputAction[] actions)
+        public static void MapStateToInput(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0, params InputAction[] actions)
         {
-            MapStateToInput(stateName, new InputCombination(actions));
+            MapStateToInput(stateName, new InputCombination(actions),player);
         }
 
 
@@ -394,27 +404,29 @@ namespace ws.winx.input
         /// Maps state to input.
         /// </summary>
         /// <param name="stateName">State name.</param>
-        /// <param name="combination">Combination.</param>
+        /// <param name="combination">Combination.</param>    
+        /// <param name="player"></param>
         /// <param name="at">At.Valid:-1(next) or 0(primary) and 1(secondary)</param>
-        public static void MapStateToInput(string stateName, InputCombination combination, int at = -1)
+
+        public static void MapStateToInput(string stateName, InputCombination combination, InputPlayer.Player player = InputPlayer.Player.Player0, int at = -1)
         {
 
             if (at > 2) throw new Exception("Only indexes 0(Primary) and 1(Secondary) input are allowed");
 
-			if (!isReady ())
-								return;
+            if (!isReady())
+                return;
 
-            int stateNameHash=Animator.StringToHash(stateName);
+            int stateNameHash = Animator.StringToHash(stateName);
             InputState state;
 
-            if (!__settings.stateInputs.ContainsKey(stateNameHash))
+            if (!__settings.GetInputStatesOfPlayer(player).ContainsKey(stateNameHash))
             {
                 //create InputState and add to Dictionary of state inputs
-                state = __settings.stateInputs[stateNameHash] = new InputState(stateName, stateNameHash);
+                state = __settings.GetInputStatesOfPlayer(player)[stateNameHash] = new InputState(stateName, stateNameHash);
             }
             else
             {
-                state = __settings.stateInputs[stateNameHash];
+                state = __settings.GetInputStatesOfPlayer(player)[stateNameHash];
             }
 
             state.Add(combination, at);
@@ -422,92 +434,119 @@ namespace ws.winx.input
         }
 
 
-		/// <summary>
-		/// Maps state to input.
-		/// </summary>
-		/// <param name="stateName">State name hash.</param>
-		/// <param name="combination">Combination.</param>
-		/// <param name="at">At.Valid:-1(next) or 0(primary) and 1(secondary)</param>
-		public static void MapStateToInput(int stateNameHash,InputCombination combination,int at=-1){
-
-			if(at>2) throw new Exception("Only indexes 0(Primary) and 1(Secondary) input are allowed");
-			if (!isReady ())
-				return;
-			
-			InputState state;
-			
-			if(!__settings.stateInputs.ContainsKey(stateNameHash)){
-				//create InputState and add to Dictionary of state inputs
-				state=__settings.stateInputs[stateNameHash]=new InputState("GenState_"+stateNameHash,stateNameHash);
-			}else{
-				state=__settings.stateInputs[stateNameHash];
-			}
-
-			state.Add(combination,at);
-	
-		}
-
-        public static bool HasInputState(int stateNameHash)
+        /// <summary>
+        /// Maps state to input.
+        /// </summary>
+        /// <param name="stateName">State name hash.</param>
+        /// <param name="combination">Combination.</param>
+        /// <param name="player"></param>
+        /// <param name="player"></param>
+        /// <param name="at">At.Valid:-1(next) or 0(primary) and 1(secondary)</param>
+        public static void MapStateToInput(int stateNameHash, InputCombination combination, InputPlayer.Player player = InputPlayer.Player.Player0, int at = -1)
         {
 
-			return isReady () && __settings.stateInputs.ContainsKey(stateNameHash);
-        }
+            if (at > 2) throw new Exception("Only indexes 0(Primary) and 1(Secondary) input are allowed");
+            if (!isReady())
+                return;
 
-        public static bool HasInputState(string stateName)
-        {
+            InputState state;
 
-			return isReady() && InputManager.HasInputState(Animator.StringToHash(stateName));
+            if (!__settings.GetInputStatesOfPlayer(player).ContainsKey(stateNameHash))
+            {
+                //create InputState and add to Dictionary of state inputs
+                state = __settings.GetInputStatesOfPlayer(player)[stateNameHash] = new InputState("GenState_" + stateNameHash, stateNameHash);
+            }
+            else
+            {
+                state = __settings.GetInputStatesOfPlayer(player)[stateNameHash];
+            }
+
+            state.Add(combination, at);
+
         }
 
 
-        public static InputEvent addEventListener(int stateNameHash)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="stateNameHash"></param>
+        /// <param name="player"></param>
+        /// <returns></returns>
+        public static bool HasInputState(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0)
+        {
+
+            return isReady() && __settings.GetInputStatesOfPlayer(player).ContainsKey(stateNameHash);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="stateName"></param>
+        /// <param name="player"></param>
+        /// <returns></returns>
+        public static bool HasInputState(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0)
+        {
+
+            return isReady() && InputManager.HasInputState(Animator.StringToHash(stateName));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="stateNameHash"></param>
+        /// <param name="player"></param>
+        /// <returns></returns>
+        public static InputEvent addEventListener(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0)
         {
             if (isReady())
 
-                return InputEx.currentPlayer.GetEvent(stateNameHash);
+                return __settings.Players[(int)player].GetEvent(stateNameHash);
 
             return null;
         }
 
-
-        internal static void dispatchEvent()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="player"></param>
+        internal static void dispatchEvent(InputPlayer.Player player = InputPlayer.Player.Player0)
         {
             Delegate[] delegates;
 
-            Dictionary<int,InputEvent> stateEvents=InputEx.currentPlayer.stateEvents;
+            Dictionary<int, InputEvent> stateEvents = __settings.Players[(int)player].stateEvents;
 
-			if(stateEvents!=null)
-            foreach (var stateInputEventsPair in stateEvents)
-            {
-                var Events=stateInputEventsPair.Value.Events;
-                foreach (KeyValuePair<int, Delegate[]> pair in Events)
+            if (stateEvents != null)
+                foreach (var stateInputEventsPair in stateEvents)
                 {
-
-                    //                    if(pair.Value[0]!=null && InputManager.GetInput(pair.Key,false)){
-                    //                        delegates= pair.Value[0].GetInvocationList();
-                    //                        foreach(Delegate d in delegates)
-                    //                            ((EventHandler)d).BeginInvoke(this, args, EndAsyncEvent, null);
-                    //                    }
-
-                    if (pair.Value[1] != null && InputManager.GetInputUp(pair.Key))
+                    var Events = stateInputEventsPair.Value.Events;
+                    foreach (KeyValuePair<int, Delegate[]> pair in Events)
                     {
-                        delegates = pair.Value[1].GetInvocationList();
-                        foreach (Delegate d in delegates)
-                            ((EventHandler)d).BeginInvoke(null, null, EndAsyncEvent, null);
+
+                        //                    if(pair.Value[0]!=null && InputManager.GetInput(pair.Key,false)){
+                        //                        delegates= pair.Value[0].GetInvocationList();
+                        //                        foreach(Delegate d in delegates)
+                        //                            ((EventHandler)d).BeginInvoke(this, args, EndAsyncEvent, null);
+                        //                    }
+
+                        if (pair.Value[1] != null && InputManager.GetInputUp(pair.Key))
+                        {
+                            delegates = pair.Value[1].GetInvocationList();
+                            foreach (Delegate d in delegates)
+                                ((EventHandler)d).BeginInvoke(null, null, EndAsyncEvent, null);
+                        }
+
+                        if (pair.Value[2] != null && InputManager.GetInputDown(pair.Key))
+                        {
+                            delegates = pair.Value[2].GetInvocationList();
+                            foreach (Delegate d in delegates)
+                                ((EventHandler)d).BeginInvoke(null, null, EndAsyncEvent, null);
+                        }
+
+
+
                     }
-
-                    if (pair.Value[2] != null && InputManager.GetInputDown(pair.Key))
-                    {
-                        delegates = pair.Value[2].GetInvocationList();
-                        foreach (Delegate d in delegates)
-                            ((EventHandler)d).BeginInvoke(null, null, EndAsyncEvent, null);
-                    }
-
-
 
                 }
-
-            }
         }
 
 
@@ -527,265 +566,250 @@ namespace ws.winx.input
                 Debug.Log("An event listener went kaboom!");
             }
         }
-	
-
-		//[Not tested] idea for expansion
-//		public static void PlayStateOnInputUp(Animator animator,int stateNameHash,int layer=0,float normalizedTime=0f){
-//					if(InputManager.GetInputUp(stateNameHash)) 
-//						animator.Play(stateNameHash,layer,normalizedTime); 
-//		}
-//
-//		public static void PlayStateOnInputDown(Animator animator,int stateNameHash,int layer=0,float normalizedTime=0f){
-//			if(InputManager.GetInputDown(stateNameHash)) 
-//				animator.Play(stateNameHash,layer,normalizedTime); 
-//		}
-//
-//
-//		public static void CrossFadeStateOnInputUp(Animator animator,int stateNameHash,float transitionDuration=0.5f,int layer=0,float normailizeTime=0f){
-//				if(InputManager.GetInputUp(stateNameHash)) 
-//				animator.CrossFade(stateNameHash,transitionDuration,layer,normailizeTime);
-//
-//		}
-//
-//		public static void CrossFadeStateOnInputDown(Animator animator,int stateNameHash,float transitionDuration=0.5f,int layer=0,float normailizeTime=0f){
-//			if(InputManager.GetInputDown(stateNameHash)) 
-//				animator.CrossFade(stateNameHash,transitionDuration,layer,normailizeTime);
-//    	}
 
 
 
 
 
-		///!!!! UNITY DOESN"T INCLUDE SYSTEM.XML (OR SOME PARTS OF IT) SO RUNTIME SERIALIZATION DOESN"T WORK IN WEBPLAYER
-		/// manual deserialzation is done with addtional methods for WEBPLAYER 
-		/// TODO mulitplayer changes for webplayer ser/des should be done if there is interest of community
+
+
+
+        ///!!!! UNITY DOESN"T INCLUDE SYSTEM.XML (OR SOME PARTS OF IT) SO RUNTIME SERIALIZATION DOESN"T WORK IN WEBPLAYER
+        /// manual deserialzation is done with addtional methods for WEBPLAYER 
+        /// TODO mulitplayer changes for webplayer ser/des should be done if there is interest of community
 
 
 #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
         /// <summary>
-		/// Loads the Input settings from InputSettings.xml and deserialize into OO structure.
-		/// Create your .xml settings with InputMapper Editor
-		/// </summary>
-		public static InputSettings loadSettings(String path="InputSettings.xml"){
-			XmlReaderSettings xmlSettings=new XmlReaderSettings();
-			xmlSettings.CloseInput=true;
-			xmlSettings.IgnoreWhitespace=true;
+        /// Loads the Input settings from InputSettings.xml and deserialize into OO structure.
+        /// Create your .xml settings with InputMapper Editor
+        /// </summary>
+        public static InputSettings loadSettings(String path = "InputSettings.xml")
+        {
+            XmlReaderSettings xmlSettings = new XmlReaderSettings();
+            xmlSettings.CloseInput = true;
+            xmlSettings.IgnoreWhitespace = true;
 
 
-			
-			//DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<int,InputCombination[]>),"Inputs","");
-			DataContractSerializer serializer = new DataContractSerializer(typeof(InputSettings),"Inputs","");
 
-			
-			using(XmlReader reader=XmlReader.Create(path,xmlSettings))
-			{
-
-				__settings=(InputSettings)serializer.ReadObject(reader);
-
-			}
-			
+            //DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<int,InputCombination[]>),"Inputs","");
+            DataContractSerializer serializer = new DataContractSerializer(typeof(InputSettings), "Inputs", "");
 
 
-			return __settings;
-		}
+            using (XmlReader reader = XmlReader.Create(path, xmlSettings))
+            {
+
+                __settings = (InputSettings)serializer.ReadObject(reader);
+
+            }
 
 
-		public static InputSettings loadSettings(StringReader stringReader){
-			XmlReaderSettings xmlSettings=new XmlReaderSettings();
-			xmlSettings.CloseInput=true;
-			xmlSettings.IgnoreWhitespace=true;
-			
-			
-			
-			//DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<int,InputCombination[]>),"Inputs","");
-			DataContractSerializer serializer = new DataContractSerializer(typeof(InputSettings),"Inputs","");
-			
-			
-			using(XmlReader reader=XmlReader.Create(stringReader,xmlSettings))
-			{
-				
-				__settings=(InputSettings)serializer.ReadObject(reader);
-				
-			}
-			
-			
-			
-			return __settings;
-		}
+
+            return __settings;
+        }
+
+
+        public static InputSettings loadSettings(StringReader stringReader)
+        {
+            XmlReaderSettings xmlSettings = new XmlReaderSettings();
+            xmlSettings.CloseInput = true;
+            xmlSettings.IgnoreWhitespace = true;
+
+
+
+            //DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<int,InputCombination[]>),"Inputs","");
+            DataContractSerializer serializer = new DataContractSerializer(typeof(InputSettings), "Inputs", "");
+
+
+            using (XmlReader reader = XmlReader.Create(stringReader, xmlSettings))
+            {
+
+                __settings = (InputSettings)serializer.ReadObject(reader);
+
+            }
+
+
+
+            return __settings;
+        }
 #endif
 
 
 
-   
 
 
-//        #if (UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE
-//        /// <summary>
-//        /// Loads the Input settings from InputSettings.xml and deserialize into OO structure.
-//        /// Create your .xml settings with InputMapper Editor
-//        /// </summary>
-//        public static IEnumerator loadSettings(String path)
-//        {
-//             XmlReaderSettings xmlSettings=new XmlReaderSettings();
-//            xmlSettings.CloseInput=true;
-//            xmlSettings.IgnoreWhitespace=true;
 
-//            if (Application.isEditor)
-//                path = "file:///" + path;
+        //        #if (UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE
+        //        /// <summary>
+        //        /// Loads the Input settings from InputSettings.xml and deserialize into OO structure.
+        //        /// Create your .xml settings with InputMapper Editor
+        //        /// </summary>
+        //        public static IEnumerator loadSettings(String path)
+        //        {
+        //             XmlReaderSettings xmlSettings=new XmlReaderSettings();
+        //            xmlSettings.CloseInput=true;
+        //            xmlSettings.IgnoreWhitespace=true;
 
-//            WWW www = new WWW(path);
-//          // UnityEngine.Debug.Log(path);
-//            while (!www.isDone)
-//            {
-//                yield return null;
-//            }
+        //            if (Application.isEditor)
+        //                path = "file:///" + path;
 
-            
-          
+        //            WWW www = new WWW(path);
+        //          // UnityEngine.Debug.Log(path);
+        //            while (!www.isDone)
+        //            {
+        //                yield return null;
+        //            }
 
-//            if (www.error != null)
-//            {
-//                UnityEngine.Debug.LogError(www.error);
-//                yield break;
-//            }
 
-           
-//            StringReader stringReader = new StringReader(www.text);
 
-//            stringReader.Read();//skip BOM
 
-//            using (XmlReader reader = XmlReader.Create(stringReader, xmlSettings))
-//            {
-//                __settings = new InputSettings();
+        //            if (www.error != null)
+        //            {
+        //                UnityEngine.Debug.LogError(www.error);
+        //                yield break;
+        //            }
 
-//                int key;
 
-//                InputAction action;
-//                List<InputAction> actions = null;
-//                InputCombination[] combinations = null;
-//                string name;
-//                InputState state;
-//                int i;
-//                //XmlNameTable nameTable = reader.NameTable;
-//                //XmlNamespaceManager nsManager = new XmlNamespaceManager(nameTable);
-//                //nsManager.AddNamespace("d1p1", "http://schemas.datacontract.org/2004/07/ws.winx.input");
+        //            StringReader stringReader = new StringReader(www.text);
 
-//                reader.ReadToFollowing("d1p1:doubleDesignator");
-//                __settings.doubleDesignator = reader.ReadElementContentAsString();
+        //            stringReader.Read();//skip BOM
 
+        //            using (XmlReader reader = XmlReader.Create(stringReader, xmlSettings))
+        //            {
+        //                __settings = new InputSettings();
 
-//                __settings.longDesignator = reader.ReadElementContentAsString();
+        //                int key;
 
+        //                InputAction action;
+        //                List<InputAction> actions = null;
+        //                InputCombination[] combinations = null;
+        //                string name;
+        //                InputState state;
+        //                int i;
+        //                //XmlNameTable nameTable = reader.NameTable;
+        //                //XmlNamespaceManager nsManager = new XmlNamespaceManager(nameTable);
+        //                //nsManager.AddNamespace("d1p1", "http://schemas.datacontract.org/2004/07/ws.winx.input");
 
-//                __settings.spaceDesignator = reader.ReadElementContentAsString();
+        //                reader.ReadToFollowing("d1p1:doubleDesignator");
+        //                __settings.doubleDesignator = reader.ReadElementContentAsString();
 
 
+        //                __settings.longDesignator = reader.ReadElementContentAsString();
 
 
-//                __settings.singleClickSensitivity = reader.ReadElementContentAsFloat();
+        //                __settings.spaceDesignator = reader.ReadElementContentAsString();
 
 
-//                __settings.doubleClickSensitivity = reader.ReadElementContentAsFloat();
 
 
-//                __settings.longClickSensitivity = reader.ReadElementContentAsFloat();
+        //                __settings.singleClickSensitivity = reader.ReadElementContentAsFloat();
 
 
-//                __settings.combinationsClickSensitivity = reader.ReadElementContentAsFloat();
+        //                __settings.doubleClickSensitivity = reader.ReadElementContentAsFloat();
 
-//                if (reader.ReadToFollowing("d2p1:KeyValueOfintInputState"))
-//                {
 
+        //                __settings.longClickSensitivity = reader.ReadElementContentAsFloat();
 
-//                    do
-//                    {
-//                        reader.ReadToDescendant("d2p1:Key");
 
-//                        key = reader.ReadElementContentAsInt();
+        //                __settings.combinationsClickSensitivity = reader.ReadElementContentAsFloat();
 
+        //                if (reader.ReadToFollowing("d2p1:KeyValueOfintInputState"))
+        //                {
 
 
+        //                    do
+        //                    {
+        //                        reader.ReadToDescendant("d2p1:Key");
 
-//                        if (reader.ReadToFollowing("d1p1:InputCombination"))
-//                        {
+        //                        key = reader.ReadElementContentAsInt();
 
-//                            combinations = new InputCombination[2];
-//                            i = 0;
 
-//                            do
-//                            {
-//                                if (reader.GetAttribute("i:nil") == null)
-//                                {
 
 
-//                                    if (reader.ReadToDescendant("d1p1:InputAction"))
-//                                    {
-//                                        actions = new List<InputAction>();
+        //                        if (reader.ReadToFollowing("d1p1:InputCombination"))
+        //                        {
 
-//                                        do
-//                                        {
-//                                            reader.ReadToDescendant("d1p1:Code");
+        //                            combinations = new InputCombination[2];
+        //                            i = 0;
 
-//                                            action = new InputAction(reader.ReadElementContentAsString());
+        //                            do
+        //                            {
+        //                                if (reader.GetAttribute("i:nil") == null)
+        //                                {
 
-//                                            actions.Add(action);
 
-//                                        } while (reader.ReadToNextSibling("d1p1:InputAction"));
+        //                                    if (reader.ReadToDescendant("d1p1:InputAction"))
+        //                                    {
+        //                                        actions = new List<InputAction>();
 
+        //                                        do
+        //                                        {
+        //                                            reader.ReadToDescendant("d1p1:Code");
 
-//                                    }
+        //                                            action = new InputAction(reader.ReadElementContentAsString());
 
+        //                                            actions.Add(action);
 
+        //                                        } while (reader.ReadToNextSibling("d1p1:InputAction"));
 
 
-//                                    combinations[i++] = new InputCombination(actions);
+        //                                    }
 
-//                                    reader.Read();//read </InputCombination>
 
-//                                }
 
 
+        //                                    combinations[i++] = new InputCombination(actions);
 
-//                            } while (reader.ReadToNextSibling("d1p1:InputCombination"));
+        //                                    reader.Read();//read </InputCombination>
 
+        //                                }
 
 
-//                        }
 
-//                        reader.ReadToFollowing("d1p1:Name");
-//                        name = reader.ReadElementContentAsString();
-//                        state = new InputState(name, key);
-//                        state.combinations = combinations;
-//                        __settings.stateInputs[key] = state;
+        //                            } while (reader.ReadToNextSibling("d1p1:InputCombination"));
 
 
-//                        reader.Read();//</d2p1:KeyValueOfintInputState>
 
-//                    } while (reader.ReadToNextSibling("d2p1:KeyValueOfintInputState"));
-//                }
-//            }
+        //                        }
 
-//            stringReader.Close();
+        //                        reader.ReadToFollowing("d1p1:Name");
+        //                        name = reader.ReadElementContentAsString();
+        //                        state = new InputState(name, key);
+        //                        state.combinations = combinations;
+        //                        __settings.stateInputs[key] = state;
 
-         
 
-          
+        //                        reader.Read();//</d2p1:KeyValueOfintInputState>
 
-//          //yield break;
-          
-//        }
-//#endif
+        //                    } while (reader.ReadToNextSibling("d2p1:KeyValueOfintInputState"));
+        //                }
+        //            }
 
-        public static void loadSettingsFromText(string text,bool readBOM=true)
+        //            stringReader.Close();
+
+
+
+
+
+        //          //yield break;
+
+        //        }
+        //#endif
+
+        public static void loadSettingsFromText(string text, bool readBOM = true)
         {
             XmlReaderSettings xmlSettings = new XmlReaderSettings();
             xmlSettings.CloseInput = true;
             xmlSettings.IgnoreWhitespace = true;
             StringReader stringReader = new StringReader(text);
 
-          
-            if(readBOM)
-            stringReader.Read();//skip BOM
+
+            //TODO
+            throw new Exception("Should be Extended to multiplayer version");
+
+
+            if (readBOM)
+                stringReader.Read();//skip BOM
 
             using (XmlReader reader = XmlReader.Create(stringReader, xmlSettings))
             {
@@ -889,7 +913,10 @@ namespace ws.winx.input
                         name = reader.ReadElementContentAsString();
                         state = new InputState(name, key);
                         state.combinations = combinations;
-                        __settings.stateInputs[key] = state;
+                      
+
+                        //Shound be extended to multiplayer expansion
+                        //__settings.stateInputs[key] = state;
 
 
                         reader.Read();//</d2p1:KeyValueOfintInputState>
@@ -900,18 +927,18 @@ namespace ws.winx.input
 
             stringReader.Close();
 
-           // UnityEngine.Debug.Log("end reader");
+            // UnityEngine.Debug.Log("end reader");
 
-          
+
 
 
         }
 
 
 
-       
 
-		#if UNITY_WEBPLAYER && !UNITY_EDITOR
+
+#if UNITY_WEBPLAYER && !UNITY_EDITOR
 		public static IEnumerator saveSettings(String url){
 
         //V1
@@ -933,10 +960,14 @@ namespace ws.winx.input
             if(www.error!=null) UnityEngine.Debug.LogError(www.error);
 		}
 
-		#endif
+#endif
 
         public static string formatOutput()
         {
+
+
+            throw new Exception("Should be extended to multiplayer version");
+
 
             string HEADFORMAT = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
    "<Inputs xmlns:d1p1=\"http://schemas.datacontract.org/2004/07/ws.winx.input\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\">" +
@@ -978,8 +1009,8 @@ namespace ws.winx.input
                    "       </d1p1:InputAction>";
             string actionsString;
 
-            // 
-            Dictionary<int, InputState> stateInputs = InputManager.Settings.stateInputs;
+            // TODO (SHould be extended to multiplayer version
+            Dictionary<int, InputState> stateInputs;// = InputManager.Settings.stateInputs;
             InputCombination[] combinations;
             InputCombination combination;
 
@@ -1031,7 +1062,7 @@ namespace ws.winx.input
         }
 
 
-        #if UNITY_WEBPLAYER && UNITY_EDITOR
+#if UNITY_WEBPLAYER && UNITY_EDITOR
        public static void saveSettings(string path){
            XmlWriterSettings xmlSettings = new XmlWriterSettings();
            xmlSettings.Indent = true;
@@ -1061,231 +1092,256 @@ namespace ws.winx.input
        }
 #endif
 
-		#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID)&& !UNITY_WEBPLAYER
-		/// <summary>
-		/// Saves the settings to InputSettings.xml.
-		/// </summary>
-		public static void saveSettings(String path){
+#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID)&& !UNITY_WEBPLAYER
+        /// <summary>
+        /// Saves the settings to InputSettings.xml.
+        /// </summary>
+        public static void saveSettings(String path)
+        {
 
-			//DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<int,InputCombination[]>),"Inputs","");
-			 
-			DataContractSerializer serializer = new DataContractSerializer(typeof(InputSettings),"Inputs","");
-			
+            //DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<int,InputCombination[]>),"Inputs","");
 
-			XmlWriterSettings xmlSettings=new XmlWriterSettings();
-			xmlSettings.Indent=true;
-			xmlSettings.CloseOutput=true;//this would close stream after write 
-		//	xmlSettings.IndentChars="\t";
-		//	xmlSettings.NewLineOnAttributes = false;
-		//	xmlSettings.OmitXmlDeclaration = true;
+            DataContractSerializer serializer = new DataContractSerializer(typeof(InputSettings), "Inputs", "");
 
 
-
-
-
-			using(XmlWriter writer=XmlWriter.Create(path,xmlSettings))
-			{
-				//serializer.WriteObject(writer, __settings.stateInputs);
-				serializer.WriteObject(writer,__settings);
-
-				//Write the XML to file and close the writer.
-				writer.Flush();
-				writer.Close(); 
-
-
-			}
+            XmlWriterSettings xmlSettings = new XmlWriterSettings();
+            xmlSettings.Indent = true;
+            xmlSettings.CloseOutput = true;//this would close stream after write 
+            //	xmlSettings.IndentChars="\t";
+            //	xmlSettings.NewLineOnAttributes = false;
+            //	xmlSettings.OmitXmlDeclaration = true;
 
 
 
-		}
-
-		#endif     
-
-		public static void processGUIEvent (Event current)
-		{
-			InputEx.processGUIEvent (current);
-		}
-      
 
 
+            using (XmlWriter writer = XmlWriter.Create(path, xmlSettings))
+            {
+                //serializer.WriteObject(writer, __settings.stateInputs);
+                serializer.WriteObject(writer, __settings);
 
-      
+                //Write the XML to file and close the writer.
+                writer.Flush();
+                writer.Close();
+
+
+            }
+
+
+
+        }
+
+#endif
+
+        public static void processGUIEvent(Event current)
+        {
+            InputEx.processGUIEvent(current);
+        }
+
+
+
+
+
 
         //public void resetMap(){
         //}
 
-	
-		/// <summary>
-		/// Gets action from IDevice or if null
-		/// gets the action that happens on any keyboard,mouse or game controller input.(useful for building user mapping interface)
-		/// </summary>
-		 /// <returns>The action.</returns>
-		 /// <param name="">.</param>
-		public static InputAction GetAction(IDevice device){
-				if (__settings != null)
-									return InputEx.GetAction (device);
-							else
-									return null;
-			}
+
+        /// <summary>
+        /// Gets action from IDevice or if null
+        /// gets the action that happens on any keyboard,mouse or game controller input.(useful for building user mapping interface)
+        /// </summary>
+        /// <returns>The action.</returns>
+        /// <param name="">.</param>
+        public static InputAction GetAction(IDevice device)
+        {
+            if (__settings != null)
+                return InputEx.GetAction(device);
+            else
+                return null;
+        }
 
 
 
 
-		/// <summary>
-		/// Gets the input of generic created values in range 0f to 1f
-		/// in steps defined with "sensitivity" param
-		/// while key, button,mouse is HOLD
-		/// If axis(full or part) are mapped normalized values in range 0f to 1f
-		/// are returned without influence of "sensitivity" settings
-		/// 
-		/// </summary>
-		/// <returns> 0f to 1f</returns>
-		/// <param name="stateNameHash">State name hash.</param>
-		/// <param name="sensitivity">Sensitivity of rising value 0f to 1f</param>
-		/// <param name="dreadzone">Dreadzone.If value drop under dreadzone value would be nullify</param>
-		/// <param name="gravity">Gravity. After no signal from input value would drop with step of gravity or immidiately</param>
-		public static float GetInput(int stateNameHash,float sensitivity=0.1f,float dreadzone=0.1f,float gravity=0.3f){
-           //Use is mapping states so no quering keys during gameplay
+        /// <summary>
+        /// Gets the input of generic created values in range 0f to 1f
+        /// in steps defined with "sensitivity" param
+        /// while key, button,mouse is HOLD
+        /// If axis(full or part) are mapped normalized values in range 0f to 1f
+        /// are returned without influence of "sensitivity" settings
+        /// 
+        /// </summary>
+        /// <returns> 0f to 1f</returns>
+        /// <param name="stateNameHash">State name hash.</param>
+        /// <param name="player"></param>
+        /// <param name="sensitivity">Sensitivity of rising value 0f to 1f</param>
+        /// <param name="dreadzone">Dreadzone.If value drop under dreadzone value would be nullify</param>
+        /// <param name="gravity">Gravity. After no signal from input value would drop with step of gravity or immidiately</param>
+        public static float GetInput(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0, float sensitivity = 0.1f, float dreadzone = 0.1f, float gravity = 0.3f)
+        {
+            //Use is mapping states so no quering keys during gameplay
             if (!InputManager.isReady()) return 0f;
-            
-            __inputCombinations=__settings.stateInputs[stateNameHash].combinations;
 
-				return Mathf.Clamp01(__inputCombinations [0].GetInputNormalized (sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations [1] != null ? __inputCombinations [1].GetInputNormalized (sensitivity, dreadzone, gravity) : 0));
+            __inputCombinations = __settings.GetInputStatesOfPlayer(player)[stateNameHash].combinations;
 
-		}
+            IDevice device = __settings.Players[(int)player].Device;
 
+            return Mathf.Clamp01(__inputCombinations[0].GetInputNormalized(device,sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetInputNormalized(device,sensitivity, dreadzone, gravity) : 0));
 
-
-		
-		
-		
-		/// <summary>
-		/// Gets the input of device(hardware)
-		/// if device mapped is digital would return 0f or 1f 
-		/// if device mapped is analog would return 0f to 1f(positive axis) or 0f to -1f(negative axis) in steps depending of device sensitivity
-		/// </summary>
-		/// <param name="stateNameHash">State name hash.</param>
-		/// <param name="sensitivity">Sensitivity of rising value 0f to 1f</param>
-		/// <param name="dreadzone">Dreadzone.If value drop under dreadzone value would be nullify</param>
-		/// <param name="gravity">Gravity. After no signal from input value would drop with step of gravity or immidiately</param>
-		public static float GetInputRaw(int stateNameHash,float sensitivity=0.1f,float dreadzone=0.1f,float gravity=0.3f){
-			//Use is mapping states so no quering keys during gameplay
-			if (!InputManager.isReady()) return 0f;
-			
-			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
-
-			return Mathf.Clamp(__inputCombinations [0].GetAnalogValue (sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetAnalogValue(sensitivity,dreadzone,gravity) : 0f),-1f,1f);
-			
-		}
+        }
 
 
-	
 
 
-		/// <summary>
-		/// HOLD.
-		/// </summary>
-		/// <returns><c>true</c>, while input binded to state returns signal, <c>false</c> otherwise.</returns>
-		/// <param name="stateNameHash">State name hash.</param>
-		public static bool GetInputHold(int stateNameHash){
-			//Use is mapping states so no quering keys during gameplay
-			if (!InputManager.isReady()) return false;
-			
-			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
-			return __inputCombinations[0].GetInputHold() || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputHold());
-		}
 
-		/// <summary>
-		/// UP.
-		/// </summary>
-		/// <returns><c>true</c>, if input binded to state stopped to return values(then is reseted), <c>false</c> otherwise.</returns>
-		/// <param name="stateNameHash">State name hash.</param>
-		/// </param>
-		/// 
-		public static bool GetInputUp(int stateNameHash){
+
+        /// <summary>
+        /// Gets the input of device(hardware)
+        /// if device mapped is digital would return 0f or 1f 
+        /// if device mapped is analog would return 0f to 1f(positive axis) or 0f to -1f(negative axis) in steps depending of device sensitivity
+        /// </summary>
+        /// <param name="stateNameHash">State name hash.</param>
+        /// <param name="player"></param>
+        /// <param name="sensitivity">Sensitivity of rising value 0f to 1f</param>
+        /// <param name="dreadzone">Dreadzone.If value drop under dreadzone value would be nullify</param>
+        /// <param name="gravity">Gravity. After no signal from input value would drop with step of gravity or immidiately</param>
+        /// 
+        public static float GetInputRaw(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0, float sensitivity = 0.1f, float dreadzone = 0.1f, float gravity = 0.3f)
+        {
+            //Use is mapping states so no quering keys during gameplay
+            if (!InputManager.isReady()) return 0f;
+
+            __inputCombinations = __settings.GetInputStatesOfPlayer(player)[stateNameHash].combinations;
+
+            IDevice device = __settings.Players[(int)player].Device;
+
+            return Mathf.Clamp(__inputCombinations[0].GetAnalogValue(device,sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetAnalogValue(device,sensitivity, dreadzone, gravity) : 0f), -1f, 1f);
+
+        }
+
+
+
+
+
+        /// <summary>
+        /// HOLD.
+        /// </summary>
+        /// <returns><c>true</c>, while input binded to state returns signal, <c>false</c> otherwise.</returns>
+        /// <param name="stateNameHash">State name hash.</param>
+        /// <param name="player"></param>
+        public static bool GetInputHold(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0)
+        {
             //Use is mapping states so no quering keys during gameplay
             if (!InputManager.isReady()) return false;
 
-			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
+            __inputCombinations = __settings.GetInputStatesOfPlayer(player)[stateNameHash].combinations;
+
+            IDevice device = __settings.Players[(int)player].Device;
+
+            return __inputCombinations[0].GetInputHold(device) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputHold(device));
+        }
+
+        /// <summary>
+        /// UP.
+        /// </summary>
+        /// <returns><c>true</c>, if input binded to state stopped to return values(then is reseted), <c>false</c> otherwise.</returns>
+        /// <param name="stateNameHash">State name hash.</param>
+        /// <param name="player"></param>
+        public static bool GetInputUp(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0)
+        {
+            //Use is mapping states so no quering keys during gameplay
+            if (!InputManager.isReady()) return false;
+
+            __inputCombinations = __settings.GetInputStatesOfPlayer(player)[stateNameHash].combinations;
 
 
+            IDevice device = __settings.Players[(int)player].Device;
+            return __inputCombinations[0].GetInputUp(device) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp(device));
 
-            return __inputCombinations[0].GetInputUp() || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp());
+        }
 
-		}
-
-		/// <summary>
-		/// DOWN.
-		/// </summary>
-		/// <returns><c>true</c>, if input binded to state started to return values (than is reseted), <c>false</c> otherwise.</returns>
-		/// <param name="stateNameHash">State name hash.</param>
-		/// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts successive action (ex. W+C => W pressed,released then C pressed)
+        /// <summary>
+        /// DOWN.
+        /// </summary>
+        /// <returns><c>true</c>, if input binded to state started to return values (than is reseted), <c>false</c> otherwise.</returns>
+        /// <param name="stateNameHash">State name hash.</param>
+        /// <param name="player"></param>
+        /// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts successive action (ex. W+C => W pressed,released then C pressed)
         /// atOnce=true useful for building modifires like behaviour (LeftCtrl(-)+C)
-        /// </param>		 
-		public static bool GetInputDown(int stateNameHash,bool atOnce=false){
-			//Use is mapping states so no quering keys during gameplay
-			if (!InputManager.isReady()) return false;
 
-			//__settings.Players[InputManager.currentPlayerInx].GetStateInputBasedOnControllerMappedToPlayer
+        public static bool GetInputDown(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0, bool atOnce = false)
+        {
+            //Use is mapping states so no quering keys during gameplay
+            if (!InputManager.isReady()) return false;
 
-			__inputCombinations=__settings.stateInputs[stateNameHash].combinations;
+            //__settings.Players[InputManager.currentPlayerInx].GetStateInputBasedOnControllerMappedToPlayer
 
-          	 return __inputCombinations[0].GetInputDown(atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputDown(atOnce));
-		}
+            __inputCombinations = __settings.GetInputStatesOfPlayer(player)[stateNameHash].combinations;
 
+            IDevice device = __settings.Players[(int)player].Device;
 
-
-		/// <summary>
-		/// Log states - inputs values to console
-		/// </summary>
-		public static string Log(){
-			StringBuilder content=new StringBuilder();
-			int i;
-			//primary,secondary...
-			InputCombination[] combinations;
-
-			foreach (var keyValuPair in __settings.stateInputs)
-			{
-				content.AppendLine("Name:"+keyValuPair.Value.name+" Key:"+keyValuPair.Key);
-				combinations=keyValuPair.Value.combinations;
-
-				for(i=0;i<combinations.Length;i++){
-					if(combinations[i]!=null)
-					content.AppendLine(i+": " +combinations[i].ToString());
-				}
-
-				content.AppendLine();
-				 
-
-			}
-
-
-						return content.ToString();
-
-		}
-
-
-		
-	
-		
-	
+            return __inputCombinations[0].GetInputDown(device,atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputDown(device,atOnce));
+        }
 
 
 
-        public static void Dispose(){
+        /// <summary>
+        /// Log states - inputs values to console
+        /// </summary>
+        public static string Log()
+        {
+            StringBuilder content = new StringBuilder();
+            int i;
+            int j;
+            //primary,secondary...
+            InputCombination[] combinations;
 
-			Debug.Log ("InputManager Dispose");
+            for (j = 0; j < __settings.Players.Length; j++)
+                foreach (var keyValuPair in __settings.GetInputStatesOfPlayer((InputPlayer.Player)j))
+                {
+                    content.AppendLine("Name:" + keyValuPair.Value.name + " Key:" + keyValuPair.Key);
+                    combinations = keyValuPair.Value.combinations;
+
+                    for (i = 0; i < combinations.Length; i++)
+                    {
+                        if (combinations[i] != null)
+                            content.AppendLine(i + ": " + combinations[i].ToString());
+                    }
+
+                    content.AppendLine();
+
+
+                }
+
+
+            return content.ToString();
+
+        }
+
+
+
+
+
+
+
+
+
+        public static void Dispose()
+        {
+
+            Debug.Log("InputManager Dispose");
 
             if (__hidInterface != null)
             {
-				Debug.Log ("Try to remove HidInterface events");
-				__hidInterface.DeviceDisconnectEvent-=new EventHandler<DeviceEventArgs<string>>(onRemoveDevice);
+                Debug.Log("Try to remove HidInterface events");
+                __hidInterface.DeviceDisconnectEvent -= new EventHandler<DeviceEventArgs<string>>(onRemoveDevice);
 
 
-				__hidInterface.DeviceConnectEvent-=new EventHandler<DeviceEventArgs<IDevice>>(onAddDevice);
+                __hidInterface.DeviceConnectEvent -= new EventHandler<DeviceEventArgs<IDevice>>(onAddDevice);
 
 
-				__hidInterface.Dispose();
+                __hidInterface.Dispose();
                 __hidInterface = null;
             }
 
@@ -1295,33 +1351,36 @@ namespace ws.winx.input
                 UnityEngine.Debug.Log(" NotificationHandle Erorr" + error);
 
 
-			if (InputEx.Devices != null) {
-				Debug.Log ("Try to remove devices");
-				InputEx.Devices.Clear ();
+            if (InputEx.Devices != null)
+            {
+                Debug.Log("Try to remove devices");
+                InputEx.Devices.Clear();
 
-			}
+            }
 
-			Debug.Log ("Try to remove states per player");
-			InputPlayer[] players = InputManager.Settings.Players;
-			if(players!=null)
-			for (int i=0; i<players.Length; i++) {
+            Debug.Log("Try to remove states per player");
+            InputPlayer[] players = InputManager.Settings.Players;
+            if (players != null)
+                for (int i = 0; i < players.Length; i++)
+                {
 
-				foreach (var DeviceStateInputPair in players[i].DeviceProfileStateInputs) {
-					DeviceStateInputPair.Value.Clear();
-					
-				}
+                    foreach (var DeviceStateInputPair in players[i].DeviceProfileStateInputs)
+                    {
+                        DeviceStateInputPair.Value.Clear();
+
+                    }
 
 
-				players[i].DeviceProfileStateInputs.Clear();
+                    players[i].DeviceProfileStateInputs.Clear();
 
-			}
+                }
 
-//		if (InputManager.Settings.stateInputs != null)
-//								InputManager.Settings.stateInputs.Clear ();
-			
-			Debug.Log ("Dispose Finished");
+            //		if (InputManager.Settings.stateInputs != null)
+            //								InputManager.Settings.stateInputs.Clear ();
 
-          
+            Debug.Log("Dispose Finished");
+
+
             if (error > 0)
 
                 UnityEngine.Debug.Log(" NotificationHandle Erorr" + error);
@@ -1329,139 +1388,152 @@ namespace ws.winx.input
 
 
 
-		#region Settings
+        #region Settings
 
-		#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
-		[DataContract]
+#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+        [DataContract]
 #endif
-		public class InputSettings{
-
-
-
-			
-			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
-			[DataMember(Order=4)]
-			#endif
-			public float singleClickSensitivity{
-				get{ return InputAction.SINGLE_CLICK_SENSITIVITY; }
-				set{ InputAction.SINGLE_CLICK_SENSITIVITY=value; }
-
-			}
-
-			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
-			[DataMember(Order=5)]
-			#endif
-			public float doubleClickSensitivity{
-				get{ return InputAction.DOUBLE_CLICK_SENSITIVITY; }
-				set{ InputAction.DOUBLE_CLICK_SENSITIVITY=value; }
-				
-			}
-
-			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
-			[DataMember(Order=6)]
-			#endif
-			public float longClickSensitivity{
-				get{ return InputAction.LONG_CLICK_SENSITIVITY; }
-				set{ InputAction.LONG_CLICK_SENSITIVITY=value; }
-				
-			}
-
-			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
-			[DataMember(Order=7)]
-			#endif
-			public float combinationsClickSensitivity{
-				get{ return InputAction.COMBINATION_CLICK_SENSITIVITY; }
-				set{ InputAction.COMBINATION_CLICK_SENSITIVITY=value; }
-				
-			}
-
-			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
-			[DataMember(Order=1)]
-			#endif
-			public string doubleDesignator{
-				get{ return InputAction.DOUBLE_DESIGNATOR; }
-				set{ InputAction.DOUBLE_DESIGNATOR=value; }
-				
-			}
-
-			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
-			[DataMember(Order=2)]
-			#endif
-			public string longDesignator{
-				get{ return InputAction.LONG_DESIGNATOR; }
-				set{ InputAction.LONG_DESIGNATOR=value; }
-				
-			}
-
-			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
-			[DataMember(Order=3)]
-			#endif
-			public string spaceDesignator{
-				get{ return InputAction.SPACE_DESIGNATOR.ToString(); }
-				set{ InputAction.SPACE_DESIGNATOR=value[0]; }
-				
-			}
-
-			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
-			[DataMember(Name="Players",Order=9)]
-			#endif
-			protected InputPlayer[] _players;
-			
-			public InputPlayer[] Players{
-				get {return _players;}
-				set { _players = value;}
-			}
-
-
-
-			public Dictionary<int,InputState> GetInputStatesOfPlayer(InputPlayer.Player index){
-
-
-				InputPlayer player = _players [(int)index];
-
-					//if there is device attached to player
-					if (player.Device != null) {
-										string profileName = player.Device.profile != null ? player.Device.profile.Name : "default";
-
-										if (player.DeviceProfileStateInputs.ContainsKey (profileName)) {
-												return player.DeviceProfileStateInputs [profileName];
-
-										}
-
-					}
-
-					return player.DeviceProfileStateInputs["default"];
-
-
-			}
+        public class InputSettings
+        {
 
 
 
 
+#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+            [DataMember(Order = 4)]
+#endif
+            public float singleClickSensitivity
+            {
+                get { return InputAction.SINGLE_CLICK_SENSITIVITY; }
+                set { InputAction.SINGLE_CLICK_SENSITIVITY = value; }
 
-//			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
-//			[DataMember(Name="StateInputs",Order=9)]
-//			#endif
-//			protected Dictionary<int,InputState> _stateInputs;
-			
-			public Dictionary<int,InputState> stateInputs{
-				get {return GetInputStatesOfPlayer(InputManager.currentPlayerIndex);}
-			}
+            }
+
+#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+            [DataMember(Order = 5)]
+#endif
+            public float doubleClickSensitivity
+            {
+                get { return InputAction.DOUBLE_CLICK_SENSITIVITY; }
+                set { InputAction.DOUBLE_CLICK_SENSITIVITY = value; }
+
+            }
+
+#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+            [DataMember(Order = 6)]
+#endif
+            public float longClickSensitivity
+            {
+                get { return InputAction.LONG_CLICK_SENSITIVITY; }
+                set { InputAction.LONG_CLICK_SENSITIVITY = value; }
+
+            }
+
+#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+            [DataMember(Order = 7)]
+#endif
+            public float combinationsClickSensitivity
+            {
+                get { return InputAction.COMBINATION_CLICK_SENSITIVITY; }
+                set { InputAction.COMBINATION_CLICK_SENSITIVITY = value; }
+
+            }
+
+#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+            [DataMember(Order = 1)]
+#endif
+            public string doubleDesignator
+            {
+                get { return InputAction.DOUBLE_DESIGNATOR; }
+                set { InputAction.DOUBLE_DESIGNATOR = value; }
+
+            }
+
+#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+            [DataMember(Order = 2)]
+#endif
+            public string longDesignator
+            {
+                get { return InputAction.LONG_DESIGNATOR; }
+                set { InputAction.LONG_DESIGNATOR = value; }
+
+            }
+
+#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+            [DataMember(Order = 3)]
+#endif
+            public string spaceDesignator
+            {
+                get { return InputAction.SPACE_DESIGNATOR.ToString(); }
+                set { InputAction.SPACE_DESIGNATOR = value[0]; }
+
+            }
+
+#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+            [DataMember(Name = "Players", Order = 9)]
+#endif
+            protected InputPlayer[] _players;
+
+            public InputPlayer[] Players
+            {
+                get { return _players; }
+                set { _players = value; }
+            }
 
 
-		   public InputSettings(){
-					//_stateInputs=new Dictionary<int,InputState>();
 
-		   }
-		}
-		#endregion
+            internal Dictionary<int, InputState> GetInputStatesOfPlayer(InputPlayer.Player index)
+            {
+
+
+                InputPlayer player = _players[(int)index];
+
+                //if there is device attached to player
+                if (player.Device != null)
+                {
+                    string profileName = player.Device.profile != null ? player.Device.profile.Name : "default";
+
+                    if (player.DeviceProfileStateInputs.ContainsKey(profileName))
+                    {
+                        return player.DeviceProfileStateInputs[profileName];
+
+                    }
+
+                }
+
+                return player.DeviceProfileStateInputs["default"];
+
+
+            }
 
 
 
 
 
+            //			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+            //			[DataMember(Name="StateInputs",Order=9)]
+            //			#endif
+            //			protected Dictionary<int,InputState> _stateInputs;
 
-       
+            //public Dictionary<int,InputState> stateInputs{
+            //    get {return GetInputStatesOfPlayer(InputManager.currentPlayerIndex);}
+            //}
+
+
+            public InputSettings()
+            {
+                //_stateInputs=new Dictionary<int,InputState>();
+
+            }
+        }
+        #endregion
+
+
+
+
+
+
+
     }
 }
 
