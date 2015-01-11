@@ -41,7 +41,7 @@ namespace ws.winx.platform
 			void AddDriver(IDriver driver);
 			void Update();
 			void Enumerate();
-			void LoadProfiles();
+			void LoadProfiles(string fileName);
 			DeviceProfile LoadProfile(string fileBase);
 		    
 

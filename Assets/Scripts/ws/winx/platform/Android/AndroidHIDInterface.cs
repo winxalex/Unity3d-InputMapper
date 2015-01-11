@@ -171,7 +171,7 @@ namespace ws.winx.platform.android
 
 
 
-        public void LoadProfiles()
+        public void LoadProfiles(String fileName)
         {
               throw new NotImplementedException();
         }

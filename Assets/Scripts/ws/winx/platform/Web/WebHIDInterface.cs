@@ -51,7 +51,7 @@ namespace ws.winx.platform.web
 #region IHIDInterface implementation
 
 
-	public void LoadProfiles ()
+	public void LoadProfiles (String fileName)
 		{
 			//cos UNITY_WEBPLAYER: Application.dataPath  = "http://localhost/appfolder/"
 
@@ -62,7 +62,7 @@ namespace ws.winx.platform.web
 			StreamReader reader = new StreamReader(stream);
 			string[] deviceNameProfilePair;
 			char splitChar='|';
-			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, "profiles.txt"))){
+			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileName))){
 				
 				
 				while(!reader.EndOfStream){

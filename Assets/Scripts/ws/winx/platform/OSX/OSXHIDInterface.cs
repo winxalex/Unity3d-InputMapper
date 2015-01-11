@@ -137,7 +137,7 @@ namespace ws.winx.platform.osx
 			hidmanager = Native.IOHIDManagerCreate(IntPtr.Zero,(int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone);
 			
 			
-			LoadProfiles ();
+			LoadProfiles ("profiles.txt");
 			
 			
 			
@@ -147,13 +147,13 @@ namespace ws.winx.platform.osx
 
 #region IHIDInterface implementation
 
-		public void LoadProfiles ()
+		public void LoadProfiles (string fileName)
 		{
 			
 			string[] deviceNameProfilePair;
 			char splitChar='|';
 
-			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, "profiles.txt"))){
+			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath,fileName))){
 
 
 				while(!reader.EndOfStream){
@@ -302,7 +302,9 @@ namespace ws.winx.platform.osx
             get { if (__defaultJoystickDriver == null) { __defaultJoystickDriver = new OSXDriver(); } return __defaultJoystickDriver; }
             set { __defaultJoystickDriver = value; 
 				if(value is ws.winx.drivers.UnityDriver){
+
 					Debug.LogWarning("UnityDriver set as default driver.\n Warring:Unity doesn't make distinction between triggers/axis/pow, samekind controllers can't be distinct as they would have same na in GetJoystickList and some controlers would have different joystick index then on in list. Also current profiles aren't done for this driver");
+					LoadProfiles("profiles_uni.txt");
 				}
 			}
 
