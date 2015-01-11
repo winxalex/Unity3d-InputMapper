@@ -1,0 +1,2 @@
+A|B|X|Y|LB|RB|Back|Start|Mode|Vibration
+Left Stick X|Left Stick Y|LT|RT|Right Stick X|Right Stick Y|DPAD_|DPAD_

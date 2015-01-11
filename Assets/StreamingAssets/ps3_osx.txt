@@ -1,0 +1,2 @@
+Select|||Start|DPAD_Forward|DPAD_Right|DPAD_Back|DPAD_Left|L2|R2|L1|R1|Triangle|Circle|Cross|Square
+Left Stick X|Left Stick Y|Right Stick X|Right Stick Y

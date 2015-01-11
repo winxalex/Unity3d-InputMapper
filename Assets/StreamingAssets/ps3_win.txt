@@ -1,0 +1,2 @@
+Triangle|Circle|Cross|Square|L1|R1|L2|R2|Select|||Start|System
+Left Stick X|Left Stick Y|Right Stick X|Right Stick Y|Tilt X|Tilt Y|DPAD_|DPAD_
