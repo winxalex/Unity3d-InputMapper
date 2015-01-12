@@ -88,7 +88,14 @@ public class PlayerInputComponent : MonoBehaviour
     void Update()
     {
        
+		//Debug.Log (InputManager.GetInput (Animator.StringToHash ("ManualFullAxisMap"),Player,0.25f));
 
+		//Debug.Log (InputManager.GetInputRaw (Animator.StringToHash ("ManualFullAxisMap"),Player,0.25f));
+
+//		if (InputManager.GetInputUp(Animator.StringToHash ("ManualFullAxisMap"),Player))
+//		{
+//			Debug.Log (Player+"_Full Axis UP");
+//		}
 
         if (InputManager.GetInputDown((int)States.Wave,Player,true))
         {
@@ -102,7 +109,7 @@ public class PlayerInputComponent : MonoBehaviour
 
 
         //
-        //
+        //Math.Abs prevent code to function diffrently when axis is inverted
         float forward = Math.Abs(InputManager.GetInput((int)States.WalkForward,Player, 0.25f))
             - Math.Abs(InputManager.GetInput((int)States.WalkBackward,Player, 0.25f));
 

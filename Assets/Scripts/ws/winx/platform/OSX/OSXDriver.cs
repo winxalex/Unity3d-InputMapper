@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using System.Collections.Generic;
 using ws.winx.utils;
+using ws.winx.drivers;
 
 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
 using System;
@@ -329,16 +330,16 @@ namespace ws.winx.platform.osx
 			//check for profile
 			DeviceProfile profile = null;
 
-			//V2 faster version with profilemin.txt but won't work with Unity as default driver
-			//String.Format ("X4{0}#X4{1}", hidDevice.VID, hidDevice.PID);
 
-			if (hidDevice.hidInterface.Profiles.ContainsKey (hidDevice.Name)) {
-				
-				
-				
-				profile = hidDevice.hidInterface.LoadProfile (hidDevice.hidInterface.Profiles [hidDevice.Name]);
-			}
-			
+
+			String profileKey=hidDevice.hidInterface.defaultDriver is UnityDriver? hidDevice.Name : hidDevice.VID.ToString("X4")+"#"+hidDevice.PID.ToString("X4");
+						if (hidDevice.hidInterface.Profiles.ContainsKey(profileKey)) {
+							try{
+							profile = hidDevice.hidInterface.LoadProfile (hidDevice.hidInterface.Profiles [profileKey]);
+							}catch(Exception ex){
+								Debug.LogException(ex);
+							}
+						}
 
 
 			IAxisDetails axisDetailsPovX=null;

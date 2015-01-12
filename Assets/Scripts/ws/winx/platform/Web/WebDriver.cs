@@ -32,7 +32,7 @@ namespace ws.winx.platform.web
             int numButtons = genericDevice.numButtons; //info.Extension.buttons;
 
          
-              joystick = new JoystickDevice(info.index, info.PID, info.VID, Math.Max(8,numAxes),numButtons, this);
+              joystick = new JoystickDevice(info.index, info.PID, info.VID,info.ID, Math.Max(8,numAxes),numButtons, this);
               joystick.Name = info.Name;
 
                     
@@ -83,7 +83,7 @@ namespace ws.winx.platform.web
             
             
             
-             JoystickDevice device = InputManager.Devices.GetDeviceAt(report.index) as JoystickDevice; 
+             JoystickDevice device = InputEx.Devices.GetDeviceAt(report.index) as JoystickDevice; 
  
             
             // UnityEngine.Debug.Log("onPositionUpdate:Joy" + info.index);
@@ -204,13 +204,13 @@ namespace ws.winx.platform.web
            // Debug.Log("Update"+_isReady);
             if (device.isReady)
             {
-                if(_hidInterface.Generics.ContainsKey(device.PID)){
+                if(_hidInterface.Generics.ContainsKey(device.ID)){
                   
                 // Debug.Log("Request Update Joy"+joystick.ID);
                 //((JoystickDevice)device).isReady = false;
 
                      //_hidInterface.Read(device.PID,onRead);
-                        onRead(_hidInterface.ReadBuffered(device.PID));
+                        onRead(_hidInterface.ReadBuffered(device.ID));
                 }
 
                  //read from generic device
@@ -236,8 +236,22 @@ namespace ws.winx.platform.web
             float _value;
             uint _uid;
             ButtonState _buttonState=ButtonState.None;
+			String _name;
 
 #region IDeviceDetails implementation
+
+
+
+			public string name {
+				get {
+					return _name;
+				}
+				set {
+					_name=value;
+				}
+			}
+
+		
 
 
             public uint uid
@@ -352,6 +366,7 @@ namespace ws.winx.platform.web
             bool _isNullable;
             bool _isHat;
             bool _isTrigger;
+			string _name;
 
 
 #region IAxisDetails implementation
@@ -438,6 +453,16 @@ namespace ws.winx.platform.web
                     throw new NotImplementedException();
                 }
             }
+
+			
+			public string name {
+				get {
+					return _name;
+				}
+				set {
+					_name=value;
+				}
+			}
 
 
 #endregion

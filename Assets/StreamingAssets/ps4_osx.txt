@@ -1,0 +1,2 @@
+Square|Cross|Circle|Triangle|L1|R1|||Share|Options|||System
+Left Stick X|Left Stick Y|Right Stick X|Right Stick Y|L2|R2|DPAD_|DPAD_

@@ -1,17 +1,83 @@
-Controller (Afterglow Gamepad for Xbox 360)|xbox360
-Controller (Batarang wired controller (XBOX))|xbox360
-Controller (Gamepad for Xbox 360)|xbox360
-Controller (Infinity Controller 360)|xbox360
-Controller (Mad Catz FPS Pro GamePad)|xbox360
-Controller (MadCatz Call of Duty GamePad)|xbox360
-Controller (MadCatz GamePad)|xbox360
-Controller (MLG GamePad for Xbox 360)|xbox360
-Controller (Razer Sabertooth Elite)|xbox360
-Controller (Rock Candy Gamepad for Xbox 360)|xbox360
-Controller (Xbox 360 For Windows)|xbox360
-Controller (Xbox 360 Wireless Receiver for Windows)|xbox360
-XBOX 360 For Windows (Controller)|xbox360
-Controller (XEOX Gamepad)|xbox360
-Microsoft Wireless 360 Controller|xbox360
-Thrustmaster Thrustmaster force feedback wheel|tm_rgtffpro
-Thrustmaster force feedback wheel|tm_rgtffpro
+045E#02A1|xbox360
+045E#0202|xbox360
+045E#0289|xbox360
+045E#0285|xbox360
+045E#0287|xbox360
+045E#028E|xbox360
+045E#0291|xbox360
+045E#0719|xbox360
+045E#02D1|xbox360
+0C12#8809|xbox360
+044F#0F07|xbox360
+046D#C242|xbox360
+046D#CA84|xbox360
+0738#4540|xbox360
+0738#4556|xbox360
+0738#4716|xbox360
+0738#4728|xbox360
+0738#4738|xbox360
+0738#4A01|xbox360
+0738#6040|xbox360
+0738#CB03|xbox360
+0738#4718|xbox360
+0738#4726|xbox360
+0738#4736|xbox360
+0738#4740|xbox360
+0738#B726|xbox360
+0738#B738|xbox360
+0738#BEEF|xbox360
+0738#F738|xbox360
+06A3#F51A|xbox360
+0738#CB02|xbox360
+0C12#8802|xbox360
+0C12#880A|xbox360
+0C12#8810|xbox360
+0C12#9902|xbox360
+0E6F#0003|xbox360
+0E6F#0005|xbox360
+0E6F#0006|xbox360
+0E6F#0006|xbox360
+0E6F#0105|xbox360
+0E6F#0201|xbox360
+0E6F#0213|xbox360
+0E6F#0113|xbox360
+12AB#0301|xbox360
+1BAD#F900|xbox360
+0E8F#0201|xbox360
+0F0D#000D|xbox360
+0F0D#0016|xbox360
+0F30#0202|xbox360
+0F30#8888|xbox360
+102C#FF0C|xbox360
+146B#0601|xbox360
+0F0D#000A|xbox360
+0F0D#000C|xbox360
+24C6#5503|xbox360
+24C6#5300|xbox360
+1689#FD00|xbox360
+1689#FE00|xbox360
+1689#FD01|xbox360
+1BAD#F028|xbox360
+1BAD#F901|xbox360
+1BAD#F903|xbox360
+1BAD#FD00|xbox360
+1BAD#5500|xbox360
+1BAD#F016|xbox360
+1BAD#F501|xbox360
+1BAD#F502|xbox360
+15E4#3F0A|xbox360
+15E4#3F00|xbox360
+162E#BEEF|xbox360
+044F#B653|tm_rgtffpro
+046D#C216|log_dualact
+046D#C218|log_rumble2
+046D#C219|log_rumble2
+046D#C21A|log_precision
+046D#C21D|log_f310
+046D#C21E|log_f510
+046D#C21F|log_f710
+054C#05C4|ps4
+0F0D#0055|ps4
+054C#042F|ps3
+054C#0268|ps3
+0F0D#0022|ps3

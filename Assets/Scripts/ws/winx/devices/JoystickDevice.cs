@@ -213,6 +213,27 @@ namespace ws.winx.devices
 
 						JoystickAxis axis = InputCode.toAxis (code);
 						int data = InputCode.toData (code);
+
+
+			if (axis == JoystickAxis.None) {   //MO data for axis => buttons data
+				//UnityEngine.Debug.Log("Button state>" + button_collection[data].buttonState);
+				
+				//previous mapping might be to device with less or more buttons
+				//at same device index
+				if (button_collection.Count > data)
+					return button_collection [data].value;
+				else
+					return 0f;
+				
+			}
+			
+			//previous mapping might be to device with less or more axess
+					//at same device index
+					if (axis_collection.Count <= (int)axis)
+					return 0f;
+			
+			
+						
 						float axisValue = axis_collection [axis].value;
 
 
@@ -252,68 +273,7 @@ namespace ws.winx.devices
 
 
 
-				/// <summary>
-				/// Gets the key up.
-				/// </summary>
-				/// <returns><c>true</c>, if key up was gotten, <c>false</c> otherwise.</returns>
-				/// <param name="code">Code.</param>
-				public virtual  bool GetInputUp (int code)
-				{
-						Update ();// 
-
-						// UnityEngine.Debug.Log("GetKeyUP");
-
-
-						JoystickAxis axis = InputCode.toAxis (code);
-						int data = InputCode.toData (code);
-                    
-						if (axis == JoystickAxis.None) {
-
-								//previous mapping might be to device with less or more buttons
-								//at same device index
-								if (button_collection.Count > data)
-										return button_collection [data].buttonState == ButtonState.Up;
-								else
-										return false;
-						}
-
-						//previous mapping might be to device with less or more axess
-						//at same device index
-						if (axis_collection.Count <= (int)axis)
-								return false;
-
-						IAxisDetails axisDetails = axis_collection [axis];
-
-
-
-
-						if (axisDetails == null)
-								return false;
-
-						if (axis == JoystickAxis.AxisPovX) {
-								if (data == (int)JoystickPovPosition.Left && axisDetails.buttonState == ButtonState.NegToUp)
-										return true;
-								if (data == (int)JoystickPovPosition.Right && axisDetails.buttonState == ButtonState.PosToUp)
-										return true;
-								return false;
-						}
-
-						if (axis == JoystickAxis.AxisPovY) {
-								if (data == (int)JoystickPovPosition.Backward && axisDetails.buttonState == ButtonState.NegToUp)
-										return true;
-								if (data == (int)JoystickPovPosition.Forward && axisDetails.buttonState == ButtonState.PosToUp)
-										return true;
-								return false;
-						}
-
-						//check if the axis moved in Negative values was released
-						if (data == (int)JoystickPosition.Negative && axisDetails.buttonState == ButtonState.NegToUp)
-								return true;
-						if (data == (int)JoystickPosition.Positive && axisDetails.buttonState == ButtonState.PosToUp)
-								return true; 
-
-						return false;
-				}
+			
 
 				public virtual bool GetInputDigital (int code, ButtonState buttonState)
 				{
@@ -399,6 +359,17 @@ namespace ws.winx.devices
 								//	UnityEngine.Debug.Log("data:" + data+"buttotnState:"+buttonState+" equal"+isEqualToButtonState+" value:"+axisDetails.value);
 								return true;
 						}
+
+//						if (data == (int)JoystickPosition.Full && buttonState == ButtonState.Up) {
+//						if (isPositive && axisDetails.value >= 0)
+//								return true;
+//						if (isNegative && axisDetails.value <= 0)
+//								return true;		
+//				}else
+						if (data == (int)JoystickPosition.Full && isEqualToButtonState && (isPositive || isNegative)) {
+								return true;
+						}
+
 							
 							
 						return false;
@@ -832,6 +803,7 @@ namespace ws.winx.devices
 				
 				public TAxisDetails this [JoystickAxis axis] {
 						get { 
+				               
 								return details [(int)axis]; 
 						}
 						internal set { details [(int)axis] = value; }

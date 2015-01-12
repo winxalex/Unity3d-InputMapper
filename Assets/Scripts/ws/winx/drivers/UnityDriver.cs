@@ -122,7 +122,7 @@ namespace ws.winx.drivers
 								//axisValue = Input.GetAxis (index.ToString () + i.ToString ()) + " ";
 
 //							if(i==1){
-								Debug.Log(axisValue);
+//								Debug.Log(axisValue);
 //								
 //							}
 

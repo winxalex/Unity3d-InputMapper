@@ -26,7 +26,7 @@ namespace ws.winx.platform.web
         public event EventHandler<WebMessageArgs<bool>> GamePadEventsSupportEvent;
 
 		public event EventHandler<WebMessageArgs<GenericHIDDevice>> DeviceConnectedEvent;
-		public event EventHandler<WebMessageArgs<int>> DeviceDisconnectedEvent;
+		public event EventHandler<WebMessageArgs<string>> DeviceDisconnectedEvent;
         public event EventHandler<WebMessageArgs<WebHIDReport>> PositionUpdateEvent;
 
         protected bool _isInitialized = false;
@@ -92,7 +92,7 @@ namespace ws.winx.platform.web
 				int PID;
 				int VID;
 				string Name;
-				IDToDeviceData (info.id,out PID,out VID,out Name);
+				IDToDeviceData (info.ID,out PID,out VID,out Name);
 
 				info.PID=PID;
 				info.VID=VID;
@@ -101,15 +101,15 @@ namespace ws.winx.platform.web
             }
         }
 
-        public void onDeviceDisconnectedEvent(string message)
+        public void onDeviceDisconnectedEvent(string ID)
         {
             if (DeviceDisconnectedEvent != null)
             {
-				int PID;
-				int VID;
-				string Name;
-				IDToDeviceData (message,out PID,out VID,out Name);
-                DeviceDisconnectedEvent(this, new WebMessageArgs<int>(PID));
+				//int PID;
+				//int VID;
+				//string Name;
+				//IDToDeviceData (message,out PID,out VID,out Name);
+                DeviceDisconnectedEvent(this, new WebMessageArgs<string>(ID));
             }
         }
 
@@ -121,7 +121,7 @@ namespace ws.winx.platform.web
 
 
 			parts = value.Split('-');
-			//044f-b653-NAME FF
+			//044f-b653-NAME Fire Fox
 			//Name (Vendor: 044f Product: b653) Chrome
 
 			PID = 0x0;

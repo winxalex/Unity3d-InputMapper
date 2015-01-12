@@ -7,6 +7,8 @@ using UnityEngine;
 using ws.winx.devices;
 using System.Timers;
 using System.Runtime.InteropServices;
+using System.IO;
+using System.Net;
 
 
 
@@ -23,9 +25,10 @@ namespace ws.winx.platform.web
 
         //link towards Browser
         internal readonly WebHIDBehaviour webHIDBehaviour;
-        private Dictionary<int, HIDDevice> __Generics;
+        private Dictionary<string, HIDDevice> __Generics;
+		private Dictionary<string,string> __profiles;
 
-		public event EventHandler<DeviceEventArgs<int>> DeviceDisconnectEvent;
+		public event EventHandler<DeviceEventArgs<string>> DeviceDisconnectEvent;
 		public event EventHandler<DeviceEventArgs<IDevice>> DeviceConnectEvent;
 
        
@@ -36,14 +39,14 @@ namespace ws.winx.platform.web
         {
             __drivers = new List<IDriver>();
            
-            __Generics=new Dictionary<int,HIDDevice>();
+            __Generics=new Dictionary<string,HIDDevice>();
 
             //"{"id":"feed-face-VJoy Virtual Joystick","axes":[0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0,0,0,0,0,0,-1,0,0,0,0,0,0],"buttons":[{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}],"index":0}"
 
             _container = new GameObject("WebHIDBehaviourGO");
             webHIDBehaviour= _container.AddComponent<WebHIDBehaviour>();
           
-            LoadProfiles();
+            LoadProfiles("profiles.txt");
 
         }
 #endregion
@@ -51,18 +54,68 @@ namespace ws.winx.platform.web
 #region IHIDInterface implementation
 
 
-	public void LoadProfiles ()
+
+		public HIDReport ReadDefault (string id)
+		{
+			throw new NotImplementedException ();
+		}
+
+	
+
+		public void Read (string id, HIDDevice.ReadCallback callback)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void Read (string id, HIDDevice.ReadCallback callback, int timeout)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void Write (object data, string id, HIDDevice.WriteCallback callback, int timeout)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void Write (object data, string id, HIDDevice.WriteCallback callback)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void Write (object data, string id)
+		{
+			throw new NotImplementedException ();
+		}
+
+
+		Dictionary<string, HIDDevice> IHIDInterface.Generics {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
+
+		public Dictionary<string, string> Profiles {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
+
+
+
+
+	public void LoadProfiles (String fileName)
 		{
 			//cos UNITY_WEBPLAYER: Application.dataPath  = "http://localhost/appfolder/"
 
 			throw new Exception("UnityWebPlayer loading profiles option not yet tested");
 			
 			WebClient client = new WebClient();
-			Stream stream = client.OpenRead(strURL);
-			StreamReader reader = new StreamReader(stream);
+			Stream stream = client.OpenRead(Path.Combine(Application.streamingAssetsPath, fileName));
+
 			string[] deviceNameProfilePair;
 			char splitChar='|';
-			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, "profiles.txt"))){
+
+			using(StreamReader reader = new StreamReader(stream)){
 				
 				
 				while(!reader.EndOfStream){
@@ -86,12 +139,11 @@ namespace ws.winx.platform.web
 			throw new Exception("UnityWebPlayer loading profiles option not yet not tested");
 			
 			WebClient client = new WebClient();
-			Stream stream = client.OpenRead(strURL);
-			StreamReader reader = new StreamReader(stream);
+			Stream stream = client.OpenRead(Path.Combine(Application.streamingAssetsPath, fileBase+"_web.txt"));
 
 			char splitChar='|';
 			
-			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileBase+"_web.txt"))){
+			using(StreamReader reader = new StreamReader(stream)){
 				
 				
 				if(!reader.EndOfStream)
@@ -120,59 +172,32 @@ namespace ws.winx.platform.web
 			__drivers.Add (driver);
 		}
 
-		public bool Contains (int pid)
+		public bool Contains (string id)
 		{
-			return __Generics != null && __Generics.ContainsKey (pid);
+			return __Generics != null && __Generics.ContainsKey (id);
 		}
 
         public void Enumerate ()
 		{
 		
-			webHIDBehaviour.DeviceDisconnectedEvent += new EventHandler<WebMessageArgs<int>>(DeviceDisconnectedEventHandler);
+			webHIDBehaviour.DeviceDisconnectedEvent += new EventHandler<WebMessageArgs<string>>(DeviceDisconnectedEventHandler);
 			webHIDBehaviour.DeviceConnectedEvent += new EventHandler<WebMessageArgs<GenericHIDDevice>>(DeviceConnectedEventHandler);
 			webHIDBehaviour.GamePadEventsSupportEvent += new EventHandler<WebMessageArgs<bool>>(GamePadEventsSupportHandler);
 		}
 
 	
 
-        public HIDReport ReadDefault(int pid)
+     
+
+
+        public HIDReport ReadBuffered(string id)
         {
-            throw new NotImplementedException ();
+            return this.__Generics[id].ReadBuffered();
         }
 
 
-        public HIDReport ReadBuffered(int pid)
-        {
-            return this.__Generics[pid].ReadBuffered();
-        }
 
-		public void Read (int pid, HIDDevice.ReadCallback callback, int timeout)
-		{
-			throw new NotImplementedException ();
-		}
-		public void Write (object data, int device, HIDDevice.WriteCallback callback, int timeout)
-		{
-			throw new NotImplementedException ();
-		}
-		
-
-
-        public void Read(int pid, HIDDevice.ReadCallback callback)
-        {
-            throw new NotImplementedException ();
-        }
-
-        public void Write(object data, int pid, HIDDevice.WriteCallback callback)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Write(object data, int pid)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Dictionary<int, HIDDevice> Generics
+        public Dictionary<string, HIDDevice> Generics
         {
             get { return __Generics; }
 
@@ -214,7 +239,7 @@ namespace ws.winx.platform.web
                     {
                       
                         this.webHIDBehaviour.Log("Device PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + driver.GetType().ToString());
-                        this.__Generics[deviceInfo.PID]=deviceInfo;
+                        this.__Generics[deviceInfo.ID]=deviceInfo;
                         break;
                     }
                 }
@@ -233,7 +258,7 @@ namespace ws.winx.platform.web
                     
 					webHIDBehaviour.PositionUpdateEvent += new EventHandler<WebMessageArgs<WebHIDReport>>(((GenericHIDDevice)deviceInfo).onPositionUpdate);
 
-					this.__Generics[deviceInfo.PID]=deviceInfo;
+					this.__Generics[deviceInfo.ID]=deviceInfo;
                 }
                 else
                 {
@@ -271,7 +296,7 @@ namespace ws.winx.platform.web
 
            
           
-             if(!__Generics.ContainsKey(info.PID))
+             if(!__Generics.ContainsKey(info.ID))
              {
                  info.hidInterface = this;
                  
@@ -286,7 +311,7 @@ namespace ws.winx.platform.web
 		/// </summary>
 		/// <param name="sender">Sender.</param>
 		/// <param name="args">Arguments.</param>
-        public void DeviceDisconnectedEventHandler(object sender, WebMessageArgs<int> args)
+        public void DeviceDisconnectedEventHandler(object sender, WebMessageArgs<string> args)
         {
             
 		
@@ -294,10 +319,11 @@ namespace ws.winx.platform.web
 		
 
 			if (__Generics.ContainsKey (args.RawMessage)) {
-				int PID=args.RawMessage;
-				string Name=__Generics[PID].Name;
-								this.webHIDBehaviour.Log ("Device " + Name + " PID:" + PID + " Removed");
-				this.__Generics.Remove (PID);
+				string ID=args.RawMessage;
+				string Name=__Generics[ID].Name;
+				int PID=__Generics[ID].PID;
+				this.webHIDBehaviour.Log ("Device " + Name + " PID:" + PID + " Removed");
+				this.__Generics.Remove (ID);
 	
 						}
            
@@ -325,7 +351,7 @@ namespace ws.winx.platform.web
         {
 			
 			if (Generics != null) {
-				foreach (KeyValuePair<int, HIDDevice> entry in Generics) {
+				foreach (KeyValuePair<string, HIDDevice> entry in Generics) {
 					entry.Value.Dispose ();
 				}
 				

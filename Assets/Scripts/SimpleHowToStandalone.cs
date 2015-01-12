@@ -32,15 +32,13 @@ namespace ws.winx
 		void Start()
 		{
 
+			if (Application.platform!=RuntimePlatform.WindowsEditor && Application.platform!=RuntimePlatform.OSXEditor 
+			    &&   Application.platform !=RuntimePlatform.WindowsPlayer && Application.platform != RuntimePlatform.OSXPlayer) {
+				Debug.LogError ("Set target in File>BuildSetting> Win or OSX Player");
+				return;
+			}
 
 
-
-			
-
-
-			
-		//
-		
 
 			
 			//supporting devices with custom drivers
@@ -82,7 +80,12 @@ namespace ws.winx
 				
 				ui.settings = InputManager.Settings;
 
-			
+//				if (!InputManager.HasInputState("ManualFullAxisMap"))
+//					InputManager.MapStateToInput("ManualFullAxisMap",InputPlayer.Player.Player0, InputCode.Joystick0AxisX);// InputCode.W.SINGLE, InputCode.C.SINGLE);
+//
+//			
+//				if (!InputManager.HasInputState("ManualFullAxisMap",InputPlayer.Player.Player1))
+//					InputManager.MapStateToInput("ManualFullAxisMap",InputPlayer.Player.Player1, InputCode.Joystick0AxisX);// InputCode.W.SINGLE, InputCode.C.SINGLE);
 
 			}
 			

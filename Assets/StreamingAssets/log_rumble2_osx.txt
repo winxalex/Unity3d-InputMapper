@@ -1,0 +1,2 @@
+1|2|3|4|L5|R6|L7|R8||9|10|Mode|Vibration
+Left Stick X|Left Stick Y|Right Stick X|Right Stick Y|||DPAD_|DPAD_

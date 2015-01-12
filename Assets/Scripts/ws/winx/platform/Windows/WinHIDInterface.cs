@@ -76,13 +76,13 @@ namespace ws.winx.platform.windows
         #region IHIDInterface implementation
 
 
-        public void LoadProfiles()
+        public void LoadProfiles(string fileName)
         {
 
             string[] deviceNameProfilePair;
             char splitChar = '|';
 
-            using (StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, "profiles.txt")))
+            using (StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileName)))
             {
 
 
@@ -206,12 +206,14 @@ namespace ws.winx.platform.windows
             set
             {
                 __defaultJoystickDriver = value;
+
                 if (value is ws.winx.drivers.UnityDriver)
                 {
                     Debug.LogWarning("UnityDriver set as default driver.\n Warring:Unity doesn't make distinction between triggers/axis/poitOfView and doesn't make controller distinction as multiply instances of same type have same name and can hard code index of devices no matter position in GetJoystickNames list");
-                }
-
-            }
+					LoadProfiles("profiles_uni.txt");
+				}
+				
+			}
 
         }
 
@@ -257,9 +259,9 @@ namespace ws.winx.platform.windows
 			__ports = new string[20];
 
 
-            LoadProfiles();
-
-        }
+			LoadProfiles("profiles.txt");
+			
+		}
         #endregion
 
 
