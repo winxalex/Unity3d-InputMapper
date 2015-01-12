@@ -133,6 +133,12 @@ namespace ws.winx.drivers
 
         }
 
+		#if UNITY_WEBPLAYER
+		void onRead(object data)
+		{
+			throw new Exception ("Not yet implemented");
+		}
+		#endif
 
 		#if UNITY_STANDALONE_OSX
 

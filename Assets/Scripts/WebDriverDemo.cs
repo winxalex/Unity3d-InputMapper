@@ -23,7 +23,7 @@ namespace ws.winx
 		{			
 
 
-				Animator animator = null;
+			
 				
 
 				// Use this for initialization
@@ -38,7 +38,7 @@ namespace ws.winx
 		
 			
 			
-						//TODO think of better entry point
+						
 						InputManager.hidInterface.Enumerate ();
 			
 		
@@ -46,16 +46,16 @@ namespace ws.winx
 
 			
 						#if(UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE && !UNITY_ANDROID
-			Loader request = new Loader();
-			
-			//UNITY_WEBPLAYER: Application.dataPath "http://localhost/appfolder/"
-			request.Add(Application.dataPath+"/StreamingAssets/InputSettings.xml");
-			
-			
-			request.LoadComplete += new EventHandler<LoaderEvtArgs<List<WWW>>>(onLoadComplete);
-			request.Error += new EventHandler<LoaderEvtArgs<String>>(onLoadError);
-			request.LoadItemComplete += new EventHandler<LoaderEvtArgs<WWW>>(onLoadItemComplete);
-			request.load();
+						Loader request = new Loader();
+						
+						//UNITY_WEBPLAYER: Application.dataPath "http://localhost/appfolder/"
+						request.Add(Application.dataPath+"/StreamingAssets/InputSettings.xml");
+						
+						
+						request.LoadComplete += new EventHandler<LoaderEvtArgs<List<WWW>>>(onLoadComplete);
+						request.Error += new EventHandler<LoaderEvtArgs<String>>(onLoadError);
+						request.LoadItemComplete += new EventHandler<LoaderEvtArgs<WWW>>(onLoadItemComplete);
+						request.load();
 						#endif
 
 			
@@ -66,25 +66,7 @@ namespace ws.winx
 			
 				}
 		
-				void onUp (object o, EventArgs args)
-				{
-						Debug.Log ("Up");
-				}
-		
-				void onDown (object o, EventArgs args)
-				{
-						Debug.Log ("Down");
-				}
-		
-				void Handle1 (object o, EventArgs args)
-				{
-						Debug.Log ("Handle1");
-				}
-		
-				void Handle2 (object o, EventArgs args)
-				{
-						Debug.Log ("Handle2");
-				}
+			
 		
 		#if (UNITY_WEBPLAYER || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_STANDALONE
 		void onLoadComplete(object sender, LoaderEvtArgs<List<WWW>> args)
@@ -108,7 +90,7 @@ namespace ws.winx
 			}
 			
 			
-			manuallyAddStateAndHandlers();
+
 			
 		}
 		
@@ -125,76 +107,7 @@ namespace ws.winx
 		#endif
 		
 		
-		
-		
-				void manuallyAddStateAndHandlers ()
-				{
-			
-	
-			
-						////easiest way to map state to combination (ex.of single W and C click)
-						if (!InputManager.HasInputState ("ManualAddedSTATE"))
-								InputManager.MapStateToInput ("ManualAddedSTATE",InputPlayer.Player.Player0, InputCode.W.SINGLE, InputCode.C.SINGLE);
-			
-						UnityEngine.Debug.Log ("Log:" + InputManager.Log ());
-			
-			
-						////Event Based input handling
-						InputEvent ev = new InputEvent ("ManualAddedSTATE");
-						//InputEvent ev = new InputEvent((int)States.SomeState);
-			
-				
-						ev.UP += new EventHandler (onUp);
-						ev.DOWN += new EventHandler (onDown);
-			
-						
-			
-			
-			
-				}
-		
-		
-				// Update is called once per frame
-				void Update ()
-				{
-			
-			
-			
-					
-			
-			
-						//Input.GetInput allows combos (combined input actions)
-						if (InputManager.GetInputDown ((int)States.Wave)) {// || InputManager.GetInput((int)States.Wave,true))
-								// if (InputManager.GetInput((int)States.Wave,false))
-								Debug.Log ("Wave Down");
-								// animator.Play((int)States.Wave);
-								animator.Play (Animator.StringToHash ("Wave"));
-						}
-			
-			
-					
-			
 
-			
-		
-			
-			
-			
-			
-			
-				}
-		
-		
-		
-		
-
-		
-		
-
-		
-		
-		
-		
 		
 		
 		

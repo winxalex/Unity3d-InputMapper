@@ -25,19 +25,17 @@ namespace ws.winx.platform.web
             set { _numButtons = value; }
         }
 
-      
-		private string _id;
 
-        public string id
-        {
-            get { return _id; }
-            set
-            {
-               
-				_id=value;
-
-            }
-        }
+		string _ID;
+      	public new string ID {
+			get {
+				return _ID;
+			}
+			set {
+				_ID=value;
+			}
+		}
+		
 
 
         //public override void Read(HIDDevice.ReadCallback callback)
@@ -132,7 +130,7 @@ namespace ws.winx.platform.web
          private WebHIDReport __lastHIDReport;
 
         public GenericHIDDevice()
-            : base(0, 0, 0, IntPtr.Zero, null, String.Empty)
+            : base(0, 0, 0,String.Empty, IntPtr.Zero, null, String.Empty)
         {
             __lastHIDReport = new WebHIDReport(this.index, CreateInputBuffer(),HIDReport.ReadStatus.NoDataRead);
         }

@@ -229,7 +229,7 @@ namespace ws.winx
             if (ui != null)//without settingsXML defined =>load them manually and attach them
             {
                 InputManager.loadSettingsFromText(args.data.ElementAt(0).text);
-                ui.StateInputCombinations = InputManager.Settings.stateInputs;
+                ui.settings = InputManager.Settings;
             }
 
 

@@ -32,6 +32,10 @@ namespace ws.winx
 		void Start()
 		{
 
+			if (Application.platform !=RuntimePlatform.WindowsPlayer || Application.platform != RuntimePlatform.OSXPlayer) {
+				Debug.LogError ("Set target in File>BuildSetting> Win or OSX Player");
+				return;
+			}
 
 
 

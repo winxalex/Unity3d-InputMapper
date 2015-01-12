@@ -398,6 +398,13 @@ namespace ws.winx.input
 						
 						} else {
 
+				//if any axis part
+				//GetGenericAnalogValue
+
+				//if full
+				//GetGenericAnalogValue of one part
+				//GetGenericAnalogValue of second part
+
 								int data = InputCode.toData (__currentInputAction.getCode(device));
 								if (axis != JoystickAxis.AxisPovX && axis != JoystickAxis.AxisPovY && ((JoystickPosition)data) == JoystickPosition.Full) {
 										//full Axis => normalize in range 0 to 1
