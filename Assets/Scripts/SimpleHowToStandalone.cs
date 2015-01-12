@@ -40,13 +40,6 @@ namespace ws.winx
 
 
 			
-
-
-			
-		//
-		
-
-			
 			//supporting devices with custom drivers
 			//When you add them add specialized first then XInputDriver  then wide range supporting drivers UnityDriver
 			#if (UNITY_STANDALONE_WIN)

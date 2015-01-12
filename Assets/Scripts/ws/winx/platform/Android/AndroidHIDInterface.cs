@@ -26,9 +26,9 @@ namespace ws.winx.platform.android
 
         //link towards Browser
         internal readonly AndroidHIDBehaviour droidHIDBehaviour;
-        private Dictionary<int, HIDDevice> __Generics;
+        private Dictionary<string, HIDDevice> __Generics;
 
-		public event EventHandler<DeviceEventArgs<int>> DeviceDisconnectEvent;
+		public event EventHandler<DeviceEventArgs<string>> DeviceDisconnectEvent;
 		public event EventHandler<DeviceEventArgs<IDevice>> DeviceConnectEvent;
 
 
@@ -42,13 +42,13 @@ namespace ws.winx.platform.android
             UnityEngine.Debug.Log("AndroidHIDInterface");
             __drivers = new List<IDriver>();
            
-            __Generics = new Dictionary<int, HIDDevice>();
+            __Generics = new Dictionary<string, HIDDevice>();
 
             _container = new GameObject("AndroidHIDBehaviourGO");
             droidHIDBehaviour = _container.AddComponent<AndroidHIDBehaviour>();
           
               
-          LoadProfiles();
+          LoadProfiles("profile.txt");
         }
 
 	
@@ -57,7 +57,7 @@ namespace ws.winx.platform.android
             AndroidJavaObject device = args.data;
 			int pid = device.Get<int> ("PID");
 
-			if (!__Generics.ContainsKey(pid))
+			if (!__Generics.ContainsKey(pid.ToString()))
             {
                 // UnityEngine.Debug.Log(args.Message);
                 GenericHIDDevice info = new GenericHIDDevice(__Generics.Count, device, this);
@@ -71,7 +71,7 @@ namespace ws.winx.platform.android
         public void DeviceDisconnectedEventHandler(object sender, AndroidMessageArgs<int> args)
         {
 
-            int pid = args.data;
+            string pid = args.data.ToString();
            
             if (__Generics.ContainsKey(pid))
             {
@@ -79,7 +79,7 @@ namespace ws.winx.platform.android
                 this.droidHIDBehaviour.Log(TAG, "Device " + device.Name + " index:" + device.index+ " Removed");
                 this.__Generics.Remove(pid);
 
-				this.DeviceDisconnectEvent(this,new DeviceEventArgs<int>(pid));
+				this.DeviceDisconnectEvent(this,new DeviceEventArgs<string>(pid));
                
             }
 
@@ -124,7 +124,7 @@ namespace ws.winx.platform.android
                         Debug.Log("Device index:" + deviceInfo.index + " PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID 
 							          + " attached to " + driver.GetType().ToString());
                       //  this.droidHIDBehaviour.Log("AndroidHIDInterface", "Device index:"+joyDevice.ID+" PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + driver.GetType().ToString());
-                        this.__Generics[deviceInfo.PID] = deviceInfo;
+                        this.__Generics[deviceInfo.ID] = deviceInfo;
 
 							this.DeviceConnectEvent(this,new DeviceEventArgs<IDevice>(joyDevice));
 
@@ -144,7 +144,7 @@ namespace ws.winx.platform.android
                     Debug.Log("Device index:" + deviceInfo.index + " PID:" + deviceInfo.PID + " VID:" + deviceInfo.VID + " attached to " + __defaultJoystickDriver.GetType().ToString());
                      
                    // this.droidHIDBehaviour.Log("AndroidHIDInterface", "Device index:" + joyDevice.ID + " PID:" + joyDevice.PID + " VID:" + joyDevice.VID + " attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + deviceInfo.DevicePath + " Name:" + joyDevice.Name);
-                    this.__Generics[joyDevice.PID] = deviceInfo;
+                    this.__Generics[joyDevice.ID] = deviceInfo;
 
 							this.DeviceConnectEvent(this,new DeviceEventArgs<IDevice>(joyDevice));
                 }
@@ -161,7 +161,7 @@ namespace ws.winx.platform.android
 
        
 
-        public Dictionary<int, HIDDevice> Generics
+        public Dictionary<string, HIDDevice> Generics
         {
             get { return __Generics; }
         }
@@ -170,9 +170,69 @@ namespace ws.winx.platform.android
 
 
 
+		public HIDReport ReadDefault (string id)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public HIDReport ReadBuffered (string id)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void Write (object data, string id, HIDDevice.WriteCallback callback)
+		{
+			throw new NotImplementedException ();
+		}
+
+
+	
+
+		public void Read(string id, HIDDevice.ReadCallback callback,int timeout=0xffff)
+		{
+			this.__Generics[id].Read(callback,timeout);
+		}
+		
+		public void Read(string id, HIDDevice.ReadCallback callback)
+		{
+			this.__Generics[id].Read(callback,0);
+		}
+		
+		public void Write(object data, string id, HIDDevice.WriteCallback callback,int timeout=0xffff)
+		{
+			this.__Generics[id].Write(data,callback,timeout);
+		}
+		
+		public void Write(object data, string id)
+		{
+			this.__Generics[id].Write(data);
+		}
+
+		public bool Contains (string id)
+		{
+			return __Generics != null && __Generics.ContainsKey (id);
+		}
+
+		Dictionary<string, HIDDevice> IHIDInterface.Generics {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
+
+		public Dictionary<string, string> Profiles {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
+
+	
+
+
+
 
         public void LoadProfiles(String fileName)
         {
+
               throw new NotImplementedException();
         }
 
@@ -188,10 +248,7 @@ namespace ws.winx.platform.android
 			__drivers.Add (driver);
 		}
 
-		public bool Contains (int pid)
-		{
-			return __Generics != null && __Generics.ContainsKey (pid);
-		}
+
 
 
 
@@ -213,33 +270,9 @@ namespace ws.winx.platform.android
 		}
 
 
-        public HIDReport ReadDefault(int pid){
-			throw new NotImplementedException ();
-		}
+      
 
-		public HIDReport ReadBuffered(int pid){
-			throw new NotImplementedException ();
-		}
-
-        public void Read(int pid, HIDDevice.ReadCallback callback,int timeout=0xffff)
-        {
-            this.__Generics[pid].Read(callback,timeout);
-        }
-
-        public void Read(int pid, HIDDevice.ReadCallback callback)
-        {
-            this.__Generics[pid].Read(callback,0);
-        }
-
-        public void Write(object data, int pid, HIDDevice.WriteCallback callback,int timeout=0xffff)
-        {
-            this.__Generics[pid].Write(data,callback,timeout);
-        }
-
-        public void Write(object data, int pid)
-        {
-            this.__Generics[pid].Write(data);
-        }
+      
 
 
 
@@ -260,7 +293,7 @@ namespace ws.winx.platform.android
         public void Dispose()
         {
 			if(__Generics!=null){
-	            foreach (KeyValuePair<int, HIDDevice> entry in __Generics)
+	            foreach (KeyValuePair<string, HIDDevice> entry in __Generics)
 	            {
 	                entry.Value.Dispose();
 	            }

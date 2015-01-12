@@ -58,7 +58,7 @@ namespace ws.winx.platform.android
         Action<object, ElapsedEventArgs> timeoutActionHandler;
 
         public GenericHIDDevice(int inx, AndroidJavaObject device, IHIDInterface hidInterface)
-            : base(inx, device.Get<int>("VID"), device.Get<int>("PID"), IntPtr.Zero, hidInterface, device.Get<string>("path"))
+			: base(inx, device.Get<int>("VID"), device.Get<int>("PID"),device.Get<string>("path"), IntPtr.Zero, hidInterface, device.Get<string>("path"))
         {
 
 

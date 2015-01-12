@@ -132,7 +132,7 @@ namespace ws.winx
                     {
                         Debug.Log("Game>> Try to load from " + Application.persistentDataPath);
                         InputManager.loadSettings(Application.persistentDataPath + "/" + "InputSettings.xml");
-                        ui.StateInputCombinations = InputManager.Settings.stateInputs;
+                        ui.settings = InputManager.Settings;
                         manuallyAddStateAndHandlers();
                         return;
 
@@ -158,7 +158,7 @@ namespace ws.winx
 
 
 
-                    ui.StateInputCombinations = InputManager.Settings.stateInputs;
+                    ui.settings = InputManager.Settings;
                 }
 
 

@@ -133,7 +133,7 @@ namespace ws.winx.drivers
 
         }
 
-		#if UNITY_WEBPLAYER
+		#if UNITY_WEBPLAYER || UNITY_ANDROID
 		void onRead(object data)
 		{
 			throw new Exception ("Not yet implemented");
