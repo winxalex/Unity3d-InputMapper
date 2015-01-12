@@ -487,7 +487,7 @@ namespace ws.winx.input
         public static bool HasInputState(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0)
         {
 
-            return isReady() && InputManager.HasInputState(Animator.StringToHash(stateName));
+            return isReady() && InputManager.HasInputState(Animator.StringToHash(stateName),player);
         }
 
         /// <summary>
@@ -512,6 +512,8 @@ namespace ws.winx.input
         internal static void dispatchEvent(InputPlayer.Player player = InputPlayer.Player.Player0)
         {
             Delegate[] delegates;
+			if (!isReady ())
+								return;
 
             Dictionary<int, InputEvent> stateEvents = __settings.Players[(int)player].stateEvents;
 
@@ -1165,14 +1167,11 @@ namespace ws.winx.input
 
 
         /// <summary>
-        /// Gets the input of generic created values in range 0f to 1f
+        /// Gets the input of generic created values in range 0f to +/-1f
         /// in steps defined with "sensitivity" param
-        /// while key, button,mouse is HOLD
-        /// If axis(full or part) are mapped normalized values in range 0f to 1f
-        /// are returned without influence of "sensitivity" settings
-        /// 
+        /// while key, button,mouse,axis being HOLD
         /// </summary>
-        /// <returns> 0f to 1f</returns>
+        /// <returns> 0f to +/-1f</returns>
         /// <param name="stateNameHash">State name hash.</param>
         /// <param name="player"></param>
         /// <param name="sensitivity">Sensitivity of rising value 0f to 1f</param>
@@ -1187,7 +1186,7 @@ namespace ws.winx.input
 
             IDevice device = __settings.Players[(int)player].Device;
 
-            return Mathf.Clamp01(__inputCombinations[0].GetInputNormalized(device,sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetInputNormalized(device,sensitivity, dreadzone, gravity) : 0));
+            return Mathf.Clamp(__inputCombinations[0].GetInputGenerated(device,sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetInputGenerated(device,sensitivity, dreadzone, gravity) : 0),-1f,1f);
 
         }
 

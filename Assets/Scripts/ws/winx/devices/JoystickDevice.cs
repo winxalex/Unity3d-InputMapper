@@ -212,14 +212,28 @@ namespace ws.winx.devices
 						Update ();
 
 						JoystickAxis axis = InputCode.toAxis (code);
-							
-					//previous mapping might be to device with less or more axess
+						int data = InputCode.toData (code);
+
+
+			if (axis == JoystickAxis.None) {   //MO data for axis => buttons data
+				//UnityEngine.Debug.Log("Button state>" + button_collection[data].buttonState);
+				
+				//previous mapping might be to device with less or more buttons
+				//at same device index
+				if (button_collection.Count > data)
+					return button_collection [data].value;
+				else
+					return 0f;
+				
+			}
+			
+			//previous mapping might be to device with less or more axess
 					//at same device index
 					if (axis_collection.Count <= (int)axis)
 					return 0f;
 			
 			
-						int data = InputCode.toData (code);
+						
 						float axisValue = axis_collection [axis].value;
 
 
@@ -345,6 +359,17 @@ namespace ws.winx.devices
 								//	UnityEngine.Debug.Log("data:" + data+"buttotnState:"+buttonState+" equal"+isEqualToButtonState+" value:"+axisDetails.value);
 								return true;
 						}
+
+//						if (data == (int)JoystickPosition.Full && buttonState == ButtonState.Up) {
+//						if (isPositive && axisDetails.value >= 0)
+//								return true;
+//						if (isNegative && axisDetails.value <= 0)
+//								return true;		
+//				}else
+						if (data == (int)JoystickPosition.Full && isEqualToButtonState && (isPositive || isNegative)) {
+								return true;
+						}
+
 							
 							
 						return false;

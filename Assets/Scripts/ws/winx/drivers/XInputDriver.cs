@@ -198,14 +198,14 @@ namespace ws.winx.drivers
 				if(pov>0){
 					if((pov & 0xC)!=0){
 
-						if((pov&0x8)!=0) r=1;
-						   else l=-1;
+						if((pov&0x8)!=0) r=1f;
+						   else l=-1f;
 					}
 
 
 					if((pov & 0x3) !=0) {
-						if((pov & 0x1) !=0)  f=1 ;
-						else b=-1;
+						if((pov & 0x1) !=0)  f=1f ;
+						else b=-1f;
 
 					}
 				}
@@ -213,14 +213,14 @@ namespace ws.winx.drivers
 				
 				device.Buttons[5].value=f;       //Forward;
                 device.Buttons[6].value=b;               //Backward
-                device.Buttons[7].value= l;               //Left
+                device.Buttons[7].value=l;               //Left
                 device.Buttons[8].value=r;             //Right
 
 				
 				//device.Axis[JoystickAxis.AxisPovX].value = x;
 				//device.Axis[JoystickAxis.AxisPovY].value = y;
 				
-				// UnityEngine.Debug.Log("x=" + x+" y="+y);
+				// UnityEngine.Debug.Log("b=" + b+" l="+l);
 
 
 				IAxisDetails axisDetails;
@@ -770,66 +770,71 @@ namespace ws.winx.drivers
 
 
 
-            public ButtonState buttonState
-            {
-                get { return _buttonState; }
-            }
+			public ButtonState buttonState
+			{
+				get { return _buttonState; }
+			}
+			public float value
+			{
+				get { return _value; }
+				set
+				{
+					
+					if (value == -1 || value==1)
+					{
+						if (_buttonState == ButtonState.None)
+							//|| _buttonState == ButtonState.PosToUp || _buttonState==ButtonState.NegToUp)
+						{
+							
+							_buttonState = ButtonState.Down;
+							
+							//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
+							
+						}
+						else
+						{
+							_buttonState = ButtonState.Hold;
+							//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
+						}
+						
+						
+					}
+					else
+					{
+						
+						if (_buttonState == ButtonState.Down
+						    || _buttonState == ButtonState.Hold)
+						{
+							
 
+								_buttonState = ButtonState.Up;
 
-
-            public float value
-            {
-                get
-                {
-                    return _value;
-                    //return (_buttonState==JoystickButtonState.Hold || _buttonState==JoystickButtonState.Down);
-                }
-                set
-                {
-
-                    _value = value;
-                    //if pressed==TRUE
-                    //TODO check the code with triggers
-                    if (value > 0)
-                    {
-                        if (_buttonState == ButtonState.None
-                            || _buttonState == ButtonState.Up)
-                        {
-
-                            _buttonState = ButtonState.Down;
-
-
-
-                        }
-                        else
-                        {
-                            //if (buttonState == JoystickButtonState.Down)
-                            _buttonState = ButtonState.Hold;
-
-                        }
-
-
-                    }
-                    else
-                    { //
-                        if (_buttonState == ButtonState.Down
-                            || _buttonState == ButtonState.Hold)
-                        {
-                            _buttonState = ButtonState.Up;
-                        }
-                        else
-                        {//if(buttonState==JoystickButtonState.Up){
-                            _buttonState = ButtonState.None;
-                        }
-
-                    }
-                }
-            }
-            #endregion
-            #endregion
-
-            #region Constructor
-            public ButtonDetails(uint uid = 0) { this.uid = uid; }
+							
+							//	Debug.Log("val:"+value+"_buttonState:"+_buttonState);
+							
+						}
+						else
+						{//if(buttonState==JoystickButtonState.Up){
+							_buttonState = ButtonState.None;
+							
+							//Debug.Log("val:"+value+"_buttonState:"+_buttonState);
+						}
+						
+						
+					}
+					
+					
+					_value = value;
+					
+					
+					
+				}//set
+			}
+			#endregion
+			#endregion
+			
+			#region Constructor
+			public ButtonDetails(uint uid = 0) { this.uid = uid; }
             #endregion
 
 

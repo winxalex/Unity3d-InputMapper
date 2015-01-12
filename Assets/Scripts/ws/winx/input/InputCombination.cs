@@ -378,7 +378,7 @@ namespace ws.winx.input
 				/// <param name="sensitivity">Sensitivity.</param>
 				/// <param name="dreadzone">Dreadzone.</param>
 				/// <param name="gravity">Gravity.</param>
-				internal float GetInputNormalized (IDevice device,float sensitivity, float dreadzone, float gravity)
+				internal float GetInputGenerated (IDevice device,float sensitivity, float dreadzone, float gravity)
 				{
 
 						if (_actionsList.Count > 1)
@@ -391,30 +391,26 @@ namespace ws.winx.input
 						if (__currentInputAction.getCode(device) < InputCode.MAX_KEY_CODE) {
 								return GetGenericAnalogValue (device,sensitivity, dreadzone, gravity);
 
-						} else 
-						//or button
-						if ((axis = InputCode.toAxis (__currentInputAction.getCode(device))) == JoystickAxis.None) {
-										return GetGenericAnalogValue (device,sensitivity, dreadzone, gravity);
-						
 						} else {
+						//or button
+//						if ((axis = InputCode.toAxis (__currentInputAction.getCode(device))) == JoystickAxis.None) {
+//										return GetGenericAnalogValue (device,sensitivity, dreadzone, gravity);
+//						
+//						} else {//axis
 
-				//if any axis part
-				//GetGenericAnalogValue
 
-				//if full
-				//GetGenericAnalogValue of one part
-				//GetGenericAnalogValue of second part
 
-								int data = InputCode.toData (__currentInputAction.getCode(device));
-								if (axis != JoystickAxis.AxisPovX && axis != JoystickAxis.AxisPovY && ((JoystickPosition)data) == JoystickPosition.Full) {
-										//full Axis => normalize in range 0 to 1
-
-										//if(InputEx.GetInput (__currentInputAction)>0 && InputEx.
-										return 0f;
-								} else {
+							//	int data = InputCode.toData (__currentInputAction.getCode(device));
 								
-										return Math.Abs (InputEx.GetInputAnalog (__currentInputAction,device));
-								}
+
+					            if(InputEx.GetInputAnalog(__currentInputAction,device)<0f)
+												return -GetGenericAnalogValue (device,sensitivity, dreadzone, gravity);
+
+					
+
+											return GetGenericAnalogValue (device,sensitivity, dreadzone, gravity);;
+							
+
 
 
 						}

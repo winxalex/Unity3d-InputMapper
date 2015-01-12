@@ -45,6 +45,10 @@ namespace ws.winx
 		{
 
 			
+			if (Application.platform !=RuntimePlatform.Android) {
+				Debug.LogError ("Set target in File>BuildSetting> Android ");
+				return;
+			}
 		
 			
 			vSliderValuePrev = vSliderValue = 128f;
