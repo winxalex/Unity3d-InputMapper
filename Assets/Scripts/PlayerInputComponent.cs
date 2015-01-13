@@ -97,6 +97,9 @@ public class PlayerInputComponent : MonoBehaviour
 //			Debug.Log (Player+"_Full Axis UP");
 //		}
 
+	
+
+
         if (InputManager.GetInputDown((int)States.Wave,Player,true))
         {
             animator.Play((int)States.Wave);
@@ -125,7 +128,7 @@ public class PlayerInputComponent : MonoBehaviour
 
 
 
-        InputManager.dispatchEvent();
+       
 
     }
 }

@@ -496,17 +496,17 @@ namespace ws.winx.gui
 
 						if (_selectedStateHash != hash) {
 
-
-								//if (GUILayout.Button (InputCode.toProfiled (_playerSelected.Device, combinations [0]), _inputButtonStyle)) {
-										 if (GUILayout.Button(combinations[0].combinationString, _inputButtonStyle)){
+								//!!! USE HERE YOUR CUSTOM METHOD TO SHOW DISPLAY
+								
+										 if (GUILayout.Button(InputCode.beautify(combinations[0].combinationString), _inputButtonStyle)){
 										_selectedStateHash = hash;
 										_previousStateInput = null;
 										_isPrimary = 0;
 								}
 
 								if (combinations.Length > 1 && combinations [1] != null)
-								//if (GUILayout.Button (InputCode.toProfiled (_playerSelected.Device, combinations [1]), _inputButtonStyle)) {
-										if (GUILayout.Button(combinations[1].combinationString, _inputButtonStyle)){
+								//!!! USE HERE YOUR CUSTOM METHOD TO SHOW DISPLAY
+				if (GUILayout.Button(InputCode.beautify(combinations[1].combinationString), _inputButtonStyle)){
 										_selectedStateHash = hash;
 										_previousStateInput = null;
 										_isPrimary = 1;
@@ -519,15 +519,16 @@ namespace ws.winx.gui
 
 
 
-								//currentCombinationString = InputCode.toProfiled (_playerSelected.Device, combinations [_isPrimary]);
+								
 								currentCombinationString = combinations[_isPrimary].combinationString;
 
 								if (_previousStateInput == null) {
 										_previousStateInput = combinations [_isPrimary].Clone ();
 								}
 
-
-								GUILayout.Label (currentCombinationString);//, _inputLabelStyle);
+								//!!! USE HERE YOUR CUSTOM METHOD TO SHOW DISPLAY
+								currentCombinationString=InputCode.beautify(currentCombinationString);
+								GUILayout.Label (currentCombinationString);
 
 #if UNITY_ANDROID || UNITY_IPHONE
                                 if (GUILayout.Button("Submit",_submitButtonStyle))

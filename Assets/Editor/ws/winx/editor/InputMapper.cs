@@ -618,15 +618,13 @@ namespace ws.winx.editor
 												if (!_isComplexActionTypesAllowed)
 														_action.type = InputActionType.SINGLE;
 
-												//if (_isDeviceAny) {
-														//_action.getCode(_deviceByProfile) = InputCode.toCodeAnyDevice (_action.getCode(_deviceByProfile));
-														//_action.type = InputActionType.SINGLE;
-												//}
+												_action.setCode(InputCode.toCodeAnyDevice(_action.getCode(_deviceByProfile)),_deviceByProfile);
+					
 
-                                                //if (_isDeviceAxisPositionFull) {
-                                                //        _action.getCode(_deviceByProfile) = InputCode.toCodeAxisFull (_action.getCode(_deviceByProfile));
-                                                //        _action.type = InputActionType.SINGLE;
-                                                //}
+                                                if (_isDeviceAxisPositionFull) {
+													_action.setCode(InputCode.toCodeAxisFull (_action.getCode(_deviceByProfile)),_deviceByProfile);
+                                                       
+                                                }
 
 												toInputCombination (_stateInputCombinations [_selectedStateHash].combinations [_isPrimary], _action);
 										}
