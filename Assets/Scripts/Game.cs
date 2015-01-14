@@ -384,37 +384,37 @@ namespace ws.winx
 
             //	
             //
-            if (InputManager.GetInputHold(Animator.StringToHash("WalkBackward")))
-            {
-                Debug.Log("WalkBackward-Hold");
-            }
-
-
-            if (InputManager.GetInputDown(Animator.StringToHash("WalkBackward")))
-            {
-                Debug.Log("WalkBackward-Down");
-            }
-
-            if (InputManager.GetInputUp(Animator.StringToHash("WalkBackward")))
-            {
-                Debug.Log("WalkBackward-Up");
-            }
-
-
-            if (InputManager.GetInputHold(Animator.StringToHash("WalkForward")))
-            {
-                Debug.Log("WalkForward-Hold");
-            }
-
-            if (InputManager.GetInputDown(Animator.StringToHash("WalkForward")))
-            {
-                Debug.Log("WalkForward-Down");
-            }
-
-            if (InputManager.GetInputUp(Animator.StringToHash("WalkForward")))
-            {
-                Debug.Log("WalkForward-Up");
-            }
+//            if (InputManager.GetInputHold(Animator.StringToHash("WalkBackward")))
+//            {
+//                Debug.Log("WalkBackward-Hold");
+//            }
+//
+//
+//            if (InputManager.GetInputDown(Animator.StringToHash("WalkBackward")))
+//            {
+//                Debug.Log("WalkBackward-Down");
+//            }
+//
+//            if (InputManager.GetInputUp(Animator.StringToHash("WalkBackward")))
+//            {
+//                Debug.Log("WalkBackward-Up");
+//            }
+//
+//
+//            if (InputManager.GetInputHold(Animator.StringToHash("WalkForward")))
+//            {
+//                Debug.Log("WalkForward-Hold");
+//            }
+//
+//            if (InputManager.GetInputDown(Animator.StringToHash("WalkForward")))
+//            {
+//                Debug.Log("WalkForward-Down");
+//            }
+//
+//            if (InputManager.GetInputUp(Animator.StringToHash("WalkForward")))
+//            {
+//                Debug.Log("WalkForward-Up");
+//            }
             //
             ////
 

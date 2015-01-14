@@ -223,7 +223,7 @@ namespace ws.winx.input
          
 
 
-//parse TYPE
+				//parse TYPE
                _type = InputActionType.SINGLE;
 
             if (code.Contains(InputAction.DOUBLE_DESIGNATOR))
@@ -293,7 +293,17 @@ namespace ws.winx.input
 
 
 
+		public void setCode(int newCode,IDevice device)
+		{
 
+			_code = newCode;
+
+			if (device == null)
+				_codeString = InputCode.toEnumString (newCode);
+			else
+				_codeString = InputCode.toProfiled (newCode, device);
+
+		}
 
         public int getCode(IDevice device)
         {

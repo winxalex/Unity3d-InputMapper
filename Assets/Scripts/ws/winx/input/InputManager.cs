@@ -508,66 +508,54 @@ namespace ws.winx.input
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="player"></param>
-        internal static void dispatchEvent(InputPlayer.Player player = InputPlayer.Player.Player0)
+        internal static void dispatchEvent()
         {
             Delegate[] delegates;
 			if (!isReady ())
 								return;
-
-            Dictionary<int, InputEvent> stateEvents = __settings.Players[(int)player].stateEvents;
-
-            if (stateEvents != null)
-                foreach (var stateInputEventsPair in stateEvents)
-                {
-                    var Events = stateInputEventsPair.Value.Events;
-                    foreach (KeyValuePair<int, Delegate[]> pair in Events)
-                    {
-
-                        //                    if(pair.Value[0]!=null && InputManager.GetInput(pair.Key,false)){
-                        //                        delegates= pair.Value[0].GetInvocationList();
-                        //                        foreach(Delegate d in delegates)
-                        //                            ((EventHandler)d).BeginInvoke(this, args, EndAsyncEvent, null);
-                        //                    }
-
-                        if (pair.Value[1] != null && InputManager.GetInputUp(pair.Key))
-                        {
-                            delegates = pair.Value[1].GetInvocationList();
-                            foreach (Delegate d in delegates)
-                                ((EventHandler)d).BeginInvoke(null, null, EndAsyncEvent, null);
-                        }
-
-                        if (pair.Value[2] != null && InputManager.GetInputDown(pair.Key))
-                        {
-                            delegates = pair.Value[2].GetInvocationList();
-                            foreach (Delegate d in delegates)
-                                ((EventHandler)d).BeginInvoke(null, null, EndAsyncEvent, null);
-                        }
+			int numPlayers = __settings.Players.Length;
 
 
+			Dictionary<int, InputEvent> stateEvents;
 
-                    }
 
-                }
+			for (int i=0; i<numPlayers; i++) {
+				stateEvents= __settings.Players[i].stateEvents;
+
+								if (stateEvents != null)
+										foreach (var stateInputEventsPair in stateEvents) {
+												var Events = stateInputEventsPair.Value.Events;
+												foreach (KeyValuePair<int, Delegate[]> pair in Events) {
+
+														if (pair.Value [0] != null && InputManager.GetInputHold (pair.Key,i)) {
+																delegates = pair.Value [0].GetInvocationList ();
+																foreach (Delegate d in delegates)
+																		((EventHandler)d).Invoke (null, null);
+														}
+
+														if (pair.Value [1] != null && InputManager.GetInputUp (pair.Key,i)) {
+																delegates = pair.Value [1].GetInvocationList ();
+																foreach (Delegate d in delegates)
+																		((EventHandler)d).Invoke (null, null);
+														}
+
+														if (pair.Value [2] != null && InputManager.GetInputDown (pair.Key,i)) {
+																delegates = pair.Value [2].GetInvocationList ();
+																foreach (Delegate d in delegates)
+																		((EventHandler)d).Invoke (null, null);
+														}
+
+
+
+												}
+
+										}
+						}
         }
 
 
 
-        private static void EndAsyncEvent(IAsyncResult iar)
-        {
-            var ar = (System.Runtime.Remoting.Messaging.AsyncResult)iar;
-            var invokedMethod = (EventHandler)ar.AsyncDelegate;
-
-            try
-            {
-                invokedMethod.EndInvoke(iar);
-            }
-            catch
-            {
-                // Handle any exceptions that were thrown by the invoked method
-                Debug.Log("An event listener went kaboom!");
-            }
-        }
+     
 
 
 
@@ -851,6 +839,16 @@ namespace ws.winx.input
 
 
                 __settings.combinationsClickSensitivity = reader.ReadElementContentAsFloat();
+
+
+
+			//<d1p1:Players>
+					//<d1p1:InputPlayer>
+						//<d1p1:_DeviceStateInputs xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+							//<d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
+									//<d4p1:Key>xbox360</d4p1:Key>
+										//<d4p1:Value>
+
 
                 if (reader.ReadToFollowing("d2p1:KeyValueOfintInputState"))
                 {
@@ -1190,15 +1188,27 @@ namespace ws.winx.input
 
         }
 
-
-
-
-
-
-        /// <summary>
+		/// <summary>
+		/// Gets the input.
+		/// </summary>
+		/// <returns>The input.</returns>
+		/// <param name="stateName">State name.</param>
+		/// <param name="player">Player.</param>
+		/// <param name="sensitivity">Sensitivity.</param>
+		/// <param name="dreadzone">Dreadzone.</param>
+		/// <param name="gravity">Gravity.</param>
+		public static float GetInput(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0, float sensitivity = 0.1f, float dreadzone = 0.1f, float gravity = 0.3f)
+		{
+			return GetInput (Animator.StringToHash (stateName), player, sensitivity, dreadzone, gravity);
+		}
+			
+			
+			
+		/// <summary>
         /// Gets the input of device(hardware)
-        /// if device mapped is digital would return 0f or 1f 
-        /// if device mapped is analog would return 0f to 1f(positive axis) or 0f to -1f(negative axis) in steps depending of device sensitivity
+        /// if device's input mapped is digital would return -1f to 1f generic values emulating analog hardware 
+        /// if device's input mapped is analog would return 0f to 1f(positive axis) or 0f to -1f(negative axis) 
+		/// full axis -1f to 1f
         /// </summary>
         /// <param name="stateNameHash">State name hash.</param>
         /// <param name="player"></param>
@@ -1219,29 +1229,87 @@ namespace ws.winx.input
 
         }
 
+		/// <summary>
+		/// [Use for testing as string to hash is slow operat
+		/// Gets the input of device(hardware)
+		/// if device's input mapped is digital would return -1f to 1f generic values emulating analog hardware 
+		/// if device's input mapped is analog would return 0f to 1f(positive axis) or 0f to -1f(negative axis) 
+		/// full axis -1f to 1f
+		/// </summary>
+		/// <returns>The input raw.</returns>
+		/// <param name="stateNameHash">State name hash.</param>
+		/// <param name="player">Player.</param>
+		/// <param name="sensitivity">Sensitivity.</param>
+		/// <param name="dreadzone">Dreadzone.</param>
+		/// <param name="gravity">Gravity.</param>
+		public static float GetInputRaw(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0, float sensitivity = 0.1f, float dreadzone = 0.1f, float gravity = 0.3f)
+		{
+			return GetInputRaw (Animator.StringToHash (stateName), player, sensitivity, dreadzone, gravity);
+		}
+			
+			
+		/// <summary>
+		/// HOLD.
+		/// </summary>
+		/// <returns><c>true</c>, while input binded to state returns signal, <c>false</c> otherwise.</returns>
+		/// <param name="stateNameHash">State name hash.</param>
+		/// <param name="playerIndex">Player index.</param>
+		internal static bool GetInputHold(int stateNameHash, int playerIndex){
 
+			//Use is mapping states so no quering keys during gameplay
+			if (!InputManager.isReady()) return false;
+			
+			__inputCombinations = __settings.GetInputStatesOfPlayer(playerIndex)[stateNameHash].combinations;
+			
+			IDevice device = __settings.Players[playerIndex].Device;
+			
+			return __inputCombinations[0].GetInputHold(device) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputHold(device));
 
+		}
+		
 
-
-        /// <summary>
-        /// HOLD.
-        /// </summary>
-        /// <returns><c>true</c>, while input binded to state returns signal, <c>false</c> otherwise.</returns>
-        /// <param name="stateNameHash">State name hash.</param>
-        /// <param name="player"></param>
+		/// <summary>
+		/// HOLD.
+		/// </summary>
+		/// <returns><c>true</c>, while input binded to state returns signal, <c>false</c> otherwise.</returns>
+		/// <param name="stateNameHash">State name hash.</param>
+		/// <param name="player">Player.</param>
         public static bool GetInputHold(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0)
         {
-            //Use is mapping states so no quering keys during gameplay
-            if (!InputManager.isReady()) return false;
-
-            __inputCombinations = __settings.GetInputStatesOfPlayer(player)[stateNameHash].combinations;
-
-            IDevice device = __settings.Players[(int)player].Device;
-
-            return __inputCombinations[0].GetInputHold(device) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputHold(device));
+			return GetInputHold (stateNameHash, (int)player);
         }
 
-        /// <summary>
+
+
+		/// <summary>
+		/// HOLD.[Use for testing as string to hash is slow operat
+		/// </summary>
+		/// <returns><c>true</c>, while input binded to state returns signal, <c>false</c> otherwise.</returns>
+		/// <returns><c>true</c>, if input hold was gotten, <c>false</c> otherwise.</returns>
+		/// <param name="stateName">State name.</param>
+		/// <param name="player">Player.</param>
+		public static bool GetInputHold(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0)
+		{
+			return GetInputHold (Animator.StringToHash(stateName), player);
+		}
+
+
+
+
+		internal static bool GetInputUp(int stateNameHash, int playerIndex=0)
+		{
+			//Use is mapping states so no quering keys during gameplay
+			if (!InputManager.isReady()) return false;
+			
+			__inputCombinations = __settings.GetInputStatesOfPlayer(playerIndex)[stateNameHash].combinations;
+			
+			
+			IDevice device = __settings.Players[playerIndex].Device;
+			return __inputCombinations[0].GetInputUp(device) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp(device));
+
+		}
+			
+		/// <summary>
         /// UP.
         /// </summary>
         /// <returns><c>true</c>, if input binded to state stopped to return values(then is reseted), <c>false</c> otherwise.</returns>
@@ -1249,43 +1317,72 @@ namespace ws.winx.input
         /// <param name="player"></param>
         public static bool GetInputUp(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0)
         {
-            //Use is mapping states so no quering keys during gameplay
-            if (!InputManager.isReady()) return false;
-
-            __inputCombinations = __settings.GetInputStatesOfPlayer(player)[stateNameHash].combinations;
-
-
-            IDevice device = __settings.Players[(int)player].Device;
-            return __inputCombinations[0].GetInputUp(device) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp(device));
-
+			return GetInputUp (stateNameHash, (int)player);
         }
 
-        /// <summary>
-        /// DOWN.
-        /// </summary>
-        /// <returns><c>true</c>, if input binded to state started to return values (than is reseted), <c>false</c> otherwise.</returns>
-        /// <param name="stateNameHash">State name hash.</param>
-        /// <param name="player"></param>
-        /// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts successive action (ex. W+C => W pressed,released then C pressed)
-        /// atOnce=true useful for building modifires like behaviour (LeftCtrl(-)+C)
 
-        public static bool GetInputDown(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0, bool atOnce = false)
+		/// <summary>
+		/// UP.[Use for testing as string to hash is slow operation in loop]
+		/// </summary>
+		/// <returns><c>true</c>, if input binded to state stopped to return values(then is reseted), <c>false</c> otherwise.</returns>
+		/// <param name="stateName">State name.</param>
+		/// <param name="player">Player.</param>
+		public static bool GetInputUp(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0)
+		{
+			return GetInputUp (Animator.StringToHash (stateName), player);
+		}
+			
+
+		/// <summary>
+		/// Gets the input down.
+		/// </summary>
+		/// <returns><c>true</c>, if input down was gotten, <c>false</c> otherwise.</returns>
+		/// <param name="stateNameHash">State name hash.</param>
+		/// <param name="playerIndex">Player index.</param>
+		/// <param name="atOnce">If set to <c>true</c> at once.</param>
+       internal static bool GetInputDown(int stateNameHash, int playerIndex=0, bool atOnce = false)
         {
             //Use is mapping states so no quering keys during gameplay
             if (!InputManager.isReady()) return false;
 
             //__settings.Players[InputManager.currentPlayerInx].GetStateInputBasedOnControllerMappedToPlayer
 
-            __inputCombinations = __settings.GetInputStatesOfPlayer(player)[stateNameHash].combinations;
+            __inputCombinations = __settings.GetInputStatesOfPlayer(playerIndex)[stateNameHash].combinations;
 
-            IDevice device = __settings.Players[(int)player].Device;
+            IDevice device = __settings.Players[playerIndex].Device;
 
             return __inputCombinations[0].GetInputDown(device,atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputDown(device,atOnce));
         }
 
 
 
-        /// <summary>
+		/// <summary>
+		/// DOWN.
+		/// </summary>
+		/// <returns><c>true</c>, if input binded to state started to return values (than is reseted), <c>false</c> otherwise.</returns>
+		/// <param name="stateNameHash">State name hash.</param>
+		/// <param name="player"></param>
+		/// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts successive action (ex. W+C => W pressed,released then C pressed)
+		/// atOnce=true useful for building modifires like behaviour (LeftCtrl(-)+C)	
+		public static bool GetInputDown(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0, bool atOnce = false)
+		{
+			return GetInputDown (stateNameHash, (int)player, atOnce);
+		}
+
+
+		/// <summary>
+		/// DOWN.[Use for testing as string to hash is slow operation in loop]
+		/// </summary>
+		/// <returns><c>true</c>, if input binded to state started to return values (than is reseted), <c>false</c> otherwise.</returns>
+		/// <param name="stateName">State name.</param>
+		/// <param name="player">Player.</param>
+		/// <param name="atOnce">If set to <c>true</c> at once.</param>
+		public static bool GetInputDown(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0, bool atOnce = false)
+		{ 
+			return GetInputDown (Animator.StringToHash (stateName), player, atOnce);
+		}
+			
+			/// <summary>
         /// Log states - inputs values to console
         /// </summary>
         public static string Log()
@@ -1479,13 +1576,19 @@ namespace ws.winx.input
                 set { _players = value; }
             }
 
+			//public InputPlayer[] this[
+
+			internal Dictionary<int, InputState> GetInputStatesOfPlayer(InputPlayer.Player player){
+				return GetInputStatesOfPlayer ((int)player);
+
+			}
 
 
-            internal Dictionary<int, InputState> GetInputStatesOfPlayer(InputPlayer.Player index)
+            internal Dictionary<int, InputState> GetInputStatesOfPlayer(int index)
             {
 
 
-                InputPlayer player = _players[(int)index];
+                InputPlayer player = _players[index];
 
                 //if there is device attached to player
                 if (player.Device != null)

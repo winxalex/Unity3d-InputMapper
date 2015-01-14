@@ -50,7 +50,22 @@ namespace ws.winx.input
 
         }
 
-        //TODO optimize this
+
+
+		public event EventHandler HOLD
+		{
+			add
+			{
+				AddHandler(_stateNameHash, value,0);
+				
+			}
+			remove
+			{
+				RemoveHandler(_stateNameHash, value,0);
+			}
+		}
+
+       
         public event EventHandler UP
         {
             add

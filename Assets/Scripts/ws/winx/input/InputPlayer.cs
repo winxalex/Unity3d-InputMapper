@@ -90,7 +90,13 @@ namespace ws.winx.input{
 
 
 
-        public Dictionary<int, InputEvent> stateEvents = new Dictionary<int, InputEvent>();
+		public Dictionary<int, InputEvent> stateEvents;
+
+
+		public InputPlayer(){
+
+			stateEvents= new Dictionary<int, InputEvent>();
+		}
 
 		public InputPlayer Clone(){
 			InputPlayer newInputPlayer = new InputPlayer ();
@@ -119,7 +125,9 @@ namespace ws.winx.input{
 
         internal InputEvent GetEvent(int stateNameHash)
         {
-            if (stateEvents.ContainsKey(stateNameHash))
+			if(stateEvents==null) stateEvents=new Dictionary<int, InputEvent>();
+
+            if (!stateEvents.ContainsKey(stateNameHash))
             {
                 stateEvents[stateNameHash] = new InputEvent(stateNameHash);
 
