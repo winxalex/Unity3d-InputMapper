@@ -254,63 +254,6 @@ namespace ws.winx
 		{
 			
 
-
-			//	
-			//
-			if (InputManager.GetInputHold (Animator.StringToHash ("WalkBackward"))) {
-				Debug.Log ("WalkBackward-Hold");
-			}
-			
-			
-			if (InputManager.GetInputDown (Animator.StringToHash ("WalkBackward"))) {
-				Debug.Log ("WalkBackward-Down");
-			}
-			
-			if (InputManager.GetInputUp (Animator.StringToHash ("WalkBackward"))) {
-				Debug.Log ("WalkBackward-Up");
-			}
-			
-			
-			if (InputManager.GetInputHold (Animator.StringToHash ("WalkForward"))) {
-				Debug.Log ("WalkForward-Hold");
-			}
-			
-			if (InputManager.GetInputDown (Animator.StringToHash ("WalkForward"))) {
-				Debug.Log ("WalkForward-Down");
-			}
-			
-			if (InputManager.GetInputUp (Animator.StringToHash ("WalkForward"))) {
-				Debug.Log ("WalkForward-Up");
-			}
-			//
-			////
-			
-			//Bind Axis as one part
-			
-			//						InputManager.MapStateToInput ("WalkForward", KeyCodeExtension.W.SINGLE);
-			//						InputManager.MapStateToInput ("WalkForward", 1, KeyCodeExtension.Joystick1AxisXPositive.SINGLE);
-			//
-			//
-			//						InputManager.MapStateToInput ("WalkBackward", KeyCodeExtension.S.SINGLE);
-			//						InputManager.MapStateToInput ("WalkBackward", 1, KeyCodeExtension.Joystick1AxisYNegative.SINGLE);
-			//
-			//						
-			
-			//			float axisPos = InputManager.GetInput (Animator.StringToHash ("WalkForward"), 0.3f, 0.1f, 0.2f);
-			//
-			//			float axisNeg= InputManager.GetInput (Animator.StringToHash ("WalkBackward"),  0.3f, 0.1f, 0.1f);
-			//
-			//			float analogVal=axisPos - axisNeg;
-			
-			//Debug.Log (analogVal);//would go from  -1 to 1
-			
-			
-			
-			
-			// Hardware normalized value in range of -1f to 1f (keys,mouse would return 0f or 1f, triggers 0f to 1f)
-			//float analogVal2= InputManager.GetInput (Animator.StringToHash ("WalkBackward"));
-			//Debug.Log (analogVal2);
-			
 			
 			
 			

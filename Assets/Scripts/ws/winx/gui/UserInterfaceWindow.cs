@@ -109,17 +109,16 @@ namespace ws.winx.gui
 			
 
 
-									_action = InputManager.GetAction (_playerSelected.Device);
+								_action = InputManager.GetAction (_playerSelected.Device);
 
 									
                           
 
 
-                                    if (_action != null && (_action.getCode(_playerSelected.Device) ^ (int)KeyCode.Escape) != 0 && (_action.getCode(_playerSelected.Device) ^ (int)KeyCode.Return) != 0)
-                                    {
+								if (_action != null && (_action.getCode (_playerSelected.Device) ^ (int)KeyCode.Escape) != 0 && (_action.getCode (_playerSelected.Device) ^ (int)KeyCode.Return) != 0) {
 
 
-										if ((_action.getCode(_playerSelected.Device) ^ (int)KeyCode.Backspace) == 0) {
+										if ((_action.getCode (_playerSelected.Device) ^ (int)KeyCode.Backspace) == 0) {
 												_stateInputCombinations [_selectedStateHash].combinations [_isPrimary].Clear ();
 												_stateInputCombinations [_selectedStateHash].combinations [_isPrimary].Add (new InputAction (KeyCode.None));
 										} else {
@@ -127,7 +126,7 @@ namespace ws.winx.gui
 												//remove ord
 												//_action.getCode(_playerSelected.Device)=InputCode.toCodeAnyDevice (_action.getCode(_playerSelected.Device));
 
-                                               // _action.codeString = InputCode.toProfiled(_playerSelected.Device, _action);
+												// _action.codeString = InputCode.toProfiled(_playerSelected.Device, _action);
 
 												toInputCombination (_stateInputCombinations [_selectedStateHash].combinations [_isPrimary], _action);
 										}
@@ -237,7 +236,7 @@ namespace ws.winx.gui
 				void toInputCombination (InputCombination combos, InputAction input)
 				{
 
-						if (combos.numActions + 1 > maxCombosNum || (combos.numActions == 1 && combos.GetActionAt (0).getCode(_playerSelected.Device) == 0))
+						if (combos.numActions + 1 > maxCombosNum || (combos.numActions == 1 && combos.GetActionAt (0).getCode (_playerSelected.Device) == 0))
 								combos.Clear ();
 
 						combos.Add (input);
@@ -321,9 +320,9 @@ namespace ws.winx.gui
 
 								_playerIndexSelected = GUILayout.SelectionGrid (_playerIndexSelected, _playerDisplayOptions, _playerDisplayOptions.Length);
 			
-							_playerSelected=settings.Players[_playerIndexSelected];
+								_playerSelected = settings.Players [_playerIndexSelected];
 				
-				// close/hide device list when player index changed
+								// close/hide device list when player index changed
 								if (_playerIndexSelectedPrev != _playerIndexSelected) {
 										_deviceListShow = false;
 										_deviceDisplayIndexPrev = 0;
@@ -498,7 +497,7 @@ namespace ws.winx.gui
 
 								//!!! USE HERE YOUR CUSTOM METHOD TO SHOW DISPLAY
 								
-										 if (GUILayout.Button(InputCode.beautify(combinations[0].combinationString), _inputButtonStyle)){
+								if (GUILayout.Button (InputCode.beautify (combinations [0].combinationString), _inputButtonStyle)) {
 										_selectedStateHash = hash;
 										_previousStateInput = null;
 										_isPrimary = 0;
@@ -506,7 +505,7 @@ namespace ws.winx.gui
 
 								if (combinations.Length > 1 && combinations [1] != null)
 								//!!! USE HERE YOUR CUSTOM METHOD TO SHOW DISPLAY
-				if (GUILayout.Button(InputCode.beautify(combinations[1].combinationString), _inputButtonStyle)){
+								if (GUILayout.Button (InputCode.beautify (combinations [1].combinationString), _inputButtonStyle)) {
 										_selectedStateHash = hash;
 										_previousStateInput = null;
 										_isPrimary = 1;
@@ -520,14 +519,14 @@ namespace ws.winx.gui
 
 
 								
-								currentCombinationString = combinations[_isPrimary].combinationString;
+								currentCombinationString = combinations [_isPrimary].combinationString;
 
 								if (_previousStateInput == null) {
 										_previousStateInput = combinations [_isPrimary].Clone ();
 								}
 
 								//!!! USE HERE YOUR CUSTOM METHOD TO SHOW DISPLAY
-								currentCombinationString=InputCode.beautify(currentCombinationString);
+								currentCombinationString = InputCode.beautify (currentCombinationString);
 								GUILayout.Label (currentCombinationString);
 
 #if UNITY_ANDROID || UNITY_IPHONE

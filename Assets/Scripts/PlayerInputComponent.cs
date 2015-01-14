@@ -10,6 +10,9 @@ public class PlayerInputComponent : MonoBehaviour
 
 
     public InputPlayer.Player Player;
+
+	//public States state;
+
     Animator animator;
     int forwardHash;
     int turnHash;
@@ -26,6 +29,12 @@ public class PlayerInputComponent : MonoBehaviour
     }
 
 
+	public void onInputSettingsLoadComplete(){
+
+		Debug.Log ("InputSettings Loadded Received in "+Player);
+		manuallyAddStateAndHandlers ();
+
+	}
 
     void manuallyAddStateAndHandlers()
     {
@@ -44,7 +53,7 @@ public class PlayerInputComponent : MonoBehaviour
 
         ////easiest way to map state to combination (ex.of single W and C click)
         if (!InputManager.HasInputState("ManualFullAxisMap"))
-            InputManager.MapStateToInput("ManualFullAxisMap",Player, InputCode.Joystick0AxisX);// InputCode.W.SINGLE, InputCode.C.SINGLE);
+            InputManager.MapStateToInput("ManualFullAxisMap",Player, InputCode.JoystickAxisX);// InputCode.W.SINGLE, InputCode.C.SINGLE);
 
 
         //			InputManager.MapStateToInput ("WalkForward", InputCode.W.SINGLE);
@@ -54,13 +63,13 @@ public class PlayerInputComponent : MonoBehaviour
         //			InputManager.MapStateToInput ("WalkBackward", InputCode.S.SINGLE);
         //			InputManager.MapStateToInput ("WalkBackward", 1, InputCode.Joystick1AxisYNegative.SINGLE);
 
-        UnityEngine.Debug.Log("Log:" + InputManager.Log());
+    //    UnityEngine.Debug.Log("Log:" + InputManager.Log());
 
 
 
 
-        InputManager.addEventListener((int)States.Wave).UP += onUp;
-        InputManager.addEventListener((int)States.Wave).DOWN += onDown;
+        InputManager.addEventListener((int)States.Wave,Player).UP += onUp;
+        InputManager.addEventListener((int)States.Wave,Player).DOWN += onDown;
 
 
 
@@ -74,12 +83,12 @@ public class PlayerInputComponent : MonoBehaviour
 
     void onUp(object o, EventArgs args)
     {
-        Debug.Log("Up");
+        Debug.Log(Player+">Wave state trigger Up");
     }
 
     void onDown(object o, EventArgs args)
     {
-        Debug.Log("Down");
+		Debug.Log(Player+">Wave state trigger Down");
     }
 
 
@@ -105,7 +114,7 @@ public class PlayerInputComponent : MonoBehaviour
             animator.Play((int)States.Wave);
         }
 
-        if (InputManager.GetInputDown((int)States.Jump))
+        if (InputManager.GetInputDown((int)States.Jump,Player))
         {
             animator.Play((int)States.Jump);
         }

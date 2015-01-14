@@ -508,66 +508,54 @@ namespace ws.winx.input
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="player"></param>
-        internal static void dispatchEvent(InputPlayer.Player player = InputPlayer.Player.Player0)
+        internal static void dispatchEvent()
         {
             Delegate[] delegates;
 			if (!isReady ())
 								return;
-
-            Dictionary<int, InputEvent> stateEvents = __settings.Players[(int)player].stateEvents;
-
-            if (stateEvents != null)
-                foreach (var stateInputEventsPair in stateEvents)
-                {
-                    var Events = stateInputEventsPair.Value.Events;
-                    foreach (KeyValuePair<int, Delegate[]> pair in Events)
-                    {
-
-                        //                    if(pair.Value[0]!=null && InputManager.GetInput(pair.Key,false)){
-                        //                        delegates= pair.Value[0].GetInvocationList();
-                        //                        foreach(Delegate d in delegates)
-                        //                            ((EventHandler)d).BeginInvoke(this, args, EndAsyncEvent, null);
-                        //                    }
-
-                        if (pair.Value[1] != null && InputManager.GetInputUp(pair.Key))
-                        {
-                            delegates = pair.Value[1].GetInvocationList();
-                            foreach (Delegate d in delegates)
-                                ((EventHandler)d).BeginInvoke(null, null, EndAsyncEvent, null);
-                        }
-
-                        if (pair.Value[2] != null && InputManager.GetInputDown(pair.Key))
-                        {
-                            delegates = pair.Value[2].GetInvocationList();
-                            foreach (Delegate d in delegates)
-                                ((EventHandler)d).BeginInvoke(null, null, EndAsyncEvent, null);
-                        }
+			int numPlayers = __settings.Players.Length;
 
 
+			Dictionary<int, InputEvent> stateEvents;
 
-                    }
 
-                }
+			for (int i=0; i<numPlayers; i++) {
+				stateEvents= __settings.Players[i].stateEvents;
+
+								if (stateEvents != null)
+										foreach (var stateInputEventsPair in stateEvents) {
+												var Events = stateInputEventsPair.Value.Events;
+												foreach (KeyValuePair<int, Delegate[]> pair in Events) {
+
+														if (pair.Value [0] != null && InputManager.GetInputHold (pair.Key,i)) {
+																delegates = pair.Value [0].GetInvocationList ();
+																foreach (Delegate d in delegates)
+																		((EventHandler)d).Invoke (null, null);
+														}
+
+														if (pair.Value [1] != null && InputManager.GetInputUp (pair.Key,i)) {
+																delegates = pair.Value [1].GetInvocationList ();
+																foreach (Delegate d in delegates)
+																		((EventHandler)d).Invoke (null, null);
+														}
+
+														if (pair.Value [2] != null && InputManager.GetInputDown (pair.Key,i)) {
+																delegates = pair.Value [2].GetInvocationList ();
+																foreach (Delegate d in delegates)
+																		((EventHandler)d).Invoke (null, null);
+														}
+
+
+
+												}
+
+										}
+						}
         }
 
 
 
-        private static void EndAsyncEvent(IAsyncResult iar)
-        {
-            var ar = (System.Runtime.Remoting.Messaging.AsyncResult)iar;
-            var invokedMethod = (EventHandler)ar.AsyncDelegate;
-
-            try
-            {
-                invokedMethod.EndInvoke(iar);
-            }
-            catch
-            {
-                // Handle any exceptions that were thrown by the invoked method
-                Debug.Log("An event listener went kaboom!");
-            }
-        }
+     
 
 
 
@@ -1260,23 +1248,35 @@ namespace ws.winx.input
 		}
 			
 			
+		/// <summary>
+		/// HOLD.
+		/// </summary>
+		/// <returns><c>true</c>, while input binded to state returns signal, <c>false</c> otherwise.</returns>
+		/// <param name="stateNameHash">State name hash.</param>
+		/// <param name="playerIndex">Player index.</param>
+		internal static bool GetInputHold(int stateNameHash, int playerIndex){
+
+			//Use is mapping states so no quering keys during gameplay
+			if (!InputManager.isReady()) return false;
 			
-			/// <summary>
-        /// HOLD.
-        /// </summary>
-        /// <returns><c>true</c>, while input binded to state returns signal, <c>false</c> otherwise.</returns>
-        /// <param name="stateNameHash">State name hash.</param>
-        /// <param name="player"></param>
+			__inputCombinations = __settings.GetInputStatesOfPlayer(playerIndex)[stateNameHash].combinations;
+			
+			IDevice device = __settings.Players[playerIndex].Device;
+			
+			return __inputCombinations[0].GetInputHold(device) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputHold(device));
+
+		}
+		
+
+		/// <summary>
+		/// HOLD.
+		/// </summary>
+		/// <returns><c>true</c>, while input binded to state returns signal, <c>false</c> otherwise.</returns>
+		/// <param name="stateNameHash">State name hash.</param>
+		/// <param name="player">Player.</param>
         public static bool GetInputHold(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0)
         {
-            //Use is mapping states so no quering keys during gameplay
-            if (!InputManager.isReady()) return false;
-
-            __inputCombinations = __settings.GetInputStatesOfPlayer(player)[stateNameHash].combinations;
-
-            IDevice device = __settings.Players[(int)player].Device;
-
-            return __inputCombinations[0].GetInputHold(device) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputHold(device));
+			return GetInputHold (stateNameHash, (int)player);
         }
 
 
@@ -1292,6 +1292,22 @@ namespace ws.winx.input
 		{
 			return GetInputHold (Animator.StringToHash(stateName), player);
 		}
+
+
+
+
+		internal static bool GetInputUp(int stateNameHash, int playerIndex=0)
+		{
+			//Use is mapping states so no quering keys during gameplay
+			if (!InputManager.isReady()) return false;
+			
+			__inputCombinations = __settings.GetInputStatesOfPlayer(playerIndex)[stateNameHash].combinations;
+			
+			
+			IDevice device = __settings.Players[playerIndex].Device;
+			return __inputCombinations[0].GetInputUp(device) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp(device));
+
+		}
 			
 		/// <summary>
         /// UP.
@@ -1301,15 +1317,7 @@ namespace ws.winx.input
         /// <param name="player"></param>
         public static bool GetInputUp(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0)
         {
-            //Use is mapping states so no quering keys during gameplay
-            if (!InputManager.isReady()) return false;
-
-            __inputCombinations = __settings.GetInputStatesOfPlayer(player)[stateNameHash].combinations;
-
-
-            IDevice device = __settings.Players[(int)player].Device;
-            return __inputCombinations[0].GetInputUp(device) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp(device));
-
+			return GetInputUp (stateNameHash, (int)player);
         }
 
 
@@ -1324,27 +1332,42 @@ namespace ws.winx.input
 			return GetInputUp (Animator.StringToHash (stateName), player);
 		}
 			
+
 		/// <summary>
-		/// DOWN.[Use for testing as string to hash is slow operation in loop]
-        /// </summary>
-        /// <returns><c>true</c>, if input binded to state started to return values (than is reseted), <c>false</c> otherwise.</returns>
-        /// <param name="stateNameHash">State name hash.</param>
-        /// <param name="player"></param>
-        /// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts successive action (ex. W+C => W pressed,released then C pressed)
-        /// atOnce=true useful for building modifires like behaviour (LeftCtrl(-)+C)		                 
-       public static bool GetInputDown(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0, bool atOnce = false)
+		/// Gets the input down.
+		/// </summary>
+		/// <returns><c>true</c>, if input down was gotten, <c>false</c> otherwise.</returns>
+		/// <param name="stateNameHash">State name hash.</param>
+		/// <param name="playerIndex">Player index.</param>
+		/// <param name="atOnce">If set to <c>true</c> at once.</param>
+       internal static bool GetInputDown(int stateNameHash, int playerIndex=0, bool atOnce = false)
         {
             //Use is mapping states so no quering keys during gameplay
             if (!InputManager.isReady()) return false;
 
             //__settings.Players[InputManager.currentPlayerInx].GetStateInputBasedOnControllerMappedToPlayer
 
-            __inputCombinations = __settings.GetInputStatesOfPlayer(player)[stateNameHash].combinations;
+            __inputCombinations = __settings.GetInputStatesOfPlayer(playerIndex)[stateNameHash].combinations;
 
-            IDevice device = __settings.Players[(int)player].Device;
+            IDevice device = __settings.Players[playerIndex].Device;
 
             return __inputCombinations[0].GetInputDown(device,atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputDown(device,atOnce));
         }
+
+
+
+		/// <summary>
+		/// DOWN.
+		/// </summary>
+		/// <returns><c>true</c>, if input binded to state started to return values (than is reseted), <c>false</c> otherwise.</returns>
+		/// <param name="stateNameHash">State name hash.</param>
+		/// <param name="player"></param>
+		/// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts successive action (ex. W+C => W pressed,released then C pressed)
+		/// atOnce=true useful for building modifires like behaviour (LeftCtrl(-)+C)	
+		public static bool GetInputDown(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0, bool atOnce = false)
+		{
+			return GetInputDown (stateNameHash, (int)player, atOnce);
+		}
 
 
 		/// <summary>
@@ -1553,13 +1576,19 @@ namespace ws.winx.input
                 set { _players = value; }
             }
 
+			//public InputPlayer[] this[
+
+			internal Dictionary<int, InputState> GetInputStatesOfPlayer(InputPlayer.Player player){
+				return GetInputStatesOfPlayer ((int)player);
+
+			}
 
 
-            internal Dictionary<int, InputState> GetInputStatesOfPlayer(InputPlayer.Player index)
+            internal Dictionary<int, InputState> GetInputStatesOfPlayer(int index)
             {
 
 
-                InputPlayer player = _players[(int)index];
+                InputPlayer player = _players[index];
 
                 //if there is device attached to player
                 if (player.Device != null)
