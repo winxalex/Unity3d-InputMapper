@@ -16,6 +16,7 @@ namespace ws.winx.input
 #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 		[DataContract]
 #endif
+	[System.Serializable]
     public class InputState
     {
 #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
@@ -23,14 +24,7 @@ namespace ws.winx.input
 #endif
         public InputCombination[] combinations;
 
-        ///
-        public Animator animator
-        {
-            get
-            {
-                return _animator;
-            }
-        }
+      
 
         public int hash
         {
@@ -60,7 +54,7 @@ namespace ws.winx.input
 				[DataMember(Name = "Hash")]
 #endif
         protected int _hash;
-        protected Animator _animator;
+      
         protected int _count = 0;
 
         public InputState(string name, int hash)

@@ -22,6 +22,9 @@ using ws.winx.devices;
 using System.Threading;
 using System.Runtime.InteropServices;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+
+
 
 namespace ws.winx.input
 {
@@ -570,12 +573,41 @@ namespace ws.winx.input
 
 
 #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+		public static InputSettings loadSettingsFromBin(String path){
+			
+			
+			using (Stream stream = new FileStream(path,FileMode.Open,FileAccess.Read)) {
+				BinaryFormatter bf=new BinaryFormatter();
+				__settings = (InputManager.InputSettings)bf.Deserialize (stream);
+				stream.Close ();
+			}
+			
+			return __settings;
+		}
+
+
+
+
         /// <summary>
         /// Loads the Input settings from InputSettings.xml and deserialize into OO structure.
         /// Create your .xml settings with InputMapper Editor
         /// </summary>
         public static InputSettings loadSettings(String path = "InputSettings.xml")
         {
+
+			if (!File.Exists (path)) {
+				throw new FileNotFoundException("File Not found",path);
+			}
+
+			if (Path.GetExtension (path) != ".xml" && Path.GetExtension (path) != ".bin")
+								throw new Exception ("Not supported file type. Please use XML or BIN");
+
+			if (Path.GetExtension (path) == ".bin") {
+				return	loadSettingsFromBin(path);
+
+			}
+
+
             XmlReaderSettings xmlSettings = new XmlReaderSettings();
             xmlSettings.CloseInput = true;
             xmlSettings.IgnoreWhitespace = true;
@@ -1092,12 +1124,30 @@ namespace ws.winx.input
        }
 #endif
 
-#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID)&& !UNITY_WEBPLAYER
+		internal static void saveSettingsBin(String path)
+		{
+			using (FileStream ms = new FileStream(path,FileMode.Create,FileAccess.Write))
+						{
+							var bin = new BinaryFormatter();
+							bin.Serialize(ms, __settings);
+							ms.Flush();
+							ms.Close();
+						} 
+		}
+			
+			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID)&& !UNITY_WEBPLAYER
         /// <summary>
         /// Saves the settings to InputSettings.xml.
         /// </summary>
         public static void saveSettings(String path)
         {
+			if (Path.GetExtension(path)==".bin") {
+					saveSettingsBin (path);
+				return;
+
+			}
+
+
 
             //DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<int,InputCombination[]>),"Inputs","");
 
@@ -1489,10 +1539,11 @@ namespace ws.winx.input
 #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
         [DataContract]
 #endif
+		[System.Serializable]
         public class InputSettings
         {
 
-
+		
 
 
 #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER

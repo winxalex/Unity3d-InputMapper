@@ -100,7 +100,7 @@ namespace ws.winx
             UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
 
 
-            if (ui != null && ui.settingsXML == null)
+            if (ui != null)
             {//settingsXML would trigger internal loading mechanism (only for testing)
 
                 InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));
@@ -266,24 +266,20 @@ namespace ws.winx
             //			InputManager.MapStateToInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
 
 
+			int ManualAddedState = Animator.StringToHash ("ManualAddedSTATE");
 
             ////easiest way to map state to combination (ex.of single W and C click)
-            if (!InputManager.HasInputState("ManualAddedSTATE"))
-                InputManager.MapStateToInput("ManualAddedSTATE",InputPlayer.Player.Player0, InputCode.W.SINGLE, InputCode.C.SINGLE);
+            if (!InputManager.HasInputState(ManualAddedState))
+			    InputManager.MapStateToInput(ManualAddedState,InputPlayer.Player.Player0, InputCode.W.SINGLE, InputCode.C.SINGLE);
 
             //add secondary
-            InputManager.MapStateToInput("AnyJoystick", InputPlayer.Player.Player0,InputCode.JoystickAxisXPositive.SINGLE);
+           // InputManager.MapStateToInput("AnyJoystick", InputPlayer.Player.Player0,InputCode.JoystickAxisXPositive.SINGLE);
 
             UnityEngine.Debug.Log("Log:" + InputManager.Log());
 
 
-            ////Event Based input handling
-            InputEvent ev = new InputEvent("ManualAddedSTATE");
-            //InputEvent ev = new InputEvent((int)States.SomeState);
-
-
-            ev.UP += new EventHandler(onUp);
-            ev.DOWN += new EventHandler(onDown);
+			InputManager.addEventListener(ManualAddedState).UP += onUp;
+			InputManager.addEventListener(ManualAddedState).DOWN += onDown;
 
           
 

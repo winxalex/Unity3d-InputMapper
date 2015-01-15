@@ -268,7 +268,7 @@ namespace ws.winx.drivers
 #endif
 
 
-		#if UNITY_STANDALONE_WIN || UNITY_ANDROID
+		#if UNITY_STANDALONE_WIN || UNITY_ANDROID || UNITY_WEBPLAYER
         void onRead(object data)
 		{
 			

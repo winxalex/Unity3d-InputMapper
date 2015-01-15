@@ -71,7 +71,7 @@ namespace ws.winx
 
 			
 			
-			if (ui != null && ui.settingsXML == null)
+			if (ui != null)
 			{//settingsXML would trigger internal loading mechanism (only for testing)
 				
 				InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, "InputSettingsTest.xml"));

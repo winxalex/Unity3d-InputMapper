@@ -23,13 +23,21 @@ using UnityEngine.Serialization;
 public class InputComponent : MonoBehaviour
 {
 
-		//TODO browse and XML drag
+		
 
 		//
 		// Fields
 		//
 
-		public TextAsset settingsXML;
+
+
+		public TextAsset profileList;
+
+		public TextAsset[] profiles;
+
+		public string settingsFileName="InputSettings.xml";
+
+		
 
 		[FormerlySerializedAs ("onLoad"), UnityEngine.SerializeField]
 		private InputComponentEvent m_onLoad = new InputComponentEvent ();
@@ -66,15 +74,12 @@ public class InputComponent : MonoBehaviour
 		void Start ()
 		{
 
-		if (settingsXML == null) {
-						Debug.LogError ("Please add Setting.xml file");
-						return;
-		}
 
-		if (String.IsNullOrEmpty(settingsXML.name)) {
-			Debug.LogError ("Please add Setting.xml file");
-			return;
-		}
+				   if (String.IsNullOrEmpty (settingsFileName)) {
+
+						Debug.LogError("Add Settings FileName from StreamingAssets");
+						return;
+					}
 
 
 		ui= this.GetComponent<UserInterfaceWindow>();
@@ -119,14 +124,20 @@ public class InputComponent : MonoBehaviour
 
 		
 		
-		if (ui != null && ui.settingsXML == null)
+		if (ui != null && !String.IsNullOrEmpty (settingsFileName))
 		{//settingsXML would trigger internal loading mechanism (only for testing)
-			
-			InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, settingsXML.name+".xml"));
-			
-			
-			
-			ui.settings = InputManager.Settings;
+
+			//load settings from external file
+			ui.settings=InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, settingsFileName));
+
+			//ui.settings=InputManager.loadSettingsFromText(settingsXML.text);
+
+
+
+	
+
+
+
 
 			//dispatch Event 
 			this.m_onLoad.Invoke();
@@ -179,7 +190,7 @@ public class InputComponent : MonoBehaviour
 		}
 		else //TARGET=ANDROID but playing in EDITOR => use Standalone setup
 		{
-			if (ui != null && ui.settingsXML == null)
+			if (ui != nulll)
 			{//settingsXML would trigger internal loading mechanism (only for testing)
 				
 				InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, settingsXML.name+".xml"));
@@ -203,7 +214,7 @@ public class InputComponent : MonoBehaviour
 		Loader request = new Loader();
 		
 		//UNITY_WEBPLAYER: Application.dataPath "http://localhost/appfolder/"
-		request.Add(Application.dataPath+"/StreamingAssets/"+settingsXML.name+".xml);
+		request.Add(Application.dataPath+"/StreamingAssets/"+settingsXML.name+".xml");
 		
 		
 		request.LoadComplete += new EventHandler<LoaderEvtArgs<List<WWW>>>(onLoadComplete);

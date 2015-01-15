@@ -75,14 +75,13 @@ namespace ws.winx
 			UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
 
 			
-			if (ui != null && ui.settingsXML == null)
+			if (ui != null)
 			{//settingsXML would trigger internal loading mechanism (only for testing)
 				
-				InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));
+				ui.settings=InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));
 				
 				
-				ui.settings=InputManager.Settings;
-				//ui.StateInputCombinations = InputManager.Settings.stateInputs;
+			
 			}
 			
 			

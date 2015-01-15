@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ws.winx.input;
 using ws.winx.devices;
 using System.Runtime.Serialization;
+using System;
 
 namespace ws.winx.input{
 
@@ -13,6 +14,7 @@ namespace ws.winx.input{
 	#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 	[DataContract]
 	#endif
+	[System.Serializable]
 	public class InputPlayer:System.IDisposable
 	{
 
@@ -47,8 +49,10 @@ namespace ws.winx.input{
 			}
 		}
 
+		[NonSerialized]
+		protected IDevice _Device;
 
-		public IDevice _Device;
+
 
         public IDevice Device{
             get{ 
@@ -89,7 +93,7 @@ namespace ws.winx.input{
 
 
 
-
+		[NonSerialized]
 		public Dictionary<int, InputEvent> stateEvents;
 
 

@@ -12,6 +12,7 @@ namespace ws.winx.input
 #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 	[DataContract]
 #endif
+	[System.Serializable]
 		public class InputCombination
 		{
 

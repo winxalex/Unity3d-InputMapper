@@ -104,7 +104,7 @@ namespace ws.winx.editor
 				public int maxCombosNum = 3;
 				public TextAsset settingsXML;
 				public AnimatorController controller;
-
+				public bool saveBinary=false;
                 public static EditorWindow _instance;
 	    
 				void Start ()
@@ -358,6 +358,7 @@ namespace ws.winx.editor
 
 								//Debug.Log ("AfterSave..." + _stateInputCombinations.Count+" inputmngr "+InputManager.Settings.stateInputs.Count+"to path:"+path);
 						
+										
 
 								loadTextAsset (path);
 						
