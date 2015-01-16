@@ -4,11 +4,12 @@ using ws.winx.input;
 using System.Collections.Generic;
 using System.IO;
 using System.Collections;
-using UnityEditor;
 using ws.winx.devices;
 
-namespace ws.winx.gui
+
+namespace ws.winx.input.components
 {
+		
 		public class UserInterfaceWindow : MonoBehaviour
 		{
 
@@ -71,7 +72,7 @@ namespace ws.winx.gui
 				public InputManager.InputSettings settings;
 				public int maxCombosNum = 3;
 				public GUISkin guiSkin;
-				public TextAsset settingsXML;
+			
 				public Rect windowRect = new Rect (0, 0, 600, 430);
 				//public bool allowDuplicates=false;
 
@@ -79,10 +80,7 @@ namespace ws.winx.gui
 				{
 
 
-						if (!_settingsLoaded && settingsXML != null) {
-								loadInputSettings ();
-								_settingsLoaded = true;
-						}
+						
 
 
 
@@ -162,10 +160,10 @@ namespace ws.winx.gui
 
 #if UNITY_WEBPLAYER && UNITY_EDITOR
            
-            if(settingsXML!=null)
-                InputManager.saveSettings(Path.Combine(Application.streamingAssetsPath, settingsXML.name + ".xml"));
-             else 
+          
 				InputManager.saveSettings(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));
+			InputManager.saveSettings(Path.Combine(Application.streamingAssetsPath,this.GetComponent<InputComponent>().settingsFileName));
+
 
 
 #endif
@@ -173,59 +171,29 @@ namespace ws.winx.gui
 #if UNITY_ANDROID
                     //Try to save to /storage/sdcard0/Android/data/ws.winx.InputManager/files
 
-                         if (settingsXML != null)
-			                  InputManager.saveSettings(Application.persistentDataPath+"/"+settingsXML.name+".xml");
-                         else
-				              InputManager.saveSettings(Application.persistentDataPath+"/InputSettings.xml");
+                        
+				  //InputManager.saveSettings(Application.persistentDataPath+"/InputSettings.xml");
+			InputManager.saveSettings(Path.Combine(Application.persistentDataPath,this.GetComponent<InputComponent>().settingsFileName));
+
 
                          Debug.Log("UI>> Try to save to " + Application.persistentDataPath);
 #endif
 
 
 #if UNITY_STANDALONE
-            if (settingsXML != null)
-                InputManager.saveSettings(Path.Combine(Application.streamingAssetsPath, settingsXML.name + ".xml"));
-            else
-                InputManager.saveSettings(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));
+       
+
+
+			InputManager.saveSettings(Path.Combine(Application.streamingAssetsPath,this.GetComponent<InputComponent>().settingsFileName));
+
+
+
 
 #endif
 				}
 
 
-				/// <summary>
-				/// Loads the input settings.
-				/// </summary>
-				void loadInputSettings ()
-				{
-
-						//UnityEngine.Debug.Log("loadInputSettings");
-
-						//clone(cos maybe some are added manually)
-						// _stateInputCombinations = new Dictionary<int, InputState>(InputManager.Settings.stateInputs);
-
-						//load settngs from TextAsset(seem its utf-8 so not need of reading BOM)
-						InputManager.loadSettingsFromText (settingsXML.text, false);
-
-
-						//var stateInputs = InputManager.Settings.stateInputs;
-
-						////concat//concate with priority of keys/items loaded from .xml
-						//foreach (var KeyValuePair in _stateInputCombinations)
-						//{
-						//    if (!stateInputs.ContainsKey(KeyValuePair.Key))
-						//        InputManager.Settings.stateInputs.Add(KeyValuePair.Key, KeyValuePair.Value);
-
-
-						//}
-
-						//clone(cos maybe some are added manually)
-						//_stateInputCombinations = new Dictionary<int, InputState>(InputManager.Settings.stateInputs);
-
-						settings = InputManager.Settings;
-						_stateInputCombinations = settings.Players [0].DeviceProfileStateInputs ["default"];
-
-
-				}
+				
 
 
 				/// <summary>

@@ -22,6 +22,9 @@ using ws.winx.devices;
 using System.Threading;
 using System.Runtime.InteropServices;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+
+
 
 namespace ws.winx.input
 {
@@ -490,6 +493,15 @@ namespace ws.winx.input
             return isReady() && InputManager.HasInputState(Animator.StringToHash(stateName),player);
         }
 
+
+		public static void addEvents(InputEvent[] events,InputPlayer.Player player=InputPlayer.Player.Player0){
+
+			int len = events.Length;
+				  
+			for (int i=0; i<len; i++)
+								__settings.Players [(int)player].AddEvent (events [i]);
+		}
+
         /// <summary>
         /// 
         /// </summary>
@@ -510,7 +522,7 @@ namespace ws.winx.input
         /// </summary>
         internal static void dispatchEvent()
         {
-            Delegate[] delegates;
+           
 			if (!isReady ())
 								return;
 			int numPlayers = __settings.Players.Length;
@@ -524,30 +536,19 @@ namespace ws.winx.input
 
 								if (stateEvents != null)
 										foreach (var stateInputEventsPair in stateEvents) {
-												var Events = stateInputEventsPair.Value.Events;
-												foreach (KeyValuePair<int, Delegate[]> pair in Events) {
-
-														if (pair.Value [0] != null && InputManager.GetInputHold (pair.Key,i)) {
-																delegates = pair.Value [0].GetInvocationList ();
-																foreach (Delegate d in delegates)
-																		((EventHandler)d).Invoke (null, null);
+										
+														if (InputManager.GetInputHold (stateInputEventsPair.Key,i)) {
+															stateInputEventsPair.Value.onHOLD.Invoke();
 														}
 
-														if (pair.Value [1] != null && InputManager.GetInputUp (pair.Key,i)) {
-																delegates = pair.Value [1].GetInvocationList ();
-																foreach (Delegate d in delegates)
-																		((EventHandler)d).Invoke (null, null);
-														}
+															if (InputManager.GetInputDown (stateInputEventsPair.Key,i)) {
+																stateInputEventsPair.Value.onDOWN.Invoke();
+															}
 
-														if (pair.Value [2] != null && InputManager.GetInputDown (pair.Key,i)) {
-																delegates = pair.Value [2].GetInvocationList ();
-																foreach (Delegate d in delegates)
-																		((EventHandler)d).Invoke (null, null);
-														}
-
-
-
-												}
+															if (InputManager.GetInputUp (stateInputEventsPair.Key,i)) {
+																stateInputEventsPair.Value.onUP.Invoke();
+															}
+	
 
 										}
 						}
@@ -570,12 +571,44 @@ namespace ws.winx.input
 
 
 #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+		public static InputSettings loadSettingsFromBin(String path){
+			
+			
+			using (Stream stream = new FileStream(path,FileMode.Open,FileAccess.Read)) {
+				BinaryFormatter bf=new BinaryFormatter();
+				__settings = (InputManager.InputSettings)bf.Deserialize (stream);
+				stream.Close ();
+			}
+			
+			return __settings;
+		}
+
+
+
+
         /// <summary>
         /// Loads the Input settings from InputSettings.xml and deserialize into OO structure.
         /// Create your .xml settings with InputMapper Editor
         /// </summary>
         public static InputSettings loadSettings(String path = "InputSettings.xml")
         {
+
+			if (!File.Exists (path)) {
+				throw new FileNotFoundException("File Not found",path);
+				return null;
+			}
+
+			if (Path.GetExtension (path) != ".xml" && Path.GetExtension (path) != ".bin") {
+								throw new Exception ("Not supported file type. Please use XML or BIN");
+				return null;
+						}
+
+			if (Path.GetExtension (path) == ".bin") {
+				return	loadSettingsFromBin(path);
+
+			}
+
+
             XmlReaderSettings xmlSettings = new XmlReaderSettings();
             xmlSettings.CloseInput = true;
             xmlSettings.IgnoreWhitespace = true;
@@ -604,6 +637,7 @@ namespace ws.winx.input
             XmlReaderSettings xmlSettings = new XmlReaderSettings();
             xmlSettings.CloseInput = true;
             xmlSettings.IgnoreWhitespace = true;
+
 
 
 
@@ -1092,12 +1126,30 @@ namespace ws.winx.input
        }
 #endif
 
-#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID)&& !UNITY_WEBPLAYER
+		internal static void saveSettingsBin(String path)
+		{
+			using (FileStream ms = new FileStream(path,FileMode.Create,FileAccess.Write))
+						{
+							var bin = new BinaryFormatter();
+							bin.Serialize(ms, __settings);
+							ms.Flush();
+							ms.Close();
+						} 
+		}
+			
+			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID)&& !UNITY_WEBPLAYER
         /// <summary>
         /// Saves the settings to InputSettings.xml.
         /// </summary>
         public static void saveSettings(String path)
         {
+			if (Path.GetExtension(path)==".bin") {
+					saveSettingsBin (path);
+				return;
+
+			}
+
+
 
             //DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<int,InputCombination[]>),"Inputs","");
 
@@ -1489,10 +1541,11 @@ namespace ws.winx.input
 #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
         [DataContract]
 #endif
+		[System.Serializable]
         public class InputSettings
         {
 
-
+		
 
 
 #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
@@ -1576,7 +1629,7 @@ namespace ws.winx.input
                 set { _players = value; }
             }
 
-			//public InputPlayer[] this[
+
 
 			internal Dictionary<int, InputState> GetInputStatesOfPlayer(InputPlayer.Player player){
 				return GetInputStatesOfPlayer ((int)player);

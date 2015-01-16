@@ -34,15 +34,17 @@ namespace ws.winx.editor
 				protected static InputManager.InputSettings settings = InputManager.Settings;
 				protected static bool _settingsLoaded = false;
 				protected UnityEngine.Object _lastController;
-				protected TextAsset _lastSettingsXML;
+				protected UnityEngine.Object _lastSettingsXML;
 				protected static int _selectedStateHash = 0;
 				protected static int _deleteStateWithHash = 0;
-				
 				protected bool _isDeviceAxisPositionFull;
 				protected bool _isComplexActionTypesAllowed;
 				protected string _warrningAddStateLabel;
 				protected int _isPrimary = 0;
 				protected string _currentInputString;
+
+				protected bool _saveBinary=true;
+
 
 				//Players
 				protected int _playerNumber = 1;
@@ -51,7 +53,7 @@ namespace ws.winx.editor
 				protected string[] _playerDisplayOptions;
 
 				//Profiles
-				TextAsset _profilesTextAsset;
+			
 				int _profileSelectedIndex;
 				string[] _profilesDevicesDisplayOptions;
 				
@@ -102,10 +104,10 @@ namespace ws.winx.editor
 				public Vector2 scrollPosition = Vector2.zero;
 				public Vector2 scrollPosition2 = Vector2.zero;
 				public int maxCombosNum = 3;
-				public TextAsset settingsXML;
+				public UnityEngine.Object settingsFile;
 				public AnimatorController controller;
-
-                public static EditorWindow _instance;
+				public bool saveBinary = false;
+				public static EditorWindow _instance;
 	    
 				void Start ()
 				{
@@ -160,14 +162,13 @@ namespace ws.winx.editor
 						_selectedStateHash = 0;
 
 						// Get existing open window or if none, make a new one:
-						if(InputMapper._instance==null)
-                            if (!Application.isPlaying)
-                            {
-                                InputManager.hidInterface.Enumerate();
-                                __wereDevicesEnumerated = true;
-                            }
+						if (InputMapper._instance == null)
+						if (!Application.isPlaying) {
+								InputManager.hidInterface.Enumerate ();
+								__wereDevicesEnumerated = true;
+						}
 
-                       _instance=EditorWindow.GetWindow (typeof(InputMapper));
+						_instance = EditorWindow.GetWindow (typeof(InputMapper));
 
 
 
@@ -257,7 +258,7 @@ namespace ws.winx.editor
 			
 				}
 		
-				void loadTextAsset (string path)
+				void loadAsset (string path)
 				{
 						Uri fullPath = new Uri (path, UriKind.Absolute);
 						Uri relRoot = new Uri (Application.dataPath, UriKind.Absolute);
@@ -265,10 +266,10 @@ namespace ws.winx.editor
 						AssetDatabase.ImportAsset (relRoot.MakeRelativeUri (fullPath).ToString (), ImportAssetOptions.ForceUpdate);
 
 				
-						_lastSettingsXML = settingsXML = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri (fullPath).ToString (), typeof(TextAsset)) as TextAsset;
+						_lastSettingsXML = settingsFile = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri (fullPath).ToString (), typeof(UnityEngine.Object));
 
 						if (_lastSettingsXML != null)
-								loadInputSettings (_lastSettingsXML.text);
+								loadInputSettings (_lastSettingsXML);
 
 						//_lastSettingsXML = settingsXML = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri(fullPath).ToString(), typeof(TextAsset)) as TextAsset;
 						//Debug.Log ("Loading Text asset"+settingsXML.name+" from "+path+" full path:"+ fullPath+" rell:"+relRoot+"relativePath:"+relRoot.MakeRelativeUri(fullPath).ToString());
@@ -281,31 +282,49 @@ namespace ws.winx.editor
 				/// <summary>
 				/// Loads the input settings 
 				/// </summary>
-				void loadInputSettings (string text)
+				void loadInputSettings (UnityEngine.Object asset)
 				{
-
-						if (text != null && text.Length > 1) {
-
-								Debug.Log ("Loading..." + _stateInputCombinations);
-
-								//clone
-								//_stateInputCombinations = new Dictionary<int,InputState> (_stateInputCombinations);
-								//Debug.Log ("Clone..." + _stateInputCombinations.Count);		
 						
-								//load
-								#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
-								InputManager.loadSettings(new StringReader(text));
-								#else
-								InputManager.loadSettingsFromText (text, false);
-								#endif
+						if (asset is TextAsset) {
+							
+								string text = ((TextAsset)asset).text;
 
-								//InputManager.loadSettings (path);
+								if (text != null && text.Length > 1) {
+
+										Debug.Log ("Loading..." + _stateInputCombinations);
+
+										//clone
+										//_stateInputCombinations = new Dictionary<int,InputState> (_stateInputCombinations);
+										//Debug.Log ("Clone..." + _stateInputCombinations.Count);		
+						
+										//load
+										#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
+											settings=InputManager.loadSettings (new StringReader (text));
+										#else
+										settings = InputManager.loadSettingsFromText (text, false);
+										#endif
+
+										
 
 				
 								
 								
 							
-								settings = InputManager.Settings;
+										
+
+										
+								
+		
+								}		
+
+						} else {
+
+								settings = InputManager.loadSettings (AssetDatabase.GetAssetPath (settingsFile));
+
+						}
+
+
+						if (settings != null) {
 
 								//assign settings
 								_doubleClickDesignator = settings.doubleDesignator;
@@ -315,26 +334,10 @@ namespace ws.winx.editor
 								_longClickDesignator = settings.longDesignator;
 								_longClickSensitivity = settings.longClickSensitivity;
 								_spaceDesignator = settings.spaceDesignator;
-
+				
 								_playerNumber = settings.Players.Length;
 								_playerIndexSelected = 0;
-								
-						
-								//	var stateInputs = InputManager.Settings.stateInputs;
-						
-								//concat//concate with priority of keys/items loaded from .xml
-//								foreach (var KeyValuePair in _stateInputCombinations) {
-//										if (!stateInputs.ContainsKey (KeyValuePair.Key))
-//												InputManager.Settings.stateInputs.Add (KeyValuePair.Key, KeyValuePair.Value);
-//							
-//							
-//								}
 
-						
-								//_stateInputCombinations = InputManager.Settings.stateInputs;
-								//Debug.Log ("Concat..." + _stateInputCombinations.Count);	
-			
-						
 						}
 		    
 				}
@@ -358,18 +361,21 @@ namespace ws.winx.editor
 
 								//Debug.Log ("AfterSave..." + _stateInputCombinations.Count+" inputmngr "+InputManager.Settings.stateInputs.Count+"to path:"+path);
 						
+										
 
-								loadTextAsset (path);
+								loadAsset (path);
+
+								AssetDatabase.Refresh();
 						
 						}
 				}
 				
 
 
-            /// <summary>
-            /// Fill StringBuilde with StateName=Hash,...values
-            /// </summary>
-            /// <returns></returns>
+				/// <summary>
+				/// Fill StringBuilde with StateName=Hash,...values
+				/// </summary>
+				/// <returns></returns>
 				StringBuilder HashStateInputsToStringBuilder ()
 				{
 						Dictionary<int,InputState> stateInputsCurrent;
@@ -568,7 +574,7 @@ namespace ws.winx.editor
 				void toInputCombination (InputCombination combos, InputAction input)
 				{
 				
-						if (combos.numActions + 1 > maxCombosNum || (combos.numActions == 1 && combos.GetActionAt (0).getCode(_deviceByProfile) == 0))
+						if (combos.numActions + 1 > maxCombosNum || (combos.numActions == 1 && combos.GetActionAt (0).getCode (_deviceByProfile) == 0))
 								combos.Clear ();
 				
 						combos.Add (input);
@@ -597,14 +603,14 @@ namespace ws.winx.editor
 								}
 
 									
-								_action = InputManager.GetAction(_deviceByProfile);
+								_action = InputManager.GetAction (_deviceByProfile);
 				
 
-								if (_action != null && (_action.getCode(_deviceByProfile) ^ (int)KeyCode.Escape) != 0 && (_action.getCode(_deviceByProfile) ^ (int)KeyCode.Return) != 0) {
+								if (_action != null && (_action.getCode (_deviceByProfile) ^ (int)KeyCode.Escape) != 0 && (_action.getCode (_deviceByProfile) ^ (int)KeyCode.Return) != 0) {
 
 
 
-										if ((_action.getCode(_deviceByProfile) ^ (int)KeyCode.Backspace) == 0) {
+										if ((_action.getCode (_deviceByProfile) ^ (int)KeyCode.Backspace) == 0) {
 												state = _stateInputCombinations [_selectedStateHash];
 												state.combinations [_isPrimary].Clear ();
 												state.combinations [_isPrimary].Add (new InputAction (KeyCode.None));
@@ -618,13 +624,13 @@ namespace ws.winx.editor
 												if (!_isComplexActionTypesAllowed)
 														_action.type = InputActionType.SINGLE;
 
-												_action.setCode(InputCode.toCodeAnyDevice(_action.getCode(_deviceByProfile)),_deviceByProfile);
+												_action.setCode (InputCode.toCodeAnyDevice (_action.getCode (_deviceByProfile)), _deviceByProfile);
 					
 
-                                                if (_isDeviceAxisPositionFull) {
-													_action.setCode(InputCode.toCodeAxisFull (_action.getCode(_deviceByProfile)),_deviceByProfile);
+												if (_isDeviceAxisPositionFull) {
+														_action.setCode (InputCode.toCodeAxisFull (_action.getCode (_deviceByProfile)), _deviceByProfile);
                                                        
-                                                }
+												}
 
 												toInputCombination (_stateInputCombinations [_selectedStateHash].combinations [_isPrimary], _action);
 										}
@@ -807,17 +813,17 @@ namespace ws.winx.editor
 
 
 
-				List<IDevice> devices=InputManager.GetDevices<IDevice>();
+								List<IDevice> devices = InputManager.GetDevices<IDevice> ();
 
-				if (devices.Count>0) {
+								if (devices.Count > 0) {
 
-					List<string> pList=devices.Where (item=>item.profile!=null).Select(item=>item.profile.Name).Distinct().ToList();
-					pList.Insert(0,"default");
+										List<string> pList = devices.Where (item => item.profile != null).Select (item => item.profile.Name).Distinct ().ToList ();
+										pList.Insert (0, "default");
 
-					_profilesDevicesDisplayOptions=pList.ToArray();
+										_profilesDevicesDisplayOptions = pList.ToArray ();
 
-				}else
-				_profilesDevicesDisplayOptions=new string[]{"default"};
+								} else
+										_profilesDevicesDisplayOptions = new string[]{"default"};
 
 
 				
@@ -826,15 +832,15 @@ namespace ws.winx.editor
 				
 				
 				
-				_profileSelectedIndex = EditorGUILayout.Popup (_profileSelectedIndex, _profilesDevicesDisplayOptions);
+								_profileSelectedIndex = EditorGUILayout.Popup (_profileSelectedIndex, _profilesDevicesDisplayOptions);
 
 
-				//by selecting profile we are setting Device type expectation
-				_deviceByProfile=InputManager.GetDevices<IDevice>().Where (item=>item.profile!=null).FirstOrDefault(item=>item.profile.Name==_profilesDevicesDisplayOptions[_profileSelectedIndex]);
+								//by selecting profile we are setting Device type expectation
+								_deviceByProfile = InputManager.GetDevices<IDevice> ().Where (item => item.profile != null).FirstOrDefault (item => item.profile.Name == _profilesDevicesDisplayOptions [_profileSelectedIndex]);
 
 				
 				
-				player = settings.Players [_playerIndexSelected];
+								player = settings.Players [_playerIndexSelected];
 
 								Dictionary<int,InputState> stateInputsCurrent;
 
@@ -882,7 +888,7 @@ namespace ws.winx.editor
 
 								//////////  ANY/Complex Action Types(doubles,long...)  /FULL AXIS Checkers ///////
 								EditorGUILayout.BeginHorizontal ();
-							//	_isDeviceAny = GUILayout.Toggle (_isDeviceAny, "Any(Uncheck 4Testing Only");
+								//	_isDeviceAny = GUILayout.Toggle (_isDeviceAny, "Any(Uncheck 4Testing Only");
 								_isComplexActionTypesAllowed = GUILayout.Toggle (_isComplexActionTypesAllowed, "Allow DOUBLE/LONG(HOLD)");
 								_isDeviceAxisPositionFull = GUILayout.Toggle (_isDeviceAxisPositionFull, "Full Axis");
 								EditorGUILayout.EndHorizontal ();
@@ -914,22 +920,27 @@ namespace ws.winx.editor
 						/////////////////   XML  ////////////////////
 						EditorGUILayout.LabelField ("Input XML");
 						EditorGUILayout.BeginHorizontal ();
-						settingsXML = EditorGUILayout.ObjectField (settingsXML, typeof(TextAsset), true) as TextAsset;
+						settingsFile = EditorGUILayout.ObjectField (settingsFile, typeof(UnityEngine.Object), true);
 
 						//reload if xml changed
-						if (_lastSettingsXML != settingsXML)
+						if (_lastSettingsXML != settingsFile)
 								_settingsLoaded = false;
 
-						_lastSettingsXML = settingsXML;
+						_lastSettingsXML = settingsFile;
 
 
 						if (_selectedStateHash == 0 && GUILayout.Button ("Open")) {
-								string path = EditorUtility.OpenFilePanel ("Open XML Input Settings file", "", "xml");
+							string path; 
+
+									if(_saveBinary)
+									  path=EditorUtility.OpenFilePanel ("Open XML Input Settings file", "", "bin");
+									else
+										path=EditorUtility.OpenFilePanel ("Open XML Input Settings file", "", "xml");
 
 								if (path.Length > 0) {
 										//loadInputSettings (path);
 
-										loadTextAsset (path);
+										loadAsset (path);
 				
 										_settingsLoaded = true;
 								}
@@ -951,14 +962,23 @@ namespace ws.winx.editor
 										Directory.CreateDirectory (Application.streamingAssetsPath);
 								}
 
-								if (settingsXML != null)
-										saveInputSettings (Path.Combine (Application.streamingAssetsPath, settingsXML.name + ".xml"));
-								else
-										saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", Application.streamingAssetsPath, "InputSettings", "xml"));
-
+								if (settingsFile != null) {
+										if (settingsFile is TextAsset) {
+												saveInputSettings (Path.Combine (Application.streamingAssetsPath, settingsFile.name + ".xml"));
+										} else {
+												saveInputSettings (Path.Combine (Application.streamingAssetsPath, settingsFile.name + ".bin"));
+										}
+								} else{ 
+									    if(_saveBinary)
+											saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", Application.streamingAssetsPath, "InputSettings", "bin"));
+										else
+											saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", Application.streamingAssetsPath, "InputSettings", "xml"));
 								return;
-
+								}
 						}
+
+			if(settingsFile==null)
+				_saveBinary = GUILayout.Toggle (_saveBinary,"Binary");
 
 						/////////// RELOAD ////////////////
 						if (GUILayout.Button ("Reload")) { 
@@ -970,9 +990,10 @@ namespace ws.winx.editor
 						EditorGUILayout.Separator ();
 
 						//loadingSettings 
-						if ((!_settingsLoaded && settingsXML != null)) { 
+						if ((!_settingsLoaded && settingsFile != null)) { 
 								//loadInputSettings (AssetDatabase.GetAssetPath (settingsXML));
-								loadInputSettings (settingsXML.text);
+								
+								loadInputSettings (settingsFile);
 								_settingsLoaded = true;
 						}
 
@@ -1172,7 +1193,7 @@ namespace ws.winx.editor
 										if (combinations [0] == null)
 												combinations [0] = new InputCombination ("None");
 
-												if (GUILayout.Button (combinations [0].combinationString)) {
+										if (GUILayout.Button (combinations [0].combinationString)) {
 												_selectedStateHash = hash;
 												_previousStateInput = null;
 												_isPrimary = 0;
@@ -1234,7 +1255,7 @@ namespace ws.winx.editor
 										combinations = InputMapper._stateInputCombinations [hash].combinations;
 			
 
-										currentCombinationString =combinations[_isPrimary].combinationString;
+										currentCombinationString = combinations [_isPrimary].combinationString;
 
 										if (_previousStateInput == null) {
 												_previousStateInput = combinations [_isPrimary].Clone ();

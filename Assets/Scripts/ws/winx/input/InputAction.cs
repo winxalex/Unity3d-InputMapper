@@ -12,6 +12,8 @@ namespace ws.winx.input
 	#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 	[DataContract()]
     #endif
+
+	[System.Serializable]
     public class InputAction
     {
 		/*
@@ -50,22 +52,26 @@ namespace ws.winx.input
 	    #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 		[IgnoreDataMemberAttribute]
         #endif
+		[field: NonSerialized]
 		protected int _code=0;//KeyCode.None;
 		
         #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 		[IgnoreDataMemberAttribute]
         #endif
+		[field: NonSerialized]
         protected InputActionType _type=InputActionType.SINGLE;
 		
          #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 		[IgnoreDataMemberAttribute]
         #endif
+		//[field: NonSerialized]
         protected String _codeString;
         public float startTime;
 
         #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 		[DataMember(Name = "Code")]
         #endif
+	
         public String codeString{
 			get{
                 if (_codeString == null) _codeString = String.Empty;

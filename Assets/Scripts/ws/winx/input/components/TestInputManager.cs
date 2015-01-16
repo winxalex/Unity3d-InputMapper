@@ -10,16 +10,16 @@ using System.Xml.Serialization;
 using UnityEngine;
 using ws.winx.devices;
 using ws.winx.drivers;
-using ws.winx.gui;
 using ws.winx.input;
 using ws.winx.input.states;
 using ws.winx.platform;
 using ws.winx.unity;
 using ws.winx.utils;
+using ws.winx.input.components;
 
-namespace ws.winx
+namespace ws.winx.components
 {
-    public class Game : MonoBehaviour
+    public class TestInputManager : MonoBehaviour
     {
 
 
@@ -100,7 +100,7 @@ namespace ws.winx
             UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
 
 
-            if (ui != null && ui.settingsXML == null)
+            if (ui != null)
             {//settingsXML would trigger internal loading mechanism (only for testing)
 
                 InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));
@@ -191,22 +191,22 @@ namespace ws.winx
 
         }
 
-        void onUp(object o, EventArgs args)
+        void onUp()
         {
             Debug.Log("Up");
         }
 
-        void onDown(object o, EventArgs args)
+        void onDown()
         {
             Debug.Log("Down");
         }
 
-        void Handle1(object o, EventArgs args)
+        void Handle1()
         {
             Debug.Log("Handle1");
         }
 
-        void Handle2(object o, EventArgs args)
+        void Handle2()
         {
             Debug.Log("Handle2");
         }
@@ -266,24 +266,20 @@ namespace ws.winx
             //			InputManager.MapStateToInput("My State1",new InputCombination("Mouse1+Joystick12AxisXPositive(x2)+B"));
 
 
+			int ManualAddedState = Animator.StringToHash ("ManualAddedSTATE");
 
             ////easiest way to map state to combination (ex.of single W and C click)
-            if (!InputManager.HasInputState("ManualAddedSTATE"))
-                InputManager.MapStateToInput("ManualAddedSTATE",InputPlayer.Player.Player0, InputCode.W.SINGLE, InputCode.C.SINGLE);
+            if (!InputManager.HasInputState(ManualAddedState))
+			    InputManager.MapStateToInput(ManualAddedState,InputPlayer.Player.Player0, InputCode.W.SINGLE, InputCode.C.SINGLE);
 
             //add secondary
-            InputManager.MapStateToInput("AnyJoystick", InputPlayer.Player.Player0,InputCode.JoystickAxisXPositive.SINGLE);
+           // InputManager.MapStateToInput("AnyJoystick", InputPlayer.Player.Player0,InputCode.JoystickAxisXPositive.SINGLE);
 
             UnityEngine.Debug.Log("Log:" + InputManager.Log());
 
 
-            ////Event Based input handling
-            InputEvent ev = new InputEvent("ManualAddedSTATE");
-            //InputEvent ev = new InputEvent((int)States.SomeState);
-
-
-            ev.UP += new EventHandler(onUp);
-            ev.DOWN += new EventHandler(onDown);
+			InputManager.addEventListener(ManualAddedState).UP += onUp;
+			InputManager.addEventListener(ManualAddedState).DOWN += onDown;
 
           
 
