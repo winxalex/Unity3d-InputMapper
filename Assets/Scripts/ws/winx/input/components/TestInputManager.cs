@@ -57,7 +57,7 @@ namespace ws.winx.components
             timer = new Timer(500.0);
             timer.Elapsed += new ElapsedEventHandler(onTimerElapsed);
 
-
+			UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
 
 
             //supporting devices with custom drivers
@@ -97,13 +97,13 @@ namespace ws.winx.components
 
 #if (UNITY_STANDALONE || UNITY_EDITOR ) && !UNITY_WEBPLAYER && !UNITY_ANDROID
             //UnityEngine.Debug.Log("Standalone");
-            UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
+           
 
 
             if (ui != null)
             {//settingsXML would trigger internal loading mechanism (only for testing)
 
-                InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));
+				InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, settingsFileName));
 
 
 
@@ -117,7 +117,7 @@ namespace ws.winx.components
 
             #region Load InputSettings.xml Android
 #if UNITY_ANDROID
-			UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
+
 
 
             Loader request = new Loader();
@@ -151,7 +151,7 @@ namespace ws.winx.components
             }
             else //TARGET=ANDROID but playing in EDITOR => use Standalone setup
             {
-                if (ui != null && ui.settingsXML == null)
+                if (ui != null)
                 {//settingsXML would trigger internal loading mechanism (only for testing)
 
                     InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));

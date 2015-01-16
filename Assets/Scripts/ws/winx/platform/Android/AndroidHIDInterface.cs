@@ -7,6 +7,7 @@ using UnityEngine;
 using ws.winx.devices;
 using ws.winx.unity;
 using ws.winx.drivers;
+using System.IO;
 
 namespace ws.winx.platform.android
 {
@@ -31,7 +32,7 @@ namespace ws.winx.platform.android
 		public event EventHandler<DeviceEventArgs<string>> DeviceDisconnectEvent;
 		public event EventHandler<DeviceEventArgs<IDevice>> DeviceConnectEvent;
 
-
+		private Dictionary<string, string> __profiles;
 
 
         #endregion
@@ -45,6 +46,9 @@ namespace ws.winx.platform.android
             __Generics = new Dictionary<string, HIDDevice>();
 
             _container = new GameObject("AndroidHIDBehaviourGO");
+
+			__profiles = new Dictionary<string, string>();
+
             droidHIDBehaviour = _container.AddComponent<AndroidHIDBehaviour>();
           
               
@@ -233,14 +237,50 @@ namespace ws.winx.platform.android
         public void LoadProfiles(String fileName)
         {
 
-              throw new NotImplementedException();
+			string[] deviceNameProfilePair;
+			char splitChar = '|';
+			
+			using (StreamReader reader = new StreamReader(Path.Combine(Application.persistentDataPath, fileName)))
+			{
+				
+				
+				while (!reader.EndOfStream)
+				{
+					
+					deviceNameProfilePair = reader.ReadLine().Split(splitChar);
+					__profiles[deviceNameProfilePair[0]] = deviceNameProfilePair[1];
+				}
+				
+			}
         }
 
         public DeviceProfile LoadProfile(string fileBase)
         {
-
-
-              throw new NotImplementedException();
+			DeviceProfile profile = new DeviceProfile();
+			
+			
+			profile.Name = fileBase;
+			
+			char splitChar = '|';
+			
+			using (StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileBase + "_drd.txt")))
+			{
+				
+				if (!reader.EndOfStream)
+					profile.buttonNaming = reader.ReadLine().Split(splitChar);
+				
+				if (!reader.EndOfStream)
+					profile.axisNaming = reader.ReadLine().Split(splitChar);
+				
+				//rest in future
+				
+				
+				
+			}
+			
+			
+			
+			return profile;
         }
 
 		public void AddDriver (IDriver driver)

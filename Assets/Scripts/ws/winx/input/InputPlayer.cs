@@ -83,6 +83,10 @@ namespace ws.winx.input{
 			get {
 					return _deviceID;
 			}
+
+			internal set{
+				_deviceID=value;
+			}
 			
 		}
 

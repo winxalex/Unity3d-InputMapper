@@ -160,15 +160,19 @@ public class InputComponent : MonoBehaviour
 		
 		if (Application.platform == RuntimePlatform.Android)
 		{
-			if (File.Exists(Application.persistentDataPath + "/" + settingsXML.name+".xml"))
+				if (File.Exists(Application.persistentDataPath + "/" + settingsFileName))
 			{
 				
 				if (ui != null)
 				{
 					Debug.Log("Game>> Try to load from " + Application.persistentDataPath);
-					InputManager.loadSettings(Application.persistentDataPath + "/" + settingsXML.name+".xml");
-					ui.settings = InputManager.Settings;
-					manuallyAddStateAndHandlers();
+
+						ui.settings=InputManager.loadSettings(Application.persistentDataPath + "/" + settingsFileName);
+					
+
+						//dispatch load complete
+						this.m_onLoad.Invoke();
+					
 					return;
 					
 				}
@@ -191,10 +195,10 @@ public class InputComponent : MonoBehaviour
 		}
 		else //TARGET=ANDROID but playing in EDITOR => use Standalone setup
 		{
-			if (ui != nulll)
+			if (ui != null)
 			{//settingsXML would trigger internal loading mechanism (only for testing)
 				
-				InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, settingsXML.name+".xml"));
+					InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, settingsFileName));
 				
 				
 				
