@@ -10,7 +10,6 @@ using System.Xml.Serialization;
 using UnityEngine;
 using ws.winx.devices;
 using ws.winx.drivers;
-using ws.winx.gui;
 using ws.winx.input;
 using ws.winx.input.states;
 using ws.winx.platform;
@@ -19,6 +18,8 @@ using ws.winx.utils;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
 
+
+namespace ws.winx.input.components{
 [RequireComponent(typeof(UserInterfaceWindow))]
 public class InputComponent : MonoBehaviour
 {
@@ -282,4 +283,4 @@ public class InputComponent : MonoBehaviour
 
 		}
 }
-
+}

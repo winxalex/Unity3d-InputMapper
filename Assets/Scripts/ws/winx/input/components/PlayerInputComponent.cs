@@ -7,6 +7,7 @@ using UnityEngine.Events;
 using System.Collections.Generic;
 using System.Reflection;
 
+namespace ws.winx.input.components{
 public class PlayerInputComponent : MonoBehaviour
 {
 
@@ -160,5 +161,6 @@ public class PlayerInputComponent : MonoBehaviour
        
 
 		}
+}
 }
 

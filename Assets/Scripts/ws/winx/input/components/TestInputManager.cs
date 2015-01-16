@@ -10,16 +10,16 @@ using System.Xml.Serialization;
 using UnityEngine;
 using ws.winx.devices;
 using ws.winx.drivers;
-using ws.winx.gui;
 using ws.winx.input;
 using ws.winx.input.states;
 using ws.winx.platform;
 using ws.winx.unity;
 using ws.winx.utils;
+using ws.winx.input.components;
 
-namespace ws.winx
+namespace ws.winx.components
 {
-    public class Game : MonoBehaviour
+    public class TestInputManager : MonoBehaviour
     {
 
 

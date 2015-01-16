@@ -6,8 +6,10 @@ using System.IO;
 using System.Collections;
 using ws.winx.devices;
 
-namespace ws.winx.gui
+
+namespace ws.winx.input.components
 {
+		
 		public class UserInterfaceWindow : MonoBehaviour
 		{
 
