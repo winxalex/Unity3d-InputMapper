@@ -232,14 +232,7 @@ namespace ws.winx
 			
 			UnityEngine.Debug.Log("Log:" + InputManager.Log());
 			
-			
-			////Event Based input handling
-			InputEvent ev = new InputEvent("ManualAddedSTATE");
-			//InputEvent ev = new InputEvent((int)States.SomeState);
-			
 		
-			ev.UP += new EventHandler(onUp);
-			ev.DOWN += new EventHandler(onDown);
 			
 		
 			

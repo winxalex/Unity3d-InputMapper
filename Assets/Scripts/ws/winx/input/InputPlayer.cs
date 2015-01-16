@@ -103,6 +103,7 @@ namespace ws.winx.input{
 		}
 
 		public InputPlayer Clone(){
+
 			InputPlayer newInputPlayer = new InputPlayer ();
 			Dictionary<int,InputState> stateInputs;
 
@@ -133,13 +134,27 @@ namespace ws.winx.input{
 
             if (!stateEvents.ContainsKey(stateNameHash))
             {
-                stateEvents[stateNameHash] = new InputEvent(stateNameHash);
+				stateEvents[stateNameHash] = new InputEvent(stateNameHash);
 
             }
 
 
             return stateEvents[stateNameHash];
         }
+
+		public void AddEvent (InputEvent inputEvent)
+		{
+			if(stateEvents==null) stateEvents=new Dictionary<int, InputEvent>();
+
+			if (inputEvent.stateNameHash == 0)
+								throw new Exception ("Try to add event on 0-null state");
+
+			if (!stateEvents.ContainsKey(inputEvent.stateNameHash))
+			{
+				stateEvents[inputEvent.stateNameHash] = inputEvent;
+				
+			}
+		}
 
         public void Dispose()
         {

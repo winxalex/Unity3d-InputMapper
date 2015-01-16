@@ -30,17 +30,17 @@ public class InputComponent : MonoBehaviour
 		//
 
 
-
-		public TextAsset profileList;
-
-		public TextAsset[] profiles;
+//TODO Maybe
+//		public TextAsset profileList;
+//
+//		public TextAsset[] profiles;
 
 		public string settingsFileName="InputSettings.xml";
 
 		
 
 		[FormerlySerializedAs ("onLoad"), UnityEngine.SerializeField]
-		private InputComponentEvent m_onLoad = new InputComponentEvent ();
+		private UnityEvent m_onLoad = new UnityEvent ();
 
 
 		//
@@ -55,7 +55,7 @@ public class InputComponent : MonoBehaviour
 	//
 	// Properties
 	//
-	public InputComponentEvent onLoad
+	public UnityEvent onLoad
 	{
 		get
 		{
@@ -249,6 +249,7 @@ public class InputComponent : MonoBehaviour
 				
 				
 			   //dispatch load complete
+				this.m_onLoad.Invoke();
 				
 			}
 			

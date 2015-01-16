@@ -191,22 +191,22 @@ namespace ws.winx
 
         }
 
-        void onUp(object o, EventArgs args)
+        void onUp()
         {
             Debug.Log("Up");
         }
 
-        void onDown(object o, EventArgs args)
+        void onDown()
         {
             Debug.Log("Down");
         }
 
-        void Handle1(object o, EventArgs args)
+        void Handle1()
         {
             Debug.Log("Handle1");
         }
 
-        void Handle2(object o, EventArgs args)
+        void Handle2()
         {
             Debug.Log("Handle2");
         }

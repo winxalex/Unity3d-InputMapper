@@ -5,21 +5,33 @@ using System.Text;
 using UnityEngine;
 using System.Collections;
 using System.Threading;
+using ws.winx.input.states;
+using UnityEngine.Events;
 
 namespace ws.winx.input
 {
+	[System.Serializable]
     public class InputEvent
     {
+
+		public States state;
+
+		public UnityEvent onUP=new UnityEvent();
+		public UnityEvent onDOWN=new UnityEvent();
+		public UnityEvent onHOLD=new UnityEvent();
 
 
 
         protected int _stateNameHash;
-     
-        //public static delegate bool GetInputDelegate(int stateNameHash,bool atOnce);
-		protected static Func<int,bool,bool> _action;
 
- 
+		public int stateNameHash {
+			get {
+				if(_stateNameHash==0 && (int)state!=0) _stateNameHash=(int)state;
+				return _stateNameHash;
+			}
+		}
 
+	
 
         public InputEvent(int stateNameHash)
         {
@@ -34,64 +46,49 @@ namespace ws.winx.input
         }
 
 
-       
 
 
-
-        private  Dictionary<int, Delegate[]> __events;
-        public  Dictionary<int, Delegate[]> Events
-        {
-            get
-            {
-                if (__events == null)
-                    __events = new Dictionary<int, Delegate[]>();
-                return __events;
-            }
-
-        }
-
-
-
-		public event EventHandler HOLD
+		public event UnityAction HOLD
 		{
 			add
 			{
-				AddHandler(_stateNameHash, value,0);
+
+				onHOLD.AddListener(value);
 				
 			}
 			remove
 			{
-				RemoveHandler(_stateNameHash, value,0);
+				onHOLD.RemoveListener(value);
 			}
 		}
 
        
-        public event EventHandler UP
+        public event UnityAction UP
         {
             add
             {
-                AddHandler(_stateNameHash, value,1);
+
+				onUP.AddListener(value);
 
             }
             remove
             {
-                RemoveHandler(_stateNameHash, value,1);
+				onUP.RemoveListener(value);
             }
         }
 
 
 
-        public event EventHandler DOWN
+        public event UnityAction DOWN
         {
             add
             {
-                AddHandler(_stateNameHash, value,2);
-
+				onDOWN.AddListener(value);
               
             }
             remove
             {
-                RemoveHandler(_stateNameHash, value,2);
+				onDOWN.RemoveListener(value);
             }
         }
 
@@ -106,43 +103,43 @@ namespace ws.winx.input
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <param name="inx">0-Continuios events,1-Up,2-Down events</param>
-        protected void AddHandler(int key, Delegate value,uint inx)
-        {
+//        protected void AddHandler(int key, Delegate value,uint inx)
+//        {
+//
+//            Delegate[] d;
+//
+//
+//            if (Events.TryGetValue(key, out d))
+//            {
+//                if (d[inx] != null)
+//                    d[inx] = Delegate.Combine(d[inx], value);
+//                else
+//                    Events[key][inx] = value;
+//            }
+//            else
+//            {
+//                Events[key]=new Delegate[3];
+//                Events[key][inx] = value;
+//
+//            }
+//
+//
+//
+//
+//        }
 
-            Delegate[] d;
 
-
-            if (Events.TryGetValue(key, out d))
-            {
-                if (d[inx] != null)
-                    d[inx] = Delegate.Combine(d[inx], value);
-                else
-                    Events[key][inx] = value;
-            }
-            else
-            {
-                Events[key]=new Delegate[3];
-                Events[key][inx] = value;
-
-            }
-
-
-
-
-        }
-
-
-        protected void RemoveHandler(int key, Delegate value,uint inx)
-        {
-            Delegate[] d;
-
-            if (Events.TryGetValue(key, out d))
-            {
-                Events[key][inx] = Delegate.Remove(d[inx], value);
-            }
-            // else... no error for removal of non-existant delegate
-            //
-        }
+//        protected void RemoveHandler(int key, Delegate value,uint inx)
+//        {
+//            Delegate[] d;
+//
+//            if (Events.TryGetValue(key, out d))
+//            {
+//                Events[key][inx] = Delegate.Remove(d[inx], value);
+//            }
+//            // else... no error for removal of non-existant delegate
+//            //
+//        }
 
 
 
@@ -151,12 +148,9 @@ namespace ws.winx.input
         {
        
 
-            if (this.Events != null)
-            {
-
-                this.Events.Remove(_stateNameHash);
-           
-            }
+			this.onUP.RemoveAllListeners ();
+			this.onHOLD.RemoveAllListeners ();
+			this.onDOWN.RemoveAllListeners ();
 
             
         }

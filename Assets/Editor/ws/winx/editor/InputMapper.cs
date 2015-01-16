@@ -43,6 +43,9 @@ namespace ws.winx.editor
 				protected int _isPrimary = 0;
 				protected string _currentInputString;
 
+				protected bool _saveBinary=true;
+
+
 				//Players
 				protected int _playerNumber = 1;
 				protected int[] _playersIndices;
@@ -263,7 +266,7 @@ namespace ws.winx.editor
 						AssetDatabase.ImportAsset (relRoot.MakeRelativeUri (fullPath).ToString (), ImportAssetOptions.ForceUpdate);
 
 				
-						_lastSettingsXML = settingsFile = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri (fullPath).ToString (),typeof(UnityEngine.Object)) ;
+						_lastSettingsXML = settingsFile = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri (fullPath).ToString (), typeof(UnityEngine.Object));
 
 						if (_lastSettingsXML != null)
 								loadInputSettings (_lastSettingsXML);
@@ -316,7 +319,7 @@ namespace ws.winx.editor
 
 						} else {
 
-							settings = InputManager.loadSettings (AssetDatabase.GetAssetPath (settingsFile));
+								settings = InputManager.loadSettings (AssetDatabase.GetAssetPath (settingsFile));
 
 						}
 
@@ -361,6 +364,8 @@ namespace ws.winx.editor
 										
 
 								loadAsset (path);
+
+								AssetDatabase.Refresh();
 						
 						}
 				}
@@ -925,7 +930,12 @@ namespace ws.winx.editor
 
 
 						if (_selectedStateHash == 0 && GUILayout.Button ("Open")) {
-								string path = EditorUtility.OpenFilePanel ("Open XML Input Settings file", "", "bin,xml");
+							string path; 
+
+									if(_saveBinary)
+									  path=EditorUtility.OpenFilePanel ("Open XML Input Settings file", "", "bin");
+									else
+										path=EditorUtility.OpenFilePanel ("Open XML Input Settings file", "", "xml");
 
 								if (path.Length > 0) {
 										//loadInputSettings (path);
@@ -952,18 +962,23 @@ namespace ws.winx.editor
 										Directory.CreateDirectory (Application.streamingAssetsPath);
 								}
 
-				if (settingsFile != null){
-										if(settingsFile is TextAsset){
-										saveInputSettings (Path.Combine (Application.streamingAssetsPath, settingsFile.name + ".xml"));
-				}else{
-						saveInputSettings (Path.Combine (Application.streamingAssetsPath, settingsFile.name+".bin"));
-					}}
-								else
-										saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", Application.streamingAssetsPath, "InputSettings", "xml"));
-
+								if (settingsFile != null) {
+										if (settingsFile is TextAsset) {
+												saveInputSettings (Path.Combine (Application.streamingAssetsPath, settingsFile.name + ".xml"));
+										} else {
+												saveInputSettings (Path.Combine (Application.streamingAssetsPath, settingsFile.name + ".bin"));
+										}
+								} else{ 
+									    if(_saveBinary)
+											saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", Application.streamingAssetsPath, "InputSettings", "bin"));
+										else
+											saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", Application.streamingAssetsPath, "InputSettings", "xml"));
 								return;
-
+								}
 						}
+
+			if(settingsFile==null)
+				_saveBinary = GUILayout.Toggle (_saveBinary,"Binary");
 
 						/////////// RELOAD ////////////////
 						if (GUILayout.Button ("Reload")) { 
