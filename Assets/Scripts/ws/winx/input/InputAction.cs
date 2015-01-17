@@ -305,9 +305,9 @@ namespace ws.winx.input
 			_code = newCode;
 
 			if (device == null)
-				_codeString = InputCode.toEnumString (newCode);
+				_codeString = InputCode.toEnumString (newCode)+_type.ToDesignatorString();
 			else
-				_codeString = InputCode.toProfiled (newCode, device);
+				_codeString = InputCode.toProfiled (newCode, device)+_type.ToDesignatorString();
 
 		}
 
