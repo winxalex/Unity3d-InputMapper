@@ -63,9 +63,9 @@ namespace ws.winx.platform.osx
 
 		volatile bool IsReadInProgress = false;
 
-		bool _scheduleWithRunLoop;
+//		bool _scheduleWithRunLoop;
 
-		bool _registeredToInputReport;
+//		bool _registeredToInputReport;
 
 		private HIDReport __lastHIDReport;
 
@@ -180,10 +180,10 @@ namespace ws.winx.platform.osx
 				
 				
 										Native.IOHIDDeviceRegisterInputValueCallback (__deviceHandle, DeviceValueReceived, GCHandle.ToIntPtr (DeviceGCHandle));
-										_registeredToInputReport=true;
+										//_registeredToInputReport=true;
 
 										Native.IOHIDDeviceScheduleWithRunLoop (__deviceHandle, RunLoop, Native.RunLoopModeDefault);
-										_scheduleWithRunLoop=true;
+										//_scheduleWithRunLoop=true;
 										
 						
 				
@@ -370,7 +370,7 @@ namespace ws.winx.platform.osx
 					// Schedule the device on the current run loop in case it isn't already scheduled
 					Native.IOHIDDeviceScheduleWithRunLoop (__deviceHandle, RunLoop, Native.RunLoopModeDefault);
 
-					_scheduleWithRunLoop=true;
+//					_scheduleWithRunLoop=true;
 					
 					
 					// Register a callback		
@@ -378,7 +378,7 @@ namespace ws.winx.platform.osx
 					                                               
 					                                               GCHandle.ToIntPtr (DeviceGCHandle));
 
-					_registeredToInputReport=true;
+	//				_registeredToInputReport=true;
 					
 				}
 				

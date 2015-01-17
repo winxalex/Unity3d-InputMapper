@@ -129,13 +129,10 @@ public class InputComponent : MonoBehaviour
 		{//settingsXML would trigger internal loading mechanism (only for testing)
 
 			//load settings from external file
+
 			ui.settings=InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, settingsFileName));
 
-			//ui.settings=InputManager.loadSettingsFromText(settingsXML.text);
-
-
-
-	
+			//	ui.settings=InputManager.loadSettingsFromXMLText(Path.Combine(Application.streamingAssetsPath,settingsFileName));
 
 
 
@@ -219,7 +216,7 @@ public class InputComponent : MonoBehaviour
 		Loader request = new Loader();
 		
 		//UNITY_WEBPLAYER: Application.dataPath "http://localhost/appfolder/"
-		request.Add(Application.dataPath+"/StreamingAssets/"+settingsXML.name+".xml");
+		request.Add(Application.dataPath+"/StreamingAssets/"+settingsFileName);
 		
 		
 		request.LoadComplete += new EventHandler<LoaderEvtArgs<List<WWW>>>(onLoadComplete);
@@ -246,7 +243,7 @@ public class InputComponent : MonoBehaviour
 				
 				
 				
-				if (ui != null)//without settingsXML defined =>load them manually and attach them
+				if (ui != null)
 				{
 					InputManager.loadSettingsFromText(args.data.ElementAt(0).text);
 					ui.settings = InputManager.Settings;

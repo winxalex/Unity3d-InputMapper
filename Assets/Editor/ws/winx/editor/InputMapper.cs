@@ -301,7 +301,7 @@ namespace ws.winx.editor
 										#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 											settings=InputManager.loadSettings (new StringReader (text));
 										#else
-										settings = InputManager.loadSettingsFromText (text, false);
+											settings = InputManager.loadSettingsFromText (text, false);
 										#endif
 
 										
@@ -319,7 +319,7 @@ namespace ws.winx.editor
 
 						} else {
 
-								settings = InputManager.loadSettings (AssetDatabase.GetAssetPath (settingsFile));
+								settings = InputManager.loadSettingsFromXMLText (AssetDatabase.GetAssetPath (settingsFile));
 
 						}
 

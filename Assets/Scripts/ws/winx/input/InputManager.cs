@@ -659,168 +659,47 @@ namespace ws.winx.input
 #endif
 
 
-
-
-
-
-        //        #if (UNITY_WEBPLAYER || UNITY_EDITOR) && !UNITY_STANDALONE
-        //        /// <summary>
-        //        /// Loads the Input settings from InputSettings.xml and deserialize into OO structure.
-        //        /// Create your .xml settings with InputMapper Editor
-        //        /// </summary>
-        //        public static IEnumerator loadSettings(String path)
-        //        {
-        //             XmlReaderSettings xmlSettings=new XmlReaderSettings();
-        //            xmlSettings.CloseInput=true;
-        //            xmlSettings.IgnoreWhitespace=true;
-
-        //            if (Application.isEditor)
-        //                path = "file:///" + path;
-
-        //            WWW www = new WWW(path);
-        //          // UnityEngine.Debug.Log(path);
-        //            while (!www.isDone)
-        //            {
-        //                yield return null;
-        //            }
-
-
-
-
-        //            if (www.error != null)
-        //            {
-        //                UnityEngine.Debug.LogError(www.error);
-        //                yield break;
-        //            }
-
-
-        //            StringReader stringReader = new StringReader(www.text);
-
-        //            stringReader.Read();//skip BOM
-
-        //            using (XmlReader reader = XmlReader.Create(stringReader, xmlSettings))
-        //            {
-        //                __settings = new InputSettings();
-
-        //                int key;
-
-        //                InputAction action;
-        //                List<InputAction> actions = null;
-        //                InputCombination[] combinations = null;
-        //                string name;
-        //                InputState state;
-        //                int i;
-        //                //XmlNameTable nameTable = reader.NameTable;
-        //                //XmlNamespaceManager nsManager = new XmlNamespaceManager(nameTable);
-        //                //nsManager.AddNamespace("d1p1", "http://schemas.datacontract.org/2004/07/ws.winx.input");
-
-        //                reader.ReadToFollowing("d1p1:doubleDesignator");
-        //                __settings.doubleDesignator = reader.ReadElementContentAsString();
-
-
-        //                __settings.longDesignator = reader.ReadElementContentAsString();
-
-
-        //                __settings.spaceDesignator = reader.ReadElementContentAsString();
-
-
-
-
-        //                __settings.singleClickSensitivity = reader.ReadElementContentAsFloat();
-
-
-        //                __settings.doubleClickSensitivity = reader.ReadElementContentAsFloat();
-
-
-        //                __settings.longClickSensitivity = reader.ReadElementContentAsFloat();
-
-
-        //                __settings.combinationsClickSensitivity = reader.ReadElementContentAsFloat();
-
-        //                if (reader.ReadToFollowing("d2p1:KeyValueOfintInputState"))
-        //                {
-
-
-        //                    do
-        //                    {
-        //                        reader.ReadToDescendant("d2p1:Key");
-
-        //                        key = reader.ReadElementContentAsInt();
-
-
-
-
-        //                        if (reader.ReadToFollowing("d1p1:InputCombination"))
-        //                        {
-
-        //                            combinations = new InputCombination[2];
-        //                            i = 0;
-
-        //                            do
-        //                            {
-        //                                if (reader.GetAttribute("i:nil") == null)
-        //                                {
-
-
-        //                                    if (reader.ReadToDescendant("d1p1:InputAction"))
-        //                                    {
-        //                                        actions = new List<InputAction>();
-
-        //                                        do
-        //                                        {
-        //                                            reader.ReadToDescendant("d1p1:Code");
-
-        //                                            action = new InputAction(reader.ReadElementContentAsString());
-
-        //                                            actions.Add(action);
-
-        //                                        } while (reader.ReadToNextSibling("d1p1:InputAction"));
-
-
-        //                                    }
-
-
-
-
-        //                                    combinations[i++] = new InputCombination(actions);
-
-        //                                    reader.Read();//read </InputCombination>
-
-        //                                }
-
-
-
-        //                            } while (reader.ReadToNextSibling("d1p1:InputCombination"));
-
-
-
-        //                        }
-
-        //                        reader.ReadToFollowing("d1p1:Name");
-        //                        name = reader.ReadElementContentAsString();
-        //                        state = new InputState(name, key);
-        //                        state.combinations = combinations;
-        //                        __settings.stateInputs[key] = state;
-
-
-        //                        reader.Read();//</d2p1:KeyValueOfintInputState>
-
-        //                    } while (reader.ReadToNextSibling("d2p1:KeyValueOfintInputState"));
-        //                }
-        //            }
-
-        //            stringReader.Close();
-
-
-
-
-
-        //          //yield break;
-
-        //        }
-        //#endif
-
-        public static void loadSettingsFromText(string text, bool readBOM = true)
+		/// <summary>
+		/// Loads the settings from XML text.
+		/// </summary>
+		/// <returns>The settings from XML text.</returns>
+		/// <param name="path">Path.</param>
+		/// <param name="readBOM">If set to <c>true</c> read BO.</param>
+		public static InputSettings loadSettingsFromXMLText(string path, bool readBOM = true)
+		{
+			XmlReaderSettings xmlSettings = new XmlReaderSettings();
+			xmlSettings.CloseInput = true;
+			xmlSettings.IgnoreWhitespace = true;
+		
+			
+		
+			
+			using (XmlReader reader = XmlReader.Create(path, xmlSettings)) {
+				
+				if (readBOM)
+					reader.Read();//skip BOM
+
+
+				
+				readSettings(reader);
+				
+
+				
+
+				
+			}// UnityEngine.Debug.Log("end reader");
+
+			return __settings;
+		}
+
+
+		/// <summary>
+		/// Loads the settings from text.
+		/// </summary>
+		/// <returns>The settings from text.</returns>
+		/// <param name="text">Text.</param>
+		/// <param name="readBOM">If set to <c>true</c> read BO.</param>
+        public static InputSettings loadSettingsFromText(string text, bool readBOM = true)
         {
             XmlReaderSettings xmlSettings = new XmlReaderSettings();
             xmlSettings.CloseInput = true;
@@ -828,194 +707,22 @@ namespace ws.winx.input
             StringReader stringReader = new StringReader(text);
 
             if (readBOM)
-                stringReader.Read();//skip BOM
+              stringReader.Read();//skip BOM
 
             using (XmlReader reader = XmlReader.Create(stringReader, xmlSettings)) {
 
+
 								__settings = new InputSettings ();
 
-								int key;
-
-								InputAction action;
-								List<InputAction> actions = null;
-								InputCombination[] combinations = null;
-								string name;
-								InputState state;
-								int i;
-								List<InputPlayer> playerList;
-								InputPlayer player;
-								string profileKey;
-								Dictionary<int,InputState> stateInputs;
-								//XmlNameTable nameTable = reader.NameTable;
-								//XmlNamespaceManager nsManager = new XmlNamespaceManager(nameTable);
-								//nsManager.AddNamespace("d1p1", "http://schemas.datacontract.org/2004/07/ws.winx.input");
-
-								reader.ReadToFollowing ("d1p1:doubleDesignator");
-								__settings.doubleDesignator = reader.ReadElementContentAsString ();
-
-
-								__settings.longDesignator = reader.ReadElementContentAsString ();
-
-
-								__settings.spaceDesignator = reader.ReadElementContentAsString ();
-
-
-
-
-								__settings.singleClickSensitivity = reader.ReadElementContentAsFloat ();
-
-
-								__settings.doubleClickSensitivity = reader.ReadElementContentAsFloat ();
-
-
-								__settings.longClickSensitivity = reader.ReadElementContentAsFloat ();
-
-
-								__settings.combinationsClickSensitivity = reader.ReadElementContentAsFloat ();
-
-
-
-								//<d1p1:Players>
-								//<d1p1:InputPlayer>
-								//<d1p1:_DeviceStateInputs xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
-								//<d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
-								//<d4p1:Key>xbox360</d4p1:Key>
-								//<d4p1:Value>
-
-			
-				
-								if (reader.ReadToFollowing ("d1p1:InputPlayer")) {
-
-										playerList = new List<InputPlayer> ();
-
-										do {
-
-												player = new InputPlayer ();
-
-												playerList.Add (player);
-
-
-												if (reader.ReadToFollowing ("d2p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState")) {
-
-
-														do {
-																reader.ReadToDescendant ("d4p1:Key");
-								
-																profileKey = reader.ReadElementContentAsString ();
-
-																
-
-																if (reader.ReadToFollowing ("d2p1:KeyValueOfintInputState")) {
-
-																			stateInputs=new Dictionary<int, InputState>();
-
-																		do {
-
-																				
-
-								
-																				reader.ReadToDescendant ("d2p1:Key");
-
-																				key = reader.ReadElementContentAsInt ();
-
-
-
-
-																				if (reader.ReadToFollowing ("d1p1:InputCombination")) {
-
-																						combinations = new InputCombination[2];
-																						i = 0;
-
-																						do {
-																								if (reader.GetAttribute ("i:nil") == null) {
-
-
-																										if (reader.ReadToDescendant ("d1p1:InputAction")) {
-																												actions = new List<InputAction> ();
-
-																												do {
-																														reader.ReadToDescendant ("d1p1:Code");
-
-																														action = new InputAction (reader.ReadElementContentAsString ());
-
-																														actions.Add (action);
-
-																												} while (reader.ReadToNextSibling("d1p1:InputAction"));
-
-
-																										}
-
-
-
-
-																										combinations [i++] = new InputCombination (actions);
-
-																										reader.Read ();//read </InputCombination>
-
-																								}
-
-
-
-																						} while (reader.ReadToNextSibling("d1p1:InputCombination"));
-
-
-
-																				}
-
-																				reader.ReadToFollowing ("d1p1:Name");
-																				name = reader.ReadElementContentAsString ();
-																				state = new InputState (name, key);
-																				state.combinations = combinations;
-						                      
-
-																				//Shound be extended to multiplayer expansion
-																				stateInputs[key] = state;
-
-
-																				reader.Read ();//</d2p1:KeyValueOfintInputState>
-
-																		} while (reader.ReadToNextSibling("d2p1:KeyValueOfintInputState"));
-
-																		player.DeviceProfileStateInputs [profileKey] = stateInputs;
-
-																}//
-
-																
-															
-
-																reader.Read ();//</d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
-
-														} while(reader.ReadToNextSibling("d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState"));
-
-
-
-												}
-
-												if (reader.ReadToFollowing ("_deviceID") && reader.GetAttribute ("i:nil") == null) {
-														player.DeviceID = reader.ReadElementContentAsString ();
-												}
-						
-												if (reader.ReadToFollowing ("1p1:Name") && reader.GetAttribute ("i:nil") == null) {
-														player.Name = reader.ReadElementContentAsString ();
-												}
-						
-												
-
-												reader.Read ();//</d1p1:InputPlayer>
-
-										} while(reader.ReadToNextSibling("d1p1:InputPlayer"));
-
-
-										__settings.Players = playerList.ToArray ();
-								}
+								readSettings(reader);
 
 								stringReader.Close ();
 
-								// UnityEngine.Debug.Log("end reader");
+								
 
-						}
+			}// UnityEngine.Debug.Log("end reader");
 
-
+			return __settings;
 }
 
 
@@ -1046,11 +753,188 @@ namespace ws.winx.input
 
 #endif
 
+
+		internal static void readSettings(XmlReader reader){
+
+			__settings = new InputSettings ();
+
+			int key;
+			
+			InputAction action;
+			List<InputAction> actions = null;
+			InputCombination[] combinations = null;
+			string name;
+			InputState state;
+			int i;
+			List<InputPlayer> playerList;
+			InputPlayer player;
+			string profileKey;
+			Dictionary<int,InputState> stateInputs;
+			//XmlNameTable nameTable = reader.NameTable;
+			//XmlNamespaceManager nsManager = new XmlNamespaceManager(nameTable);
+			//nsManager.AddNamespace("d1p1", "http://schemas.datacontract.org/2004/07/ws.winx.input");
+			
+			reader.ReadToFollowing ("d1p1:doubleDesignator");
+			__settings.doubleDesignator = reader.ReadElementContentAsString ();
+			
+			
+			__settings.longDesignator = reader.ReadElementContentAsString ();
+			
+			
+			__settings.spaceDesignator = reader.ReadElementContentAsString ();
+			
+			
+			
+			
+			__settings.singleClickSensitivity = reader.ReadElementContentAsFloat ();
+			
+			
+			__settings.doubleClickSensitivity = reader.ReadElementContentAsFloat ();
+			
+			
+			__settings.longClickSensitivity = reader.ReadElementContentAsFloat ();
+			
+			
+			__settings.combinationsClickSensitivity = reader.ReadElementContentAsFloat ();
+			
+			
+			
+			
+			
+			
+			if (reader.ReadToFollowing ("d1p1:InputPlayer")) {
+				
+				playerList = new List<InputPlayer> ();
+				
+				do {
+					
+					player = new InputPlayer ();
+					
+					playerList.Add (player);
+					
+					
+					if (reader.ReadToFollowing ("d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState")) {
+						
+						
+						do {
+							reader.ReadToDescendant ("d4p1:Key");
+							
+							profileKey = reader.ReadElementContentAsString ();
+							
+							
+							
+							if (reader.ReadToFollowing ("d4p1:KeyValueOfintInputState")) {
+								
+								stateInputs=new Dictionary<int, InputState>();
+								
+								do {
+									
+									
+									
+									
+									reader.ReadToDescendant ("d4p1:Key");
+									
+									key = reader.ReadElementContentAsInt ();
+									
+									
+									
+									
+									if (reader.ReadToFollowing ("d1p1:InputCombination")) {
+										
+										combinations = new InputCombination[2];
+										i = 0;
+										
+										do {
+											if (reader.GetAttribute ("i:nil") == null) {
+												
+												
+												if (reader.ReadToDescendant ("d1p1:InputAction")) {
+													actions = new List<InputAction> ();
+													
+													do {
+														reader.ReadToDescendant ("d1p1:Code");
+														
+														action = new InputAction (reader.ReadElementContentAsString ());
+														
+														actions.Add (action);
+														
+													} while (reader.ReadToNextSibling("d1p1:InputAction"));
+													
+													
+												}
+												
+												
+												
+												
+												combinations [i++] = new InputCombination (actions);
+												
+												reader.Read ();//read </InputCombination>
+												
+											}
+											
+											
+											
+										} while (reader.ReadToNextSibling("d1p1:InputCombination"));
+										
+										
+										
+									}
+									
+									reader.ReadToFollowing ("d1p1:Name");
+									name = reader.ReadElementContentAsString ();
+									state = new InputState (name, key);
+									state.combinations = combinations;
+									
+									
+									//Shound be extended to multiplayer expansion
+									stateInputs[key] = state;
+									
+									
+									reader.Read ();//</d4p1:KeyValueOfintInputState>
+									
+								} while (reader.ReadToNextSibling("d4p1:KeyValueOfintInputState"));
+								
+								player.DeviceProfileStateInputs [profileKey] = stateInputs;
+								
+							}//
+							
+							
+							
+							
+							reader.Read ();//</d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
+							
+						} while(reader.ReadToNextSibling("d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState"));
+						
+						
+						
+					}
+					
+					if (reader.ReadToFollowing ("d1p1:_deviceID") && reader.GetAttribute ("i:nil") == null) {
+						player.DeviceID = reader.ReadElementContentAsString ();
+					}
+					
+					if (reader.ReadToFollowing ("d1p1:Name") && reader.GetAttribute ("i:nil") == null) {
+						player.Name = reader.ReadElementContentAsString ();
+					}else
+						
+						
+						
+						reader.Read ();//</d1p1:InputPlayer>
+					
+				} while(reader.ReadToNextSibling("d1p1:InputPlayer"));
+				
+				
+				__settings.Players = playerList.ToArray ();
+			}
+
+
+		}
+
         public static string formatOutput()
         {
 
 
-            throw new Exception("Should be extended to multiplayer version");
+           
 
 
             string HEADFORMAT = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
@@ -1062,22 +946,45 @@ namespace ws.winx.input
     " <d1p1:doubleClickSensitivity>{4}</d1p1:doubleClickSensitivity>" +
    "  <d1p1:longClickSensitivity>{5}</d1p1:longClickSensitivity>" +
    "  <d1p1:combinationsClickSensitivity>{6}</d1p1:combinationsClickSensitivity>" +
-   "  <d1p1:StateInputs xmlns:d2p1=\"http://schemas.microsoft.com/2003/10/Serialization/Arrays\">" +
+	"<d1p1:Players>" +
+
     " {7}" +
-    "      </d1p1:StateInputs>" +
+					"</d1p1:Players>" +
    "</Inputs>";
 
-            string STATEFORMAT = " <d2p1:KeyValueOfintInputState>" +
-      " <d2p1:Key>{0}</d2p1:Key>" +
-      " <d2p1:Value>" +
-       "  <d1p1:Hash>{0}</d1p1:Hash>" +
-        " <d1p1:InputCombinations>" +
-           " {1}" +
+			string EMPTY_TAG_FORMAT = "<d1p1:{0} i:nil=\"true\" />";
+			string TAG_FORMAT = "<d1p1:{0}>{1}<d1p1:{0}/>";
+		    
 
-        " </d1p1:InputCombinations>" +
-       "  <d1p1:Name>{2}</d1p1:Name>" +
-      " </d2p1:Value>" +
-     "</d2p1:KeyValueOfintInputState>";
+			string PROFILEFORMAT =
+								 "<d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>"
+								+ "<d4p1:Key>{0}</d4p1:Key>"
+								+ "<d4p1:Value>"
+								+ "{1}</d4p1:Value>"
+					+ "</d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>";
+								
+									
+			string DEVICE_STATES_INPUTS_FORMAT=
+				"<d1p1:_DeviceStateInputs xmlns:d4p1=\"http://schemas.microsoft.com/2003/10/Serialization/Arrays\">"+
+				"{0}"+
+					"</d1p1:_DeviceStateInputs>";
+
+					string INPUTPLAYER =
+					"<d1p1:InputPlayer>" +
+					"{0}"+
+					"</d1p1:InputPlayer>";
+
+            string STATEFORMAT = " <d4p1:KeyValueOfintInputState>" +
+									" <d4p1:Key>{0}</d4p1:Key>" +
+							      " <d4p1:Value>" +
+							       "  <d1p1:Hash>{0}</d1p1:Hash>" +
+							        " <d1p1:InputCombinations>" +
+							           " {1}" +
+
+							        " </d1p1:InputCombinations>" +
+							       "  <d1p1:Name>{2}</d1p1:Name>" +
+							      " </d4p1:Value>" +
+							     "</d4p1:KeyValueOfintInputState>";
 
 
             string COMBINATIONFORMAT =
@@ -1093,56 +1000,91 @@ namespace ws.winx.input
                    "       </d1p1:InputAction>";
             string actionsString;
 
-            // TODO (SHould be extended to multiplayer version
+           
             Dictionary<int, InputState> stateInputs;// = InputManager.Settings.stateInputs;
             InputCombination[] combinations;
             InputCombination combination;
 
             int key;
-            StringBuilder sb = new StringBuilder(10000);
+            StringBuilder statesSB = new StringBuilder(10000);
             StringBuilder combinationSB = new StringBuilder(100);
+			StringBuilder profilesSB = new StringBuilder(100000);
+			StringBuilder playersSB = new StringBuilder(100000);
+
+			int numPlayers = __settings.Players.Length;
+			InputPlayer player;
+			for (int playerInx=0; playerInx<numPlayers; playerInx++) {
+
+						player = __settings.Players [playerInx];
+
+						profilesSB.Length=0;
+
+						foreach (KeyValuePair<string, Dictionary<int,InputState>> profileStateInput in player.DeviceProfileStateInputs) {
+
+								stateInputs = profileStateInput.Value;
+
+								statesSB.Length=0;
+
+								foreach (KeyValuePair<int, InputState> stateInput in stateInputs) {
+										key = stateInput.Key;
+										combinations = stateInput.Value.combinations;
+
+										combinationSB.Length = 0;
 
 
-            foreach (KeyValuePair<int, InputState> stateInput in stateInputs)
-            {
-                key = stateInput.Key;
-                combinations = stateInput.Value.combinations;
+										if ((combination = combinations [0]) != null) {
+												actionsString = "";
 
-                combinationSB.Length = 0;
+												foreach (InputAction action in combination.actionsList) {
+														actionsString += String.Format (ACTIONFORMAT, action.ToString ());
+												}
 
+												combinationSB.AppendFormat (COMBINATIONFORMAT, actionsString);
+										}
 
-                if ((combination = combinations[0]) != null)
-                {
-                    actionsString = "";
+										if ((combination = combinations [1]) != null) {
+												actionsString = "";
+												foreach (InputAction action in combination.actionsList) {
+														actionsString += String.Format (ACTIONFORMAT, action.ToString ());
+												}
 
-                    foreach (InputAction action in combination.actionsList)
-                    {
-                        actionsString += String.Format(ACTIONFORMAT, action.ToString());
-                    }
-
-                    combinationSB.AppendFormat(COMBINATIONFORMAT, actionsString);
-                }
-
-                if ((combination = combinations[1]) != null)
-                {
-                    actionsString = "";
-                    foreach (InputAction action in combination.actionsList)
-                    {
-                        actionsString += String.Format(ACTIONFORMAT, action.ToString());
-                    }
-
-                    combinationSB.AppendFormat(COMBINATIONFORMAT, actionsString);
-                }
+												combinationSB.AppendFormat (COMBINATIONFORMAT, actionsString);
+										}
 
 
-                sb.AppendFormat(STATEFORMAT, key, combinationSB.ToString(), stateInput.Value.name);
+										statesSB.AppendFormat (STATEFORMAT, key, combinationSB.ToString (), stateInput.Value.name);
 
-                //stateInput.Value.name
-            }
+										
+								}//StateInputs
 
-            InputSettings settings = InputManager.Settings;
-            return String.Format(HEADFORMAT, settings.doubleDesignator, settings.longDesignator, settings.spaceDesignator, settings.singleClickSensitivity, settings.doubleClickSensitivity, settings.longClickSensitivity, settings.combinationsClickSensitivity,
-                                sb.ToString());
+					profilesSB.AppendFormat(PROFILEFORMAT,profileStateInput.Key,statesSB.ToString());	
+
+						}//DeviceProfileStateInputs
+
+							statesSB.Length=0;
+							statesSB.AppendFormat(DEVICE_STATES_INPUTS_FORMAT,profilesSB.ToString());
+
+							if(!String.IsNullOrEmpty(player.DeviceID)){
+								statesSB.AppendFormat(TAG_FORMAT,"_deviceID",player.DeviceID);
+							}else{
+								statesSB.AppendFormat(EMPTY_TAG_FORMAT,"_deviceID");
+							}
+
+							if(!String.IsNullOrEmpty(player.Name)){
+								statesSB.AppendFormat(TAG_FORMAT,"Name",player.Name);
+							}else{
+								statesSB.AppendFormat(EMPTY_TAG_FORMAT,"Name");
+							}
+
+								playersSB.AppendFormat(INPUTPLAYER,statesSB.ToString());
+
+							
+
+				}//players
+
+        
+            return String.Format(HEADFORMAT, __settings.doubleDesignator, __settings.longDesignator, __settings.spaceDesignator, __settings.singleClickSensitivity, __settings.doubleClickSensitivity, __settings.longClickSensitivity, __settings.combinationsClickSensitivity,
+                                playersSB.ToString());
         }
 
 

@@ -41,6 +41,7 @@ namespace ws.winx.components
         public static double DEG_TO_RAD = Math.PI / 180;
         GameObject wiimote;
         Vector3 Angles;
+		UserInterfaceWindow ui;
 
 
         // Use this for initialization
@@ -57,7 +58,7 @@ namespace ws.winx.components
             timer = new Timer(500.0);
             timer.Elapsed += new ElapsedEventHandler(onTimerElapsed);
 
-			UserInterfaceWindow ui = this.GetComponent<UserInterfaceWindow>();
+			 ui= this.GetComponent<UserInterfaceWindow>();
 
 
             //supporting devices with custom drivers
@@ -103,7 +104,7 @@ namespace ws.winx.components
             if (ui != null)
             {//settingsXML would trigger internal loading mechanism (only for testing)
 
-				InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, settingsFileName));
+				InputManager.loadSettings(Path.Combine(Application.streamingAssetsPath, "InputSettings.xml"));
 
 
 
@@ -223,7 +224,7 @@ namespace ws.winx.components
 			
 			
 
-			UserInterfaceWindow ui=this.GetComponent<UserInterfaceWindow>();
+		
 
 
             if (ui != null)//without settingsXML defined =>load them manually and attach them
