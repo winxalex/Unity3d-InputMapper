@@ -41,6 +41,8 @@ namespace ws.winx.platform.web
            
             __Generics=new Dictionary<string,HIDDevice>();
 
+			__profiles = new Dictionary<string,string> ();
+
             //"{"id":"feed-face-VJoy Virtual Joystick","axes":[0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0,0,0,0,0,0,-1,0,0,0,0,0,0],"buttons":[{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}],"index":0}"
 
             _container = new GameObject("WebHIDBehaviourGO");
@@ -107,7 +109,8 @@ namespace ws.winx.platform.web
 		{
 			//cos UNITY_WEBPLAYER: Application.dataPath  = "http://localhost/appfolder/"
 
-			throw new Exception("UnityWebPlayer loading profiles option not yet tested");
+			//throw new Exception("UnityWebPlayer loading profiles option not yet tested");
+			Debug.LogWarning("UnityWebPlayer loading profiles option not yet tested");
 			
 			WebClient client = new WebClient();
 			Stream stream = client.OpenRead(Path.Combine(Application.streamingAssetsPath, fileName));
@@ -136,7 +139,8 @@ namespace ws.winx.platform.web
 
 			//cos UNITY_WEBPLAYER: Application.dataPath  = "http://localhost/appfolder/"
 
-			throw new Exception("UnityWebPlayer loading profiles option not yet not tested");
+			//throw new Exception("UnityWebPlayer loading profiles option not yet not tested");
+			Debug.LogWarning("UnityWebPlayer loading profile for controller option not yet tested");
 			
 			WebClient client = new WebClient();
 			Stream stream = client.OpenRead(Path.Combine(Application.streamingAssetsPath, fileBase+"_web.txt"));
