@@ -637,7 +637,7 @@ namespace ws.winx.editor
 
 
 
-										//								Debug.Log ("Action:" + _action + " " + _action.getCode(_deviceByProfile));
+																		//Debug.Log ("Action:" + _action + " " + _action.getCode(_deviceByProfile)+" type:"+_action.type);
 								}
 
 

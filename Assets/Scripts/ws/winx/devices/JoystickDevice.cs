@@ -229,7 +229,7 @@ namespace ws.winx.devices
 			
 			//previous mapping might be to device with less or more axess
 					//at same device index
-					if (axis_collection.Count <= (int)axis)
+            if (axis_collection.Count <= (int)axis || axis_collection[axis]==null)
 					return 0f;
 			
 			
