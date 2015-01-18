@@ -1161,10 +1161,6 @@ namespace ws.winx.editor
 
 
 				//////////////////////               CREATE STATE GUI             ///////////////////////
-			
-
-
-
 
 				/// <summary>
 				/// Creates the state GUI.

@@ -8,16 +8,27 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 using System;
+using UnityEngine;
+
+
 namespace ws.winx.devices
 {
+	[System.Serializable]
 		public class DeviceProfile
 		{
-		public string Name;
-		public string[] axisNaming;
-		public string[] buttonNaming;
-		public float sensitivity;
-		public float dreadZoneUpper;
-		public float deradZoneLower;
+			public string Name;
+			public string[] axisNaming;
+			public string[] buttonNaming;
+			public float sensitivity;
+			public float dreadZoneUpper;
+			public float deradZoneLower;
+
+
+//		    public DeviceProfile(){
+//
+//			axisNaming=new string[20];
+//
+//			}
 		   
 		}
 }
