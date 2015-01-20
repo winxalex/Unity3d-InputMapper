@@ -50,6 +50,11 @@ namespace ws.winx.editor
 						_instance = EditorWindow.GetWindow<DeviceProfiling> ();
 				}
 
+
+
+				/// <summary>
+				/// Update this instance.
+				/// </summary>
 				void Update ()
 				{
 
@@ -99,6 +104,7 @@ namespace ws.winx.editor
 				/// <summary>
 				/// onGUI
 				/// </summary>
+				/////////////////    onGUI   ////////////
 				void OnGUI ()
 				{
 
@@ -118,6 +124,35 @@ namespace ws.winx.editor
 								EditorGUILayout.LabelField ("No attached devices");
 						}
 
+						
+
+						if (_profiles != null && !String.IsNullOrEmpty (_profileNameSelected)) {
+
+								EditorGUILayout.BeginHorizontal ();
+								if (GUILayout.Button ("Assign Profile")) {
+				
+										string pidVidKey = _deviceSelected.VID.ToString ("X4") + "#" + _deviceSelected.PID.ToString ("X4");
+										_profiles.pidvidShortTypeNames [pidVidKey] = _profileNameSelected;
+
+										EditorUtility.SetDirty (_profiles);
+										AssetDatabase.SaveAssets ();
+								}
+
+								if (GUILayout.Button ("Remove From Profile")) {
+				
+										string pidVidKey = _deviceSelected.VID.ToString ("X4") + "#" + _deviceSelected.PID.ToString ("X4");
+
+										_profiles.pidvidShortTypeNames.Remove (pidVidKey);
+
+										EditorUtility.SetDirty (_profiles);
+										AssetDatabase.SaveAssets ();
+				
+								}
+
+								EditorGUILayout.EndHorizontal ();
+						}
+						
+
 						EditorGUILayout.Separator ();
 
 
@@ -129,7 +164,7 @@ namespace ws.winx.editor
 						if (_deviceSelected != null && _profiles != null) {
 								
 
-								_displayOptions = _profiles.pidvidShortTypeNames.Values.Distinct ().ToArray ();
+								_displayOptions = _profiles.runtimePlatformDeviceProfileDict.Keys.Distinct ().ToArray ();
 
 								if (_displayOptions.Length > 0) {
 										_profileIndexSelected = EditorGUILayout.Popup ("Profiles:", _profileIndexSelected, _displayOptions);
@@ -140,13 +175,12 @@ namespace ws.winx.editor
 
 								_profileName = EditorGUILayout.TextField ("Name", _profileName);
 
-								if (GUILayout.Button ("Add profile")) {
-										string pidVidKey = _deviceSelected.VID.ToString ("X4") + "#" + _deviceSelected.PID.ToString ("X4");
+								if (GUILayout.Button ("Add profile") && !String.IsNullOrEmpty (_profileName)) {
+										
 
+										if (!_profiles.runtimePlatformDeviceProfileDict.ContainsKey (_profileName)) {
 
-										if (!_profiles.pidvidShortTypeNames.ContainsKey (pidVidKey)) {
-
-												_profiles.pidvidShortTypeNames [pidVidKey] = _profileName;
+											
 												_profiles.runtimePlatformDeviceProfileDict [_profileName] = new Dictionary<RuntimePlatform, DeviceProfile> ();
 										} else {
 
@@ -159,6 +193,9 @@ namespace ws.winx.editor
 										AssetDatabase.SaveAssets ();
 
 								}
+
+
+								
 
 
 								EditorGUILayout.EndHorizontal ();

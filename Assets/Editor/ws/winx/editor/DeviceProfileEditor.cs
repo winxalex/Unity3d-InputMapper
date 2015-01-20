@@ -15,13 +15,13 @@ namespace ws.winx.editor
 	[CanEditMultipleObjects]
 	public class DeviceProfileEditor : Editor
 	{
-		private DeviceProfiles D; //Make an easy shortcut to the Dialogue your editing
+		private DeviceProfiles __profiles; //Make an easy shortcut to the Dialogue your editing
 
-		private DeviceProfile[] __profiles;
+
 
 		void Awake()
 		{
-			//D=(DeviceProfiles)target;
+			__profiles=(DeviceProfiles)target;
 		}
 
 	
