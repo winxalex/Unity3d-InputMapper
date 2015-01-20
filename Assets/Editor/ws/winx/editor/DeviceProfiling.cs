@@ -164,7 +164,7 @@ namespace ws.winx.editor
 						if (_deviceSelected != null && _profiles != null) {
 								
 
-								_displayOptions = _profiles.runtimePlatformDeviceProfileDict.Keys.Distinct ().ToArray ();
+								_displayOptions = _profiles.runtimePlatformDeviceProfileDict.Keys.ToArray ();
 
 								if (_displayOptions.Length > 0) {
 										_profileIndexSelected = EditorGUILayout.Popup ("Profiles:", _profileIndexSelected, _displayOptions);
@@ -200,8 +200,8 @@ namespace ws.winx.editor
 
 								EditorGUILayout.EndHorizontal ();
 
-
-
+								EditorGUILayout.Separator ();
+				
 
 								///////////////// NAMING(buttons,axis..) //////////////
 								string actionCodeString = "Click button or Move stick";
@@ -248,6 +248,7 @@ namespace ws.winx.editor
 
 										EditorGUILayout.EndHorizontal ();
 
+										EditorGUILayout.Separator ();
 
 										///// GIVE NAME ////			
 										EditorGUILayout.BeginHorizontal ();

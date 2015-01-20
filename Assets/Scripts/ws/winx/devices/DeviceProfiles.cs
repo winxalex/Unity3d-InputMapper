@@ -9,24 +9,29 @@ namespace ws.winx.devices
 		{
 
 
-	
+				[HideInInspector]
 				public List<string> pidvidShortTypeNamesKeys;
+
+				[HideInInspector]
 				public List<string> pidvidShortTypeNamesValues;
+
+				[HideInInspector]
 				public List<string> runtimePlatformDeviceProfileKeys;
-				public List<RuntimePlatformListWrapper> runtimePlatfromKeys;
+
+		[HideInInspector]
+		public List<RuntimePlatformListWrapper> runtimePlatfromKeys;
+
+		[HideInInspector]
 				public List<DeviceProfileListWrapper> deviceProfileValues;
 				public Dictionary<string,string>  pidvidShortTypeNames = new Dictionary<string,string> ();
 				public Dictionary<string,Dictionary<RuntimePlatform,DeviceProfile>>  runtimePlatformDeviceProfileDict = new Dictionary<string,Dictionary<RuntimePlatform,DeviceProfile>> ();
-
-				
-				public bool EditMode;
+			
+				public DeviceProfile currentProfile;
 
 		#region ISerializationCallbackReceiver implementation
 				public void OnBeforeSerialize ()
 				{
-			if (EditMode)
-								return;
-
+						
 						pidvidShortTypeNamesKeys.Clear ();
 						pidvidShortTypeNamesValues.Clear ();
 						foreach (var kvp in pidvidShortTypeNames) {
@@ -70,7 +75,7 @@ namespace ws.winx.devices
 
 
 
-//			throw new System.NotImplementedException ();
+
 				}
 
 				public void OnAfterDeserialize ()
@@ -81,7 +86,7 @@ namespace ws.winx.devices
 								pidvidShortTypeNames.Add (pidvidShortTypeNamesKeys [i], pidvidShortTypeNamesValues [i]);
 
 						runtimePlatformDeviceProfileDict = new Dictionary<string,Dictionary<RuntimePlatform,DeviceProfile>> ();
-			for (i=0; i<Math.Min(runtimePlatformDeviceProfileKeys.Count,Math.Min(runtimePlatfromKeys.Count,deviceProfileValues.Count)); i++) {
+						for (i=0; i<Math.Min(runtimePlatformDeviceProfileKeys.Count,Math.Min(runtimePlatfromKeys.Count,deviceProfileValues.Count)); i++) {
 
 								Dictionary<RuntimePlatform,DeviceProfile> tempDict = new Dictionary<RuntimePlatform, DeviceProfile> ();
 
