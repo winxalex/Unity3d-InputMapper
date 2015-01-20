@@ -15,8 +15,6 @@ namespace ws.winx.input.components
 
 
 
-
-
 				protected Rect _buttonRect = new Rect (0, 0, 100, 15);
 				protected Rect _layerLabelRect = new Rect (0, 0, 100, 15);
 				protected Dictionary<int, InputState> _stateInputCombinations;
@@ -305,7 +303,7 @@ namespace ws.winx.input.components
 				
 				
 				
-								///////////// DEVICES /////////
+								///////////// DEVICES ////////////
 								
 
 								

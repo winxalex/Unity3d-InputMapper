@@ -189,6 +189,11 @@ namespace ws.winx.input
 			_type=__defaultType;
 		}
 
+		public InputAction Clone ()
+		{
+
+			return new InputAction (_code);
+		}
 
 
 		/// <summary>

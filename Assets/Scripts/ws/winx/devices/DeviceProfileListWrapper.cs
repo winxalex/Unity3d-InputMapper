@@ -4,5 +4,5 @@ using ws.winx.devices;
 [System.Serializable]
 public class DeviceProfileListWrapper
 {
-	public List<DeviceProfile> list;
+	public List<DeviceProfile> list=new List<DeviceProfile>();
 }

@@ -6,7 +6,7 @@ using System;
 namespace ws.winx.devices{
 	public class DeviceProfiles : ScriptableObject,ISerializationCallbackReceiver
 	{
-		public DeviceProfile[] profiles;
+
 
 	
 		public List<string> pidvidShortTypeNamesKeys;
@@ -15,8 +15,8 @@ namespace ws.winx.devices{
 		public List<string> runtimePlatformDeviceProfileKeys;
 
 
-		public List<RuntimePlatformListWrapper> runtimePlatfromKeys=new List<RuntimePlatformListWrapper>();
-		public List<DeviceProfileListWrapper> deviceProfileValues=new List<DeviceProfileListWrapper>();
+		public List<RuntimePlatformListWrapper> runtimePlatfromKeys;
+		public List<DeviceProfileListWrapper> deviceProfileValues;
 
 		public Dictionary<string,string>  pidvidShortTypeNames = new Dictionary<string,string>();
 
@@ -35,15 +35,18 @@ namespace ws.winx.devices{
 				pidvidShortTypeNamesKeys.Add(kvp.Key);
 				pidvidShortTypeNamesValues.Add(kvp.Value);
 			}
+
 			int i;
 			for (i=0; i<deviceProfileValues.Count; i++) {
-				deviceProfileValues[i].list.Clear();
+				if(deviceProfileValues[i].list!=null)
+					deviceProfileValues[i].list.Clear();
 			}
 
 			deviceProfileValues.Clear ();
 
 
 			for (i=0; i<runtimePlatfromKeys.Count; i++) {
+				if(runtimePlatfromKeys[i].list!=null)
 				runtimePlatfromKeys[i].list.Clear();
 			}
 			runtimePlatfromKeys.Clear ();
@@ -57,6 +60,7 @@ namespace ws.winx.devices{
 				DeviceProfileListWrapper runtimePlatformValueList=new DeviceProfileListWrapper();
 
 				foreach(var kvp1 in kvp.Value){
+
 
 					runtimePlatformValueList.list.Add(kvp1.Value);
 					runtimePlatformKeyList.list.Add(kvp1.Key);

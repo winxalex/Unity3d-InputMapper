@@ -17,8 +17,8 @@ namespace ws.winx.devices
 		public class DeviceProfile
 		{
 			public string Name;
-			public string[] axisNaming;
-			public string[] buttonNaming;
+			public string[] axisNaming=new string[16];
+			public string[] buttonNaming=new string[32];
 			public float sensitivity;
 			public float dreadZoneUpper;
 			public float deradZoneLower;
