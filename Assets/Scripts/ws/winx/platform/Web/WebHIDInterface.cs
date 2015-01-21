@@ -26,7 +26,7 @@ namespace ws.winx.platform.web
         //link towards Browser
         internal readonly WebHIDBehaviour webHIDBehaviour;
         private Dictionary<string, HIDDevice> __Generics;
-		private Dictionary<string,string> __profiles;
+		private DeviceProfiles __profiles;
 
 		public event EventHandler<DeviceEventArgs<string>> DeviceDisconnectEvent;
 		public event EventHandler<DeviceEventArgs<IDevice>> DeviceConnectEvent;
@@ -41,14 +41,14 @@ namespace ws.winx.platform.web
            
             __Generics=new Dictionary<string,HIDDevice>();
 
-			__profiles = new Dictionary<string,string> ();
+
 
             //"{"id":"feed-face-VJoy Virtual Joystick","axes":[0.000015259021893143654,0.000015259021893143654,0.000015259021893143654,0,0,0,0,0,0,-1,0,0,0,0,0,0],"buttons":[{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}],"index":0}"
 
             _container = new GameObject("WebHIDBehaviourGO");
             webHIDBehaviour= _container.AddComponent<WebHIDBehaviour>();
           
-            LoadProfiles("profiles.txt");
+           
 
         }
 #endregion
@@ -96,72 +96,40 @@ namespace ws.winx.platform.web
 			}
 		}
 
-		public Dictionary<string, string> Profiles {
-			get {
-				throw new NotImplementedException ();
-			}
-		}
 
 
+		public void SetProfiles(DeviceProfiles profiles){
+			__profiles = profiles;
 
 
-	public void LoadProfiles (String fileName)
-		{
-			//cos UNITY_WEBPLAYER: Application.dataPath  = "http://localhost/appfolder/"
+				}
 
-			//throw new Exception("UnityWebPlayer loading profiles option not yet tested");
-			Debug.LogWarning("UnityWebPlayer loading profiles option not yet tested");
+
+		public void LoadProfiles(string fileName){
 			
-			WebClient client = new WebClient();
-			Stream stream = client.OpenRead(Path.Combine(Application.streamingAssetsPath, fileName));
-
-			string[] deviceNameProfilePair;
-			char splitChar='|';
-
-			using(StreamReader reader = new StreamReader(stream)){
+			__profiles=Resources.Load<DeviceProfiles> ("DeviceProfiles");
+			
+		}
+		
+		
+		public DeviceProfile LoadProfile(string key){
+			
+			DeviceProfile profile=null;
+			
+			if (__profiles.vidpidProfileNameDict.ContainsKey (key)) {
 				
+				string profileName=__profiles.vidpidProfileNameDict[key];
 				
-				while(!reader.EndOfStream){
+				RuntimePlatform platform=Application.platform == RuntimePlatform.OSXWebPlayer ? RuntimePlatform.OSXPlayer: RuntimePlatform.WindowsPlayer;
+				
+				if(__profiles.runtimePlatformDeviceProfileDict[profileName].ContainsKey(platform)){
 					
-					deviceNameProfilePair=reader.ReadLine().Split(splitChar);
-					__profiles[deviceNameProfilePair[0]]=deviceNameProfilePair[1];
+					profile=__profiles.runtimePlatformDeviceProfileDict[profileName][platform];
 				}
 				
 			}
-
-		}
-
-		public DeviceProfile LoadProfile(string fileBase){
-
-			DeviceProfile profile=new DeviceProfile();
-
-
-
-			//cos UNITY_WEBPLAYER: Application.dataPath  = "http://localhost/appfolder/"
-
-			//throw new Exception("UnityWebPlayer loading profiles option not yet not tested");
-			Debug.LogWarning("UnityWebPlayer loading profile for controller option not yet tested");
 			
-			WebClient client = new WebClient();
-			Stream stream = client.OpenRead(Path.Combine(Application.streamingAssetsPath, fileBase+"_web.txt"));
-
-			char splitChar='|';
 			
-			using(StreamReader reader = new StreamReader(stream)){
-				
-				
-				if(!reader.EndOfStream)
-					profile.buttonNaming =reader.ReadLine().Split(splitChar);
-				
-				if(!reader.EndOfStream)
-					profile.axisNaming =reader.ReadLine().Split(splitChar);
-				
-				//rest in future
-				
-			}
-		
-
-
 			return profile;
 		}
 

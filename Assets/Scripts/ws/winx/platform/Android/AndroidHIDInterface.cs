@@ -47,12 +47,12 @@ namespace ws.winx.platform.android
 
             _container = new GameObject("AndroidHIDBehaviourGO");
 
-			__profiles = new Dictionary<string, string>();
+
 
             droidHIDBehaviour = _container.AddComponent<AndroidHIDBehaviour>();
           
               
-          LoadProfiles("profile.txt");
+         
         }
 
 	
@@ -231,57 +231,39 @@ namespace ws.winx.platform.android
 
 	
 
-
-
-
-        public void LoadProfiles(String fileName)
-        {
-
-			string[] deviceNameProfilePair;
-			char splitChar = '|';
+		public void SetProfiles(DeviceProfiles profiles){
+			__profiles = profiles;
 			
-			using (StreamReader reader = new StreamReader(Path.Combine(Application.persistentDataPath, fileName)))
-			{
+			
+		}
+		
+		
+		public void LoadProfiles(string fileName){
+			
+			__profiles=Resources.Load<DeviceProfiles> ("DeviceProfiles");
+			
+		}
+		
+		
+		public DeviceProfile LoadProfile(string key){
+			
+			DeviceProfile profile=null;
+			
+			if (__profiles.vidpidProfileNameDict.ContainsKey (key)) {
 				
-				
-				while (!reader.EndOfStream)
-				{
+				string profileName=__profiles.vidpidProfileNameDict[key];
+
+				if(__profiles.runtimePlatformDeviceProfileDict[profileName].ContainsKey(Application.platform)){
 					
-					deviceNameProfilePair = reader.ReadLine().Split(splitChar);
-					__profiles[deviceNameProfilePair[0]] = deviceNameProfilePair[1];
+					profile=__profiles.runtimePlatformDeviceProfileDict[profileName][Application.platform];
 				}
 				
 			}
-        }
-
-        public DeviceProfile LoadProfile(string fileBase)
-        {
-			DeviceProfile profile = new DeviceProfile();
-			
-			
-			profile.Name = fileBase;
-			
-			char splitChar = '|';
-			
-			using (StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileBase + "_drd.txt")))
-			{
-				
-				if (!reader.EndOfStream)
-					profile.buttonNaming = reader.ReadLine().Split(splitChar);
-				
-				if (!reader.EndOfStream)
-					profile.axisNaming = reader.ReadLine().Split(splitChar);
-				
-				//rest in future
-				
-				
-				
-			}
-			
 			
 			
 			return profile;
-        }
+		}
+
 
 		public void AddDriver (IDriver driver)
 		{

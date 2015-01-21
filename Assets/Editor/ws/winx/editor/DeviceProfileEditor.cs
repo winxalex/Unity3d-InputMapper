@@ -60,26 +60,7 @@ namespace ws.winx.editor
 						}
 
 
-						if (GUILayout.Button ("Remove") && !String.IsNullOrEmpty (_profileNameSelected)) {
-
-								if (EditorUtility.DisplayDialog ("Remove the profile",
-				                                 "Are you sure remove profile and all devices's map to it?", "Yes", "Cancel")) {
-
-										if (__profiles.runtimePlatformDeviceProfileDict.ContainsKey (_profileNameSelected)) {
-												__profiles.runtimePlatformDeviceProfileDict.Remove (_profileNameSelected);
-												List<string> pidVidMappingsToBeRemoved = new List<string> ();
-
-												foreach (var kvp in __profiles.vidpidProfileNameDict) {
-														pidVidMappingsToBeRemoved.Add (kvp.Key);
-												}
-
-												foreach (var key in pidVidMappingsToBeRemoved) {
-														__profiles.vidpidProfileNameDict.Remove (key);
-												}
-										}
-								}
-
-						}
+					
 						
 						EditorGUILayout.EndHorizontal ();
 
@@ -97,15 +78,37 @@ namespace ws.winx.editor
 								_profileIndexSelected = EditorGUILayout.Popup ("Profiles:", _profileIndexSelected, _displayOptions);
 								_profileNameSelected = _displayOptions [_profileIndexSelected];
 
+								if (GUILayout.Button ("Remove") && !String.IsNullOrEmpty (_profileNameSelected)) {
+					
+										if (EditorUtility.DisplayDialog ("Remove the profile",
+					                                 "Are you sure remove profile and all devices's map to it?", "Yes", "Cancel")) {
+						
+												if (__profiles.runtimePlatformDeviceProfileDict.ContainsKey (_profileNameSelected)) {
+														__profiles.runtimePlatformDeviceProfileDict.Remove (_profileNameSelected);
+														List<string> pidVidMappingsToBeRemoved = new List<string> ();
+							
+														foreach (var kvp in __profiles.vidpidProfileNameDict) {
+																pidVidMappingsToBeRemoved.Add (kvp.Key);
+														}
+							
+														foreach (var key in pidVidMappingsToBeRemoved) {
+																__profiles.vidpidProfileNameDict.Remove (key);
+														}
+												}
+										}
+					
+								}
+
 						}
 				
 
 						EditorGUILayout.Separator ();
 
 						/////////// DEVICES //////////
+
 						if (!String.IsNullOrEmpty (_profileNameSelected)) {
 								EditorGUILayout.BeginHorizontal ();//,
-								EditorGUILayout.LabelField ("Device PID#VID or Name(UnityDriver)", new GUILayoutOption[]{GUILayout.Width (100)});
+								EditorGUILayout.LabelField ("Device PID#VID or Name(UnityDriver)", new GUILayoutOption[]{GUILayout.Width (130)});
 								_pidVidKey = EditorGUILayout.TextField (_pidVidKey);
 					
 				
@@ -115,6 +118,17 @@ namespace ws.winx.editor
 										__profiles.vidpidProfileNameDict [_pidVidKey] = _profileNameSelected;
 										EditorUtility.SetDirty (__profiles);
 										AssetDatabase.SaveAssets ();
+										_pidVidKey=String.Empty;
+										this.Repaint();
+								}
+								
+								if (GUILayout.Button ("Remove") && !String.IsNullOrEmpty (_pidVidKey)) {
+
+										if (__profiles.vidpidProfileNameDict.ContainsKey (_pidVidKey)) {
+												__profiles.vidpidProfileNameDict.Remove (_pidVidKey);
+												EditorUtility.SetDirty (__profiles);
+												AssetDatabase.SaveAssets ();
+										}
 								}
 
 								EditorGUILayout.EndHorizontal ();
