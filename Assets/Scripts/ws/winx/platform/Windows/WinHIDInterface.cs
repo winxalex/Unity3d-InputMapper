@@ -37,7 +37,7 @@ namespace ws.winx.platform.windows
 
 		private string[] __ports;
 
-        private Dictionary<string, string> __profiles;
+        private DeviceProfiles __profiles;
 
 
         private static readonly object syncRoot = new object();
@@ -52,10 +52,6 @@ namespace ws.winx.platform.windows
         private static readonly Guid GUID_DEVINTERFACE_HID = new Guid("4D1E55B2-F16F-11CF-88CB-001111000030"); // HID devices
 
         public IntPtr hidDeviceNotificationReceiverWindowHandle;
-
-
-
-
 
 
 
@@ -75,68 +71,40 @@ namespace ws.winx.platform.windows
 
         #region IHIDInterface implementation
 
+		public void SetProfiles(DeviceProfiles profiles){
+			
+			__profiles = profiles;
+		}
+		
+		public void LoadProfiles(string fileName){
+			
+			__profiles=Resources.Load<DeviceProfiles> ("DeviceProfiles");
+			
+		}
+		
+		
+		public DeviceProfile LoadProfile(string key){
+			
+			DeviceProfile profile=null;
+			
+			if (__profiles.vidpidProfileNameDict.ContainsKey (key)) {
+				
+				string profileName=__profiles.vidpidProfileNameDict[key];
+				
+				
+				
+				if(__profiles.runtimePlatformDeviceProfileDict[profileName].ContainsKey(RuntimePlatform.OSXPlayer)){
+					
+					profile=__profiles.runtimePlatformDeviceProfileDict[profileName][RuntimePlatform.OSXPlayer];
+				}
+				
+			}
+			
+			
+			return profile;
+		}
 
-        public void LoadProfiles(string fileName)
-        {
-
-            string[] deviceNameProfilePair;
-            char splitChar = '|';
-
-            using (StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileName)))
-            {
-
-
-                while (!reader.EndOfStream)
-                {
-
-                    deviceNameProfilePair = reader.ReadLine().Split(splitChar);
-                    __profiles[deviceNameProfilePair[0]] = deviceNameProfilePair[1];
-                }
-
-            }
-
-
-
-
-        }
-
-        public DeviceProfile LoadProfile(string fileBase)
-        {
-
-            DeviceProfile profile = new DeviceProfile();
-
-
-			profile.Name = fileBase;
-
-            char splitChar = '|';
-
-            using (StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileBase + "_win.txt")))
-            {
-
-                if (!reader.EndOfStream)
-                    profile.buttonNaming = reader.ReadLine().Split(splitChar);
-
-                if (!reader.EndOfStream)
-                    profile.axisNaming = reader.ReadLine().Split(splitChar);
-
-                //rest in future
-
-
-
-            }
-
-
-
-            return profile;
-        }
-
-        public Dictionary<string, string> Profiles
-        {
-            get
-            {
-                return __profiles;
-            }
-        }
+       
 
 
 
@@ -254,12 +222,12 @@ namespace ws.winx.platform.windows
 
             __Generics = new Dictionary<string, HIDDevice>();
 
-            __profiles = new Dictionary<string, string>();
+           
 
 			__ports = new string[20];
 
 
-			LoadProfiles("profiles.txt");
+
 			
 		}
         #endregion

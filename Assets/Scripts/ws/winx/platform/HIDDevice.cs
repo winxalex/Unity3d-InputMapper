@@ -9,6 +9,10 @@
 //------------------------------------------------------------------------------
 using System;
 using ws.winx.devices;
+using ws.winx.drivers;
+using UnityEngine;
+
+
 namespace ws.winx.platform
 {
 		public abstract class HIDDevice:IHIDDevice,IDisposable
@@ -50,15 +54,7 @@ namespace ws.winx.platform
 
 
 
-                //public void Read(ReadCa callback)
-                //{
-                //    throw new Exception("Need to be overrided");
-                //}
-
-                //public void Write(Delegate callback)
-                //{
-                //    throw new Exception("Need to be overrided");
-                //}
+              
 				
 
 
@@ -73,7 +69,20 @@ namespace ws.winx.platform
 
 
 
-	
+				public DeviceProfile loadProfile(){
+
+						String profileKey=this.hidInterface.defaultDriver is UnityDriver? this.Name : this.VID.ToString("X4")+"#"+this.PID.ToString("X4");
+						DeviceProfile profile = null;
+						
+						try{
+							profile = this.hidInterface.LoadProfile (profileKey);
+						}catch(Exception ex){
+							Debug.LogException(ex);
+						}
+
+						return profile;
+
+				}
 
 
 

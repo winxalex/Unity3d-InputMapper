@@ -47,14 +47,9 @@ namespace ws.winx.drivers
 								return null;
 						}
 
-						DeviceProfile profile = null;
-
-						if (hidDevice.hidInterface.Profiles.ContainsKey (hidDevice.Name)) {
-
+						DeviceProfile profile = hidDevice.loadProfile();
 
 					
-								profile = hidDevice.hidInterface.LoadProfile (hidDevice.hidInterface.Profiles [hidDevice.Name]);
-						}
                            
                         
 

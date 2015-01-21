@@ -23,7 +23,6 @@ namespace ws.winx.editor
 				int _profileIndexSelected;
 				string[] _displayOptions;
 				RuntimePlatform _platformSelected;
-			
 
 				void Awake ()
 				{
@@ -51,12 +50,37 @@ namespace ws.winx.editor
 						_profileName = EditorGUILayout.TextField ("Profile Name", _profileName);
 
 						if (GUILayout.Button ("Add") && !String.IsNullOrEmpty (_profileName)) {
+
+					
 								__profiles.runtimePlatformDeviceProfileDict [_profileName] = new Dictionary<RuntimePlatform, DeviceProfile> ();
 								EditorUtility.SetDirty (__profiles);
 								AssetDatabase.SaveAssets ();
 
 								_profileName = String.Empty;
 						}
+
+
+						if (GUILayout.Button ("Remove") && !String.IsNullOrEmpty (_profileNameSelected)) {
+
+								if (EditorUtility.DisplayDialog ("Remove the profile",
+				                                 "Are you sure remove profile and all devices's map to it?", "Yes", "Cancel")) {
+
+										if (__profiles.runtimePlatformDeviceProfileDict.ContainsKey (_profileNameSelected)) {
+												__profiles.runtimePlatformDeviceProfileDict.Remove (_profileNameSelected);
+												List<string> pidVidMappingsToBeRemoved = new List<string> ();
+
+												foreach (var kvp in __profiles.vidpidProfileNameDict) {
+														pidVidMappingsToBeRemoved.Add (kvp.Key);
+												}
+
+												foreach (var key in pidVidMappingsToBeRemoved) {
+														__profiles.vidpidProfileNameDict.Remove (key);
+												}
+										}
+								}
+
+						}
+						
 						EditorGUILayout.EndHorizontal ();
 
 
@@ -76,19 +100,19 @@ namespace ws.winx.editor
 						}
 				
 
-							EditorGUILayout.Separator ();
+						EditorGUILayout.Separator ();
 
 						/////////// DEVICES //////////
 						if (!String.IsNullOrEmpty (_profileNameSelected)) {
 								EditorGUILayout.BeginHorizontal ();//,
-								EditorGUILayout.LabelField ("Device PID#VID", new GUILayoutOption[]{GUILayout.Width (100)});
+								EditorGUILayout.LabelField ("Device PID#VID or Name(UnityDriver)", new GUILayoutOption[]{GUILayout.Width (100)});
 								_pidVidKey = EditorGUILayout.TextField (_pidVidKey);
 					
 				
 						
 
 								if (GUILayout.Button ("Assign to Profile") && !String.IsNullOrEmpty (_pidVidKey)) {
-										__profiles.pidvidShortTypeNames [_pidVidKey] = _profileNameSelected;
+										__profiles.vidpidProfileNameDict [_pidVidKey] = _profileNameSelected;
 										EditorUtility.SetDirty (__profiles);
 										AssetDatabase.SaveAssets ();
 								}

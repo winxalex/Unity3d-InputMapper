@@ -60,15 +60,8 @@ namespace ws.winx.platform.windows
 			
 			System.Threading.Thread.Sleep(100);
 			
-			DeviceProfile profile = null;
-			String profileKey=hidDevice.hidInterface.defaultDriver is UnityDriver? hidDevice.Name : hidDevice.VID.ToString("X4")+"#"+hidDevice.PID.ToString("X4");
-			if (hidDevice.hidInterface.Profiles.ContainsKey(profileKey)) {
-				try{
-					profile = hidDevice.hidInterface.LoadProfile (hidDevice.hidInterface.Profiles [profileKey]);
-				}catch(Exception ex){
-					UnityEngine.Debug.LogException(ex);
-				}
-			}
+			DeviceProfile profile = hidDevice.loadProfile();
+		
 
 			
 			int i;

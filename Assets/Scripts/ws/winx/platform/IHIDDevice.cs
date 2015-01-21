@@ -8,6 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 using System;
+using ws.winx.devices;
 
 namespace ws.winx.platform
 {
@@ -25,6 +26,7 @@ namespace ws.winx.platform
 			string DevicePath {get;}
             object Extension { set; get; }
             string Name { get; }
+			DeviceProfile loadProfile();
 		    
           
 		}

@@ -38,7 +38,7 @@ public class InputComponent : MonoBehaviour
 
 		public string settingsFileName="InputSettings.xml";
 
-		
+		public DeviceProfiles profiles;
 
 		[FormerlySerializedAs ("onLoad"), UnityEngine.SerializeField]
 		private UnityEvent m_onLoad = new UnityEvent ();
@@ -74,11 +74,11 @@ public class InputComponent : MonoBehaviour
 		// Use this for initialization
 		void Start ()
 		{
-
+				
 
 				   if (String.IsNullOrEmpty (settingsFileName)) {
 
-						Debug.LogError("Add Settings FileName from StreamingAssets");
+						Debug.LogError("Please add settings(.xml or .bin) fileName from StreamingAssets");
 						return;
 					}
 
@@ -109,7 +109,10 @@ public class InputComponent : MonoBehaviour
 		InputManager.AddDriver(new XInputDriver());
 		#endif
 		
-		
+			if (profiles == null)
+								InputManager.hidInterface.LoadProfiles ("DeviceProfiles");
+						else
+								InputManager.hidInterface.SetProfiles (profiles);
 
 		InputManager.hidInterface.Enumerate();
 		

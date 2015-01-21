@@ -121,7 +121,7 @@ namespace ws.winx.editor
 								_deviceSelected = devicesList [_deviceDisplayIndex];
 						} else {
 
-								EditorGUILayout.LabelField ("No attached devices");
+								EditorGUILayout.LabelField ("Devices: No attached devices");
 						}
 
 						
@@ -132,7 +132,7 @@ namespace ws.winx.editor
 								if (GUILayout.Button ("Assign Profile")) {
 				
 										string pidVidKey = _deviceSelected.VID.ToString ("X4") + "#" + _deviceSelected.PID.ToString ("X4");
-										_profiles.pidvidShortTypeNames [pidVidKey] = _profileNameSelected;
+										_profiles.vidpidProfileNameDict [pidVidKey] = _profileNameSelected;
 
 										EditorUtility.SetDirty (_profiles);
 										AssetDatabase.SaveAssets ();
@@ -142,7 +142,7 @@ namespace ws.winx.editor
 				
 										string pidVidKey = _deviceSelected.VID.ToString ("X4") + "#" + _deviceSelected.PID.ToString ("X4");
 
-										_profiles.pidvidShortTypeNames.Remove (pidVidKey);
+										_profiles.vidpidProfileNameDict.Remove (pidVidKey);
 
 										EditorUtility.SetDirty (_profiles);
 										AssetDatabase.SaveAssets ();
@@ -252,7 +252,9 @@ namespace ws.winx.editor
 
 										///// GIVE NAME ////			
 										EditorGUILayout.BeginHorizontal ();
-
+										
+										if (String.IsNullOrEmpty (nameGivenCurrent))
+												nameGivenCurrent = "No Name [Click to Edit]";
 
 
 										if (_actionSelected != null)
@@ -313,19 +315,19 @@ namespace ws.winx.editor
 						
 
 						///////////////         CREATE ASSET       ////////////////
-						if (GUILayout.Button ("Create Profiles Asset")) {
+						if (GUILayout.Button ("Create Assets/Resources/DeviceProfiles.asset")) {
 
-								if (!Directory.Exists (Path.Combine (Application.dataPath, "DeviceProfiles")))
-										AssetDatabase.CreateFolder ("Assets", "DeviceProfiles");
+								if (!Directory.Exists (Path.Combine (Application.dataPath, "Resources")))
+										AssetDatabase.CreateFolder ("Assets", "Resources");
 								
-								if (File.Exists (Path.Combine (Path.Combine (Application.dataPath, "DeviceProfiles"), "DeviceProfiles.asset"))) {
+								if (File.Exists (Path.Combine (Path.Combine (Application.dataPath, "Resources"), "DeviceProfiles.asset"))) {
 					
 										if (EditorUtility.DisplayDialog ("DeviceProfiles Asset Exists!",
 					                            "Are you sure you overwrite?", "Yes", "Cancel")) {
-												AssetDatabase.CreateAsset (ScriptableObject.CreateInstance<DeviceProfiles> (), "Assets/DeviceProfiles/DeviceProfiles.asset");
+												AssetDatabase.CreateAsset (ScriptableObject.CreateInstance<DeviceProfiles> (), "Assets/Resources/DeviceProfiles.asset");
 										}
 								} else {
-										AssetDatabase.CreateAsset (ScriptableObject.CreateInstance<DeviceProfiles> (), "Assets/DeviceProfiles/DeviceProfiles.asset");
+										AssetDatabase.CreateAsset (ScriptableObject.CreateInstance<DeviceProfiles> (), "Assets/Resources/DeviceProfiles.asset");
 								}
 				
 				

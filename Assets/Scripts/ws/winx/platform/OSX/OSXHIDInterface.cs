@@ -65,8 +65,8 @@ namespace ws.winx.platform.osx
 
 		private static readonly object syncRoot = new object();
 		private List<IDriver> __drivers;
-		private Dictionary<string,string> __profiles;
 
+		private DeviceProfiles __profiles;
 
 
         private IDriver __defaultJoystickDriver;
@@ -94,10 +94,10 @@ namespace ws.winx.platform.osx
 		public OSXHIDInterface()
 		{
 			__drivers = new List<IDriver>();
-			__profiles = new Dictionary<string,string> ();
+
 			__ports = new string[20];
 
-			
+
 			
 			HandleHIDDeviceAdded = HidDeviceAdded;
 			HandleHIDDeviceRemoved = HidDeviceRemoved;
@@ -137,7 +137,7 @@ namespace ws.winx.platform.osx
 			hidmanager = Native.IOHIDManagerCreate(IntPtr.Zero,(int)Native.IOHIDOptionsType.kIOHIDOptionsTypeNone);
 			
 			
-			LoadProfiles ("profiles.txt");
+
 			
 			
 			
@@ -147,52 +147,35 @@ namespace ws.winx.platform.osx
 
 #region IHIDInterface implementation
 
-		public void LoadProfiles (string fileName)
-		{
-			
-			string[] deviceNameProfilePair;
-			char splitChar='|';
 
-			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath,fileName))){
+		public void SetProfiles(DeviceProfiles profiles){
+
+			__profiles = profiles;
+		}
+
+		public void LoadProfiles(string fileName){
+
+			__profiles=Resources.Load<DeviceProfiles> ("DeviceProfiles");
+
+		}
+	
+
+		public DeviceProfile LoadProfile(string key){
+
+			DeviceProfile profile=null;
+
+			if (__profiles.vidpidProfileNameDict.ContainsKey (key)) {
+
+				string profileName=__profiles.vidpidProfileNameDict[key];
 
 
-				while(!reader.EndOfStream){
 
-					deviceNameProfilePair=reader.ReadLine().Split(splitChar);
-					__profiles[deviceNameProfilePair[0]]=deviceNameProfilePair[1];
+				if(__profiles.runtimePlatformDeviceProfileDict[profileName].ContainsKey(RuntimePlatform.OSXPlayer)){
+
+					profile=__profiles.runtimePlatformDeviceProfileDict[profileName][RuntimePlatform.OSXPlayer];
 				}
 
 			}
-
-		
-
-			
-		}
-
-		public DeviceProfile LoadProfile(string fileBase){
-
-			DeviceProfile profile=new DeviceProfile();
-
-
-
-			
-			profile.Name = fileBase;
-			char splitChar='|';
-			
-			using(StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileBase+"_osx.txt"))){
-				
-					if(!reader.EndOfStream)
-					profile.buttonNaming =reader.ReadLine().Split(splitChar);
-				
-					if(!reader.EndOfStream)
-					profile.axisNaming =reader.ReadLine().Split(splitChar);
-
-				//rest in future
-
-
-				
-			}
-
 			
 
 			return profile;
@@ -279,15 +262,6 @@ namespace ws.winx.platform.osx
 				__Generics [id].Write (data);
 		}
 
-
-
-
-
-		public Dictionary<string, string> Profiles {
-			get {
-				return __profiles;
-			}
-		}
 
 
 		public Dictionary<string, HIDDevice> Generics {

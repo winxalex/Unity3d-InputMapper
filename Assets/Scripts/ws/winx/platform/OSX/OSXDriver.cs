@@ -195,6 +195,8 @@ namespace ws.winx.platform.osx
 
 					buttonDetails=device.Buttons[buttonIndex];
 
+					if(buttonDetails==null) continue;
+
 					if ( buttonDetails.uid== uid) {
 
 						buttonDetails.value=value;
@@ -328,18 +330,14 @@ namespace ws.winx.platform.osx
 			int HIDElementType=Native.IOHIDElementGetTypeID();
 
 			//check for profile
-			DeviceProfile profile = null;
+			DeviceProfile profile = hidDevice.loadProfile();
 
 
 
-			String profileKey=hidDevice.hidInterface.defaultDriver is UnityDriver? hidDevice.Name : hidDevice.VID.ToString("X4")+"#"+hidDevice.PID.ToString("X4");
-						if (hidDevice.hidInterface.Profiles.ContainsKey(profileKey)) {
-							try{
-							profile = hidDevice.hidInterface.LoadProfile (hidDevice.hidInterface.Profiles [profileKey]);
-							}catch(Exception ex){
-								Debug.LogException(ex);
-							}
-						}
+
+					
+
+
 
 
 			IAxisDetails axisDetailsPovX=null;

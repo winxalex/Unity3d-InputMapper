@@ -150,7 +150,7 @@ namespace ws.winx.editor
 
 	
 				// Add menu named "Input Mapper" to the Window menu
-				[MenuItem ("Window/Input Mapper")]
+				[MenuItem ("Window/Input Mapper/Input Mapper")]
 				static void ShowEditor ()
 				{
 						//if (_stateInputCombinations != null && _stateInputCombinations.Count > 0)
@@ -164,6 +164,8 @@ namespace ws.winx.editor
 						// Get existing open window or if none, make a new one:
 						if (InputMapper._instance == null)
 						if (!Application.isPlaying) {
+
+								InputManager.hidInterface.SetProfiles(AssetDatabase.LoadAssetAtPath("Assets/Resources/DeviceProfiles.asset",typeof(DeviceProfiles)) as DeviceProfiles);
 								InputManager.hidInterface.Enumerate ();
 								__wereDevicesEnumerated = true;
 						}
@@ -811,8 +813,7 @@ namespace ws.winx.editor
 
 								EditorGUILayout.LabelField ("Profiles");
 
-
-
+								
 								List<IDevice> devices = InputManager.GetDevices<IDevice> ();
 
 								if (devices.Count > 0) {

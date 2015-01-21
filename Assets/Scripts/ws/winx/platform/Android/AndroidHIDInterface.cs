@@ -32,7 +32,7 @@ namespace ws.winx.platform.android
 		public event EventHandler<DeviceEventArgs<string>> DeviceDisconnectEvent;
 		public event EventHandler<DeviceEventArgs<IDevice>> DeviceConnectEvent;
 
-		private Dictionary<string, string> __profiles;
+		private DeviceProfiles __profiles;
 
 
         #endregion

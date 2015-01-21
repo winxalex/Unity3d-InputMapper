@@ -8,35 +8,37 @@ namespace ws.winx.devices
 		public class DeviceProfiles : ScriptableObject,ISerializationCallbackReceiver
 		{
 
-
+				//lists used for serialization of pidvidProfileNameDict
 				[HideInInspector]
-				public List<string> pidvidShortTypeNamesKeys;
-
+				public List<string>
+						vidpidProfileNameKeys;
 				[HideInInspector]
-				public List<string> pidvidShortTypeNamesValues;
+				public List<string>
+						vidpidProfileNameValues;
+				public Dictionary<string,string>  vidpidProfileNameDict = new Dictionary<string,string> ();
 
+				//lists used for serialization of runtimePlatformDeviceProfileDict
 				[HideInInspector]
-				public List<string> runtimePlatformDeviceProfileKeys;
-
-		[HideInInspector]
-		public List<RuntimePlatformListWrapper> runtimePlatfromKeys;
-
-		[HideInInspector]
-				public List<DeviceProfileListWrapper> deviceProfileValues;
-				public Dictionary<string,string>  pidvidShortTypeNames = new Dictionary<string,string> ();
+				public List<string>
+						runtimePlatformDeviceProfileKeys;
+				[HideInInspector]
+				public List<RuntimePlatformListWrapper>
+						runtimePlatfromKeys;
+				[HideInInspector]
+				public List<DeviceProfileListWrapper>
+						deviceProfileValues;
 				public Dictionary<string,Dictionary<RuntimePlatform,DeviceProfile>>  runtimePlatformDeviceProfileDict = new Dictionary<string,Dictionary<RuntimePlatform,DeviceProfile>> ();
-			
 				public DeviceProfile currentProfile;
 
 		#region ISerializationCallbackReceiver implementation
 				public void OnBeforeSerialize ()
 				{
 						
-						pidvidShortTypeNamesKeys.Clear ();
-						pidvidShortTypeNamesValues.Clear ();
-						foreach (var kvp in pidvidShortTypeNames) {
-								pidvidShortTypeNamesKeys.Add (kvp.Key);
-								pidvidShortTypeNamesValues.Add (kvp.Value);
+						vidpidProfileNameKeys.Clear ();
+						vidpidProfileNameValues.Clear ();
+						foreach (var kvp in vidpidProfileNameDict) {
+								vidpidProfileNameKeys.Add (kvp.Key);
+								vidpidProfileNameValues.Add (kvp.Value);
 						}
 
 						int i;
@@ -81,9 +83,10 @@ namespace ws.winx.devices
 				public void OnAfterDeserialize ()
 				{
 						int i, j;
-						pidvidShortTypeNames = new Dictionary<string,string> ();
-						for (i=0; i!= Math.Min(pidvidShortTypeNamesKeys.Count,pidvidShortTypeNamesValues.Count); i++)
-								pidvidShortTypeNames.Add (pidvidShortTypeNamesKeys [i], pidvidShortTypeNamesValues [i]);
+
+						vidpidProfileNameDict = new Dictionary<string,string> ();
+						for (i=0; i!= Math.Min(vidpidProfileNameKeys.Count,vidpidProfileNameValues.Count); i++)
+								vidpidProfileNameDict.Add (vidpidProfileNameKeys [i], vidpidProfileNameValues [i]);
 
 						runtimePlatformDeviceProfileDict = new Dictionary<string,Dictionary<RuntimePlatform,DeviceProfile>> ();
 						for (i=0; i<Math.Min(runtimePlatformDeviceProfileKeys.Count,Math.Min(runtimePlatfromKeys.Count,deviceProfileValues.Count)); i++) {

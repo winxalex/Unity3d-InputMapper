@@ -496,17 +496,8 @@ namespace ws.winx.drivers
 
 
 			//check for profile
-			DeviceProfile profile = null;
+			DeviceProfile profile = hidDevice.loadProfile();
 
-			//								if (hidDevice.hidInterface.Profiles.ContainsKey (hidDevice.Name)) {
-			//										
-			//											
-			//
-			//							
-			//												profile = hidDevice.hidInterface.LoadProfile (hidDevice.hidInterface.Profiles [hidDevice.Name]);
-			//									}
-
-				profile = hidDevice.hidInterface.LoadProfile ("xbox360");
 
            
 
