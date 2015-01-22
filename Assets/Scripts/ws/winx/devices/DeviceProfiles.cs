@@ -8,6 +8,8 @@ namespace ws.winx.devices
 		public class DeviceProfiles : ScriptableObject,ISerializationCallbackReceiver
 		{
 
+				public bool EditMode;
+
 				//lists used for serialization of pidvidProfileNameDict
 				[HideInInspector]
 				public List<string>
@@ -33,6 +35,9 @@ namespace ws.winx.devices
 		#region ISerializationCallbackReceiver implementation
 				public void OnBeforeSerialize ()
 				{
+
+						if (EditMode)
+								return;
 						
 						vidpidProfileNameKeys.Clear ();
 						vidpidProfileNameValues.Clear ();

@@ -18,12 +18,15 @@ namespace ws.winx.editor
 				static DeviceProfiling _instance;
 				static RuntimePlatform _platform;
 				static bool _nameGiveEdit;
+				static bool __wereDevicesEnumerated = false;
+	
 
 				//Device
 				static int _deviceDisplayIndex;
 				static string[] _displayOptions;
 				static IDevice _deviceSelected;
 				
+
 
 
 				//profiles
@@ -42,8 +45,10 @@ namespace ws.winx.editor
 
 						// Get existing open window or if none, make a new one:
 						if (_instance == null)
-						if (!Application.isPlaying) {
+						if (!Application.isPlaying && _profiles != null) {
+								InputManager.hidInterface.SetProfiles (_profiles);
 								InputManager.hidInterface.Enumerate ();
+								__wereDevicesEnumerated = true;
 								
 						}
 
@@ -57,6 +62,15 @@ namespace ws.winx.editor
 				/// </summary>
 				void Update ()
 				{
+
+
+
+						if (!Application.isPlaying && _profiles != null && !__wereDevicesEnumerated) {
+								InputManager.hidInterface.SetProfiles (_profiles);
+								InputManager.hidInterface.Enumerate ();
+								__wereDevicesEnumerated = true;
+							
+						}
 
 						InputAction actionCurrent;
 
@@ -111,17 +125,19 @@ namespace ws.winx.editor
 
 
 						///////////////      DEVICES      ///////////////
-						List<IDevice> devicesList = InputManager.GetDevices<IDevice> ();
+						if (_profiles != null) {
+								List<IDevice> devicesList = InputManager.GetDevices<IDevice> ();
 
-						if (devicesList.Count > 0) {
-								_displayOptions = devicesList.Select (item => item.Name).ToArray ();
+								if (devicesList.Count > 0) {
+										_displayOptions = devicesList.Select (item => item.Name).ToArray ();
 
-								_deviceDisplayIndex = EditorGUILayout.Popup ("Devices:", _deviceDisplayIndex, _displayOptions);
+										_deviceDisplayIndex = EditorGUILayout.Popup ("Devices:", _deviceDisplayIndex, _displayOptions);
 
-								_deviceSelected = devicesList [_deviceDisplayIndex];
-						} else {
+										_deviceSelected = devicesList [_deviceDisplayIndex];
+								} else {
 
-								EditorGUILayout.LabelField ("Devices: No attached devices");
+										EditorGUILayout.LabelField ("Devices: No attached devices");
+								}
 						}
 
 						
@@ -150,6 +166,92 @@ namespace ws.winx.editor
 								}
 
 								EditorGUILayout.EndHorizontal ();
+
+
+
+
+//				if(GUILayout.Button("Proifle2DeviceProfile")){
+//						char splitChar = '|';
+//
+//						string fileBase;
+//
+//						foreach(var kvp in _profiles.runtimePlatformDeviceProfileDict){
+//
+//						fileBase=kvp.Key;
+//
+//						DeviceProfile profile;
+//
+//						profile=kvp.Value[RuntimePlatform.WindowsPlayer]=new DeviceProfile();
+//						profile.Name=kvp.Key;
+//						
+//						using (StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileBase + "_win.txt")))
+//						{
+//							
+//							if (!reader.EndOfStream)
+//								profile.buttonNaming = reader.ReadLine().Split(splitChar);
+//							
+//							if (!reader.EndOfStream)
+//								profile.axisNaming = reader.ReadLine().Split(splitChar);
+//							
+//							//rest in future
+//							
+//							
+//							
+//						}
+//
+//						profile=kvp.Value[RuntimePlatform.OSXPlayer]=new DeviceProfile();
+//						profile.Name=kvp.Key;
+//
+//						using (StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, fileBase + "_osx.txt")))
+//						{
+//							
+//							if (!reader.EndOfStream)
+//								profile.buttonNaming = reader.ReadLine().Split(splitChar);
+//							
+//							if (!reader.EndOfStream)
+//								profile.axisNaming = reader.ReadLine().Split(splitChar);
+//							
+//							//rest in future
+//							
+//							
+//							
+//						}
+//
+//
+//					}
+//
+//					EditorUtility.SetDirty (_profiles);
+//					AssetDatabase.SaveAssets ();
+//
+//				}
+
+
+//								if (GUILayout.Button ("Profiles.txt2DeviceProfiles.asset")) {
+//										string[] deviceNameProfilePair;
+//										char splitChar = '|';
+//
+//										using (StreamReader reader = new StreamReader(Path.Combine(Application.streamingAssetsPath, "profiles.txt"))) {
+//					
+//					
+//												while (!reader.EndOfStream) {
+//						
+//														deviceNameProfilePair = reader.ReadLine ().Split (splitChar);
+//														if (!_profiles.vidpidProfileNameDict.ContainsKey (deviceNameProfilePair [0]))
+//																_profiles.vidpidProfileNameDict [deviceNameProfilePair [0]] = deviceNameProfilePair [1];
+//
+//														if (!_profiles.runtimePlatformDeviceProfileDict.ContainsKey (deviceNameProfilePair [1])) {
+//
+//																_profiles.runtimePlatformDeviceProfileDict [deviceNameProfilePair [1]] = new Dictionary<RuntimePlatform, DeviceProfile> ();
+//														}
+//												}
+//
+//												EditorUtility.SetDirty (_profiles);
+//												AssetDatabase.SaveAssets ();
+//					
+//										}
+//								}
+
+							
 						}
 						
 

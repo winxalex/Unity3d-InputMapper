@@ -12,7 +12,7 @@ namespace ws.winx.editor
 {
 		[CustomEditor(typeof(DeviceProfiles))]
 		[CanEditMultipleObjects]
-		public class DeviceProfileEditor : Editor
+		public class DeviceProfilesEditor : Editor
 		{
 				private DeviceProfiles __profiles; //Make an easy shortcut to the Dialogue your editing
 				
@@ -40,6 +40,10 @@ namespace ws.winx.editor
 		
 				public override void OnInspectorGUI ()
 				{
+
+
+
+					
 
 
 
