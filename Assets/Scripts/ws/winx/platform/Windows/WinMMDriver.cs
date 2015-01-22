@@ -57,10 +57,10 @@ namespace ws.winx.platform.windows
 			//Get jostick capabilities
 			Native.JoyCaps caps;
 			Native.JoystickError result = Native.JoystickError.InvalidParameters;
-			
-			
-			
-			DeviceProfile profile = hidDevice.loadProfile();
+
+
+
+            DeviceProfile profile;
 		
 
 			
@@ -89,6 +89,7 @@ namespace ws.winx.platform.windows
 					//!!! save ordNumber(I don't have still function that would return ordNum for WinMM from PID);
 					((GenericHIDDevice)hidDevice).ord = i;
 					
+                    profile=hidDevice.loadProfile();
 					
 					device = new JoystickDevice(hidDevice.index, hidDevice.PID, hidDevice.VID,hidDevice.ID, 8, caps.NumButtons, this);
 					device.Extension = new WinDefaultExtension();
