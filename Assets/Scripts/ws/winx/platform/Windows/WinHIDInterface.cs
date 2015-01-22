@@ -860,6 +860,12 @@ namespace ws.winx.platform.windows
 
             if (joyDevice == null)
             {//set default driver as resolver if no custom driver match device
+
+               // System.Threading.Thread.CurrentThread.n
+
+                //TODO Problem WinMM isn't ready
+               // System.Threading.Thread.Sleep(300);
+
                 joyDevice = defaultDriver.ResolveDevice(hidDevice);
 
 
@@ -893,7 +899,7 @@ namespace ws.winx.platform.windows
 
 
 
-            if (joyDevice != null) DeviceConnectEvent(this, new DeviceEventArgs<IDevice>(joyDevice));
+            if (joyDevice != null && DeviceConnectEvent!=null) DeviceConnectEvent(null, new DeviceEventArgs<IDevice>(joyDevice));
 
 
         }

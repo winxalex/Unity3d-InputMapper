@@ -58,7 +58,7 @@ namespace ws.winx.platform.windows
 			Native.JoyCaps caps;
 			Native.JoystickError result = Native.JoystickError.InvalidParameters;
 			
-			System.Threading.Thread.Sleep(100);
+			
 			
 			DeviceProfile profile = hidDevice.loadProfile();
 		

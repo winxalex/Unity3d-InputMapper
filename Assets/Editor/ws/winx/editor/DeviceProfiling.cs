@@ -16,27 +16,28 @@ namespace ws.winx.editor
 
 				
 				static DeviceProfiling _instance;
-				static RuntimePlatform _platform;
-				static bool _nameGiveEdit;
+				 RuntimePlatform _platform;
+				 bool _nameGiveEdit;
 				static bool __wereDevicesEnumerated = false;
 	
 
 				//Device
-				static int _deviceDisplayIndex;
-				static string[] _displayOptions;
-				static IDevice _deviceSelected;
+				 int _deviceDisplayIndex;
+				 string[] _displayOptions;
+				 IDevice _deviceSelected;
 				
 
 
 
 				//profiles
-				static DeviceProfiles _profiles;
-				static int _profileIndexSelected;
-				static string _profileName;
-				static string _axisButtonName;
-				static string _nameGiven;
-				static string _profileNameSelected;
-				static InputAction _actionSelected;
+				 static DeviceProfiles _profiles;
+				 int _profileIndexSelected;
+				 string _profileName;
+				 string _axisButtonName;
+				 string _nameGiven;
+				 string _profileNameSelected;
+				 InputAction _actionSelected;
+                 int _deviceCount;
 
 				// Add menu named "Input Mapper" to the Window menu
 				[MenuItem ("Window/Input Mapper/DeviceProfiling")]
@@ -101,7 +102,7 @@ namespace ws.winx.editor
 										_actionSelected = actionCurrent.Clone ();
 
 										//Debug.Log ("Action:" + _actionSelected + " " + _actionSelected.getCode (_deviceSelected) + " type:" + _actionSelected.type);
-										_instance.Repaint ();
+										this.Repaint ();
 										
 								}
 								
@@ -128,46 +129,63 @@ namespace ws.winx.editor
 						if (_profiles != null) {
 								List<IDevice> devicesList = InputManager.GetDevices<IDevice> ();
 
+                               
+
 								if (devicesList.Count > 0) {
 										_displayOptions = devicesList.Select (item => item.Name).ToArray ();
 
 										_deviceDisplayIndex = EditorGUILayout.Popup ("Devices:", _deviceDisplayIndex, _displayOptions);
 
 										_deviceSelected = devicesList [_deviceDisplayIndex];
+
+
+                                        if (!String.IsNullOrEmpty(_profileNameSelected))
+                                        {
+
+                                            EditorGUILayout.BeginHorizontal();
+                                            if (GUILayout.Button("Assign Profile"))
+                                            {
+
+                                                string pidVidKey = _deviceSelected.VID.ToString("X4") + "#" + _deviceSelected.PID.ToString("X4");
+                                                _profiles.vidpidProfileNameDict[pidVidKey] = _profileNameSelected;
+
+                                                EditorUtility.SetDirty(_profiles);
+                                                AssetDatabase.SaveAssets();
+                                            }
+
+                                            if (GUILayout.Button("Remove From Profile"))
+                                            {
+
+                                                string pidVidKey = _deviceSelected.VID.ToString("X4") + "#" + _deviceSelected.PID.ToString("X4");
+
+                                                _profiles.vidpidProfileNameDict.Remove(pidVidKey);
+
+                                                EditorUtility.SetDirty(_profiles);
+                                                AssetDatabase.SaveAssets();
+
+                                            }
+
+                                            EditorGUILayout.EndHorizontal();
+
+                                        }
+
+                                      
 								} else {
 
 										EditorGUILayout.LabelField ("Devices: No attached devices");
 								}
+
+
+
+                                if (_deviceCount != devicesList.Count)
+                                    this.Repaint();
+
+                                _deviceCount = devicesList.Count;
 						}
 
-						
-
-						if (_profiles != null && !String.IsNullOrEmpty (_profileNameSelected)) {
-
-								EditorGUILayout.BeginHorizontal ();
-								if (GUILayout.Button ("Assign Profile")) {
-				
-										string pidVidKey = _deviceSelected.VID.ToString ("X4") + "#" + _deviceSelected.PID.ToString ("X4");
-										_profiles.vidpidProfileNameDict [pidVidKey] = _profileNameSelected;
-
-										EditorUtility.SetDirty (_profiles);
-										AssetDatabase.SaveAssets ();
-								}
-
-								if (GUILayout.Button ("Remove From Profile")) {
-				
-										string pidVidKey = _deviceSelected.VID.ToString ("X4") + "#" + _deviceSelected.PID.ToString ("X4");
-
-										_profiles.vidpidProfileNameDict.Remove (pidVidKey);
-
-										EditorUtility.SetDirty (_profiles);
-										AssetDatabase.SaveAssets ();
-				
-								}
-
-								EditorGUILayout.EndHorizontal ();
 
 
+                     
 
 
 //				if(GUILayout.Button("Proifle2DeviceProfile")){
@@ -252,7 +270,7 @@ namespace ws.winx.editor
 //								}
 
 							
-						}
+						
 						
 
 						EditorGUILayout.Separator ();
@@ -354,10 +372,16 @@ namespace ws.winx.editor
 
 										///// GIVE NAME ////			
 										EditorGUILayout.BeginHorizontal ();
-										
-										if (String.IsNullOrEmpty (nameGivenCurrent))
-												nameGivenCurrent = "No Name [Click to Edit]";
 
+
+
+                                        if (String.IsNullOrEmpty(nameGivenCurrent))
+                                        {
+                                            nameGivenCurrent = "No Name [Click to Edit]";
+                                            _nameGiven = String.Empty;
+                                        }
+                                        else
+                                            _nameGiven = nameGivenCurrent;
 
 										if (_actionSelected != null)
 										if (!_nameGiveEdit
@@ -402,7 +426,7 @@ namespace ws.winx.editor
 
 														_nameGiveEdit = false;
 
-														_instance.Repaint ();
+														this.Repaint ();
 										
 												}
 
@@ -462,8 +486,8 @@ namespace ws.winx.editor
 				///////////////////     ON DESTROY     ////////////////
 				void OnDestroy ()
 				{
-			
-					
+
+                    __wereDevicesEnumerated = false;
 			
 						if (!Application.isPlaying) {
 				

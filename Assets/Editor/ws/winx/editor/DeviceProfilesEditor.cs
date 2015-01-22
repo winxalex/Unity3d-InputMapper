@@ -98,6 +98,9 @@ namespace ws.winx.editor
 														foreach (var key in pidVidMappingsToBeRemoved) {
 																__profiles.vidpidProfileNameDict.Remove (key);
 														}
+
+                                                        _profileNameSelected = String.Empty;
+                                                        _profileIndexSelected = 0;
 												}
 										}
 					

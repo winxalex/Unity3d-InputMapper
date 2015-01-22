@@ -140,7 +140,7 @@ namespace ws.winx.input
                 {
 
                     //remove asigned device from InputPlayer
-                    if (__settings != null && __settings.Players.Length > 0)
+                    if (__settings != null && __settings.Players!=null && __settings.Players.Length > 0)
                     {
 
                         IDevice device = InputEx.Devices[args.data];
