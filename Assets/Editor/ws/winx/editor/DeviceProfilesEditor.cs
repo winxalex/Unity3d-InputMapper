@@ -92,12 +92,17 @@ namespace ws.winx.editor
 														List<string> pidVidMappingsToBeRemoved = new List<string> ();
 							
 														foreach (var kvp in __profiles.vidpidProfileNameDict) {
+
+                                                                if(kvp.Value==_profileNameSelected)
 																pidVidMappingsToBeRemoved.Add (kvp.Key);
 														}
 							
 														foreach (var key in pidVidMappingsToBeRemoved) {
 																__profiles.vidpidProfileNameDict.Remove (key);
 														}
+
+                                                        _profileNameSelected = String.Empty;
+                                                        _profileIndexSelected = 0;
 												}
 										}
 					
