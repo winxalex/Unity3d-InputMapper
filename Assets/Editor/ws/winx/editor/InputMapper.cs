@@ -546,8 +546,8 @@ namespace ws.winx.editor
 
 				
 										for (j=0; j<numStates; j++) {
-
-												if (stateMachine.GetState (j).uniqueNameHash == key)
+                                           if(Animator.StringToHash(stateMachine.GetState(j).name)==key)
+												//if (stateMachine.GetState (j).uniqueNameHash == key)
 														return true;
 						
 
@@ -1050,8 +1050,8 @@ namespace ws.winx.editor
 				
 												for (j=0; j<numStates; j++) {
 														state = stateMachine.GetState (j);
-						
-														createInputStateGUI (state.name, state.uniqueNameHash);
+                                                        createInputStateGUI(state.name, Animator.StringToHash(state.name));
+														//createInputStateGUI (state.name, state.uniqueNameHash);
 							
 												}
 
