@@ -90,11 +90,11 @@ public class InputComponent : MonoBehaviour
 		//supporting devices with custom drivers
 		//When you add them add specialized first then XInputDriver  then wide range supporting drivers WinMM or OSXDriver
 		#if (UNITY_STANDALONE_WIN)
-		//InputManager.AddDriver(new ThrustMasterDriver());
+		InputManager.AddDriver(new ThrustMasterDriver());
 		//InputManager.AddDriver(new WiiDriver());
 		InputManager.AddDriver(new XInputDriver());
 		//change default driver
-		InputManager.hidInterface.defaultDriver=new UnityDriver();
+		//InputManager.hidInterface.defaultDriver=new UnityDriver();
 		#endif
 		#if (UNITY_STANDALONE_OSX)
 		InputManager.AddDriver(new ThrustMasterDriver());
@@ -286,5 +286,14 @@ public class InputComponent : MonoBehaviour
 
 
 		}
+
+
+        /// <summary>
+        /// DONT FORGET TO CLEAN AFTER YOURSELF
+        /// </summary>
+        void OnDestroy()
+        {
+            InputManager.Dispose();
+        }
 }
 }

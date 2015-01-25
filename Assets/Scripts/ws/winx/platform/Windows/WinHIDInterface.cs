@@ -93,9 +93,9 @@ namespace ws.winx.platform.windows
 				
 				
 				
-				if(__profiles.runtimePlatformDeviceProfileDict[profileName].ContainsKey(RuntimePlatform.OSXPlayer)){
+				if(__profiles.runtimePlatformDeviceProfileDict[profileName].ContainsKey(RuntimePlatform.WindowsPlayer)){
 					
-					profile=__profiles.runtimePlatformDeviceProfileDict[profileName][RuntimePlatform.OSXPlayer];
+					profile=__profiles.runtimePlatformDeviceProfileDict[profileName][RuntimePlatform.WindowsPlayer];
 				}
 				
 			}
@@ -865,8 +865,7 @@ namespace ws.winx.platform.windows
 
                // System.Threading.Thread.CurrentThread.n
 
-                //TODO Problem WinMM isn't ready right away
-                System.Threading.Thread.Sleep(500);
+     
 
                 joyDevice = defaultDriver.ResolveDevice(hidDevice);
 

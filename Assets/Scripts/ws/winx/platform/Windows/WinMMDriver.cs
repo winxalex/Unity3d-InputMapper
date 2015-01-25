@@ -61,8 +61,9 @@ namespace ws.winx.platform.windows
 
 
             DeviceProfile profile;
-		
 
+            //TODO Problem WinMM isn't ready right away
+            System.Threading.Thread.Sleep(500);
 			
 			int i;
 			for (i = 0; i < 16; i++)

@@ -20,14 +20,14 @@ namespace ws.winx.drivers
 								this.__hidInterface = hidDevice.hidInterface;
 
 								//check for profile
-								DeviceProfile profile = null;
+								DeviceProfile profile = hidDevice.loadProfile();;
 
 
 
 
 								JoystickDevice device = new ThrustmasterRGTFFDDevice (hidDevice.index, hidDevice.PID, hidDevice.VID, hidDevice.ID, 8, 10, this);
 								device.Name = hidDevice.Name;
-								device.profile = hidDevice.loadProfile();
+                                device.profile = profile;
 								//JoystickDevice joystick = new JoystickDevice(hidDevice.index, hidDevice.PID, hidDevice.VID, 8, 10, this);
 
                

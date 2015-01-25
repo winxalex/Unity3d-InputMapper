@@ -76,7 +76,7 @@ namespace ws.winx.input
         }
 
 
-     
+
 
 
 
@@ -140,7 +140,7 @@ namespace ws.winx.input
                 {
 
                     //remove asigned device from InputPlayer
-                    if (__settings != null && __settings.Players!=null && __settings.Players.Length > 0)
+                    if (__settings != null && __settings.Players != null && __settings.Players.Length > 0)
                     {
 
                         IDevice device = InputEx.Devices[args.data];
@@ -327,7 +327,7 @@ namespace ws.winx.input
         /// </param>
         /// <param name="player"></param>
         /// <param name="at">At.Valid:-1(next) or 0(primary) and 1(secondary)</param>
-        public static void MapStateToInput(String stateName,string codeCombination, InputPlayer.Player player = InputPlayer.Player.Player0,int at = -1)
+        public static void MapStateToInput(String stateName, string codeCombination, InputPlayer.Player player = InputPlayer.Player.Player0, int at = -1)
         {
 
             MapStateToInput(stateName, new InputCombination(codeCombination), player, at);
@@ -362,7 +362,7 @@ namespace ws.winx.input
         /// <param name="combos">Combos (ex. (int)KeyCode.P,(int)KeyCode.Joystick2Button12,JoystickDevice.toCode(...))</param>
         public static void MapStateToInput(String stateName, InputPlayer.Player player = InputPlayer.Player.Player0, params int[] combos)
         {
-            MapStateToInput(stateName, new InputCombination(combos),player);
+            MapStateToInput(stateName, new InputCombination(combos), player);
         }
 
 
@@ -374,7 +374,7 @@ namespace ws.winx.input
         /// <param name="combos">Combos (ex. (int)KeyCode.P,(int)KeyCode.Joystick2Button12,JoystickDevice.toCode(...))</param>
         public static void MapStateToInput(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0, params int[] combos)
         {
-            MapStateToInput(stateNameHash, new InputCombination(combos),player);
+            MapStateToInput(stateNameHash, new InputCombination(combos), player);
         }
 
 
@@ -386,7 +386,7 @@ namespace ws.winx.input
         /// <param name="combos">Combos (ex. KeyCodeExtension.Backspace.DOUBLE,KeyCodeExtesnion.Joystick1AxisYPositive.SINGLE)</param>
         public static void MapStateToInput(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0, params InputAction[] actions)
         {
-            MapStateToInput(stateNameHash, new InputCombination(actions),player);
+            MapStateToInput(stateNameHash, new InputCombination(actions), player);
         }
 
 
@@ -399,7 +399,7 @@ namespace ws.winx.input
         /// <param name="combos">Combos (ex. KeyCodeExtension.Backspace.DOUBLE,KeyCodeExtesnion.Joystick1AxisYPositive.SINGLE)</param>
         public static void MapStateToInput(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0, params InputAction[] actions)
         {
-            MapStateToInput(stateName, new InputCombination(actions),player);
+            MapStateToInput(stateName, new InputCombination(actions), player);
         }
 
 
@@ -490,17 +490,18 @@ namespace ws.winx.input
         public static bool HasInputState(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0)
         {
 
-            return isReady() && InputManager.HasInputState(Animator.StringToHash(stateName),player);
+            return isReady() && InputManager.HasInputState(Animator.StringToHash(stateName), player);
         }
 
 
-		public static void addEvents(InputEvent[] events,InputPlayer.Player player=InputPlayer.Player.Player0){
+        public static void addEvents(InputEvent[] events, InputPlayer.Player player = InputPlayer.Player.Player0)
+        {
 
-			int len = events.Length;
-				  
-			for (int i=0; i<len; i++)
-								__settings.Players [(int)player].AddEvent (events [i]);
-		}
+            int len = events.Length;
+
+            for (int i = 0; i < len; i++)
+                __settings.Players[(int)player].AddEvent(events[i]);
+        }
 
         /// <summary>
         /// 
@@ -522,41 +523,46 @@ namespace ws.winx.input
         /// </summary>
         internal static void dispatchEvent()
         {
-           
-			if (!isReady ())
-								return;
-			int numPlayers = __settings.Players.Length;
+
+            if (!isReady())
+                return;
+            int numPlayers = __settings.Players.Length;
 
 
-			Dictionary<int, InputEvent> stateEvents;
+            Dictionary<int, InputEvent> stateEvents;
 
 
-			for (int i=0; i<numPlayers; i++) {
-				stateEvents= __settings.Players[i].stateEvents;
+            for (int i = 0; i < numPlayers; i++)
+            {
+                stateEvents = __settings.Players[i].stateEvents;
 
-								if (stateEvents != null)
-										foreach (var stateInputEventsPair in stateEvents) {
-										
-														if (InputManager.GetInputHold (stateInputEventsPair.Key,i)) {
-															stateInputEventsPair.Value.onHOLD.Invoke();
-														}
+                if (stateEvents != null)
+                    foreach (var stateInputEventsPair in stateEvents)
+                    {
 
-															if (InputManager.GetInputDown (stateInputEventsPair.Key,i)) {
-																stateInputEventsPair.Value.onDOWN.Invoke();
-															}
+                        if (InputManager.GetInputHold(stateInputEventsPair.Key, i))
+                        {
+                            stateInputEventsPair.Value.onHOLD.Invoke();
+                        }
 
-															if (InputManager.GetInputUp (stateInputEventsPair.Key,i)) {
-																stateInputEventsPair.Value.onUP.Invoke();
-															}
-	
+                        if (InputManager.GetInputDown(stateInputEventsPair.Key, i))
+                        {
+                            stateInputEventsPair.Value.onDOWN.Invoke();
+                        }
 
-										}
-						}
+                        if (InputManager.GetInputUp(stateInputEventsPair.Key, i))
+                        {
+                            stateInputEventsPair.Value.onUP.Invoke();
+                        }
+
+
+                    }
+            }
         }
 
 
 
-     
+
 
 
 
@@ -571,17 +577,19 @@ namespace ws.winx.input
 
 
 #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
-		public static InputSettings loadSettingsFromBin(String path){
-			
-			
-			using (Stream stream = new FileStream(path,FileMode.Open,FileAccess.Read)) {
-				BinaryFormatter bf=new BinaryFormatter();
-				__settings = (InputManager.InputSettings)bf.Deserialize (stream);
-				stream.Close ();
-			}
-			
-			return __settings;
-		}
+        public static InputSettings loadSettingsFromBin(String path)
+        {
+
+
+            using (Stream stream = new FileStream(path, FileMode.Open, FileAccess.Read))
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                __settings = (InputManager.InputSettings)bf.Deserialize(stream);
+                stream.Close();
+            }
+
+            return __settings;
+        }
 
 
 
@@ -593,20 +601,23 @@ namespace ws.winx.input
         public static InputSettings loadSettings(String path = "InputSettings.xml")
         {
 
-			if (!File.Exists (path)) {
-				UnityEngine.Debug.LogError("File Not found "+path);
-				//return null;
-			}
+            if (!File.Exists(path))
+            {
+                UnityEngine.Debug.LogError("File Not found " + path);
+                //return null;
+            }
 
-			if (Path.GetExtension (path) != ".xml" && Path.GetExtension (path) != ".bin") {
-								throw new Exception ("Not supported file type. Please use XML or BIN");
-				//return null;
-			}
+            if (Path.GetExtension(path) != ".xml" && Path.GetExtension(path) != ".bin")
+            {
+                throw new Exception("Not supported file type. Please use XML or BIN");
+                //return null;
+            }
 
-			if (Path.GetExtension (path) == ".bin") {
-				return	loadSettingsFromBin(path);
+            if (Path.GetExtension(path) == ".bin")
+            {
+                return loadSettingsFromBin(path);
 
-			}
+            }
 
 
             XmlReaderSettings xmlSettings = new XmlReaderSettings();
@@ -659,46 +670,47 @@ namespace ws.winx.input
 #endif
 
 
-		/// <summary>
-		/// Loads the settings from XML text.
-		/// </summary>
-		/// <returns>The settings from XML text.</returns>
-		/// <param name="path">Path.</param>
-		/// <param name="readBOM">If set to <c>true</c> read BO.</param>
-		public static InputSettings loadSettingsFromXMLText(string path, bool readBOM = true)
-		{
-			XmlReaderSettings xmlSettings = new XmlReaderSettings();
-			xmlSettings.CloseInput = true;
-			xmlSettings.IgnoreWhitespace = true;
-		
-			
-		
-			
-			using (XmlReader reader = XmlReader.Create(path, xmlSettings)) {
-				
-				if (readBOM)
-					reader.Read();//skip BOM
+        /// <summary>
+        /// Loads the settings from XML text.
+        /// </summary>
+        /// <returns>The settings from XML text.</returns>
+        /// <param name="path">Path.</param>
+        /// <param name="readBOM">If set to <c>true</c> read BO.</param>
+        public static InputSettings loadSettingsFromXMLText(string path, bool readBOM = true)
+        {
+            XmlReaderSettings xmlSettings = new XmlReaderSettings();
+            xmlSettings.CloseInput = true;
+            xmlSettings.IgnoreWhitespace = true;
 
 
-				
-				readSettings(reader);
-				
-
-				
-
-				
-			}// UnityEngine.Debug.Log("end reader");
-
-			return __settings;
-		}
 
 
-		/// <summary>
-		/// Loads the settings from text.
-		/// </summary>
-		/// <returns>The settings from text.</returns>
-		/// <param name="text">Text.</param>
-		/// <param name="readBOM">If set to <c>true</c> read BO.</param>
+            using (XmlReader reader = XmlReader.Create(path, xmlSettings))
+            {
+
+                if (readBOM)
+                    reader.Read();//skip BOM
+
+
+
+                readSettings(reader);
+
+
+
+
+
+            }// UnityEngine.Debug.Log("end reader");
+
+            return __settings;
+        }
+
+
+        /// <summary>
+        /// Loads the settings from text.
+        /// </summary>
+        /// <returns>The settings from text.</returns>
+        /// <param name="text">Text.</param>
+        /// <param name="readBOM">If set to <c>true</c> read BO.</param>
         public static InputSettings loadSettingsFromText(string text, bool readBOM = true)
         {
             XmlReaderSettings xmlSettings = new XmlReaderSettings();
@@ -707,23 +719,24 @@ namespace ws.winx.input
             StringReader stringReader = new StringReader(text);
 
             if (readBOM)
-              stringReader.Read();//skip BOM
+                stringReader.Read();//skip BOM
 
-            using (XmlReader reader = XmlReader.Create(stringReader, xmlSettings)) {
+            using (XmlReader reader = XmlReader.Create(stringReader, xmlSettings))
+            {
 
 
-								__settings = new InputSettings ();
+                __settings = new InputSettings();
 
-								readSettings(reader);
+                readSettings(reader);
 
-								stringReader.Close ();
+                stringReader.Close();
 
-								
 
-			}// UnityEngine.Debug.Log("end reader");
 
-			return __settings;
-}
+            }// UnityEngine.Debug.Log("end reader");
+
+            return __settings;
+        }
 
 
 
@@ -754,187 +767,202 @@ namespace ws.winx.input
 #endif
 
 
-		internal static void readSettings(XmlReader reader){
+        internal static void readSettings(XmlReader reader)
+        {
 
-			__settings = new InputSettings ();
+            __settings = new InputSettings();
 
-			int key;
-			
-			InputAction action;
-			List<InputAction> actions = null;
-			InputCombination[] combinations = null;
-			string name;
-			InputState state;
-			int i;
-			List<InputPlayer> playerList;
-			InputPlayer player;
-			string profileKey;
-			Dictionary<int,InputState> stateInputs;
-			//XmlNameTable nameTable = reader.NameTable;
-			//XmlNamespaceManager nsManager = new XmlNamespaceManager(nameTable);
-			//nsManager.AddNamespace("d1p1", "http://schemas.datacontract.org/2004/07/ws.winx.input");
-			
-			reader.ReadToFollowing ("d1p1:doubleDesignator");
-			__settings.doubleDesignator = reader.ReadElementContentAsString ();
-			
-			
-			__settings.longDesignator = reader.ReadElementContentAsString ();
-			
-			
-			__settings.spaceDesignator = reader.ReadElementContentAsString ();
-			
-			
-			
-			
-			__settings.singleClickSensitivity = reader.ReadElementContentAsFloat ();
-			
-			
-			__settings.doubleClickSensitivity = reader.ReadElementContentAsFloat ();
-			
-			
-			__settings.longClickSensitivity = reader.ReadElementContentAsFloat ();
-			
-			
-			__settings.combinationsClickSensitivity = reader.ReadElementContentAsFloat ();
-			
-			
-			
-			
-			
-			
-			if (reader.ReadToFollowing ("d1p1:InputPlayer")) {
-				
-				playerList = new List<InputPlayer> ();
-				
-				do {
-					
-					player = new InputPlayer ();
-					
-					playerList.Add (player);
-					
-					
-					if (reader.ReadToFollowing ("d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState")) {
-						
-						
-						do {
-							reader.ReadToDescendant ("d4p1:Key");
-							
-							profileKey = reader.ReadElementContentAsString ();
-							
-							
-							
-							if (reader.ReadToFollowing ("d4p1:KeyValueOfintInputState")) {
-								
-								stateInputs=new Dictionary<int, InputState>();
-								
-								do {
-									
-									
-									
-									
-									reader.ReadToDescendant ("d4p1:Key");
-									
-									key = reader.ReadElementContentAsInt ();
-									
-									
-									
-									
-									if (reader.ReadToFollowing ("d1p1:InputCombination")) {
-										
-										combinations = new InputCombination[2];
-										i = 0;
-										
-										do {
-											if (reader.GetAttribute ("i:nil") == null) {
-												
-												
-												if (reader.ReadToDescendant ("d1p1:InputAction")) {
-													actions = new List<InputAction> ();
-													
-													do {
-														reader.ReadToDescendant ("d1p1:Code");
-														
-														action = new InputAction (reader.ReadElementContentAsString ());
-														
-														actions.Add (action);
-														
-													} while (reader.ReadToNextSibling("d1p1:InputAction"));
-													
-													
-												}
-												
-												
-												
-												
-												combinations [i++] = new InputCombination (actions);
-												
-												reader.Read ();//read </InputCombination>
-												
-											}
-											
-											
-											
-										} while (reader.ReadToNextSibling("d1p1:InputCombination"));
-										
-										
-										
-									}
-									
-									reader.ReadToFollowing ("d1p1:Name");
-									name = reader.ReadElementContentAsString ();
-									state = new InputState (name, key);
-									state.combinations = combinations;
-									
-									
-									//Shound be extended to multiplayer expansion
-									stateInputs[key] = state;
-									
-									
-									reader.Read ();//</d4p1:KeyValueOfintInputState>
-									
-								} while (reader.ReadToNextSibling("d4p1:KeyValueOfintInputState"));
-								
-								player.DeviceProfileStateInputs [profileKey] = stateInputs;
-								
-							}//
-							
-							
-							
-							
-							reader.Read ();//</d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
-							
-						} while(reader.ReadToNextSibling("d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState"));
-						
-						
-						
-					}
-					
-					if (reader.ReadToFollowing ("d1p1:_deviceID") && reader.GetAttribute ("i:nil") == null) {
-						player.DeviceID = reader.ReadElementContentAsString ();
-					}
-					
-					if (reader.ReadToFollowing ("d1p1:Name") && reader.GetAttribute ("i:nil") == null) {
-						player.Name = reader.ReadElementContentAsString ();
-					}else
-						
-						
-						
-						reader.Read ();//</d1p1:InputPlayer>
-					
-				} while(reader.ReadToNextSibling("d1p1:InputPlayer"));
-				
-				
-				__settings.Players = playerList.ToArray ();
-			}
+            int key;
+
+            InputAction action;
+            List<InputAction> actions = null;
+            InputCombination[] combinations = null;
+            string name;
+            InputState state;
+            int i;
+            List<InputPlayer> playerList;
+            InputPlayer player;
+            string profileKey;
+            Dictionary<int, InputState> stateInputs;
+            //XmlNameTable nameTable = reader.NameTable;
+            //XmlNamespaceManager nsManager = new XmlNamespaceManager(nameTable);
+            //nsManager.AddNamespace("d1p1", "http://schemas.datacontract.org/2004/07/ws.winx.input");
+
+            reader.ReadToFollowing("d1p1:doubleDesignator");
+            __settings.doubleDesignator = reader.ReadElementContentAsString();
 
 
-		}
+            __settings.longDesignator = reader.ReadElementContentAsString();
+
+
+            __settings.spaceDesignator = reader.ReadElementContentAsString();
+
+
+
+
+            __settings.singleClickSensitivity = reader.ReadElementContentAsFloat();
+
+
+            __settings.doubleClickSensitivity = reader.ReadElementContentAsFloat();
+
+
+            __settings.longClickSensitivity = reader.ReadElementContentAsFloat();
+
+
+            __settings.combinationsClickSensitivity = reader.ReadElementContentAsFloat();
+
+
+
+
+
+
+            if (reader.ReadToFollowing("d1p1:InputPlayer"))
+            {
+
+                playerList = new List<InputPlayer>();
+
+                do
+                {
+
+                    player = new InputPlayer();
+
+                    playerList.Add(player);
+
+
+                    if (reader.ReadToFollowing("d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState"))
+                    {
+
+
+                        do
+                        {
+                            reader.ReadToDescendant("d4p1:Key");
+
+                            profileKey = reader.ReadElementContentAsString();
+
+
+
+                            if (reader.ReadToFollowing("d4p1:KeyValueOfintInputState"))
+                            {
+
+                                stateInputs = new Dictionary<int, InputState>();
+
+                                do
+                                {
+
+
+
+
+                                    reader.ReadToDescendant("d4p1:Key");
+
+                                    key = reader.ReadElementContentAsInt();
+
+
+
+
+                                    if (reader.ReadToFollowing("d1p1:InputCombination"))
+                                    {
+
+                                        combinations = new InputCombination[2];
+                                        i = 0;
+
+                                        do
+                                        {
+                                            if (reader.GetAttribute("i:nil") == null)
+                                            {
+
+
+                                                if (reader.ReadToDescendant("d1p1:InputAction"))
+                                                {
+                                                    actions = new List<InputAction>();
+
+                                                    do
+                                                    {
+                                                        reader.ReadToDescendant("d1p1:Code");
+
+                                                        action = new InputAction(reader.ReadElementContentAsString());
+
+                                                        actions.Add(action);
+
+                                                    } while (reader.ReadToNextSibling("d1p1:InputAction"));
+
+
+                                                }
+
+
+
+
+                                                combinations[i++] = new InputCombination(actions);
+
+                                                reader.Read();//read </InputCombination>
+
+                                            }
+
+
+
+                                        } while (reader.ReadToNextSibling("d1p1:InputCombination"));
+
+
+
+                                    }
+
+                                    reader.ReadToFollowing("d1p1:Name");
+                                    name = reader.ReadElementContentAsString();
+                                    state = new InputState(name, key);
+                                    state.combinations = combinations;
+
+
+                                    //Shound be extended to multiplayer expansion
+                                    stateInputs[key] = state;
+
+
+                                    reader.Read();//</d4p1:KeyValueOfintInputState>
+
+                                } while (reader.ReadToNextSibling("d4p1:KeyValueOfintInputState"));
+
+                                player.DeviceProfileStateInputs[profileKey] = stateInputs;
+
+                            }//
+
+
+
+
+                            reader.Read();//</d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>
+
+                        } while (reader.ReadToNextSibling("d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState"));
+
+
+
+                    }
+
+                    if (reader.ReadToFollowing("d1p1:_deviceID") && reader.GetAttribute("i:nil") == null)
+                    {
+                        player.DeviceID = reader.ReadElementContentAsString();
+                    }
+
+                    if (reader.ReadToFollowing("d1p1:Name") && reader.GetAttribute("i:nil") == null)
+                    {
+                        player.Name = reader.ReadElementContentAsString();
+                    }
+                    else
+
+
+
+                        reader.Read();//</d1p1:InputPlayer>
+
+                } while (reader.ReadToNextSibling("d1p1:InputPlayer"));
+
+
+                __settings.Players = playerList.ToArray();
+            }
+
+
+        }
 
         public static string formatOutput()
         {
 
 
-           
+
 
 
             string HEADFORMAT = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
@@ -946,45 +974,45 @@ namespace ws.winx.input
     " <d1p1:doubleClickSensitivity>{4}</d1p1:doubleClickSensitivity>" +
    "  <d1p1:longClickSensitivity>{5}</d1p1:longClickSensitivity>" +
    "  <d1p1:combinationsClickSensitivity>{6}</d1p1:combinationsClickSensitivity>" +
-	"<d1p1:Players>" +
+    "<d1p1:Players>" +
 
     " {7}" +
-					"</d1p1:Players>" +
+                    "</d1p1:Players>" +
    "</Inputs>";
 
-			string EMPTY_TAG_FORMAT = "<d1p1:{0} i:nil=\"true\" />";
-			string TAG_FORMAT = "<d1p1:{0}>{1}<d1p1:{0}/>";
-		    
+            string EMPTY_TAG_FORMAT = "<d1p1:{0} i:nil=\"true\" />";
+            string TAG_FORMAT = "<d1p1:{0}>{1}<d1p1:{0}/>";
 
-			string PROFILEFORMAT =
-								 "<d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>"
-								+ "<d4p1:Key>{0}</d4p1:Key>"
-								+ "<d4p1:Value>"
-								+ "{1}</d4p1:Value>"
-					+ "</d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>";
-								
-									
-			string DEVICE_STATES_INPUTS_FORMAT=
-				"<d1p1:_DeviceStateInputs xmlns:d4p1=\"http://schemas.microsoft.com/2003/10/Serialization/Arrays\">"+
-				"{0}"+
-					"</d1p1:_DeviceStateInputs>";
 
-					string INPUTPLAYER =
-					"<d1p1:InputPlayer>" +
-					"{0}"+
-					"</d1p1:InputPlayer>";
+            string PROFILEFORMAT =
+                                 "<d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>"
+                                + "<d4p1:Key>{0}</d4p1:Key>"
+                                + "<d4p1:Value>"
+                                + "{1}</d4p1:Value>"
+                    + "</d4p1:KeyValueOfstringArrayOfKeyValuePairOfintInputState>";
+
+
+            string DEVICE_STATES_INPUTS_FORMAT =
+                "<d1p1:_DeviceStateInputs xmlns:d4p1=\"http://schemas.microsoft.com/2003/10/Serialization/Arrays\">" +
+                "{0}" +
+                    "</d1p1:_DeviceStateInputs>";
+
+            string INPUTPLAYER =
+            "<d1p1:InputPlayer>" +
+            "{0}" +
+            "</d1p1:InputPlayer>";
 
             string STATEFORMAT = " <d4p1:KeyValueOfintInputState>" +
-									" <d4p1:Key>{0}</d4p1:Key>" +
-							      " <d4p1:Value>" +
-							       "  <d1p1:Hash>{0}</d1p1:Hash>" +
-							        " <d1p1:InputCombinations>" +
-							           " {1}" +
+                                    " <d4p1:Key>{0}</d4p1:Key>" +
+                                  " <d4p1:Value>" +
+                                   "  <d1p1:Hash>{0}</d1p1:Hash>" +
+                                    " <d1p1:InputCombinations>" +
+                                       " {1}" +
 
-							        " </d1p1:InputCombinations>" +
-							       "  <d1p1:Name>{2}</d1p1:Name>" +
-							      " </d4p1:Value>" +
-							     "</d4p1:KeyValueOfintInputState>";
+                                    " </d1p1:InputCombinations>" +
+                                   "  <d1p1:Name>{2}</d1p1:Name>" +
+                                  " </d4p1:Value>" +
+                                 "</d4p1:KeyValueOfintInputState>";
 
 
             string COMBINATIONFORMAT =
@@ -1000,7 +1028,7 @@ namespace ws.winx.input
                    "       </d1p1:InputAction>";
             string actionsString;
 
-           
+
             Dictionary<int, InputState> stateInputs;// = InputManager.Settings.stateInputs;
             InputCombination[] combinations;
             InputCombination combination;
@@ -1008,81 +1036,94 @@ namespace ws.winx.input
             int key;
             StringBuilder statesSB = new StringBuilder(10000);
             StringBuilder combinationSB = new StringBuilder(100);
-			StringBuilder profilesSB = new StringBuilder(100000);
-			StringBuilder playersSB = new StringBuilder(100000);
+            StringBuilder profilesSB = new StringBuilder(100000);
+            StringBuilder playersSB = new StringBuilder(100000);
 
-			int numPlayers = __settings.Players.Length;
-			InputPlayer player;
-			for (int playerInx=0; playerInx<numPlayers; playerInx++) {
+            int numPlayers = __settings.Players.Length;
+            InputPlayer player;
+            for (int playerInx = 0; playerInx < numPlayers; playerInx++)
+            {
 
-						player = __settings.Players [playerInx];
+                player = __settings.Players[playerInx];
 
-						profilesSB.Length=0;
+                profilesSB.Length = 0;
 
-						foreach (KeyValuePair<string, Dictionary<int,InputState>> profileStateInput in player.DeviceProfileStateInputs) {
+                foreach (KeyValuePair<string, Dictionary<int, InputState>> profileStateInput in player.DeviceProfileStateInputs)
+                {
 
-								stateInputs = profileStateInput.Value;
+                    stateInputs = profileStateInput.Value;
 
-								statesSB.Length=0;
+                    statesSB.Length = 0;
 
-								foreach (KeyValuePair<int, InputState> stateInput in stateInputs) {
-										key = stateInput.Key;
-										combinations = stateInput.Value.combinations;
+                    foreach (KeyValuePair<int, InputState> stateInput in stateInputs)
+                    {
+                        key = stateInput.Key;
+                        combinations = stateInput.Value.combinations;
 
-										combinationSB.Length = 0;
-
-
-										if ((combination = combinations [0]) != null) {
-												actionsString = "";
-
-												foreach (InputAction action in combination.actionsList) {
-														actionsString += String.Format (ACTIONFORMAT, action.ToString ());
-												}
-
-												combinationSB.AppendFormat (COMBINATIONFORMAT, actionsString);
-										}
-
-										if ((combination = combinations [1]) != null) {
-												actionsString = "";
-												foreach (InputAction action in combination.actionsList) {
-														actionsString += String.Format (ACTIONFORMAT, action.ToString ());
-												}
-
-												combinationSB.AppendFormat (COMBINATIONFORMAT, actionsString);
-										}
+                        combinationSB.Length = 0;
 
 
-										statesSB.AppendFormat (STATEFORMAT, key, combinationSB.ToString (), stateInput.Value.name);
+                        if ((combination = combinations[0]) != null)
+                        {
+                            actionsString = "";
 
-										
-								}//StateInputs
+                            foreach (InputAction action in combination.actionsList)
+                            {
+                                actionsString += String.Format(ACTIONFORMAT, action.ToString());
+                            }
 
-					profilesSB.AppendFormat(PROFILEFORMAT,profileStateInput.Key,statesSB.ToString());	
+                            combinationSB.AppendFormat(COMBINATIONFORMAT, actionsString);
+                        }
 
-						}//DeviceProfileStateInputs
+                        if ((combination = combinations[1]) != null)
+                        {
+                            actionsString = "";
+                            foreach (InputAction action in combination.actionsList)
+                            {
+                                actionsString += String.Format(ACTIONFORMAT, action.ToString());
+                            }
 
-							statesSB.Length=0;
-							statesSB.AppendFormat(DEVICE_STATES_INPUTS_FORMAT,profilesSB.ToString());
+                            combinationSB.AppendFormat(COMBINATIONFORMAT, actionsString);
+                        }
 
-							if(!String.IsNullOrEmpty(player.DeviceID)){
-								statesSB.AppendFormat(TAG_FORMAT,"_deviceID",player.DeviceID);
-							}else{
-								statesSB.AppendFormat(EMPTY_TAG_FORMAT,"_deviceID");
-							}
 
-							if(!String.IsNullOrEmpty(player.Name)){
-								statesSB.AppendFormat(TAG_FORMAT,"Name",player.Name);
-							}else{
-								statesSB.AppendFormat(EMPTY_TAG_FORMAT,"Name");
-							}
+                        statesSB.AppendFormat(STATEFORMAT, key, combinationSB.ToString(), stateInput.Value.name);
 
-								playersSB.AppendFormat(INPUTPLAYER,statesSB.ToString());
 
-							
+                    }//StateInputs
 
-				}//players
+                    profilesSB.AppendFormat(PROFILEFORMAT, profileStateInput.Key, statesSB.ToString());
 
-        
+                }//DeviceProfileStateInputs
+
+                statesSB.Length = 0;
+                statesSB.AppendFormat(DEVICE_STATES_INPUTS_FORMAT, profilesSB.ToString());
+
+                if (!String.IsNullOrEmpty(player.DeviceID))
+                {
+                    statesSB.AppendFormat(TAG_FORMAT, "_deviceID", player.DeviceID);
+                }
+                else
+                {
+                    statesSB.AppendFormat(EMPTY_TAG_FORMAT, "_deviceID");
+                }
+
+                if (!String.IsNullOrEmpty(player.Name))
+                {
+                    statesSB.AppendFormat(TAG_FORMAT, "Name", player.Name);
+                }
+                else
+                {
+                    statesSB.AppendFormat(EMPTY_TAG_FORMAT, "Name");
+                }
+
+                playersSB.AppendFormat(INPUTPLAYER, statesSB.ToString());
+
+
+
+            }//players
+
+
             return String.Format(HEADFORMAT, __settings.doubleDesignator, __settings.longDesignator, __settings.spaceDesignator, __settings.singleClickSensitivity, __settings.doubleClickSensitivity, __settings.longClickSensitivity, __settings.combinationsClickSensitivity,
                                 playersSB.ToString());
         }
@@ -1118,28 +1159,29 @@ namespace ws.winx.input
        }
 #endif
 
-		internal static void saveSettingsBin(String path)
-		{
-			using (FileStream ms = new FileStream(path,FileMode.Create,FileAccess.Write))
-						{
-							var bin = new BinaryFormatter();
-							bin.Serialize(ms, __settings);
-							ms.Flush();
-							ms.Close();
-						} 
-		}
-			
-			#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID)&& !UNITY_WEBPLAYER
+        internal static void saveSettingsBin(String path)
+        {
+            using (FileStream ms = new FileStream(path, FileMode.Create, FileAccess.Write))
+            {
+                var bin = new BinaryFormatter();
+                bin.Serialize(ms, __settings);
+                ms.Flush();
+                ms.Close();
+            }
+        }
+
+#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID)&& !UNITY_WEBPLAYER
         /// <summary>
         /// Saves the settings to InputSettings.xml.
         /// </summary>
         public static void saveSettings(String path)
         {
-			if (Path.GetExtension(path)==".bin") {
-					saveSettingsBin (path);
-				return;
+            if (Path.GetExtension(path) == ".bin")
+            {
+                saveSettingsBin(path);
+                return;
 
-			}
+            }
 
 
 
@@ -1228,31 +1270,31 @@ namespace ws.winx.input
 
             IDevice device = __settings.Players[(int)player].Device;
 
-            return Mathf.Clamp(__inputCombinations[0].GetInputGenerated(device,sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetInputGenerated(device,sensitivity, dreadzone, gravity) : 0),-1f,1f);
+            return Mathf.Clamp(__inputCombinations[0].GetInputGenerated(device, sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetInputGenerated(device, sensitivity, dreadzone, gravity) : 0), -1f, 1f);
 
         }
 
-		/// <summary>
-		/// Gets the input.
-		/// </summary>
-		/// <returns>The input.</returns>
-		/// <param name="stateName">State name.</param>
-		/// <param name="player">Player.</param>
-		/// <param name="sensitivity">Sensitivity.</param>
-		/// <param name="dreadzone">Dreadzone.</param>
-		/// <param name="gravity">Gravity.</param>
-		public static float GetInput(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0, float sensitivity = 0.1f, float dreadzone = 0.1f, float gravity = 0.3f)
-		{
-			return GetInput (Animator.StringToHash (stateName), player, sensitivity, dreadzone, gravity);
-		}
-			
-			
-			
-		/// <summary>
+        /// <summary>
+        /// Gets the input.
+        /// </summary>
+        /// <returns>The input.</returns>
+        /// <param name="stateName">State name.</param>
+        /// <param name="player">Player.</param>
+        /// <param name="sensitivity">Sensitivity.</param>
+        /// <param name="dreadzone">Dreadzone.</param>
+        /// <param name="gravity">Gravity.</param>
+        public static float GetInput(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0, float sensitivity = 0.1f, float dreadzone = 0.1f, float gravity = 0.3f)
+        {
+            return GetInput(Animator.StringToHash(stateName), player, sensitivity, dreadzone, gravity);
+        }
+
+
+
+        /// <summary>
         /// Gets the input of device(hardware)
         /// if device's input mapped is digital would return -1f to 1f generic values emulating analog hardware 
         /// if device's input mapped is analog would return 0f to 1f(positive axis) or 0f to -1f(negative axis) 
-		/// full axis -1f to 1f
+        /// full axis -1f to 1f
         /// </summary>
         /// <param name="stateNameHash">State name hash.</param>
         /// <param name="player"></param>
@@ -1269,91 +1311,92 @@ namespace ws.winx.input
 
             IDevice device = __settings.Players[(int)player].Device;
 
-            return Mathf.Clamp(__inputCombinations[0].GetAnalogValue(device,sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetAnalogValue(device,sensitivity, dreadzone, gravity) : 0f), -1f, 1f);
+            return Mathf.Clamp(__inputCombinations[0].GetAnalogValue(device, sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetAnalogValue(device, sensitivity, dreadzone, gravity) : 0f), -1f, 1f);
 
         }
 
-		/// <summary>
-		/// [Use for testing as string to hash is slow operat
-		/// Gets the input of device(hardware)
-		/// if device's input mapped is digital would return -1f to 1f generic values emulating analog hardware 
-		/// if device's input mapped is analog would return 0f to 1f(positive axis) or 0f to -1f(negative axis) 
-		/// full axis -1f to 1f
-		/// </summary>
-		/// <returns>The input raw.</returns>
-		/// <param name="stateNameHash">State name hash.</param>
-		/// <param name="player">Player.</param>
-		/// <param name="sensitivity">Sensitivity.</param>
-		/// <param name="dreadzone">Dreadzone.</param>
-		/// <param name="gravity">Gravity.</param>
-		public static float GetInputRaw(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0, float sensitivity = 0.1f, float dreadzone = 0.1f, float gravity = 0.3f)
-		{
-			return GetInputRaw (Animator.StringToHash (stateName), player, sensitivity, dreadzone, gravity);
-		}
-			
-			
-		/// <summary>
-		/// HOLD.
-		/// </summary>
-		/// <returns><c>true</c>, while input binded to state returns signal, <c>false</c> otherwise.</returns>
-		/// <param name="stateNameHash">State name hash.</param>
-		/// <param name="playerIndex">Player index.</param>
-		internal static bool GetInputHold(int stateNameHash, int playerIndex){
+        /// <summary>
+        /// [Use for testing as string to hash is slow operat
+        /// Gets the input of device(hardware)
+        /// if device's input mapped is digital would return -1f to 1f generic values emulating analog hardware 
+        /// if device's input mapped is analog would return 0f to 1f(positive axis) or 0f to -1f(negative axis) 
+        /// full axis -1f to 1f
+        /// </summary>
+        /// <returns>The input raw.</returns>
+        /// <param name="stateNameHash">State name hash.</param>
+        /// <param name="player">Player.</param>
+        /// <param name="sensitivity">Sensitivity.</param>
+        /// <param name="dreadzone">Dreadzone.</param>
+        /// <param name="gravity">Gravity.</param>
+        public static float GetInputRaw(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0, float sensitivity = 0.1f, float dreadzone = 0.1f, float gravity = 0.3f)
+        {
+            return GetInputRaw(Animator.StringToHash(stateName), player, sensitivity, dreadzone, gravity);
+        }
 
-			//Use is mapping states so no quering keys during gameplay
-			if (!InputManager.isReady()) return false;
-			
-			__inputCombinations = __settings.GetInputStatesOfPlayer(playerIndex)[stateNameHash].combinations;
-			
-			IDevice device = __settings.Players[playerIndex].Device;
-			
-			return __inputCombinations[0].GetInputHold(device) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputHold(device));
 
-		}
-		
+        /// <summary>
+        /// HOLD.
+        /// </summary>
+        /// <returns><c>true</c>, while input binded to state returns signal, <c>false</c> otherwise.</returns>
+        /// <param name="stateNameHash">State name hash.</param>
+        /// <param name="playerIndex">Player index.</param>
+        internal static bool GetInputHold(int stateNameHash, int playerIndex)
+        {
 
-		/// <summary>
-		/// HOLD.
-		/// </summary>
-		/// <returns><c>true</c>, while input binded to state returns signal, <c>false</c> otherwise.</returns>
-		/// <param name="stateNameHash">State name hash.</param>
-		/// <param name="player">Player.</param>
+            //Use is mapping states so no quering keys during gameplay
+            if (!InputManager.isReady()) return false;
+
+            __inputCombinations = __settings.GetInputStatesOfPlayer(playerIndex)[stateNameHash].combinations;
+
+            IDevice device = __settings.Players[playerIndex].Device;
+
+            return __inputCombinations[0].GetInputHold(device) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputHold(device));
+
+        }
+
+
+        /// <summary>
+        /// HOLD.
+        /// </summary>
+        /// <returns><c>true</c>, while input binded to state returns signal, <c>false</c> otherwise.</returns>
+        /// <param name="stateNameHash">State name hash.</param>
+        /// <param name="player">Player.</param>
         public static bool GetInputHold(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0)
         {
-			return GetInputHold (stateNameHash, (int)player);
+            return GetInputHold(stateNameHash, (int)player);
         }
 
 
 
-		/// <summary>
-		/// HOLD.[Use for testing as string to hash is slow operat
-		/// </summary>
-		/// <returns><c>true</c>, while input binded to state returns signal, <c>false</c> otherwise.</returns>
-		/// <returns><c>true</c>, if input hold was gotten, <c>false</c> otherwise.</returns>
-		/// <param name="stateName">State name.</param>
-		/// <param name="player">Player.</param>
-		public static bool GetInputHold(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0)
-		{
-			return GetInputHold (Animator.StringToHash(stateName), player);
-		}
+        /// <summary>
+        /// HOLD.[Use for testing as string to hash is slow operat
+        /// </summary>
+        /// <returns><c>true</c>, while input binded to state returns signal, <c>false</c> otherwise.</returns>
+        /// <returns><c>true</c>, if input hold was gotten, <c>false</c> otherwise.</returns>
+        /// <param name="stateName">State name.</param>
+        /// <param name="player">Player.</param>
+        public static bool GetInputHold(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0)
+        {
+            return GetInputHold(Animator.StringToHash(stateName), player);
+        }
 
 
 
 
-		internal static bool GetInputUp(int stateNameHash, int playerIndex=0)
-		{
-			//Use is mapping states so no quering keys during gameplay
-			if (!InputManager.isReady()) return false;
-			
-			__inputCombinations = __settings.GetInputStatesOfPlayer(playerIndex)[stateNameHash].combinations;
-			
-			
-			IDevice device = __settings.Players[playerIndex].Device;
-			return __inputCombinations[0].GetInputUp(device) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp(device));
+        internal static bool GetInputUp(int stateNameHash, int playerIndex = 0)
+        {
+            //Use is mapping states so no quering keys during gameplay
+            if (!InputManager.isReady()) return false;
 
-		}
-			
-		/// <summary>
+            __inputCombinations = __settings.GetInputStatesOfPlayer(playerIndex)[stateNameHash].combinations;
+
+
+            IDevice device = __settings.Players[playerIndex].Device;
+            return __inputCombinations[0].GetInputUp(device) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp(device));
+
+        }
+
+        /// <summary>
         /// UP.
         /// </summary>
         /// <returns><c>true</c>, if input binded to state stopped to return values(then is reseted), <c>false</c> otherwise.</returns>
@@ -1361,30 +1404,30 @@ namespace ws.winx.input
         /// <param name="player"></param>
         public static bool GetInputUp(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0)
         {
-			return GetInputUp (stateNameHash, (int)player);
+            return GetInputUp(stateNameHash, (int)player);
         }
 
 
-		/// <summary>
-		/// UP.[Use for testing as string to hash is slow operation in loop]
-		/// </summary>
-		/// <returns><c>true</c>, if input binded to state stopped to return values(then is reseted), <c>false</c> otherwise.</returns>
-		/// <param name="stateName">State name.</param>
-		/// <param name="player">Player.</param>
-		public static bool GetInputUp(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0)
-		{
-			return GetInputUp (Animator.StringToHash (stateName), player);
-		}
-			
+        /// <summary>
+        /// UP.[Use for testing as string to hash is slow operation in loop]
+        /// </summary>
+        /// <returns><c>true</c>, if input binded to state stopped to return values(then is reseted), <c>false</c> otherwise.</returns>
+        /// <param name="stateName">State name.</param>
+        /// <param name="player">Player.</param>
+        public static bool GetInputUp(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0)
+        {
+            return GetInputUp(Animator.StringToHash(stateName), player);
+        }
 
-		/// <summary>
-		/// Gets the input down.
-		/// </summary>
-		/// <returns><c>true</c>, if input down was gotten, <c>false</c> otherwise.</returns>
-		/// <param name="stateNameHash">State name hash.</param>
-		/// <param name="playerIndex">Player index.</param>
-		/// <param name="atOnce">If set to <c>true</c> at once.</param>
-       internal static bool GetInputDown(int stateNameHash, int playerIndex=0, bool atOnce = false)
+
+        /// <summary>
+        /// Gets the input down.
+        /// </summary>
+        /// <returns><c>true</c>, if input down was gotten, <c>false</c> otherwise.</returns>
+        /// <param name="stateNameHash">State name hash.</param>
+        /// <param name="playerIndex">Player index.</param>
+        /// <param name="atOnce">If set to <c>true</c> at once.</param>
+        internal static bool GetInputDown(int stateNameHash, int playerIndex = 0, bool atOnce = false)
         {
             //Use is mapping states so no quering keys during gameplay
             if (!InputManager.isReady()) return false;
@@ -1395,38 +1438,38 @@ namespace ws.winx.input
 
             IDevice device = __settings.Players[playerIndex].Device;
 
-            return __inputCombinations[0].GetInputDown(device,atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputDown(device,atOnce));
+            return __inputCombinations[0].GetInputDown(device, atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputDown(device, atOnce));
         }
 
 
 
-		/// <summary>
-		/// DOWN.
-		/// </summary>
-		/// <returns><c>true</c>, if input binded to state started to return values (than is reseted), <c>false</c> otherwise.</returns>
-		/// <param name="stateNameHash">State name hash.</param>
-		/// <param name="player"></param>
-		/// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts successive action (ex. W+C => W pressed,released then C pressed)
-		/// atOnce=true useful for building modifires like behaviour (LeftCtrl(-)+C)</param>	
-		public static bool GetInputDown(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0, bool atOnce = false)
-		{
-			return GetInputDown (stateNameHash, (int)player, atOnce);
-		}
+        /// <summary>
+        /// DOWN.
+        /// </summary>
+        /// <returns><c>true</c>, if input binded to state started to return values (than is reseted), <c>false</c> otherwise.</returns>
+        /// <param name="stateNameHash">State name hash.</param>
+        /// <param name="player"></param>
+        /// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts successive action (ex. W+C => W pressed,released then C pressed)
+        /// atOnce=true useful for building modifires like behaviour (LeftCtrl(-)+C)</param>	
+        public static bool GetInputDown(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0, bool atOnce = false)
+        {
+            return GetInputDown(stateNameHash, (int)player, atOnce);
+        }
 
 
-		/// <summary>
-		/// DOWN.[Use for testing as string to hash is slow operation in loop]
-		/// </summary>
-		/// <returns><c>true</c>, if input binded to state started to return values (than is reseted), <c>false</c> otherwise.</returns>
-		/// <param name="stateName">State name.</param>
-		/// <param name="player">Player.</param>
-		/// <param name="atOnce">If set to <c>true</c> at once.</param>
-		public static bool GetInputDown(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0, bool atOnce = false)
-		{ 
-			return GetInputDown (Animator.StringToHash (stateName), player, atOnce);
-		}
-			
-			/// <summary>
+        /// <summary>
+        /// DOWN.[Use for testing as string to hash is slow operation in loop]
+        /// </summary>
+        /// <returns><c>true</c>, if input binded to state started to return values (than is reseted), <c>false</c> otherwise.</returns>
+        /// <param name="stateName">State name.</param>
+        /// <param name="player">Player.</param>
+        /// <param name="atOnce">If set to <c>true</c> at once.</param>
+        public static bool GetInputDown(string stateName, InputPlayer.Player player = InputPlayer.Player.Player0, bool atOnce = false)
+        {
+            return GetInputDown(Animator.StringToHash(stateName), player, atOnce);
+        }
+
+        /// <summary>
         /// Log states - inputs values to console
         /// </summary>
         public static string Log()
@@ -1475,7 +1518,7 @@ namespace ws.winx.input
             if (__hidInterface != null)
             {
                 Debug.Log("Try to remove HidInterface events");
-              
+
                 __hidInterface.DeviceDisconnectEvent -= new EventHandler<DeviceEventArgs<string>>(onRemoveDevice);
 
 
@@ -1491,15 +1534,18 @@ namespace ws.winx.input
 
                 UnityEngine.Debug.Log(" Win32Error Erorr" + error);
 
-
-            if (InputEx.Devices != null)
-            {
-                Debug.Log("Try to remove devices");
-                lock (syncRoot)
+           // lock (syncRoot)
+           // {
+                if (InputEx.Devices != null)
                 {
+                    Debug.Log("Try to remove devices");
+
                     InputEx.Devices.Clear();
+
+
                 }
-            }
+           // }
+
 
             Debug.Log("Try to remove states per player");
             InputPlayer[] players = InputManager.Settings.Players;
@@ -1536,11 +1582,11 @@ namespace ws.winx.input
 #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
         [DataContract]
 #endif
-		[System.Serializable]
+        [System.Serializable]
         public class InputSettings
         {
 
-		
+
 
 
 #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
@@ -1626,10 +1672,11 @@ namespace ws.winx.input
 
 
 
-			internal Dictionary<int, InputState> GetInputStatesOfPlayer(InputPlayer.Player player){
-				return GetInputStatesOfPlayer ((int)player);
+            internal Dictionary<int, InputState> GetInputStatesOfPlayer(InputPlayer.Player player)
+            {
+                return GetInputStatesOfPlayer((int)player);
 
-			}
+            }
 
 
             internal Dictionary<int, InputState> GetInputStatesOfPlayer(int index)
