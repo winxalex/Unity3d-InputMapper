@@ -921,6 +921,8 @@ namespace ws.winx.platform.windows
         {
             int error = 0;
 
+			UnityEngine.Debug.Log("Thread: System.Threading.Thread.CurrentThread.ManagedThreadId");
+
             UnityEngine.Debug.Log("Try to dispose NotificationHandle");
             UnregisterHIDDeviceNotification();
 
