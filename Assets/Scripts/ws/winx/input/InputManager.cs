@@ -1407,7 +1407,7 @@ namespace ws.winx.input
 		/// <param name="stateNameHash">State name hash.</param>
 		/// <param name="player"></param>
 		/// <param name="atOnce">(combos effective only) default=<c>false</c> expect combo parts successive action (ex. W+C => W pressed,released then C pressed)
-		/// atOnce=true useful for building modifires like behaviour (LeftCtrl(-)+C)	
+		/// atOnce=true useful for building modifires like behaviour (LeftCtrl(-)+C)</param>	
 		public static bool GetInputDown(int stateNameHash, InputPlayer.Player player = InputPlayer.Player.Player0, bool atOnce = false)
 		{
 			return GetInputDown (stateNameHash, (int)player, atOnce);
