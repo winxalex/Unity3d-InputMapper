@@ -97,7 +97,7 @@ namespace ws.winx.editor
 				protected string _prevlongClickDesignator = InputManager.Settings.longDesignator;
 				protected string _prevdoubleClickDesignator = InputManager.Settings.doubleDesignator;
 				protected bool[] _showLayer;
-				private static bool __wereDevicesEnumerated = false;
+				private bool __wereDevicesEnumerated = false;
 
 
 				//PUBLIC
@@ -131,10 +131,10 @@ namespace ws.winx.editor
 //			InputManager.AddDriver(new ThrustMasterDriver());
 //			#endif
 
-						if (!Application.isPlaying) {
-								InputManager.hidInterface.Enumerate ();
-								__wereDevicesEnumerated = true;
-						}
+                        //if (!Application.isPlaying) {
+                        //        InputManager.hidInterface.Enumerate ();
+                        //        __wereDevicesEnumerated = true;
+                        //}
 			   
 				}
 
@@ -162,13 +162,15 @@ namespace ws.winx.editor
 						_selectedStateHash = 0;
 
 						// Get existing open window or if none, make a new one:
-						if (InputMapper._instance == null)
-						if (!Application.isPlaying) {
-
-								InputManager.hidInterface.SetProfiles(AssetDatabase.LoadAssetAtPath("Assets/Resources/DeviceProfiles.asset",typeof(DeviceProfiles)) as DeviceProfiles);
-								InputManager.hidInterface.Enumerate ();
-								__wereDevicesEnumerated = true;
-						}
+                        //if (InputMapper._instance == null)
+                        //if (!Application.isPlaying && !__wereDevicesEnumerated) {
+                           
+                        //        InputManager.hidInterface.SetProfiles(AssetDatabase.LoadAssetAtPath("Assets/Resources/DeviceProfiles.asset",typeof(DeviceProfiles)) as DeviceProfiles);
+                        //        __wereDevicesEnumerated = true;
+                            
+                        //    InputManager.hidInterface.Enumerate ();
+								
+                        //}
 
 						_instance = EditorWindow.GetWindow (typeof(InputMapper));
 
@@ -595,14 +597,18 @@ namespace ws.winx.editor
 						InputState state;
 
 
+                        if (!Application.isPlaying && !__wereDevicesEnumerated)
+                        {
+                            __wereDevicesEnumerated = true;
+                            InputManager.hidInterface.SetProfiles(AssetDatabase.LoadAssetAtPath("Assets/Resources/DeviceProfiles.asset", typeof(DeviceProfiles)) as DeviceProfiles);
 
+                            InputManager.hidInterface.Enumerate();
+
+                        }
 
 						if (!Application.isPlaying && _selectedStateHash != 0) {
 
-								if (!__wereDevicesEnumerated) {
-										InputManager.hidInterface.Enumerate ();
-										__wereDevicesEnumerated = true;
-								}
+							
 
 									
 								_action = InputManager.GetAction (_deviceByProfile);
@@ -816,15 +822,20 @@ namespace ws.winx.editor
 								
 								List<IDevice> devices = InputManager.GetDevices<IDevice> ();
 
-								if (devices.Count > 0) {
+                                if (devices.Count > 0)
+                                {
 
-										List<string> pList = devices.Where (item => item.profile != null).Select (item => item.profile.Name).Distinct ().ToList ();
-										pList.Insert (0, "default");
+                                    List<string> pList = devices.Where(item => item.profile != null).Select(item => item.profile.Name).Distinct().ToList();
+                                    pList.Insert(0, "default");
 
-										_profilesDevicesDisplayOptions = pList.ToArray ();
+                                    _profilesDevicesDisplayOptions = pList.ToArray();
 
-								} else
-										_profilesDevicesDisplayOptions = new string[]{"default"};
+                                }
+                                else
+                                {
+                                    _profileSelectedIndex = 0;
+                                    _profilesDevicesDisplayOptions = new string[] { "default" };
+                                }
 
 
 				
@@ -837,20 +848,32 @@ namespace ws.winx.editor
 
 
 								//by selecting profile we are setting Device type expectation
-								_deviceByProfile = InputManager.GetDevices<IDevice> ().Where (item => item.profile != null).FirstOrDefault (item => item.profile.Name == _profilesDevicesDisplayOptions [_profileSelectedIndex]);
+								_deviceByProfile = devices.Where (item => item.profile != null).FirstOrDefault (item => item.profile.Name == _profilesDevicesDisplayOptions [_profileSelectedIndex]);
 
 				
 				
 								player = settings.Players [_playerIndexSelected];
 
-								Dictionary<int,InputState> stateInputsCurrent;
+								Dictionary<int,InputState> stateInputsCurrent=null;
 
 								//init stateInput Dictionary if player numbers is increased
-                                if (_profilesDevicesDisplayOptions.Length > _profileSelectedIndex && !player.DeviceProfileStateInputs.ContainsKey(_profilesDevicesDisplayOptions[_profileSelectedIndex]))
-										player.DeviceProfileStateInputs [_profilesDevicesDisplayOptions [_profileSelectedIndex]] = new Dictionary<int, InputState> ();
+                                if (_profilesDevicesDisplayOptions.Length > _profileSelectedIndex)
+                                {
+                                    if (!player.DeviceProfileStateInputs.ContainsKey(_profilesDevicesDisplayOptions[_profileSelectedIndex]))
+                                    {
+                                        player.DeviceProfileStateInputs[_profilesDevicesDisplayOptions[_profileSelectedIndex]] = new Dictionary<int, InputState>();
+                                    }
 
 
-								stateInputsCurrent = player.DeviceProfileStateInputs [_profilesDevicesDisplayOptions [_profileSelectedIndex]];
+                                    stateInputsCurrent = player.DeviceProfileStateInputs[_profilesDevicesDisplayOptions[_profileSelectedIndex]];
+                                }
+                                else
+                                {
+                                    _profileSelectedIndex = 0;
+                                    stateInputsCurrent = player.DeviceProfileStateInputs["default"];
+
+
+                                }
 
 
 								if (_profileSelectedIndex > 0) {
@@ -1290,6 +1313,7 @@ namespace ws.winx.editor
 
 						_selectedStateHash = 0;
 						_deleteStateWithHash = 0;
+                        __wereDevicesEnumerated = false;
 
 						if (!Application.isPlaying) {
 

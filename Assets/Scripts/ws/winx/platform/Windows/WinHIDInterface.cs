@@ -413,8 +413,8 @@ namespace ws.winx.platform.windows
                                 else
                                     UnityEngine.Debug.Log("WinHIDInterface: Not resolved device " + devicePath + " Removed"); 
 
-                                if (hidDeviceExisted)
-                                    this.DeviceDisconnectEvent(this, new DeviceEventArgs<string>(devicePath));
+                              
+                                    this.DeviceDisconnectEvent(null, new DeviceEventArgs<string>(devicePath));
 
 
 
