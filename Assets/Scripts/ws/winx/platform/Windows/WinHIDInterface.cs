@@ -944,16 +944,19 @@ namespace ws.winx.platform.windows
 
                     UnityEngine.Debug.Log("Try to destroy plug&play Notificaiton window");
 
-                   
-                   IntPtr wndHnd= Native.FindWindow(NOTIFICATION_WND_CLS, null);
 
-                    if (wndHnd == IntPtr.Zero)
-                        UnityEngine.Debug.Log("wndow not found");
-                    else
+                    if (Application.isPlaying)
                     {
-                        bool result = Native.DestroyWindow(hidDeviceNotificationReceiverWindowHandle);
+                        IntPtr wndHnd = Native.FindWindow(NOTIFICATION_WND_CLS, null);
 
-                        UnityEngine.Debug.Log("Destroy Result " + result);
+                        if (wndHnd == IntPtr.Zero)
+                            UnityEngine.Debug.Log("wndow not found");
+                        else
+                        {
+                            bool result = Native.DestroyWindow(wndHnd);
+
+                            UnityEngine.Debug.Log("Destroy Result " + result);
+                        }
                     }
 
                     //!!! Problem with InputMapper EditorWindow doesn't clean close Notification Window
