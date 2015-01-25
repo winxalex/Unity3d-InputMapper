@@ -1111,7 +1111,7 @@ namespace ws.winx.input
 										//if key is still down and time longer then default long time click => display long click
 										if (InputEx.GetInputHold (_lastCode,device) || (!Application.isPlaying && InputEx.GetKeyDown (_lastCode))) {
 												if (time - _lastCodeTime >= InputAction.LONG_CLICK_SENSITIVITY) {
-														action = new InputAction (_lastCode, InputActionType.LONG);
+														action = new InputAction (_lastCode, InputActionType.LONG,device);
 														_lastCode = 0;//KeyCode.None;
 														Debug.Log ("Long " + (time - _lastCodeTime) + " <" + InputActionType.LONG);
 												}

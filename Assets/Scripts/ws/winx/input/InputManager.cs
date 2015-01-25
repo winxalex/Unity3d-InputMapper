@@ -1475,6 +1475,7 @@ namespace ws.winx.input
             if (__hidInterface != null)
             {
                 Debug.Log("Try to remove HidInterface events");
+              
                 __hidInterface.DeviceDisconnectEvent -= new EventHandler<DeviceEventArgs<string>>(onRemoveDevice);
 
 
@@ -1488,14 +1489,16 @@ namespace ws.winx.input
             int error = Marshal.GetLastWin32Error();
             if (error > 0)
 
-                UnityEngine.Debug.Log(" NotificationHandle Erorr" + error);
+                UnityEngine.Debug.Log(" Win32Error Erorr" + error);
 
 
             if (InputEx.Devices != null)
             {
                 Debug.Log("Try to remove devices");
-                InputEx.Devices.Clear();
-
+                lock (syncRoot)
+                {
+                    InputEx.Devices.Clear();
+                }
             }
 
             Debug.Log("Try to remove states per player");
@@ -1523,7 +1526,7 @@ namespace ws.winx.input
 
             if (error > 0)
 
-                UnityEngine.Debug.Log(" NotificationHandle Erorr" + error);
+                UnityEngine.Debug.Log(" Win32Error Erorr" + error);
         }
 
 

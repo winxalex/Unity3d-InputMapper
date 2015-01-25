@@ -846,7 +846,7 @@ namespace ws.winx.editor
 								Dictionary<int,InputState> stateInputsCurrent;
 
 								//init stateInput Dictionary if player numbers is increased
-								if (!player.DeviceProfileStateInputs.ContainsKey (_profilesDevicesDisplayOptions [_profileSelectedIndex]))
+                                if (_profilesDevicesDisplayOptions.Length > _profileSelectedIndex && !player.DeviceProfileStateInputs.ContainsKey(_profilesDevicesDisplayOptions[_profileSelectedIndex]))
 										player.DeviceProfileStateInputs [_profilesDevicesDisplayOptions [_profileSelectedIndex]] = new Dictionary<int, InputState> ();
 
 

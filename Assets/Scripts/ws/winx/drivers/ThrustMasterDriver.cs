@@ -22,26 +22,12 @@ namespace ws.winx.drivers
 								//check for profile
 								DeviceProfile profile = null;
 
-//								if (hidDevice.hidInterface.Profiles.ContainsKey (hidDevice.Name)) {
-//										
-//											
-//
-//							
-//												profile = hidDevice.hidInterface.LoadProfile (hidDevice.hidInterface.Profiles [hidDevice.Name]);
-//									}
 
-					
-				String profileKey=hidDevice.hidInterface.defaultDriver is UnityDriver? hidDevice.Name : hidDevice.VID.ToString("X4")+"#"+hidDevice.PID.ToString("X4");
-				try{
-					profile = hidDevice.hidInterface.LoadProfile (profileKey);
-				}catch(Exception ex){
-					Debug.LogException(ex);
-				}
 
 
 								JoystickDevice device = new ThrustmasterRGTFFDDevice (hidDevice.index, hidDevice.PID, hidDevice.VID, hidDevice.ID, 8, 10, this);
 								device.Name = hidDevice.Name;
-								device.profile = profile;
+								device.profile = hidDevice.loadProfile();
 								//JoystickDevice joystick = new JoystickDevice(hidDevice.index, hidDevice.PID, hidDevice.VID, 8, 10, this);
 
                
