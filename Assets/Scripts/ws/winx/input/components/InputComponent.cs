@@ -94,7 +94,7 @@ public class InputComponent : MonoBehaviour
 		//InputManager.AddDriver(new WiiDriver());
 		InputManager.AddDriver(new XInputDriver());
 		//change default driver
-		//InputManager.hidInterface.defaultDriver=new UnityDriver();
+		InputManager.hidInterface.defaultDriver=new UnityDriver();
 		#endif
 		#if (UNITY_STANDALONE_OSX)
 		InputManager.AddDriver(new ThrustMasterDriver());
