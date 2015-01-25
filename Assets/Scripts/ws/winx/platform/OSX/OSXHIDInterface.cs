@@ -278,7 +278,7 @@ namespace ws.winx.platform.osx
 				if(value is ws.winx.drivers.UnityDriver){
 
 					Debug.LogWarning("UnityDriver set as default driver.\n Warring:Unity doesn't make distinction between triggers/axis/pow, samekind controllers can't be distinct as they would have same na in GetJoystickList and some controlers would have different joystick index then on in list. Also current profiles aren't done for this driver");
-					LoadProfiles("profiles_uni.txt");
+					//LoadProfiles("profiles_uni.txt");
 				}
 			}
 

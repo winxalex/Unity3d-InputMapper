@@ -178,7 +178,7 @@ namespace ws.winx.platform.windows
                 if (value is ws.winx.drivers.UnityDriver)
                 {
                     Debug.LogWarning("UnityDriver set as default driver.\n Warring:Unity doesn't make distinction between triggers/axis/poitOfView and doesn't make controller distinction as multiply instances of same type have same name and can hard code index of devices no matter position in GetJoystickNames list");
-					LoadProfiles("profiles_uni.txt");
+					//LoadProfiles("profiles_uni.txt");
 				}
 				
 			}
@@ -797,18 +797,20 @@ namespace ws.winx.platform.windows
 
 
           
-                int inx;
-
-        
+                int inx=-1;
 
 
-                //find if this device was using same port before (during same app runitime)
-                inx = Array.IndexOf(__ports, ID);
 
-                if (inx < 0)//if not found => use next available(20 ports in total) position
-                    inx = Array.IndexOf(__ports, null);
+                if (__ports != null && __ports.Length > 0)
+                {
+                    //find if this device was using same port before (during same app runitime)
+                    inx = Array.IndexOf(__ports, ID);
 
-                __ports[inx] = ID;
+                    if (inx < 0)//if not found => use next available(20 ports in total) position
+                        inx = Array.IndexOf(__ports, null);
+
+                    __ports[inx] = ID;
+                }
 
                 return inx;
 
@@ -863,8 +865,8 @@ namespace ws.winx.platform.windows
 
                // System.Threading.Thread.CurrentThread.n
 
-                //TODO Problem WinMM isn't ready
-               // System.Threading.Thread.Sleep(300);
+                //TODO Problem WinMM isn't ready right away
+                System.Threading.Thread.Sleep(500);
 
                 joyDevice = defaultDriver.ResolveDevice(hidDevice);
 
@@ -918,6 +920,8 @@ namespace ws.winx.platform.windows
         public void Dispose()
         {
             int error = 0;
+
+			UnityEngine.Debug.Log("Thread: System.Threading.Thread.CurrentThread.ManagedThreadId");
 
             UnityEngine.Debug.Log("Try to dispose NotificationHandle");
             UnregisterHIDDeviceNotification();
