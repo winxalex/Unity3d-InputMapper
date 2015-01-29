@@ -334,7 +334,7 @@ namespace ws.winx.editor
 										/// 
 										/// 
 										EditorGUILayout.BeginHorizontal ();
-										EditorGUILayout.LabelField ("ACTION:");
+										EditorGUILayout.LabelField ("GENERIC NAME:");
 
 										
 

@@ -117,7 +117,7 @@ namespace ws.winx.editor
 
 						if (!String.IsNullOrEmpty (_profileNameSelected)) {
 								EditorGUILayout.BeginHorizontal ();//,
-								EditorGUILayout.LabelField ("Device PID#VID or Name(UnityDriver)", new GUILayoutOption[]{GUILayout.Width (130)});
+								EditorGUILayout.LabelField ("Device VID#PID or Name(UnityDriver)", new GUILayoutOption[]{GUILayout.Width (160)});
 								_pidVidKey = EditorGUILayout.TextField (_pidVidKey);
 					
 				
