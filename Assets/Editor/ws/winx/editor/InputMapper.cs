@@ -43,7 +43,7 @@ namespace ws.winx.editor
 				protected int _isPrimary = 0;
 				protected string _currentInputString;
 
-				protected bool _saveBinary=true;
+				protected bool _isBinary=true;
 
 
 				//Players
@@ -322,8 +322,11 @@ namespace ws.winx.editor
 								}		
 
 						} else {
-
-								settings = InputManager.loadSettingsFromXMLText (AssetDatabase.GetAssetPath (settingsFile));
+                          
+                            if(_isBinary)
+                                settings = InputManager.loadSettingsFromBin(AssetDatabase.GetAssetPath(settingsFile));
+                            else
+						         settings = InputManager.loadSettingsFromXMLText (AssetDatabase.GetAssetPath (settingsFile));
 
 						}
 
@@ -942,7 +945,7 @@ namespace ws.winx.editor
 						EditorGUILayout.Separator ();
 
 						/////////////////   XML  ////////////////////
-						EditorGUILayout.LabelField ("Input XML");
+						EditorGUILayout.LabelField ("Input XML/BIN");
 						EditorGUILayout.BeginHorizontal ();
 						settingsFile = EditorGUILayout.ObjectField (settingsFile, typeof(UnityEngine.Object), true);
 
@@ -956,7 +959,7 @@ namespace ws.winx.editor
 						if (_selectedStateHash == 0 && GUILayout.Button ("Open")) {
 							string path; 
 
-									if(_saveBinary)
+									if(_isBinary)
 									  path=EditorUtility.OpenFilePanel ("Open XML Input Settings file", "", "bin");
 									else
 										path=EditorUtility.OpenFilePanel ("Open XML Input Settings file", "", "xml");
@@ -993,7 +996,7 @@ namespace ws.winx.editor
 												saveInputSettings (Path.Combine (Application.streamingAssetsPath, settingsFile.name + ".bin"));
 										}
 								} else{ 
-									    if(_saveBinary)
+									    if(_isBinary)
 											saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", Application.streamingAssetsPath, "InputSettings", "bin"));
 										else
 											saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", Application.streamingAssetsPath, "InputSettings", "xml"));
@@ -1002,7 +1005,7 @@ namespace ws.winx.editor
 						}
 
 			if(settingsFile==null)
-				_saveBinary = GUILayout.Toggle (_saveBinary,"Binary");
+				_isBinary = GUILayout.Toggle (_isBinary,"Binary");
 
 						/////////// RELOAD ////////////////
 						if (GUILayout.Button ("Reload")) { 
