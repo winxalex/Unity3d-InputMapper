@@ -802,12 +802,19 @@ namespace ws.winx.editor
 					
 
 								if (_playerNumber > 1 && GUILayout.Button ("Clone To All")) {
-										InputPlayer sample = settings.Players [_playerIndexSelected];
-					
-										for (i=0; i<_playerNumber; i++) {
-												if (i != _playerIndexSelected)
-														settings.Players [i] = sample.Clone ();
-										}
+
+
+                                    if (EditorUtility.DisplayDialog("Clone to All!",
+                                                "Are you sure to clone selected player overwriting other player's settings?", "Yes", "Cancel"))
+                                    {
+                                        InputPlayer sample = settings.Players[_playerIndexSelected];
+
+                                        for (i = 0; i < _playerNumber; i++)
+                                        {
+                                            if (i != _playerIndexSelected)
+                                                settings.Players[i] = sample.Clone();
+                                        }
+                                    }
 								}
 
 
@@ -880,7 +887,11 @@ namespace ws.winx.editor
 
 
 								if (_profileSelectedIndex > 0) {
-										if (GUILayout.Button ("Clone default")) {
+										if (GUILayout.Button ("Clone default")
+                                            &&  EditorUtility.DisplayDialog("Clone Default!",
+                                                "Are you sure to clone Default input settings to "+_profilesDevicesDisplayOptions[_profileSelectedIndex]+" device specific settings?", "Yes", "Cancel")
+                
+                                            ) {
 
 												Dictionary<int,InputState> stateInputsDefault = player.DeviceProfileStateInputs ["default"];
 												foreach (var HashInputStatePair in stateInputsDefault) {
