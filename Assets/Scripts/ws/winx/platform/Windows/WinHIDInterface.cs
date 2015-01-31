@@ -42,11 +42,8 @@ namespace ws.winx.platform.windows
 
         private static readonly object syncRoot = new object();
 
-		// timer is defined as a class member variable
-		// so it doesn't go out of scope
-		System.Threading.Timer delayExecutionTimer;
-        delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
+        delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
         private WndProc m_wnd_proc_delegate;
 
         private const int ERROR_CLASS_ALREADY_EXISTS = 1410;
@@ -54,7 +51,7 @@ namespace ws.winx.platform.windows
         //GUID_DEVINTERFACE_HID	Class GUID{4D1E55B2-F16F-11CF-88CB-001111000030}
         private static readonly Guid GUID_DEVINTERFACE_HID = new Guid("4D1E55B2-F16F-11CF-88CB-001111000030"); // HID devices
 
-      
+        public IntPtr hidDeviceNotificationReceiverWindowHandle;
 
 
 
@@ -65,7 +62,7 @@ namespace ws.winx.platform.windows
 
         public event EventHandler<DeviceEventArgs<string>> DeviceDisconnectEvent;
         public event EventHandler<DeviceEventArgs<IDevice>> DeviceConnectEvent;
-		public IntPtr hidDeviceNotificationReceiverWindowHandle;
+
 
 
 
@@ -285,7 +282,7 @@ namespace ws.winx.platform.windows
         /// Creates window that would receive plug in/out device events
         /// </summary>
         /// <returns></returns>
-        IntPtr CreateNotificationReceiverWnd()
+        IntPtr CreateReceiverWnd()
         {
 
 
@@ -465,7 +462,20 @@ namespace ws.winx.platform.windows
 
                                         UnityEngine.Debug.Log("WinHIDInterface: " + hidDevice.Name + " Connected");
 
+                                       
                                         ResolveDevice(hidDevice);
+
+                                        //try again
+                                        if(!Generics.ContainsKey(hidDevice.ID)){
+
+                                             ResolveDevice(hidDevice);
+                                        }
+
+                                        //System.Threading.Timer timer = new System.Threading.Timer(obj =>
+                                        //{
+                                      
+                                        //    ResolveDevice(hidDevice);
+                                        //}, null, 1000, 0);
                                     }
                                     else
                                     {
@@ -543,7 +553,7 @@ namespace ws.winx.platform.windows
 
                    // if (hidDeviceNotificationReceiverWindowHandle == IntPtr.Zero)
                  //   {
-                        hidDeviceNotificationReceiverWindowHandle = CreateNotificationReceiverWnd();
+                        hidDeviceNotificationReceiverWindowHandle = CreateReceiverWnd();
                   //  }
 
                         if (hidDeviceNotificationReceiverWindowHandle != IntPtr.Zero)
@@ -591,40 +601,49 @@ namespace ws.winx.platform.windows
             // allocates memory for an array of Win32.RawInputDeviceList
             IntPtr ptrDeviceList = Marshal.AllocHGlobal((int)(deviceSize * deviceCount));
 
-            result = Native.GetRawInputDeviceList(
-                ptrDeviceList,
-                ref deviceCount,
-                deviceSize);
-
-
-
-            if ((int)result != -1)
+            if (ptrDeviceList != IntPtr.Zero)
             {
-                Native.RawInputDeviceList rawInputDeviceList;
-                // enumerates array of Win32.RawInputDeviceList,
-                // and populates array of managed RawInputDevice objects
-                for (var index = 0; index < deviceCount; index++)
+                result = Native.GetRawInputDeviceList(
+                    ptrDeviceList,
+                    ref deviceCount,
+                    deviceSize);
+
+
+
+                if ((int)result != -1)
                 {
-
-                    rawInputDeviceList = (Native.RawInputDeviceList)Marshal.PtrToStructure(
-                        new IntPtr((ptrDeviceList.ToInt32() +
-                                (deviceSize * index))),
-                        typeof(Native.RawInputDeviceList));
-
-
-
-                    if (rawInputDeviceList.DeviceType == Native.RawInputDeviceType.HumanInterfaceDevice)
+                    Native.RawInputDeviceList rawInputDeviceList;
+                    // enumerates array of Win32.RawInputDeviceList,
+                    // and populates array of managed RawInputDevice objects
+                    for (var index = 0; index < deviceCount; index++)
                     {
-                        HIDDevice hidDevice = CreateHIDDeviceFrom(rawInputDeviceList);
 
-                        if (!__Generics.ContainsKey(hidDevice.ID))
-                            ResolveDevice(hidDevice);
+                        rawInputDeviceList = (Native.RawInputDeviceList)Marshal.PtrToStructure(
+                            new IntPtr((ptrDeviceList.ToInt32() +
+                                    (deviceSize * index))),
+                            typeof(Native.RawInputDeviceList));
+
+
+
+                        if (rawInputDeviceList.DeviceType == Native.RawInputDeviceType.HumanInterfaceDevice)
+                        {
+                            HIDDevice hidDevice = CreateHIDDeviceFrom(rawInputDeviceList);
+
+                            if (!__Generics.ContainsKey(hidDevice.ID))
+                                ResolveDevice(hidDevice);
+                        }
+
                     }
-
                 }
-            }
 
-            Marshal.FreeHGlobal(ptrDeviceList);
+                Marshal.FreeHGlobal(ptrDeviceList);
+            }
+            else
+            {
+               
+                UnityEngine.Debug.LogWarning("WinHIDInterface couldn't allocate space for RawDeviceList");
+
+            }
 
         }
 
@@ -854,68 +873,56 @@ namespace ws.winx.platform.windows
 
 
 
-                        Debug.Log("Device" + hidDevice.index + " PID:" + hidDevice.PID + " VID:" + hidDevice.VID + "[" + hidDevice.Name + "] attached to " + driver.GetType().ToString());
+                        Debug.Log("Device" + hidDevice.index + " PID:" + hidDevice.PID + " VID:" + hidDevice.VID + "[" + hidDevice.Name + "] attached to " + driver.GetType().ToString()
 
-						if (DeviceConnectEvent!=null) DeviceConnectEvent(null, new DeviceEventArgs<IDevice>(joyDevice));
+                          // +hidDevice.DevicePath 
+                            );
 
-
-                        return;
+                        break;
                     }
                 }
 
             if (joyDevice == null)
             {//set default driver as resolver if no custom driver match device
 
-              
+               // System.Threading.Thread.CurrentThread.n
 
-				//
-				// note the use of a lambda expression; 
-				// you can add multiple lines of code here, or just call bar()
-				//
-				delayExecutionTimer = new System.Threading.Timer(obj => { 
-				
-					joyDevice = defaultDriver.ResolveDevice(hidDevice);
-					
-					
-					
-					
-					if (joyDevice != null)
-					{
-						joyDevice.Name = hidDevice.Name;
-						
-						
-						lock (syncRoot)
-						{
-							Generics[hidDevice.ID] = hidDevice;
-						}
-						
-						
-						
-						
-						if (DeviceConnectEvent!=null) DeviceConnectEvent(null, new DeviceEventArgs<IDevice>(joyDevice));
-						
-						Debug.Log("Device" + hidDevice.index + "  PID:" + hidDevice.PID + " VID:" + hidDevice.VID + "[" + hidDevice.Name + "] attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + hidDevice.DevicePath);
-						
-					}
-					else
-					{
-						Debug.LogWarning("Device PID:" + hidDevice.PID + " VID:" + hidDevice.VID + " not found compatible driver thru WinHIDInterface!");
-						
-					}
-				
-				
-				
-				
-				}, null, 300, System.Threading.Timeout.Infinite);
-			
+     
 
-               
+                joyDevice = defaultDriver.ResolveDevice(hidDevice);
+
+
+
+
+                if (joyDevice != null)
+                {
+                    joyDevice.Name = hidDevice.Name;
+
+
+                    lock (syncRoot)
+                    {
+                        Generics[hidDevice.ID] = hidDevice;
+                    }
+
+
+
+
+
+
+                    Debug.Log("Device" + hidDevice.index + "  PID:" + hidDevice.PID + " VID:" + hidDevice.VID + "[" + hidDevice.Name + "] attached to " + __defaultJoystickDriver.GetType().ToString() + " Path:" + hidDevice.DevicePath);
+
+                }
+                else
+                {
+                    Debug.LogWarning("Device PID:" + hidDevice.PID + " VID:" + hidDevice.VID + " not found compatible driver thru WinHIDInterface!");
+
+                }
 
             }
 
 
 
-           
+            if (joyDevice != null && DeviceConnectEvent!=null) DeviceConnectEvent(null, new DeviceEventArgs<IDevice>(joyDevice));
 
 
         }
@@ -945,6 +952,7 @@ namespace ws.winx.platform.windows
 
             error = Marshal.GetLastWin32Error();
             if (error > 0)
+
                 UnityEngine.Debug.Log(" NotificationHandle Erorr" + error);
 
             UnityEngine.Debug.Log("Try to dispose receiverWindowHandle");

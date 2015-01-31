@@ -34,7 +34,7 @@ namespace ws.winx.input
 
 
 
-        private static InputCombination[] __inputCombinations;
+        
         private static InputSettings __settings;//=new InputSettings();
         private static IHIDInterface __hidInterface;//=new ws.winx.platform.windows.WinHIDInterface();
 
@@ -1266,7 +1266,8 @@ namespace ws.winx.input
             //Use is mapping states so no quering keys during gameplay
             if (!InputManager.isReady()) return 0f;
 
-            __inputCombinations = __settings.GetInputStatesOfPlayer(player)[stateNameHash].combinations;
+            
+            InputCombination[] __inputCombinations = __settings.GetInputStatesOfPlayer(player)[stateNameHash].combinations;
 
             IDevice device = __settings.Players[(int)player].Device;
 
@@ -1307,11 +1308,11 @@ namespace ws.winx.input
             //Use is mapping states so no quering keys during gameplay
             if (!InputManager.isReady()) return 0f;
 
-            __inputCombinations = __settings.GetInputStatesOfPlayer(player)[stateNameHash].combinations;
+            InputCombination[] inputCombinations = __settings.GetInputStatesOfPlayer(player)[stateNameHash].combinations;
 
             IDevice device = __settings.Players[(int)player].Device;
 
-            return Mathf.Clamp(__inputCombinations[0].GetAnalogValue(device, sensitivity, dreadzone, gravity) + (__inputCombinations.Length == 2 && __inputCombinations[1] != null ? __inputCombinations[1].GetAnalogValue(device, sensitivity, dreadzone, gravity) : 0f), -1f, 1f);
+            return Mathf.Clamp(inputCombinations[0].GetAnalogValue(device, sensitivity, dreadzone, gravity) + (inputCombinations.Length == 2 && inputCombinations[1] != null ? inputCombinations[1].GetAnalogValue(device, sensitivity, dreadzone, gravity) : 0f), -1f, 1f);
 
         }
 
@@ -1346,11 +1347,11 @@ namespace ws.winx.input
             //Use is mapping states so no quering keys during gameplay
             if (!InputManager.isReady()) return false;
 
-            __inputCombinations = __settings.GetInputStatesOfPlayer(playerIndex)[stateNameHash].combinations;
+            InputCombination[] inputCombinations = __settings.GetInputStatesOfPlayer(playerIndex)[stateNameHash].combinations;
 
             IDevice device = __settings.Players[playerIndex].Device;
 
-            return __inputCombinations[0].GetInputHold(device) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputHold(device));
+            return inputCombinations[0].GetInputHold(device) || (inputCombinations.Length == 2 && inputCombinations[1] != null && inputCombinations[1].GetInputHold(device));
 
         }
 
@@ -1388,11 +1389,11 @@ namespace ws.winx.input
             //Use is mapping states so no quering keys during gameplay
             if (!InputManager.isReady()) return false;
 
-            __inputCombinations = __settings.GetInputStatesOfPlayer(playerIndex)[stateNameHash].combinations;
+            InputCombination[] inputCombinations = __settings.GetInputStatesOfPlayer(playerIndex)[stateNameHash].combinations;
 
 
             IDevice device = __settings.Players[playerIndex].Device;
-            return __inputCombinations[0].GetInputUp(device) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputUp(device));
+            return inputCombinations[0].GetInputUp(device) || (inputCombinations.Length == 2 && inputCombinations[1] != null && inputCombinations[1].GetInputUp(device));
 
         }
 
@@ -1434,11 +1435,11 @@ namespace ws.winx.input
 
             //__settings.Players[InputManager.currentPlayerInx].GetStateInputBasedOnControllerMappedToPlayer
 
-            __inputCombinations = __settings.GetInputStatesOfPlayer(playerIndex)[stateNameHash].combinations;
+            InputCombination[] inputCombinations = __settings.GetInputStatesOfPlayer(playerIndex)[stateNameHash].combinations;
 
             IDevice device = __settings.Players[playerIndex].Device;
 
-            return __inputCombinations[0].GetInputDown(device, atOnce) || (__inputCombinations.Length == 2 && __inputCombinations[1] != null && __inputCombinations[1].GetInputDown(device, atOnce));
+            return inputCombinations[0].GetInputDown(device, atOnce) || (inputCombinations.Length == 2 && inputCombinations[1] != null && inputCombinations[1].GetInputDown(device, atOnce));
         }
 
 
@@ -1548,24 +1549,30 @@ namespace ws.winx.input
 
 
             Debug.Log("Try to remove states per player");
-            InputPlayer[] players = InputManager.Settings.Players;
-            if (players != null)
-                for (int i = 0; i < players.Length; i++)
-                {
+            if (InputManager.__settings != null)
+            {
 
-                    foreach (var DeviceStateInputPair in players[i].DeviceProfileStateInputs)
+                InputPlayer[] players = InputManager.__settings.Players;
+
+                if (players != null)
+                    for (int i = 0; i < players.Length; i++)
                     {
-                        DeviceStateInputPair.Value.Clear();
+
+                        foreach (var DeviceStateInputPair in players[i].DeviceProfileStateInputs)
+                        {
+                            DeviceStateInputPair.Value.Clear();
+
+                        }
+
+
+                        players[i].DeviceProfileStateInputs.Clear();
 
                     }
 
 
-                    players[i].DeviceProfileStateInputs.Clear();
 
-                }
-
-            //		if (InputManager.Settings.stateInputs != null)
-            //								InputManager.Settings.stateInputs.Clear ();
+                InputManager.__settings = null;
+            }
 
             Debug.Log("Dispose Finished");
 
