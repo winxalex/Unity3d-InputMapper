@@ -568,7 +568,19 @@ namespace ws.winx.input
 
 
 
-
+		public static InputSettings loadSettingsFromBin(String path)
+		{
+			
+			
+			using (Stream stream = new FileStream(path, FileMode.Open, FileAccess.Read))
+			{
+				BinaryFormatter bf = new BinaryFormatter();
+				__settings = (InputManager.InputSettings)bf.Deserialize(stream);
+				stream.Close();
+			}
+			
+			return __settings;
+		}
 
 
         ///!!!! UNITY DOESN"T INCLUDE SYSTEM.XML (OR SOME PARTS OF IT) SO RUNTIME SERIALIZATION DOESN"T WORK IN WEBPLAYER
@@ -577,19 +589,7 @@ namespace ws.winx.input
 
 
 #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
-        public static InputSettings loadSettingsFromBin(String path)
-        {
-
-
-            using (Stream stream = new FileStream(path, FileMode.Open, FileAccess.Read))
-            {
-                BinaryFormatter bf = new BinaryFormatter();
-                __settings = (InputManager.InputSettings)bf.Deserialize(stream);
-                stream.Close();
-            }
-
-            return __settings;
-        }
+      
 
 
 
