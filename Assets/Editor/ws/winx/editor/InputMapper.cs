@@ -105,7 +105,7 @@ namespace ws.winx.editor
 				public Vector2 scrollPosition2 = Vector2.zero;
 				public int maxCombosNum = 3;
 				public UnityEngine.Object settingsFile;
-				public AnimatorController controller;
+				public UnityEditor.Animations.AnimatorController controller;
 				public bool saveBinary = false;
 				public static EditorWindow _instance;
 	    
@@ -532,26 +532,26 @@ namespace ws.winx.editor
 						if (controller != null) {
 
 								int numLayers, numStates, i = 0, j = 0;
-								AnimatorControllerLayer layer;
-								StateMachine stateMachine;	
+								UnityEditor.Animations.AnimatorControllerLayer layer;
+								UnityEditor.Animations.AnimatorStateMachine stateMachine;	
 
 
 
-								AnimatorController ac = controller as AnimatorController;
-								numLayers = ac.layerCount;
+								UnityEditor.Animations.AnimatorController ac = controller as UnityEditor.Animations.AnimatorController;
+								numLayers = ac.layers.Length;
 			
 								for (; i<numLayers; i++) {
-										layer = ac.GetLayer (i);
+										layer = ac.layers [i];
 				
 
 										stateMachine = layer.stateMachine;
 				
-										numStates = stateMachine.stateCount;
+										numStates = stateMachine.states.Length;
 				
 
 				
 										for (j=0; j<numStates; j++) {
-                                           if(Animator.StringToHash(stateMachine.GetState(j).name)==key)
+                                           if(Animator.StringToHash(stateMachine.states[j].state.name)==key)
 												//if (stateMachine.GetState (j).uniqueNameHash == key)
 														return true;
 						
@@ -674,10 +674,10 @@ namespace ws.winx.editor
 						int numStates;
 						int i = 0;
 						int j = 0;		
-						StateMachine stateMachine;
-						UnityEditorInternal.State state;
-						AnimatorControllerLayer layer;
-						AnimatorController ac;
+						UnityEditor.Animations.AnimatorStateMachine stateMachine;
+						UnityEditor.Animations.AnimatorState state;
+						UnityEditor.Animations.AnimatorControllerLayer layer;
+						UnityEditor.Animations.AnimatorController ac;
 
 
 						if (_deleteStateWithHash != 0) {
@@ -1045,7 +1045,7 @@ namespace ws.winx.editor
 						EditorGUILayout.LabelField ("Animator Controller States");
 
 						EditorGUILayout.BeginHorizontal ();
-						controller = EditorGUILayout.ObjectField (controller, typeof(AnimatorController), true) as AnimatorController;
+						controller = EditorGUILayout.ObjectField (controller, typeof(UnityEditor.Animations.AnimatorController), true) as UnityEditor.Animations.AnimatorController;
 
 				
 						EditorGUILayout.EndHorizontal ();
@@ -1062,17 +1062,17 @@ namespace ws.winx.editor
 						/////////  Create AnimaitonController states GUI //////////
 						if (controller != null) {
 		
-								ac = controller as AnimatorController;
+								ac = controller as UnityEditor.Animations.AnimatorController;
 						
 
-								numLayers = ac.layerCount;
+								numLayers = ac.layers.Length;
 
 								if (_showLayer == null || _showLayer.Length != numLayers)
-										_showLayer = new bool[controller.layerCount];
+										_showLayer = new bool[controller.layers.Length];
 					   
 				
 								for (i=0; i<numLayers; i++) {
-										layer = ac.GetLayer (i);
+										layer = ac.layers [i];
 
 								
 
@@ -1081,12 +1081,12 @@ namespace ws.winx.editor
 										if (_showLayer [i]) {
 												stateMachine = layer.stateMachine;
 					
-												numStates = stateMachine.stateCount;
+												numStates = stateMachine.states.Length;
 					
 												scrollPosition = GUILayout.BeginScrollView (scrollPosition, false, false);
 				
 												for (j=0; j<numStates; j++) {
-														state = stateMachine.GetState (j);
+														state = stateMachine.states [j].state;
                                                         createInputStateGUI(state.name, Animator.StringToHash(state.name));
 														//createInputStateGUI (state.name, state.uniqueNameHash);
 							
