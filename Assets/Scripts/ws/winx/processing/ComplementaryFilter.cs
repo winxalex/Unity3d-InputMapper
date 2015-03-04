@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace ws.winx.csharp
+namespace ws.winx.processing
 {
 
     public class ComplementaryFilter

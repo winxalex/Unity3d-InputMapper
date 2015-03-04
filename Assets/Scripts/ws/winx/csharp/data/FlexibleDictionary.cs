@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace DTavlikos
+namespace ws.winx.csharp.data
 {
 	/// <summary>
 	/// FlexibleDictionary is a generic Dictionary but you can add items to it during a foreach iteration

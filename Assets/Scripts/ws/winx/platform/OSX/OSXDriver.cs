@@ -10,7 +10,7 @@
 using System.Runtime.InteropServices;
 using UnityEngine;
 using System.Collections.Generic;
-using ws.winx.utils;
+using ws.winx.csharp.extensions;
 using ws.winx.drivers;
 
 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
