@@ -51,13 +51,13 @@ namespace ws.winx.input.components
 				int _playerIndexSelected;
 				int _playerIndexSelectedPrev;
 				string[] _playerDisplayOptions;
-				int[] _playerIndices;
+			//	int[] _playerIndices;
 				InputPlayer _playerSelected;
 
 				//Device
 				int _deviceDisplayIndex;
 				string[] _deviceDisplayOptions;
-				int[] _deviceIndices;
+			//	int[] _deviceIndices;
 				int _deviceDisplayIndexPrev;
 
 				/// <summary>

@@ -37,8 +37,7 @@ namespace ws.winx.input
 				/// if combination sequence should be reseted)
 				/// </summary>
 				private float __actionHappenTime;
-				private float __range;
-				private KeyCode __lastCode;
+				
 
 #if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 		[DataMember(Name = "InputActions")]

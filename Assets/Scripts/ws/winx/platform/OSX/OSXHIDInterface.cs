@@ -60,7 +60,7 @@ namespace ws.winx.platform.osx
 		Native.IOHIDCallback HandleDeviceRemoved;
      
 
-        bool disposed;
+      
 		bool hidCallbacksRegistered;
 
 		private static readonly object syncRoot = new object();
