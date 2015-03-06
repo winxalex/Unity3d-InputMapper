@@ -12,7 +12,6 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
 using ws.winx.input;
-using ws.winx.platform.windows;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -161,16 +160,7 @@ namespace ws.winx.editor
 						//deselect if some state is selected for editing
 						_selectedStateHash = 0;
 
-						// Get existing open window or if none, make a new one:
-                        //if (InputMapper._instance == null)
-                        //if (!Application.isPlaying && !__wereDevicesEnumerated) {
-                           
-                        //        InputManager.hidInterface.SetProfiles(AssetDatabase.LoadAssetAtPath("Assets/Resources/DeviceProfiles.asset",typeof(DeviceProfiles)) as DeviceProfiles);
-                        //        __wereDevicesEnumerated = true;
-                            
-                        //    InputManager.hidInterface.Enumerate ();
-								
-                        //}
+						
 
 						_instance = EditorWindow.GetWindow (typeof(InputMapper));
 

@@ -5,16 +5,18 @@ using System.Text;
 using UnityEngine;
 using System.Collections;
 using System.Threading;
-using ws.winx.input.states;
+
 using UnityEngine.Events;
+using ws.winx.unity.attributes;
+
 
 namespace ws.winx.input
 {
 	[System.Serializable]
     public class InputEvent
     {
-
-		public States state;
+		[EnumAttribute("ws.winx.input.states.States")]
+		public int state;
 
 		public UnityEvent onUP=new UnityEvent();
 		public UnityEvent onDOWN=new UnityEvent();
@@ -26,7 +28,7 @@ namespace ws.winx.input
 
 		public int stateNameHash {
 			get {
-				if(_stateNameHash==0 && (int)state!=0) _stateNameHash=(int)state;
+				if(_stateNameHash==0 && Convert.ToInt32(state)!=0) _stateNameHash=Convert.ToInt32(state);
 				return _stateNameHash;
 			}
 		}
