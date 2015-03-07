@@ -20,10 +20,13 @@ namespace ws.winx.unity.attributes
 
 		}
 
-		public EnumAttribute(string enumClass){
+		public EnumAttribute(string typeName){
+			_type = Type.GetType (typeName);
+		}
 
-			_type = Type.GetType (enumClass);
-			
+		public EnumAttribute(Type enumType){
+			_type = enumType;
+
 		}
 			
 	}

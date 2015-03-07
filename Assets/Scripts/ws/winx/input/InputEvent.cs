@@ -15,7 +15,7 @@ namespace ws.winx.input
 	[System.Serializable]
     public class InputEvent
     {
-		[EnumAttribute("ws.winx.input.states.States")]
+
 		public int state;
 
 		public UnityEvent onUP=new UnityEvent();
@@ -160,5 +160,6 @@ namespace ws.winx.input
 
 
       
+
     }
 }

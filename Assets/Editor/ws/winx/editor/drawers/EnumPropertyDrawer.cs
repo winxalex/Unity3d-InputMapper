@@ -4,19 +4,21 @@ using UnityEditor;
 using System;
 using ws.winx.unity.attributes;
 
-namespace ws.winx.unity.drawers
+namespace ws.winx.editor.drawers
 {
 		[CustomPropertyDrawer(typeof(EnumAttribute))]
 		public class EnumPropertyDrawer : PropertyDrawer
 		{
 
-				Enum _selected;
+				
 
 				public new EnumAttribute attribute{ get { return (EnumAttribute)base.attribute; } }
 
 				public override void OnGUI (Rect position, SerializedProperty property, GUIContent label)
 				{
-						if (_selected == null) {
+						
+
+						Enum _selected;
 			
 								if (Enum.IsDefined (attribute.GetEnumType (), property.intValue)) {
 										_selected = (Enum)Enum.ToObject (this.attribute.GetEnumType (), property.intValue);
@@ -24,7 +26,7 @@ namespace ws.winx.unity.drawers
 										_selected = this.attribute.GetEnumValue ();
 
 
-						}
+						
 			
 						EditorGUI.BeginProperty (position, label, property);
 						_selected = EditorGUI.EnumPopup (position, _selected);
