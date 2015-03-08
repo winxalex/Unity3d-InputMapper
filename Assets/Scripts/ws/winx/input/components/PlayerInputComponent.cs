@@ -96,9 +96,9 @@ public class PlayerInputComponent : MonoBehaviour
 
 		}
 
-		public void onInformPlayerOfOtherWaveUp ()
+		public void onInformPlayerOfOtherWaveUp (GameObject sender)
 		{
-				Debug.Log ("Inform "+Player+" of Player0 Wave UP");
+				Debug.Log ("Inform "+Player+" of "+sender.GetComponent<PlayerInputComponent>().Player+" Wave UP");
 
 		}
 
