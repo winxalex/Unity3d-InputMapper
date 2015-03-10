@@ -33,7 +33,7 @@ namespace ws.winx.editor
 				protected static InputManager.InputSettings settings = InputManager.Settings;
 				protected static bool _settingsLoaded = false;
 				protected UnityEngine.Object _lastController;
-				protected UnityEngine.Object _lastSettingsXML;
+				protected UnityEngine.Object _lastSettingsFile;
 				protected static int _selectedStateHash = 0;
 				protected static int _deleteStateWithHash = 0;
 				protected bool _isDeviceAxisPositionFull;
@@ -260,10 +260,10 @@ namespace ws.winx.editor
 						AssetDatabase.ImportAsset (relRoot.MakeRelativeUri (fullPath).ToString (), ImportAssetOptions.ForceUpdate);
 
 				
-						_lastSettingsXML = settingsFile = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri (fullPath).ToString (), typeof(UnityEngine.Object));
+						_lastSettingsFile = settingsFile = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri (fullPath).ToString (), typeof(UnityEngine.Object));
 
-						if (_lastSettingsXML != null)
-								loadInputSettings (_lastSettingsXML);
+						if (_lastSettingsFile != null)
+								loadInputSettings (_lastSettingsFile);
 
 						//_lastSettingsXML = settingsXML = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri(fullPath).ToString(), typeof(TextAsset)) as TextAsset;
 						//Debug.Log ("Loading Text asset"+settingsXML.name+" from "+path+" full path:"+ fullPath+" rell:"+relRoot+"relativePath:"+relRoot.MakeRelativeUri(fullPath).ToString());
@@ -278,6 +278,8 @@ namespace ws.winx.editor
 				/// </summary>
 				void loadInputSettings (UnityEngine.Object asset)
 				{
+
+					
 						
 						if (asset is TextAsset) {
 							
@@ -312,12 +314,17 @@ namespace ws.winx.editor
 								}		
 
 						} else {
+
+				String path=AssetDatabase.GetAssetPath(settingsFile);
+				if(!String.IsNullOrEmpty(path))
+				{
+					_isBinary=Path.GetExtension(path)==".bin";
                           
                             if(_isBinary)
                                 settings = InputManager.loadSettingsFromBin(AssetDatabase.GetAssetPath(settingsFile));
                             else
 						         settings = InputManager.loadSettingsFromXMLText (AssetDatabase.GetAssetPath (settingsFile));
-
+				}
 						}
 
 
@@ -951,10 +958,13 @@ namespace ws.winx.editor
 						settingsFile = EditorGUILayout.ObjectField (settingsFile, typeof(UnityEngine.Object), true);
 
 						//reload if xml changed
-						if (_lastSettingsXML != settingsFile)
+						if (_lastSettingsFile != settingsFile) {
 								_settingsLoaded = false;
 
-						_lastSettingsXML = settingsFile;
+							
+						}
+
+						_lastSettingsFile = settingsFile;
 
 
 						if (_selectedStateHash == 0 && GUILayout.Button ("Open")) {
@@ -991,12 +1001,16 @@ namespace ws.winx.editor
 								}
 
 								if (settingsFile != null) {
-										if (settingsFile is TextAsset) {
+										string path=	AssetDatabase.GetAssetPath(settingsFile);
+
+										if (Path.GetExtension(path)==".xml") {
 												saveInputSettings (Path.Combine (Application.streamingAssetsPath, settingsFile.name + ".xml"));
 										} else {
 												saveInputSettings (Path.Combine (Application.streamingAssetsPath, settingsFile.name + ".bin"));
 										}
 								} else{ 
+										
+
 									    if(_isBinary)
 											saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", Application.streamingAssetsPath, "InputSettings", "bin"));
 										else
@@ -1017,7 +1031,7 @@ namespace ws.winx.editor
 
 						EditorGUILayout.Separator ();
 
-						//loadingSettings 
+						//loadingSettings selected thru ObjectField browser or drag and drop
 						if ((!_settingsLoaded && settingsFile != null)) { 
 								//loadInputSettings (AssetDatabase.GetAssetPath (settingsXML));
 								
