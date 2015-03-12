@@ -332,7 +332,7 @@ namespace ws.winx.input
 			KeyCode.Space
 		};
 				private static float _lastCodeTime;
-				private static volatile InputEx instance;
+				//private static volatile InputEx instance;
 
 
 

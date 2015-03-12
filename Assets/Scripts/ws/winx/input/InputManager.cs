@@ -1433,8 +1433,6 @@ namespace ws.winx.input
             //Use is mapping states so no quering keys during gameplay
             if (!InputManager.isReady()) return false;
 
-            //__settings.Players[InputManager.currentPlayerInx].GetStateInputBasedOnControllerMappedToPlayer
-
             InputCombination[] inputCombinations = __settings.GetInputStatesOfPlayer(playerIndex)[stateNameHash].combinations;
 
             IDevice device = __settings.Players[playerIndex].Device;

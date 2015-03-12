@@ -481,7 +481,7 @@ namespace ws.winx.drivers
 
         #region Fields
 				float _value;
-				int _uid;
+				uint _uid;
 				int _min;
 				int _max;
 				string _name;
