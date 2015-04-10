@@ -41,8 +41,7 @@ namespace ws.winx.editor
 				protected string _warrningAddStateLabel;
 				protected int _isPrimary = 0;
 				protected string _currentInputString;
-
-				protected bool _isBinary=true;
+				protected bool _isBinary = true;
 
 
 				//Players
@@ -130,10 +129,10 @@ namespace ws.winx.editor
 //			InputManager.AddDriver(new ThrustMasterDriver());
 //			#endif
 
-                        //if (!Application.isPlaying) {
-                        //        InputManager.hidInterface.Enumerate ();
-                        //        __wereDevicesEnumerated = true;
-                        //}
+						//if (!Application.isPlaying) {
+						//        InputManager.hidInterface.Enumerate ();
+						//        __wereDevicesEnumerated = true;
+						//}
 			   
 				}
 
@@ -263,7 +262,7 @@ namespace ws.winx.editor
 						_lastSettingsFile = settingsFile = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri (fullPath).ToString (), typeof(UnityEngine.Object));
 
 						if (_lastSettingsFile != null)
-								loadInputSettings (_lastSettingsFile);
+								_settingsLoaded= loadInputSettings (_lastSettingsFile);
 
 						//_lastSettingsXML = settingsXML = AssetDatabase.LoadAssetAtPath (relRoot.MakeRelativeUri(fullPath).ToString(), typeof(TextAsset)) as TextAsset;
 						//Debug.Log ("Loading Text asset"+settingsXML.name+" from "+path+" full path:"+ fullPath+" rell:"+relRoot+"relativePath:"+relRoot.MakeRelativeUri(fullPath).ToString());
@@ -276,7 +275,7 @@ namespace ws.winx.editor
 				/// <summary>
 				/// Loads the input settings 
 				/// </summary>
-				void loadInputSettings (UnityEngine.Object asset)
+				bool loadInputSettings (UnityEngine.Object asset)
 				{
 
 					
@@ -297,7 +296,7 @@ namespace ws.winx.editor
 										#if (UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID) && !UNITY_WEBPLAYER
 											settings=InputManager.loadSettings (new StringReader (text));
 										#else
-											settings = InputManager.loadSettingsFromText (text, false);
+										settings = InputManager.loadSettingsFromText (text, false);
 										#endif
 
 										
@@ -315,16 +314,15 @@ namespace ws.winx.editor
 
 						} else {
 
-				String path=AssetDatabase.GetAssetPath(settingsFile);
-				if(!String.IsNullOrEmpty(path))
-				{
-					_isBinary=Path.GetExtension(path)==".bin";
+								String path = AssetDatabase.GetAssetPath (settingsFile);
+								if (!String.IsNullOrEmpty (path)) {
+										_isBinary = Path.GetExtension (path) == ".bin";
                           
-                            if(_isBinary)
-                                settings = InputManager.loadSettingsFromBin(AssetDatabase.GetAssetPath(settingsFile));
-                            else
-						         settings = InputManager.loadSettingsFromXMLText (AssetDatabase.GetAssetPath (settingsFile));
-				}
+										if (_isBinary)
+												settings = InputManager.loadSettingsFromBin (path);
+										else
+												settings = InputManager.loadSettingsFromXMLText (path);
+								}
 						}
 
 
@@ -342,8 +340,12 @@ namespace ws.winx.editor
 								_playerNumber = settings.Players.Length;
 								_playerIndexSelected = 0;
 
+								return true;
+
 						}
-		    
+
+						
+						return false;
 				}
 		
 
@@ -369,7 +371,7 @@ namespace ws.winx.editor
 
 								loadAsset (path);
 
-								AssetDatabase.Refresh();
+								AssetDatabase.Refresh ();
 						
 						}
 				}
@@ -548,7 +550,7 @@ namespace ws.winx.editor
 
 				
 										for (j=0; j<numStates; j++) {
-                                           if(Animator.StringToHash(stateMachine.states[j].state.name)==key)
+												if (Animator.StringToHash (stateMachine.states [j].state.name) == key)
 												//if (stateMachine.GetState (j).uniqueNameHash == key)
 														return true;
 						
@@ -597,14 +599,13 @@ namespace ws.winx.editor
 						InputState state;
 
 
-                        if (!Application.isPlaying && !__wereDevicesEnumerated)
-                        {
-                            __wereDevicesEnumerated = true;
-                            InputManager.hidInterface.SetProfiles(AssetDatabase.LoadAssetAtPath("Assets/Resources/DeviceProfiles.asset", typeof(DeviceProfiles)) as DeviceProfiles);
+						if (!Application.isPlaying && !__wereDevicesEnumerated) {
+								__wereDevicesEnumerated = true;
+								InputManager.hidInterface.SetProfiles (AssetDatabase.LoadAssetAtPath ("Assets/Resources/DeviceProfiles.asset", typeof(DeviceProfiles)) as DeviceProfiles);
 
-                            InputManager.hidInterface.Enumerate();
+								InputManager.hidInterface.Enumerate ();
 
-                        }
+						}
 
 						if (!Application.isPlaying && _selectedStateHash != 0) {
 
@@ -645,7 +646,7 @@ namespace ws.winx.editor
 
 
 
-																		//Debug.Log ("Action:" + _action + " " + _action.getCode(_deviceByProfile)+" type:"+_action.type);
+										//Debug.Log ("Action:" + _action + " " + _action.getCode(_deviceByProfile)+" type:"+_action.type);
 								}
 
 
@@ -801,17 +802,15 @@ namespace ws.winx.editor
 								if (_playerNumber > 1 && GUILayout.Button ("Clone To All")) {
 
 
-                                    if (EditorUtility.DisplayDialog("Clone to All!",
-                                                "Are you sure to clone selected player overwriting other player's settings?", "Yes", "Cancel"))
-                                    {
-                                        InputPlayer sample = settings.Players[_playerIndexSelected];
+										if (EditorUtility.DisplayDialog ("Clone to All!",
+                                                "Are you sure to clone selected player overwriting other player's settings?", "Yes", "Cancel")) {
+												InputPlayer sample = settings.Players [_playerIndexSelected];
 
-                                        for (i = 0; i < _playerNumber; i++)
-                                        {
-                                            if (i != _playerIndexSelected)
-                                                settings.Players[i] = sample.Clone();
-                                        }
-                                    }
+												for (i = 0; i < _playerNumber; i++) {
+														if (i != _playerIndexSelected)
+																settings.Players [i] = sample.Clone ();
+												}
+										}
 								}
 
 
@@ -829,20 +828,17 @@ namespace ws.winx.editor
 								
 								List<IDevice> devices = InputManager.GetDevices<IDevice> ();
 
-                                if (devices.Count > 0)
-                                {
+								if (devices.Count > 0) {
 
-                                    List<string> pList = devices.Where(item => item.profile != null).Select(item => item.profile.Name).Distinct().ToList();
-                                    pList.Insert(0, "default");
+										List<string> pList = devices.Where (item => item.profile != null).Select (item => item.profile.Name).Distinct ().ToList ();
+										pList.Insert (0, "default");
 
-                                    _profilesDevicesDisplayOptions = pList.ToArray();
+										_profilesDevicesDisplayOptions = pList.ToArray ();
 
-                                }
-                                else
-                                {
-                                    _profileSelectedIndex = 0;
-                                    _profilesDevicesDisplayOptions = new string[] { "default" };
-                                }
+								} else {
+										_profileSelectedIndex = 0;
+										_profilesDevicesDisplayOptions = new string[] { "default" };
+								}
 
 
 				
@@ -861,32 +857,28 @@ namespace ws.winx.editor
 				
 								player = settings.Players [_playerIndexSelected];
 
-								Dictionary<int,InputState> stateInputsCurrent=null;
+								Dictionary<int,InputState> stateInputsCurrent = null;
 
 								//init stateInput Dictionary if player numbers is increased
-                                if (_profilesDevicesDisplayOptions.Length > _profileSelectedIndex)
-                                {
-                                    if (!player.DeviceProfileStateInputs.ContainsKey(_profilesDevicesDisplayOptions[_profileSelectedIndex]))
-                                    {
-                                        player.DeviceProfileStateInputs[_profilesDevicesDisplayOptions[_profileSelectedIndex]] = new Dictionary<int, InputState>();
-                                    }
+								if (_profilesDevicesDisplayOptions.Length > _profileSelectedIndex) {
+										if (!player.DeviceProfileStateInputs.ContainsKey (_profilesDevicesDisplayOptions [_profileSelectedIndex])) {
+												player.DeviceProfileStateInputs [_profilesDevicesDisplayOptions [_profileSelectedIndex]] = new Dictionary<int, InputState> ();
+										}
 
 
-                                    stateInputsCurrent = player.DeviceProfileStateInputs[_profilesDevicesDisplayOptions[_profileSelectedIndex]];
-                                }
-                                else
-                                {
-                                    _profileSelectedIndex = 0;
-                                    stateInputsCurrent = player.DeviceProfileStateInputs["default"];
+										stateInputsCurrent = player.DeviceProfileStateInputs [_profilesDevicesDisplayOptions [_profileSelectedIndex]];
+								} else {
+										_profileSelectedIndex = 0;
+										stateInputsCurrent = player.DeviceProfileStateInputs ["default"];
 
 
-                                }
+								}
 
 
 								if (_profileSelectedIndex > 0) {
 										if (GUILayout.Button ("Clone default")
-                                            &&  EditorUtility.DisplayDialog("Clone Default!",
-                                                "Are you sure to clone Default input settings to "+_profilesDevicesDisplayOptions[_profileSelectedIndex]+" device specific settings?", "Yes", "Cancel")
+												&& EditorUtility.DisplayDialog ("Clone Default!",
+                                                "Are you sure to clone Default input settings to " + _profilesDevicesDisplayOptions [_profileSelectedIndex] + " device specific settings?", "Yes", "Cancel")
                 
                                             ) {
 
@@ -968,19 +960,19 @@ namespace ws.winx.editor
 
 
 						if (_selectedStateHash == 0 && GUILayout.Button ("Open")) {
-							string path; 
+								string path; 
 
-									if(_isBinary)
-									  path=EditorUtility.OpenFilePanel ("Open XML Input Settings file", "", "bin");
-									else
-										path=EditorUtility.OpenFilePanel ("Open XML Input Settings file", "", "xml");
+								if (_isBinary)
+										path = EditorUtility.OpenFilePanel ("Open XML Input Settings file", "", "bin");
+								else
+										path = EditorUtility.OpenFilePanel ("Open XML Input Settings file", "", "xml");
 
 								if (path.Length > 0) {
-										//loadInputSettings (path);
+										
 
 										loadAsset (path);
 				
-										_settingsLoaded = true;
+										
 								}
 
 
@@ -1001,26 +993,26 @@ namespace ws.winx.editor
 								}
 
 								if (settingsFile != null) {
-										string path=	AssetDatabase.GetAssetPath(settingsFile);
+										string path = AssetDatabase.GetAssetPath (settingsFile);
 
-										if (Path.GetExtension(path)==".xml") {
+										if (Path.GetExtension (path) == ".xml") {
 												saveInputSettings (Path.Combine (Application.streamingAssetsPath, settingsFile.name + ".xml"));
 										} else {
 												saveInputSettings (Path.Combine (Application.streamingAssetsPath, settingsFile.name + ".bin"));
 										}
-								} else{ 
+								} else { 
 										
 
-									    if(_isBinary)
-											saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", Application.streamingAssetsPath, "InputSettings", "bin"));
+										if (_isBinary)
+												saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", Application.streamingAssetsPath, "InputSettings", "bin"));
 										else
-											saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", Application.streamingAssetsPath, "InputSettings", "xml"));
-								return;
+												saveInputSettings (EditorUtility.SaveFilePanel ("Save Input Settings", Application.streamingAssetsPath, "InputSettings", "xml"));
+										return;
 								}
 						}
 
-			if(settingsFile==null)
-				_isBinary = GUILayout.Toggle (_isBinary,"Binary");
+						if (settingsFile == null)
+								_isBinary = GUILayout.Toggle (_isBinary, "Binary");
 
 						/////////// RELOAD ////////////////
 						if (GUILayout.Button ("Reload")) { 
@@ -1033,10 +1025,10 @@ namespace ws.winx.editor
 
 						//loadingSettings selected thru ObjectField browser or drag and drop
 						if ((!_settingsLoaded && settingsFile != null)) { 
-								//loadInputSettings (AssetDatabase.GetAssetPath (settingsXML));
 								
-								loadInputSettings (settingsFile);
-								_settingsLoaded = true;
+								
+							_settingsLoaded=loadInputSettings (settingsFile);
+								
 						}
 
 
@@ -1091,7 +1083,7 @@ namespace ws.winx.editor
 				
 												for (j=0; j<numStates; j++) {
 														state = stateMachine.states [j].state;
-                                                        createInputStateGUI(state.name, Animator.StringToHash(state.name));
+														createInputStateGUI (state.name, Animator.StringToHash (state.name));
 														//createInputStateGUI (state.name, state.uniqueNameHash);
 							
 												}
@@ -1331,7 +1323,7 @@ namespace ws.winx.editor
 
 						_selectedStateHash = 0;
 						_deleteStateWithHash = 0;
-                        __wereDevicesEnumerated = false;
+						__wereDevicesEnumerated = false;
 
 						if (!Application.isPlaying) {
 

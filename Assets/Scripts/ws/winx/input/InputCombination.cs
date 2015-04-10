@@ -65,6 +65,10 @@ namespace ws.winx.input
 				
 				}
 
+				/// <summary>
+				/// Number of actions inside combo ( "Space" = 1 action , "Control + 1" = 2 actions..) restricted by maxActionInCombos
+				/// </summary>
+				/// <value>The number actions.</value>
 				public int numActions {
 						get {
 								return _actionsList.Count;
