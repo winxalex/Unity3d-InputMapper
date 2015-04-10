@@ -1101,27 +1101,27 @@ namespace ws.winx.input
 				/// </summary>
 				/// <returns>Integer of the code.</returns>
 				/// <param name="code">Code.</param>
-				public static int toCode (string code)
+				public static int toCode (string codeString)
 				{
 						int inx;
 
 
 						//Button found
-						if ((inx = code.IndexOf ("Bu")) > -1) {
-								return toCode ((Joysticks)Enum.Parse (typeof(Joysticks), code.Substring (0, inx)), JoystickAxis.None, Convert.ToInt32 (code.Substring (inx + 6, code.Length - (inx + 6))));
-						} else if ((inx = code.IndexOf ("Pov")) > -1) {//found POV
-								return toCode ((Joysticks)Enum.Parse (typeof(Joysticks), code.Substring (0, inx - 4)),
-               (JoystickAxis)Enum.Parse (typeof(JoystickAxis), code.Substring (inx - 4, 8)),
-               ((int)(JoystickPovPosition)Enum.Parse (typeof(JoystickPovPosition), code.Substring (inx + 4, code.Length - (inx + 4)))));
-						} else if ((inx = code.IndexOf ("A")) > -1) {//found Axis
-								return toCode ((Joysticks)Enum.Parse (typeof(Joysticks), code.Substring (0, inx)),
-               (JoystickAxis)Enum.Parse (typeof(JoystickAxis), code.Substring (inx, 5)),
-               (inx + 5 == code.Length) ? (int)JoystickPosition.Full :
+						if ((inx = codeString.IndexOf ("Bu")) > -1) {
+								return toCode ((Joysticks)Enum.Parse (typeof(Joysticks), codeString.Substring (0, inx)), JoystickAxis.None, Convert.ToInt32 (codeString.Substring (inx + 6, codeString.Length - (inx + 6))));
+						} else if ((inx = codeString.IndexOf ("Pov")) > -1) {//found POV
+								return toCode ((Joysticks)Enum.Parse (typeof(Joysticks), codeString.Substring (0, inx - 4)),
+               (JoystickAxis)Enum.Parse (typeof(JoystickAxis), codeString.Substring (inx - 4, 8)),
+               ((int)(JoystickPovPosition)Enum.Parse (typeof(JoystickPovPosition), codeString.Substring (inx + 4, codeString.Length - (inx + 4)))));
+						} else if ((inx = codeString.IndexOf ("A")) > -1) {//found Axis
+								return toCode ((Joysticks)Enum.Parse (typeof(Joysticks), codeString.Substring (0, inx)),
+               (JoystickAxis)Enum.Parse (typeof(JoystickAxis), codeString.Substring (inx, 5)),
+               (inx + 5 == codeString.Length) ? (int)JoystickPosition.Full :
                (int)(JoystickPosition)Enum.Parse (typeof(JoystickPosition),
-                                   code.Substring (inx + 5, code.Length - (inx + 5))));
+                                   codeString.Substring (inx + 5, codeString.Length - (inx + 5))));
 						}
 
-						throw new Exception (code + " not recognized as InputCodes Enum");
+						throw new Exception (codeString + " not recognized as InputCodes Enum");
 
 						//return 0;
 				}
@@ -1229,12 +1229,12 @@ namespace ws.winx.input
 
 
 				/// <summary>
-				/// 
+				/// Covenvert profiles string (see example) to int code
 				/// </summary>
-				/// <param name="code"><example>Left Stick XPositive,DPAD_Left,X,A,B</example></param>
+				/// <param name="codeString"><example>Left Stick XPositive,DPAD_Left,X,A,B</example></param>
 				/// <param name="profile"></param>
 				/// <returns></returns>
-				internal static int toCode (string code, DeviceProfile profile)
+				internal static int toCode (string codeString, DeviceProfile profile)
 				{
 
 						int inx;
@@ -1247,12 +1247,12 @@ namespace ws.winx.input
 
 						foreach (var position in positions) {
 
-								if (code.Contains (position.ToString ())) {
-										code = code.Replace (position.ToString (), "");
-										inx = Array.IndexOf (profile.axisNaming, code);
+								if (codeString.Contains (position.ToString ())) {
+										codeString = codeString.Replace (position.ToString (), "");
+										inx = Array.IndexOf (profile.axisNaming, codeString);
 
 										if (inx < 0)
-												Debug.LogError ("Wrong profile naming " + code + " in profile " + profile.Name);
+												Debug.LogError ("Wrong profile naming " + codeString + " in profile " + profile.Name);
 
 										return InputCode.toCode (Joysticks.Joystick, (JoystickAxis)inx, position);
 								}
@@ -1266,9 +1266,9 @@ namespace ws.winx.input
 
 						foreach (var position in povPositions) {
 
-								if (code.Contains (position.ToString ())) {
+								if (codeString.Contains (position.ToString ())) {
 										//check if the pov is represented as buttons or "Left Bumper" or "DPAD_Left" contains Left
-										inx = Array.IndexOf (profile.buttonNaming, code);
+										inx = Array.IndexOf (profile.buttonNaming, codeString);
 
 										if (inx > -1)
 												return InputCode.toCode (Joysticks.Joystick, JoystickAxis.None, inx);
@@ -1284,7 +1284,7 @@ namespace ws.winx.input
 												return InputCode.toCode (Joysticks.Joystick, JoystickAxis.AxisPovX, position);
 
 										if (inx < 0)
-												Debug.LogError ("Wrong profile naming " + code + " in profile " + profile.Name);
+												Debug.LogError ("Wrong profile naming " + codeString + " in profile " + profile.Name);
 
 
 								}
@@ -1295,10 +1295,10 @@ namespace ws.winx.input
 
 
 						//check any other button
-						inx = Array.IndexOf (profile.buttonNaming, code);
+						inx = Array.IndexOf (profile.buttonNaming, codeString);
 
 						if (inx < 0)
-								Debug.LogError ("Wrong profile naming " + code + " in profile " + profile.Name);
+								Debug.LogError ("Wrong profile naming " + codeString + " in profile " + profile.Name);
 
 						return InputCode.toCode (Joysticks.Joystick, JoystickAxis.None, inx);
 
