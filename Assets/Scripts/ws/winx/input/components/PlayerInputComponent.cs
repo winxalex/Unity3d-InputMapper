@@ -6,6 +6,7 @@ using System;
 using UnityEngine.Events;
 using System.Collections.Generic;
 using System.Reflection;
+using ws.winx.unity.attributes;
 
 namespace ws.winx.input.components{
 public class PlayerInputComponent : MonoBehaviour
@@ -14,6 +15,8 @@ public class PlayerInputComponent : MonoBehaviour
 
 
 		public InputPlayer.Player Player;
+
+		[InputEventAttribute(typeof(ws.winx.input.states.States))]
 		public InputEvent[] events;
 		Animator animator;
 		int forwardHash;
@@ -93,9 +96,9 @@ public class PlayerInputComponent : MonoBehaviour
 
 		}
 
-		public void onInformPlayerOfOtherWaveUp ()
+		public void onInformPlayerOfOtherWaveUp (GameObject sender)
 		{
-				Debug.Log ("Inform "+Player+" of Player0 Wave UP");
+				Debug.Log ("Inform "+Player+" of "+sender.GetComponent<PlayerInputComponent>().Player+" Wave UP");
 
 		}
 

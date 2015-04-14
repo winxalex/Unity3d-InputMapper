@@ -14,8 +14,9 @@ using ws.winx.input;
 using ws.winx.input.states;
 using ws.winx.platform;
 using ws.winx.unity;
-using ws.winx.utils;
+using ws.winx.csharp.extensions;
 using ws.winx.input.components;
+using ws.winx.processing;
 
 namespace ws.winx.components
 {

@@ -836,11 +836,12 @@ namespace ws.winx.platform.osx
 		#region CFRange
 		public struct CFRange 
 		{ 
-			public int Location, Length; 
+			public int location; 
+			public int length;
 			public CFRange(int l, int len) 
 			{ 
-				Location = l; 
-				Length = len; 
+				location = l; 
+				length = len; 
 			} 
 		}
 		#endregion

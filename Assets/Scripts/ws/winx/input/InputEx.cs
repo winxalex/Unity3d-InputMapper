@@ -230,7 +230,7 @@ namespace ws.winx.input
 
 				private static readonly object syncRoot = new object ();
 		
-				public event EventHandler<InputExArgs> InputProcessed;
+			//	public event EventHandler<InputExArgs> InputProcessed;
 
 				public static int MAX_NUM_JOYSTICK_BUTTONS = 20;
 				public static int MAX_NUM_MOUSE_BUTTONS = 7;
@@ -245,10 +245,10 @@ namespace ws.winx.input
 				static int _numJoystickButtons = InputEx.MAX_NUM_JOYSTICK_BUTTONS;
 				static int _numMouseButtons = InputEx.MAX_NUM_MOUSE_BUTTONS;
 				static int _code;
-				static int _codeFromGUIEvent;
+			//	static int _codeFromGUIEvent;
 				static int _frameCountEditor;
 				static int _frameCountEditorPrev;
-				static int _frameCountPrev;
+			//	static int _frameCountPrev;
 				static int _lastCode;
 
 				public static int LastCode {
@@ -332,7 +332,7 @@ namespace ws.winx.input
 			KeyCode.Space
 		};
 				private static float _lastCodeTime;
-				private static volatile InputEx instance;
+				//private static volatile InputEx instance;
 
 
 

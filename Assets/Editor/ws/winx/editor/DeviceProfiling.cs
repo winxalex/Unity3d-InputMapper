@@ -33,7 +33,7 @@ namespace ws.winx.editor
 				 static DeviceProfiles _profiles;
 				 int _profileIndexSelected;
 				 string _profileName;
-				 string _axisButtonName;
+				
 				 string _nameGiven;
 				 string _profileNameSelected;
 				 InputAction _actionSelected;

@@ -41,7 +41,7 @@ namespace ws.winx.input
 //		}
 	}
 
-
+		[Serializable]
 		public enum InputActionType
 		{
 		SINGLE=-1,
