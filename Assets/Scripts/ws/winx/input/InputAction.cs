@@ -273,7 +273,7 @@ namespace ws.winx.input
 		{
 			
 			
-			if (_code == 0)
+			if (_code == 0 && !String.Equals(_codeString,"None"))
 				if (device != null && device.profile != null) {//profiled string parsing by Device profile
 					
 					_code = InputCode.toCode (_codeString, device.profile);

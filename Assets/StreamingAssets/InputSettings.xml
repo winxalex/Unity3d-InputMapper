@@ -201,7 +201,13 @@
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
-                  <d1p1:InputCombination i:nil="true" />
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisXNegative</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
                 </d1p1:InputCombinations>
                 <d1p1:Name>TurnLeft</d1p1:Name>
               </d4p1:Value>
@@ -218,7 +224,13 @@
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
-                  <d1p1:InputCombination i:nil="true" />
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisXPositive</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
                 </d1p1:InputCombinations>
                 <d1p1:Name>TurnRight</d1p1:Name>
               </d4p1:Value>
@@ -261,6 +273,23 @@
                   <d1p1:InputCombination i:nil="true" />
                 </d1p1:InputCombinations>
                 <d1p1:Name>Crouch</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-2130178573</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-2130178573</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisX</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>ManualFullAxisMap</d1p1:Name>
               </d4p1:Value>
             </d4p1:KeyValueOfintInputState>
           </d4p1:Value>
@@ -368,6 +397,23 @@
                   <d1p1:InputCombination i:nil="true" />
                 </d1p1:InputCombinations>
                 <d1p1:Name>Jump</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-2130178573</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-2130178573</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisX</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>ManualFullAxisMap</d1p1:Name>
               </d4p1:Value>
             </d4p1:KeyValueOfintInputState>
           </d4p1:Value>
@@ -526,7 +572,7 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>Joystick0AxisRNegative</d1p1:Code>
+                        <d1p1:Code>JoystickAxisRNegative</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
@@ -549,7 +595,7 @@
                   <d1p1:InputCombination>
                     <d1p1:InputActions>
                       <d1p1:InputAction>
-                        <d1p1:Code>Joystick0AxisRPositive</d1p1:Code>
+                        <d1p1:Code>JoystickAxisRPositive</d1p1:Code>
                       </d1p1:InputAction>
                     </d1p1:InputActions>
                   </d1p1:InputCombination>
@@ -624,6 +670,23 @@
                   </d1p1:InputCombination>
                 </d1p1:InputCombinations>
                 <d1p1:Name>Jump</d1p1:Name>
+              </d4p1:Value>
+            </d4p1:KeyValueOfintInputState>
+            <d4p1:KeyValueOfintInputState>
+              <d4p1:Key>-2130178573</d4p1:Key>
+              <d4p1:Value>
+                <d1p1:Hash>-2130178573</d1p1:Hash>
+                <d1p1:InputCombinations>
+                  <d1p1:InputCombination>
+                    <d1p1:InputActions>
+                      <d1p1:InputAction>
+                        <d1p1:Code>JoystickAxisX</d1p1:Code>
+                      </d1p1:InputAction>
+                    </d1p1:InputActions>
+                  </d1p1:InputCombination>
+                  <d1p1:InputCombination i:nil="true" />
+                </d1p1:InputCombinations>
+                <d1p1:Name>ManualFullAxisMap</d1p1:Name>
               </d4p1:Value>
             </d4p1:KeyValueOfintInputState>
           </d4p1:Value>

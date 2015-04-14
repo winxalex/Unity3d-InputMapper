@@ -70,7 +70,7 @@ namespace ws.winx.input.components
 				public InputManager.InputSettings settings;
 				public int maxCombosNum = 3;
 				public GUISkin guiSkin;
-			
+                public bool isComplexActionTypesAllowed;
 				public Rect windowRect = new Rect (0, 0, 600, 430);
 				//public bool allowDuplicates=false;
 
@@ -119,10 +119,15 @@ namespace ws.winx.input.components
 												_stateInputCombinations [_selectedStateHash].combinations [_isPrimary].Add (new InputAction (KeyCode.None));
 										} else {
 
-												//remove ord
-												//_action.getCode(_playerSelected.Device)=InputCode.toCodeAnyDevice (_action.getCode(_playerSelected.Device));
+										
 
-												// _action.codeString = InputCode.toProfiled(_playerSelected.Device, _action);
+                                            if (!isComplexActionTypesAllowed)
+                                                _action.type = InputActionType.SINGLE;
+
+                                            //remove ord
+                                            _action.setCode(InputCode.toCodeAnyDevice(_action.getCode(_playerSelected.Device)), _playerSelected.Device);
+
+                                          
 
 												toInputCombination (_stateInputCombinations [_selectedStateHash].combinations [_isPrimary], _action);
 										}
