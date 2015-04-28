@@ -531,6 +531,7 @@ namespace ws.winx.editor
 						if (controller != null) {
 
 								int numLayers, numStates, i = 0, j = 0;
+
 								UnityEditor.Animations.AnimatorControllerLayer layer;
 								UnityEditor.Animations.AnimatorStateMachine stateMachine;	
 
