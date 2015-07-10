@@ -43,6 +43,7 @@ namespace ws.winx.components
         GameObject wiimote;
         Vector3 Angles;
 		UserInterfaceWindow ui;
+		Animator animator;
 
 
         // Use this for initialization
@@ -52,7 +53,7 @@ namespace ws.winx.components
             wiimote = GameObject.Find("wiimote");
             Angles = new Vector3();
 
-
+			animator = GameObject.FindGameObjectWithTag ("Player").GetComponent<Animator> ();
 
             vSliderValuePrev = vSliderValue = 128f;
 
@@ -299,21 +300,21 @@ namespace ws.winx.components
          
 
             //
-            //						if (InputManager.GetInputHold ((int)States.Wave)) {
-            //							
-            //								Debug.Log ("Wave -Hold");
-            //								// animator.Play((int)States.Wave);
-            //								//	animator.Play (Animator.StringToHash ("Wave"));
-            //						}
-            //					
+//            						if (InputManager.GetInputHold ((int)States.Wave)) {
+//            							
+//            								Debug.Log ("Wave -Hold");
+//            								// animator.Play((int)States.Wave);
+//            								//	animator.Play (Animator.StringToHash ("Wave"));
+//            						}
+            					
             //
             //
-            //						if (InputManager.GetInputDown ((int)States.Wave)) {
-            //           
-            //								Debug.Log ("Wave -Down");
-            //								// animator.Play((int)States.Wave);
-            //								//	animator.Play (Animator.StringToHash ("Wave"));
-            //						}
+            						if (InputManager.GetInputDown ("Wave",InputPlayer.Player.Player0)) {
+                       
+            								Debug.Log ("Wave -Down");
+            								 animator.Play((int)States.Wave);
+            								//	animator.Play (Animator.StringToHash ("Wave"));
+            						}
             //
             //						if (InputManager.GetInputUp ((int)States.Wave)) {
             //							
