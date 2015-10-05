@@ -300,7 +300,8 @@ namespace ws.winx.platform.osx
 		}
 
 		[DllImport(coreFoundationLibrary)]
-		public static  extern int CFStringGetLength(IntPtr handle);
+		public static  extern long CFStringGetLength(IntPtr handle);
+		//public static  extern int CFStringGetLength(IntPtr handle);
 		
 		[DllImport(coreFoundationLibrary)]
 		public static  extern IntPtr CFStringGetCharactersPtr(IntPtr handle);
@@ -836,14 +837,26 @@ namespace ws.winx.platform.osx
 		#region CFRange
 		public struct CFRange 
 		{ 
-			public int location; 
-			public int length;
-			public CFRange(int l, int len) 
+			public long location; 
+			public long length;
+			public CFRange(long l, long len) 
 			{ 
 				location = l; 
 				length = len; 
 			} 
 		}
+
+
+//		public struct CFRange 
+//		{ 
+//			public int location; 
+//			public int length;
+//			public CFRange(int l, int len) 
+//			{ 
+//				location = l; 
+//				length = len; 
+//			} 
+//		}
 		#endregion
 
 
@@ -1076,19 +1089,28 @@ namespace ws.winx.platform.osx
 					return null;
 				
 				string str;
-				int length = CFStringGetLength(typeRef);        
+				//int length = CFStringGetLength(typeRef);  
+				long length = CFStringGetLength(typeRef);
+
+				if(length>Int32.MaxValue){
+						return String.Empty;
+					}
+
+
 				IntPtr u = CFStringGetCharactersPtr(typeRef);
 				IntPtr buffer = IntPtr.Zero;
 				if (u == IntPtr.Zero)
 				{
-					CFRange range = new CFRange(0, length);
-					buffer = Marshal.AllocCoTaskMem(length * 2);
+					CFRange range = new CFRange(0L, length);
+					//buffer = Marshal.AllocCoTaskMem(length * 2);
+					buffer = Marshal.AllocCoTaskMem((int)length * 2);
 					CFStringGetCharacters(typeRef, range, buffer);
 					u = buffer;
 				}
 				unsafe
 				{
-					str = new string((char*)u, 0, length);
+					//str = new string((char*)u, 0, length);
+					str = new string((char*)u, 0, (int)length);
 				}
 				if (buffer != IntPtr.Zero)
 					Marshal.FreeCoTaskMem(buffer);
